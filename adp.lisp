@@ -3,8 +3,7 @@
 
 
 (cl:defparameter *add-documentation* nil)
-
-(cl:defparameter *style* #:markdown)
+(cl:defparameter *current-style* nil)
 
 
 (cl:defmacro defdefiner (name)
@@ -34,36 +33,65 @@
 (defdefiner defvar)
 (defdefiner defun)
 (defdefiner defmacro)
+(defdefiner define-compiler-macro)
 (defdefiner defstruct)
+(defdefiner defclass)
+(defdefiner defpackage)
 
 
-(macrolet ((def-write-documentation-in-file-definer ()
+(macrolet ((def-add-documentation-in-file-definer ()
 	     (let ((doc-global-proc (gensym "GLOBAL-PROC")))
 	       `(progn
 		  (defparameter ,doc-global-proc nil)
-		  (defmacro def-write-documentation-in-file-writer ((file-path) &body body)
+		  (defmacro def-add-documentation-in-file-writer ((file-path) &body body)
 		    (unless (symbolp file-path)
 		      (error "The argument must be a symbol. Found: ~s" file-path))
 		    `(setq ,',doc-global-proc (lambda (,file-path)
 						,@body)))
-		  (defun write-documentation-in-file (file-path)
+		  (defun add-documentation-in-file-impl (file-path)
+		    (unless (eq :relative (car (pathname-directory (pathname file-path))))
+		      (error "The pathname ~s is not a relative path." file-path))
+		    (unless (pathname-name (pathname file-path))
+		      (error "The pathname ~s does not designate any file." file-path))
 		    (when ,doc-global-proc
-		      (apply ,doc-global-proc file-path)))))))
-  (def-documentation-in-file-definer))
+		      (apply ,doc-global-proc file-path)))
+		  (defmacro add-documentation-in-file (file-path)
+		    (when *add-documentation*
+		      `(add-documentation-in-file ,file-path)))))))
+  (def-add-documentation-in-file-definer))
 
 
-(macrolet ((def-load-with-documentation-definer ()
+(cl:defun style-file (style)
+  (let* ((style-name (string style))
+	 (style-file (asdf:system-relative-pathname #:apd (concatenate 'string "/styles/" style-name ".lisp"))))
+    (truename style-file)))
+
+
+(cl:defun load-style (style)
+  (load (style-file style))
+  (setf *current-style* style))
+
+
+(macrolet ((def-add-documentation-please-definer ()
 	     (let ((doc-global-proc (gensym "GLOBAL-PROC")))
 	       `(progn
 		  (defparameter ,doc-global-proc nil)
-		  (defmacro def-load-with-documentation-writer (args &body body)
-		    `(setq ,',doc-global-proc (lambda ,args
-					      ,@body)))
-		  (defun load-with-documentation (system &rest args &key (style #:markdown) &allow-other-keys)
-		    (let* ((style-name (string style))
-			   (style-file (asdf:system-relative-pathname #:apd (concatenate 'string "/styles/" style-name ".lisp"))))
-		      (load style-file))
-		    (asdf:load-system system :force t)
-		    (apply ,doc-global-proc args))))))
-  (def-load-with-documentation-definer))
+		  (defmacro def-add-documentation-please-writer ((root-dir) &body body)
+		    (unless (symbolp root-dir)
+		      (error "Expected a symbol. Found: ~s" root-dir))
+		    `(setq ,',doc-global-proc (lambda (,root-dir)
+						,@body)))
+		  (defun add-documentation-please (system root-dir)
+		    (unless (eq :absolute (car (pathname-directory root-dir)))
+		      (error "The pathname ~s is not absolute." root-dir))
+		    (unless (uiop:directory-exists-p root-dir)
+		      (error "The directory ~s does no exist." root-dir))
+		    (when (not *current-style*)
+		      (load-style :markdown))
+		    (let ((*add-documentation* t))
+		      (asdf:load-system system :force t))
+		    (funcall ,doc-global-proc root-dir))))))
+  (def-add-documentation-please-definer))
+
+
 
