@@ -6,6 +6,51 @@
 (cl:defparameter *current-style* nil)
 
 
+;; ----- guide functions ----- ;; ARREGLAR TODO ESTO 
+
+(cl:defmacro def-guide-definer (name user-args priv-args &body body)
+  (let ((doc-global-proc (gensym "GLOBAL-PROC"))
+	(writer-name (intern (concatenate 'string "DEF-" (symbol-name name) "-WRITER")))
+	(body-arg (gensym "BODY"))
+	(arg-sym (gensym "ARG"))
+	(impl-name (gensym "IMPL"))
+	(impl-args (gensym "IMPL-ARGS"))
+	(whole-arg (gensym "WHOLE-ARG")))
+    `(progn
+       (defparameter ,doc-global-proc nil)
+       (defmacro ,writer-name (,priv-args &body ,body-arg)
+	 `(setq ,',doc-global-proc (lambda ,',priv-args
+				     ,@,body-arg)))
+       (defun ,impl-name ,user-args
+	 (when ,doc-global-proc
+	   (multiple-value-call ,doc-global-proc (progn ,@body))))
+       (defmacro name (&whole ,whole-arg ,@user-args)
+	 (when *add-documentation*
+	   `(,impl-name ,@(cdr ,whole-arg)))))))
+
+(def-guide-definer header (str) (str)
+  (unless (stringp str)
+    (error "Expected a string. Found: ~s" header))
+  str)
+
+(def-guide-definer subheader (str) (str)
+  (unless (stringp str)
+    (error "Expected a string. Found: ~s" header))
+  str)
+
+(def-guide-definer code-block (code) (code)
+  code)
+
+(def-guide-definer example (code) (code output result)
+  (macrolet ((eval-code ()
+	       code))
+    (let ((output (with-output-to-string (*standard-output*)
+		    (let ((result (eval-code)))
+		      (values code output result))))))))
+
+
+;; ----- api functions -----
+
 (cl:defmacro defdefiner (name)
   (let* ((definer-body (gensym "DEFINER-BODY"))
 	 (doc-function-global-proc (gensym "DOC-FUNCTION-NAME-PROC"))
@@ -41,6 +86,8 @@
 (defdefiner defpackage)
 
 
+;; ----- writer functions -----
+
 (macrolet ((def-add-documentation-in-file-definer ()
 	     (let ((doc-global-proc (gensym "GLOBAL-PROC")))
 	       `(progn
@@ -59,7 +106,7 @@
 		      (apply ,doc-global-proc file-path)))
 		  (defmacro add-documentation-in-file (file-path)
 		    (when *add-documentation*
-		      `(add-documentation-in-file ,file-path)))))))
+		      `(add-documentation-in-file-impl ,file-path)))))))
   (def-add-documentation-in-file-definer))
 
 

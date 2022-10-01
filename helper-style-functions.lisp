@@ -498,6 +498,103 @@
   documentation metaclass)
 
 
+;; ----- defgeneric components -----
+
+(defun defgeneric-function-name (defgeneric-body)
+  (car defgeneric-body))
+
+(defun defgeneric-gf-lambda-list (defgeneric-body)
+  (cadr defgeneric-body))
+
+(defun defgeneric-options (defgeneric-body)
+  (remove-if (lambda (x)
+	       (eq (car x) :method))
+	     (cddr defgeneric-body)))
+
+(defun defgeneric-argument-precedence-order (defgeneric-body)
+  (let ((options (defgeneric-options defgeneric-body)))
+    (and options
+	 (cdr (member :argument-precedence-order :key #'car)))))
+
+(defun defgeneric-gf-declarations (defgeneric-body)
+  (let ((options (defgeneric-options defgeneric-body)))
+    (and options
+	 (cdr (member 'cl:declare :key #'car)))))
+
+(defun defgeneric-documentation (defgeneric-body)
+  (let ((options (defgeneric-options defgeneric-body)))
+    (and options
+	 (cadr (member :documentation :key #'car)))))
+
+(defun defgeneric-method-combination (defgeneric-body)
+  (let ((options (defgeneric-options defgeneric-body)))
+    (and options
+	 (cdr (member :method-combination :key #'car)))))
+
+(defun defgeneric-generic-function-class (defgeneric-body)
+  (let ((options (defgeneric-options defgeneric-body)))
+    (and options
+	 (cadr (member :generic-function-class :key #'car)))))
+
+(defun defgeneric-method-class (defgeneric-body)
+  (let ((options (defgeneric-options defgeneric-body)))
+    (and options
+	 (cadr (member :method-class :key #'car)))))
+
+(defun defgeneric-method-descriptions (defgeneric-body)
+  (remove-if-not (lambda (x)
+		   (eq (car x) :method))
+		 (cddr defgeneric-body)))
+
+(def-with-components function-name gf-lambda-list options argument-precedence-order gf-declarations
+  documentation method-combination generic-function-class method-class method-descriptions)
+
+
+;; ----- defmethod components -----
+
+(defun defmethod-function-name (defmethod-body)
+  (car defmethod-body))
+
+(defun defmethod-method-qualifiers (defmethod-body)
+  (loop for qualifier in (cdr defmethod-body)
+	while (not (listp qualifier))
+	collect qualifier))
+
+(defun defmethod-specialized-lambda-list (defmethod-body)
+  (loop for possible-lambda-list in (cdr defmethod-body)
+	when (listp possible-lambda-list)
+	  return possible-lambda-list))
+
+(defun defmethod-declarations (defmethod-body)
+  (loop for rest-defmethod-body on (cdr defmethod-body)
+	when (listp (car rest-defmathod-body))
+	  return (loop for possible-declaration in (cdr rest-defmethod-body)
+		       while (or (declarationp possible-declaration)
+				 (documentationp possible-declaration))
+		       if (declarationp possible-declaration)
+			 collect possible-declaration)))
+
+(defun defmethod-documentation (defmethod-body)
+  (loop for rest-defmethod-body on (cdr defmethod-body)
+	when (listp (car rest-defmathod-body))
+	  return (loop for possible-documentation in (cdr rest-defmethod-body)
+		       while (or (declarationp possible-documentation)
+				 (documentationp possible-documentation))
+		       if (documentationp possible-documentation)
+			 return possible-documentation)))
+
+(defun defmethod-forms (defmethod-body)
+  (loop for rest-defmethod-body on (cdr defmethod-body)
+	when (listp (car rest-defmathod-body))
+	  return (loop for rest-possible-forms on (cdr rest-defmethod-body)
+		       while (or (declarationp (car rest-possible-forms))
+				 (documentationp (car rest-possible-forms)))
+		       finally return rest-possible-forms)))
+
+(def-with-components defmethod function-name method-qualifiers specialized-lambda-list declarations
+  documentation forms)
+
+
 ;; ----- defpackage components -----
 
 (defun defpackage-options (defpackage-body)
