@@ -36,6 +36,8 @@
 (defdefiner define-compiler-macro)
 (defdefiner defstruct)
 (defdefiner defclass)
+(defdefiner defgeneric)
+(defdefiner defmethod)
 (defdefiner defpackage)
 
 

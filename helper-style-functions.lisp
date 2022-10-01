@@ -383,6 +383,121 @@
   documentation)
 
 
+;; ----- defclass components -----
+
+(defun defclass-class-name (defclass-body)
+  (car defclass-body))
+
+(defun defclass-superclass-names (defclass-body)
+  (cadr defclass-body))
+
+(defun defclass-slot-specifiers (defclass-body)
+  (caddr defclass-body))
+
+(defun defclass-slot-names (defclass-body)
+  (let ((slot-specifiers (defclass-slot-specifiers defclass-body)))
+    (and slot-specifiers
+	 (loop for slot-specifier in slot-specifiers
+	       collect (if (listp slot-specifier)
+			   (car slot-specifier)
+			   slot-specifier)))))
+
+(defun defclass-slot-options (defclass-body)
+  (let ((slot-specifiers (defclass-slot-specifiers defclass-body)))
+    (and slot-specifiers
+	 (loop for slot-specifier in slot-specifiers
+	       collect (if (listp slot-specifier)
+			   (cdr slot-specifier)
+			   nil)))))
+
+(defun defclass-reader-function-names (defclass-body)
+  (let ((slot-options (defclass-slot-options defclass-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (loop for rest-slot-option on slot-option by #'cddr
+				  if (eq (car rest-slot-option) :reader)
+				    collect (cadr rest-slot-option)))))))
+
+(defun defclass-writer-function-names (defclass-body)
+  (let ((slot-options (defclass-slot-options defclass-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (loop for rest-slot-option on slot-option by #'cddr
+				  if (eq (car rest-slot-option) :writer)
+				    collect (cadr rest-slot-option)))))))
+
+(defun defclass-accessor-function-names (defclass-body)
+  (let ((slot-options (defclass-slot-options defclass-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (loop for rest-slot-option on slot-option by #'cddr
+				  if (eq (car rest-slot-option) :accessor)
+				    collect (cadr rest-slot-option)))))))
+
+(defun defclass-allocation-types (defclass-body)
+  (let ((slot-options (defclass-slot-options defclass-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (cadr (member :allocation slot-option)))))))
+
+(defun defclass-initarg-names (defclass-body)
+  (let ((slot-options (defclass-slot-options defclass-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (loop for rest-slot-option on slot-option by #'cddr
+				  if (eq (car rest-slot-option) :initarg)
+				    collect (cadr rest-slot-option)))))))
+
+(defun defclass-initforms (defclass-body)
+  (let ((slot-options (defclass-slot-options defclass-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (cadr (member :initform slot-option)))))))
+
+(defun defclass-type-specifiers (defclass-body)
+  (let ((slot-options (defclass-slot-options defclass-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (cadr (member :type slot-option)))))))
+
+(defun defclass-slot-documentations (defclass-body)
+  (let ((slot-options (defclass-slot-options defclass-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (cadr (member :documentation slot-option)))))))
+
+(defun defclass-class-options (defclass-body)
+  (cdddr defclass-body))
+
+(defun defclass-default-initargs (defclass-body)
+  (let ((class-options (defclass-class-options defclass-body)))
+    (and class-options
+	 (cdr (member :default-initargs class-options :key #'car)))))
+
+(defun defclass-documentation (defclass-body)
+  (let ((class-options (defclass-class-options defclass-body)))
+    (and class-options
+	 (cadr (member :documentation class-options :key #'car)))))
+
+(defun defclass-metaclass (defclass-body)
+  (let ((class-options (defclass-class-options defclass-body)))
+    (and class-options
+	 (cadr (member :metaclass class-options :key #'car)))))
+
+(def-with-components defclass class-name superclass-names slot-specifiers slot-names slot-options
+  reader-function-names writer-function-names accessor-function-names allocation-types
+  initarg-names initforms type-specifiers slot-documentations class-options default-initargs
+  documentation metaclass)
+
+
 ;; ----- defpackage components -----
 
 (defun defpackage-options (defpackage-body)
@@ -390,6 +505,12 @@
 
 (defun defpackage-defined-package-name (defpackage-body)
   (car defpackage-body))
+
+(defun defpackage-nicknames (defpackage-body)
+  (let ((options (defpackage-options defpackage-body)))
+    (mapcan #'cdr (remove-if-not (lambda (x)
+				   (eq (car x) :nicknames))
+				 options))))
 
 (defun defpackage-use-package-names (defpackage-body)
   (let ((options (defpackage-options defpackage-body)))
@@ -425,4 +546,24 @@
   (let ((options (defpackage-options defpackage-body)))
     (mapcan #'cddr (remove-if-not (lambda (x)
 				   (eq (car x) :import-from))
+				  options))))
+
+(defun defpackage-export-symbol-names (defpackage-body)
+  (let ((options (defpackage-options defpackage-body)))
+    (mapcan #'cdr (remove-if-not (lambda (x)
+				   (eq (car x) :export))
 				 options))))
+
+(defun defpackage-import-symbol-names (defpackage-body)
+  (let ((options (defpackage-options defpackage-body)))
+    (mapcan #'cdr (remove-if-not (lambda (x)
+				   (eq (car x) :export))
+				 options))))
+
+(defun defpackage-size (defpackage-body)
+  (let ((options (defpackage-options defpackage-body)))
+    (cadar (member :size options :key #'car))))
+
+(def-with-components defpackage options defined-package-name nicknames use-package-names shadow-symbol-names
+  shadowing-import-from-package-names shadowing-import-from-symbol-names import-from-package-names
+  import-from-symbol-names export-symbol-names import-symbol-names size)
