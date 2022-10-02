@@ -1,5 +1,5 @@
 
 
 (defpackage #:adp
-  (:use #:cl)
+  (:use #:cl #:alexandria)
   (:shadow #:defconstant))
