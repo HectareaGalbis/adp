@@ -15,10 +15,9 @@
 		 (princ arg str)
 		 (prin1 arg str)))))
 
-(cl:defmacro def-customizable-writer (name num-writer-args user-args &body body)
-  (let ((writer-name (intern (concatenate 'string "DEF-" (symbol-name name) "-WRITER")))
-	(writer-args (loop repeat num-writer-args do (gensym "WRITER-ARG"))))
-    (with-gensyms (doc-global-proc body-arg priv-writer-args priv-writer-arg impl-name)
+(cl:defmacro def-customizable-writer (writer-name impl-name num-writer-args &body body)
+  (let ((writer-args (loop repeat num-writer-args do (gensym "WRITER-ARG"))))
+    (with-gensyms (doc-global-proc body-arg priv-writer-args priv-writer-arg)
       `(progn
 	 (defparameter ,doc-global-proc nil)
 	 (defmacro ,writer-name (,writer-args &body ,body-arg)
@@ -27,107 +26,233 @@
 		   do (assert (symbolp ,priv-writer-arg)))
 	     `(setq ,',doc-global-proc (lambda ,,priv-writer-args
 					 ,@,body-arg))))
-	 (defun ,impl-name ,writer-args
-	   (when ,doc-global-proc
-	     (apply ,doc-global-proc ,@writer-args)))
-	 (defmacro ,name ,user-args
-	   (when *add-documentation*
-	     ,@body))))))
+	 (macrolet ((,impl-name ,writer-args
+		      `(when ,',doc-global-proc
+			 (apply ,',doc-global-proc ,@',writer-args))))
+	   ,@body)))))
 
 
-(def-customizable-writer header 1 (str &optional label)
-  (once-only (str label)
-    `(progn
-       (assert (stringp ,str) (,str) "~s is not a string." ,str)
-       (assert (or (not label) (symbolp ,label)) (,label) "~s is not a symbol" ,label)
-       (header-impl ,str ,label))))
+(with-customizable-writer def-header-writer header-impl 2
+  (defmacro header (str &optional label)
+    (when *add-documentation*
+      (once-only (str label)
+	`(progn
+	   (assert (stringp ,str) (,str) "~s is not a string." ,str)
+	   (assert (or (not label) (symbolp ,label)) (,label) "~s is not a symbol" ,label)
+	   (header-impl ,str ,label))))))
 
-(def-customizable-writer subheader 1 (str &optional label)
-  (once-only (str label)
-    `(progn
-       (assert (stringp ,str) (,str) "~s is not a string." ,str)
-       (assert (or (not label) (symbolp ,label)) (,label) "~s is not a symbol" ,label)
-       (subheader-impl ,str ,label))))
+(with-customizable-writer def-subheader-writer subheader-impl 2 
+  (defmacro subheader (str &optional label)
+    (when *add-documentation*
+      (once-only (str label)
+	`(progn
+	   (assert (stringp ,str) (,str) "~s is not a string." ,str)
+	   (assert (or (not label) (symbolp ,label)) (,label) "~s is not a symbol" ,label)
+	   (subheader-impl ,str ,label))))))
 
-(def-customizable-writer subsubheader 1 (str label)
-  (once-only (str label)
-    `(progn
-       (assert (stringp ,str) (,str) "~s is not a string." ,str)
-       (assert (or (not label) (symbolp ,label)) (,label) "~s is not a symbol" ,label)
-       (subsubheader-impl ,str ,label))))
+(with-customizable-writer def-subsubheader-writer subsubheader-impl 2
+  (defmacro subsubheader (str &optional label)
+    (when *add-documentation*
+      (once-only (str label)
+	`(progn
+	   (assert (stringp ,str) (,str) "~s is not a string." ,str)
+	   (assert (or (not label) (symbolp ,label)) (,label) "~s is not a symbol" ,label)
+	   (subsubheader-impl ,str ,label))))))
 
-(def-customizable-writer text 1 (&rest objects)
-  `(text-impl (slice-format ,@objects)))
+(with-customizable-writer def-text-writer text-impl 1
+  (defmacro text (&rest objects)
+    (when *add-documentation*
+      `(text-impl (slice-format ,@objects)))))
 
-(def-customizable-writer table 1 (&rest rows)
-  (loop for row in rows
-	do (assert (listp row) () "Each element must be a list representing a row."))
-  `(table-impl (list ,(loop for row in rows
-			    collect `(list ,(loop for elem in row
-						  if (listp elem)
-						    collect `(slice-format ,@elem)
-						  else
-						    collect `(slice-format ,elem)))))))
+(with-customizable-writer def-table-writer table-impl 1 
+  (defmacro table (&rest rows)
+    (when *add-documentation*
+      (loop for row in rows
+	    do (assert (listp row) () "Each element must be a list representing a row."))
+      `(table-impl (list ,(loop for row in rows
+				collect `(list ,(loop for elem in row
+						      if (listp elem)
+							collect `(slice-format ,@elem)
+						      else
+							collect `(slice-format ,elem)))))))))
 
-(def-customizable-writer itemize (&rest items)
-  (labels ((process-items (item-list)
-	     (loop for item in item-list
-		   do (assert (and (listp item)
-				   (or (eq (car item) :item)
-				       (eq (car item) :itemize)))
-			      () "Each item must be a list starting with :item or :itemize.")
-		   if (eq (car item) :itemize)
-		     collect (process-items item) into final-item-list
-		   else
-		     collect `(slice-format ,@item) into final-item-list
-		   finally return `(list ,@final-item-list))))
-    `(itemize-impl ,(process-items items))))
+(with-customizable-writer def-itemize-writer itemize-impl 1
+  (defmacro itemize (&rest items)
+    (when *add-documentation*
+      (labels ((process-items (item-list)
+		 (loop for item in item-list
+		       do (assert (and (listp item)
+				       (or (eq (car item) :item)
+					   (eq (car item) :itemize)))
+				  () "Each item must be a list starting with :item or :itemize.")
+		       if (eq (car item) :itemize)
+			 collect (process-items item) into final-item-list
+		       else
+			 collect `(slice-format ,@item) into final-item-list
+		       finally return `(list :itemize ,@final-item-list))))
+	`(itemize-impl ,(process-items items))))))
 
-(def-customizable-writer code-block 1 (&rest code)
-  `(code-block-impl ',code))
 
-(def-customizable-writer example 1 (&rest code)
-  (with-gensyms (expr output result expressions)
-    (let ((evaluated-code (loop for expr in code
-				collect `(let* ((,output (make-array 10 :adjustable t :fill-pointer 0 :element-type 'character))
-						(,result (with-output-to-string (*standard-output* ,output)
-							   ,expr)))
-					   (list ',expr ,output ,result)))))
-      `(example-impl (list ,@evaluated-code)))))
+(defparameter *code-tags* (make-hash-table))
 
-(def-customizable-writer image 1 (path)
-  (once-only (path)
-    `(progn
-       (assert (pathnamep (pathname path)) (,path) "~s is not a pathname designator" path)
-       (image-impl (pathname ,path)))))
+(defun add-code-tag (tag &rest code-list)
+  (when (not (get-hash tag *code-tags*))
+      (setf (get-hash tag *code-tags*) (make-array 10 :adjustable t :fill-pointer 0)))
+  (loop for code in code-list
+	do (vector-push-extend code (get-hash tag *code-tags*))))
 
-(def-customizable-writer bold 1 (&rest args)
-  `(bold-impl (slice-format ,@args)))
+(defun code-tagp (tag)
+  (get-hash tag *code-tags*))
 
-(def-customizable-writer italic 1 (&rest args)
-  `(italic-impl (slice-format ,@args)))
+(defun get-code-tag (tag)
+  (get-hash tag *code-tags*))
 
-(def-customizable-writer web-link 2 (name link)
-  (once-only (name link)
-    `(progn
-       (assert (stringp ,name) (,name) "~s is not a string" ,name)
-       (assert (stringp ,link) (,link) "~s is not a string" ,link)
-       (web-link-impl ,name ,link))))
+(defparameter *hide-symbol* '#:hide)
 
-(def-customizable-writer label-ref 1 (label)
-  (once-only (label)
-    `(progn
-       (assert (symbolp ,label) (,label) "~s is not a symbol" ,label)
-       (label-ref-impl ,label))))
+(defun code-hidep (code)
+  (eq code *hide-symbol*))
+
+(defun plistp (code)
+  (or (null code)
+      (and (consp code)
+	   (plistp (cdr code)))))
+
+(defun remove-code-tag-exprs (code)
+  (if (plistp code)
+      (cond
+	((member (car code) '(code-tag code-focus))
+	 (mapcan #'remove-code-tag-exprs (cddr code)))
+	(t
+	 (list (mapcan #'remove-code-tag-exprs code))))
+      (list code)))
+
+(defun process-code-tag (tag code)
+  (labels ((process-aux (tag code)
+	     (if (plistp code)
+		 (if (member (car code) '(code-tag code-focus))
+		     (if (and (eq (car code) 'code-focus)
+			      (member tag (cadr code)))
+			 (list (remove-code-tag-exprs code) t)
+			 (loop for expr in (cddr code)
+			       for (processed-expr expr-focus-found) = (process-aux tag expr)
+			       for focus-found = (or expr-focus-found focus-found)
+			       count (not expr-focus-found) into hide-count
+			       if expr-focus-found
+				 do (setf hide-count 0)
+			       if (<= hide-count 1)
+				 append processed-expr into processed-code
+			       finally (return (list processed-code focus-found))))
+		     (let* ((car-processed-values (process-aux tag (car code)))
+			    (car-processed (car car-processed-values))
+			    (car-focus-found (cadr car-processed-values)))
+		       (loop for expr in (cdr code)
+			     for (processed-expr expr-focus-found) = (process-aux tag expr)
+			     for focus-found = (or expr-focus-found car-focus-found) then (or expr-focus-found focus-found)
+			     count (not expr-focus-found) into hide-count
+			     if expr-focus-found
+			       do (setf hide-count 0)
+			     if (<= hide-count 1)
+			       append processed-expr into processed-code
+			     finally (return (if focus-found
+						 (if car-focus-found
+						     (list (list (append car-processed processed-code)) t)
+						     (list (list (append (remove-code-tag-exprs (car code)) processed-code)) t))
+						 (list (list *hide-symbol*) nil))))))
+		 (list (list *hide-symbol*) nil))))
+    (destructuring-bind (processed-code focus-found) (process-aux tag code)
+      (if focus-found
+	  processed-code
+	  (remove-code-tag-exprs code)))))
 
 (cl:defamcro code-focus (tags &rest code)
   `(progn ,@code))
 
-(def-customizable-writer code-tag 2 (tags &rest code)
-  (assert (or (symbolp tags) (listp tags)) (tags) "~s is not a symbol or a list" tags)
-  (when (listp tags)
-    (assert (every (mapcar #'symbolp tags)) (tags) "Thare is a non-symbol in ~s" tags))
-  `(code-tag-impl ',tags ',code))
+(with-customizable-writer def-code-tag-writer code-tag.impl 2
+  (defmacro code-tag (tags &rest code)
+    `(progn
+       ,@code
+       ,(when *add-documentation*
+	  (assert (or (symbolp tags) (listp tags)) (tags) "~s is not a symbol or a list" tags)
+	  (when (listp tags)
+	    (assert (every (mapcar #'symbolp tags)) (tags) "Thare is a non-symbol in ~s" tags))
+	  (labels ((remove-code-tags (code)
+		     (cond
+		       ((null code) nil)
+		       ((eq (car code) 'code-tag) (remove-code-tags (cddr code)))
+		       ((consp code) (cons (remove-code-tags (car code)) (remove-code-tags (cdr code))))
+		       (t code))))
+	    `(code-tag-impl ',tags ',(remove-code-tags code)))))))
+
+(with-customizable-writer def-code-block-writer code-block-impl 1
+  (defmacro code-block (tags &rest code)
+    `(code-block-impl ',code)))
+
+(with-customizable-writer def-example-writer example-impl 1 
+  (defmacro example (&rest code)
+    (when *add-documentation*
+      (with-gensyms (expr output result expressions)
+	(let ((evaluated-code (loop for expr in code
+				    collect `(let* ((,output (make-array 10 :adjustable t :fill-pointer 0 :element-type 'character))
+						    (,result (with-output-to-string (*standard-output* ,output)
+							       ,expr)))
+					       (list ',expr ,output ,result)))))
+	  `(example-impl (list ,@evaluated-code)))))))
+
+(with-customizable-writer def-image-writer image-impl 1
+  (defmacro image (path)
+    (when *add-documentation*
+      (once-only (path)
+	`(progn
+	   (assert (pathnamep (pathname path)) (,path) "~s is not a pathname designator" path)
+	   (image-impl (pathname ,path)))))))
+
+(with-customizable-writer def-bold-writer bold-impl 1 
+  (defmacro bold (&rest args)
+    (when *add-documentation*
+      `(bold-impl (slice-format ,@args)))))
+
+(with-customizable-writer def-italic-writer 1
+  (defmacro italic (&rest args)
+    (when *add-documentation*
+      `(italic-impl (slice-format ,@args)))))
+
+(with-customizable-writer def-code-inline-writer code-inline-impl 1 
+  (defmacro code-inline (code)
+    (when *add-documentation*
+      `(code-inline-impl ,code))))
+
+(with-customizable-writer def-web-link-writer web-link-impl 2 
+  (defmacro web-link (name link)
+    (when *add-documentation*
+      (once-only (name link)
+	`(progn
+	   (assert (stringp ,name) (,name) "~s is not a string" ,name)
+	   (assert (stringp ,link) (,link) "~s is not a string" ,link)
+	   (web-link-impl ,name ,link))))))
+
+(with-customizable-writer def-symbol-ref-writer symbol-ref-impl 1
+  (defmacro symbol-ref (label)
+    (when *add-documentation*
+      (once-only (label)
+	`(progn
+	   (assert (symbolp ,label) (,label) "~s is not a symbol" ,label)
+	   (symbol-ref-impl ,label))))))
+
+(with-customizable-writer def-function-ref-writer function-ref-impl 1
+  (defmacro function-ref (label)
+    (when *add-documentation*
+      (once-only (label)
+	`(progn
+	   (assert (symbolp ,label) (,label) "~s is not a symbol" ,label)
+	   (function-ref-impl ,label))))))
+
+(with-customizable-writer def-header-ref-writer header-ref-impl 1
+  (defmacro header-ref (label)
+    (when *add-documentation*
+      (once-only (label)
+	`(progn
+	   (assert (symbolp ,label) (,label) "~s is not a symbol" ,label)
+	   (header-ref-impl ,label))))))
 
 
 ;; ----- api functions -----
