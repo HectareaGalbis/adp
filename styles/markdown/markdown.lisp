@@ -73,12 +73,22 @@
 	(vector-push-extend str *file-documentation*))))
 
 
-(def-code-tag-writer (tags code-list)
-    (loop for tag in tags
-	  if (get-hash tag *code-tags*)
-	    do (warn "The tag ~s is already used" tag)
-	  else
-	    do (setf (get-hash tag *code-tags*) code-list)))
+(def-code-block-writer (code-list)
+    (with-stream-string (stream str)
+      (format stream "```~%~{~s~%~^~%~}~%```~%~%" code-list)
+      (vector-push-extend str *file-documentation*)))
+
+
+(def-example-writer (evaluated-code-list)
+    (with-stream-string (stream str)
+      (format stream "```~%~{> ~{~s~%~a~%~{~s~%~}~%~}~^~%~}~%```~%~%" code-list)
+      (vector-push-extend str *file-documentation*)))
+
+
+(def-image-writer (alt-text path)
+    (with-stream-string (stream str)
+      (format stream "")
+      (vector-push-extend str *file-documentation*)))
 
 
 ;; ----- api functions -----

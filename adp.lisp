@@ -6,7 +6,93 @@
 (cl:defparameter *current-style* nil)
 
 
+;; ----- adp concepts -----
+
+(deftype adp-element ()
+  '(cons keyword list))
+
+(declaim (function create-adp-element (keyword &rest t) t))
+(defun create-adp-element (key-type &rest contents)
+  (cons key-type contents))
+
+(declaim (function adp-element-key-type (adp-element) keyword))
+(defun adp-element-key-type (elem)
+  (car elem))
+
+(declaim (function adp-element-contents (adp-element) t))
+(defun adp-element-contents (elem)
+  (cdr elem))
+
+
+(declaim (type (vector adp-element) *file-adp-elements*))
+(defparameter *file-adp-elements* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'adp-element))
+
+(declaim (function push-adp-element (adp-element) t)) ; nil or (values &optional)?
+(defun push-adp-element (elem)
+  (vector-push-extend elem *file-adp-elements*))
+
+(declaim (ftype (function (keyword &rest t) nil) emplace-adp-element))
+(defun emplace-adp-element (key-type &rest contents)
+  (push-file-adp-element (apply #'create-adp-element key-type contents))
+  (values))
+
+(declaim (ftype (function () nil) empty-adp-elements))
+(defun empty-adp-elements ()
+  (setf (fill-pointer *file-adp-elements*) 0)
+  (values))
+
+
+(deftype adp-file ()
+  '(cons pathname (vector adp-element)))
+
+(declaim (ftype (function (pathname (vector adp-element)) adp-file)))
+(defun create-adp-file (path elements)
+  (cons path elements))
+
+(declaim (ftype (function (adp-file) keyword) adp-file-path))
+(defun adp-file-path (adp-file)
+  (car adp-file))
+
+(declaim (ftype (function (adp-file) (vector adp-element)) adp-file-elements))
+(defun adp-file-elements (adp-file)
+  (assert (adp-filep adp-file) (adp-file) "~s is not an adp-file" adp-file)
+  (cdr adp-file))
+
+
+(declaim (type (vector adp-file) *project-adp-files*))
+(defparameter *project-adp-files* (make-vector 10 :adjustable t :fill-pointer 0))
+
+(declaim (ftype (function (adp-file) nil) push-adp-file))
+(defun push-adp-file (adp-file)
+  (vector-push-extend adp-file *project-adp-files*)
+  (values))
+
+(declaim (ftype (function (pathname (vector adp-element)) nil) emplace-adp-file))
+(defun emplace-adp-file (path elements)
+  (vector-push-extent (create-adp-file path elements) *project-adp-files*)
+  (values))
+
+(declaim (ftype (function () nil) empty-adp-files))
+(defun empty-adp-files ()
+  (setf (fill-pointer *project-adp-files*) 0)
+  (values))
+
+
+
 ;; ----- toplevel guide functions -----
+
+(cl:defmacro def-customizable-writer (ftype-decl global-proc-name writer-name)
+  (with-gensyms (global-proc-name writer-arg writer-args body-arg priv-writer-args)
+    `(progn
+       (declaim (type ,ftype-decl ,global-proc-name))
+       (defparameter ,global-proc-name nil)
+       (defmacro ,writer-name (,writer-args &body ,body-arg)
+	 (check-type ,writer-args list)
+	 (loop for ,writer-arg in ,writer-args
+	       do (check-type ,writer-arg symbol))
+	 (let ((,priv-writer-args (list ,@writer-args)))
+	   `(setq ,',global-proc-name (lambda ,,priv-writer-args
+					,@,body-arg)))))))
 
 (cl:defun slice-format (&rest args)
   (with-output-to-string (str)
@@ -15,196 +101,95 @@
 		 (princ arg str)
 		 (prin1 arg str)))))
 
-(cl:defmacro def-customizable-writer (writer-name impl-name num-writer-args &body body)
-  (let ((writer-args (loop repeat num-writer-args do (gensym "WRITER-ARG"))))
-    (with-gensyms (doc-global-proc body-arg priv-writer-args priv-writer-arg)
-      `(progn
-	 (defparameter ,doc-global-proc nil)
-	 (defmacro ,writer-name (,writer-args &body ,body-arg)
-	   (let ((,priv-writer-args (list ,@writer-args)))
-	     (loop for ,priv-writer-arg in ,priv-writer-args
-		   do (assert (symbolp ,priv-writer-arg)))
-	     `(setq ,',doc-global-proc (lambda ,,priv-writer-args
-					 ,@,body-arg))))
-	 (macrolet ((,impl-name ,writer-args
-		      `(when ,',doc-global-proc
-			 (apply ,',doc-global-proc ,@',writer-args))))
-	   ,@body)))))
+
+(def-customizable-writer
+    (function (string symbol) nil)
+  *header-proc*
+  def-header-writer)
+
+(defmacro header (str &optional label)
+  (when *add-documentation*
+    `(emplace-adp-element :header ,str ,label)))
 
 
-(with-customizable-writer def-header-writer header-impl 2
-  (defmacro header (str &optional label)
+(def-customizable-writer
+    (function (string &optional symbol) nil)
+  *subheader-proc*
+  def-subheader-writer)
+
+(defmacro subheader (str &optional label)
+  (when *add-documentation*
+    `(emplace-adp-element :subheader ,str ,label)))
+
+
+(def-customizable-writer
+    (function (string &optional symbol) nil)
+  *subsubheader-proc*
+  def-subsubheader-writer)
+
+(defmacro subsubheader (str &optional label)
+  (when *add-documentation*
+    `(emplace-adp-element :subsubheader ,str ,label)))
+
+
+(def-customizable-writer
+    (function (string) nil)
+  *text-proc*
+  def-text-writer)
+
+(defmacro text (&rest objects)
+  (when *add-documentation*
+      `(emplace-adp-element :text (slice-format ,@objects))))
+
+
+(def-customizable-writer
+    (function (list) nil)
+  *table-proc*
+  def-table-writer)
+
+(defmacro table (&rest rows)
+  (when *add-documentation*
+    (loop for row in rows
+	  do (check-type row list "a list"))
+    `(emplace-adp-element :table (list ,(loop for row in rows
+					      collect `(list ,(loop for elem in row
+								    if (listp elem)
+								      collect `(slice-format ,@elem)
+								    else
+								      collect `(slice-format ,elem))))))))
+
+
+(def-customizable-writer
+    (function (list) nil)
+  *itemize-proc*
+  def-itemize-writer)
+
+(defmacro itemize (&rest items)
+  (when *add-documentation*
+    (labels ((process-items (item-list)
+	       (cond
+		 ((eq (car item-list) :itemize)
+		  (loop for item in item-list
+			collect (process-items item)))
+		 ((eq (car item-list) :item)
+		  `(:item (slice-format ,@(cdr item-list))))
+		 (t (error "Each item of itemize must be a list starting with :item ot :itemize. Found: ~s" (car item-list))))))
+      `(emplace-adp-element :itemize ,(process-items (cons :itemize items))))))
+
+
+(def-customizable-writer
+    (function (string pathname) nil)
+  **)
+
+
+(with-customizable-writer def-image-writer image-impl 2
+  (defmacro image (alt-text path)
     (when *add-documentation*
-      (once-only (str label)
+      (once-only (alt-text path)
 	`(progn
-	   (assert (stringp ,str) (,str) "~s is not a string." ,str)
-	   (assert (or (not label) (symbolp ,label)) (,label) "~s is not a symbol" ,label)
-	   (header-impl ,str ,label))))))
-
-(with-customizable-writer def-subheader-writer subheader-impl 2 
-  (defmacro subheader (str &optional label)
-    (when *add-documentation*
-      (once-only (str label)
-	`(progn
-	   (assert (stringp ,str) (,str) "~s is not a string." ,str)
-	   (assert (or (not label) (symbolp ,label)) (,label) "~s is not a symbol" ,label)
-	   (subheader-impl ,str ,label))))))
-
-(with-customizable-writer def-subsubheader-writer subsubheader-impl 2
-  (defmacro subsubheader (str &optional label)
-    (when *add-documentation*
-      (once-only (str label)
-	`(progn
-	   (assert (stringp ,str) (,str) "~s is not a string." ,str)
-	   (assert (or (not label) (symbolp ,label)) (,label) "~s is not a symbol" ,label)
-	   (subsubheader-impl ,str ,label))))))
-
-(with-customizable-writer def-text-writer text-impl 1
-  (defmacro text (&rest objects)
-    (when *add-documentation*
-      `(text-impl (slice-format ,@objects)))))
-
-(with-customizable-writer def-table-writer table-impl 1 
-  (defmacro table (&rest rows)
-    (when *add-documentation*
-      (loop for row in rows
-	    do (assert (listp row) () "Each element must be a list representing a row."))
-      `(table-impl (list ,(loop for row in rows
-				collect `(list ,(loop for elem in row
-						      if (listp elem)
-							collect `(slice-format ,@elem)
-						      else
-							collect `(slice-format ,elem)))))))))
-
-(with-customizable-writer def-itemize-writer itemize-impl 1
-  (defmacro itemize (&rest items)
-    (when *add-documentation*
-      (labels ((process-items (item-list)
-		 (loop for item in item-list
-		       do (assert (and (listp item)
-				       (or (eq (car item) :item)
-					   (eq (car item) :itemize)))
-				  () "Each item must be a list starting with :item or :itemize.")
-		       if (eq (car item) :itemize)
-			 collect (process-items item) into final-item-list
-		       else
-			 collect `(slice-format ,@item) into final-item-list
-		       finally return `(list :itemize ,@final-item-list))))
-	`(itemize-impl ,(process-items items))))))
-
-
-(defparameter *code-tags* (make-hash-table))
-
-(defun add-code-tag (tag &rest code-list)
-  (when (not (get-hash tag *code-tags*))
-      (setf (get-hash tag *code-tags*) (make-array 10 :adjustable t :fill-pointer 0)))
-  (loop for code in code-list
-	do (vector-push-extend code (get-hash tag *code-tags*))))
-
-(defun code-tagp (tag)
-  (get-hash tag *code-tags*))
-
-(defun get-code-tag (tag)
-  (get-hash tag *code-tags*))
-
-(defparameter *hide-symbol* '#:hide)
-
-(defun code-hidep (code)
-  (eq code *hide-symbol*))
-
-(defun plistp (code)
-  (or (null code)
-      (and (consp code)
-	   (plistp (cdr code)))))
-
-(defun remove-code-tag-exprs (code)
-  (if (plistp code)
-      (cond
-	((member (car code) '(code-tag code-focus))
-	 (mapcan #'remove-code-tag-exprs (cddr code)))
-	(t
-	 (list (mapcan #'remove-code-tag-exprs code))))
-      (list code)))
-
-(defun process-code-tag (tag code)
-  (labels ((process-aux (tag code)
-	     (if (plistp code)
-		 (if (member (car code) '(code-tag code-focus))
-		     (if (and (eq (car code) 'code-focus)
-			      (member tag (cadr code)))
-			 (list (remove-code-tag-exprs code) t)
-			 (loop for expr in (cddr code)
-			       for (processed-expr expr-focus-found) = (process-aux tag expr)
-			       for focus-found = (or expr-focus-found focus-found)
-			       count (not expr-focus-found) into hide-count
-			       if expr-focus-found
-				 do (setf hide-count 0)
-			       if (<= hide-count 1)
-				 append processed-expr into processed-code
-			       finally (return (list processed-code focus-found))))
-		     (let* ((car-processed-values (process-aux tag (car code)))
-			    (car-processed (car car-processed-values))
-			    (car-focus-found (cadr car-processed-values)))
-		       (loop for expr in (cdr code)
-			     for (processed-expr expr-focus-found) = (process-aux tag expr)
-			     for focus-found = (or expr-focus-found car-focus-found) then (or expr-focus-found focus-found)
-			     count (not expr-focus-found) into hide-count
-			     if expr-focus-found
-			       do (setf hide-count 0)
-			     if (<= hide-count 1)
-			       append processed-expr into processed-code
-			     finally (return (if focus-found
-						 (if car-focus-found
-						     (list (list (append car-processed processed-code)) t)
-						     (list (list (append (remove-code-tag-exprs (car code)) processed-code)) t))
-						 (list (list *hide-symbol*) nil))))))
-		 (list (list *hide-symbol*) nil))))
-    (destructuring-bind (processed-code focus-found) (process-aux tag code)
-      (if focus-found
-	  processed-code
-	  (remove-code-tag-exprs code)))))
-
-(cl:defamcro code-focus (tags &rest code)
-  `(progn ,@code))
-
-(with-customizable-writer def-code-tag-writer code-tag.impl 2
-  (defmacro code-tag (tags &rest code)
-    `(progn
-       ,@code
-       ,(when *add-documentation*
-	  (assert (or (symbolp tags) (listp tags)) (tags) "~s is not a symbol or a list" tags)
-	  (when (listp tags)
-	    (assert (every (mapcar #'symbolp tags)) (tags) "Thare is a non-symbol in ~s" tags))
-	  (labels ((remove-code-tags (code)
-		     (cond
-		       ((null code) nil)
-		       ((eq (car code) 'code-tag) (remove-code-tags (cddr code)))
-		       ((consp code) (cons (remove-code-tags (car code)) (remove-code-tags (cdr code))))
-		       (t code))))
-	    `(code-tag-impl ',tags ',(remove-code-tags code)))))))
-
-(with-customizable-writer def-code-block-writer code-block-impl 1
-  (defmacro code-block (tags &rest code)
-    `(code-block-impl ',code)))
-
-(with-customizable-writer def-example-writer example-impl 1 
-  (defmacro example (&rest code)
-    (when *add-documentation*
-      (with-gensyms (expr output result expressions)
-	(let ((evaluated-code (loop for expr in code
-				    collect `(let* ((,output (make-array 10 :adjustable t :fill-pointer 0 :element-type 'character))
-						    (,result (with-output-to-string (*standard-output* ,output)
-							       ,expr)))
-					       (list ',expr ,output ,result)))))
-	  `(example-impl (list ,@evaluated-code)))))))
-
-(with-customizable-writer def-image-writer image-impl 1
-  (defmacro image (path)
-    (when *add-documentation*
-      (once-only (path)
-	`(progn
-	   (assert (pathnamep (pathname path)) (,path) "~s is not a pathname designator" path)
-	   (image-impl (pathname ,path)))))))
+	   (assert (stringp ,alt-text) (,alt-text) "~s is not a string" ,alt-text)
+	   (assert (pathnamep (pathname ,path)) (,path) "~s is not a pathname designator" ,path)
+	   (image-impl (pathname ,alt-text ,path)))))))
 
 (with-customizable-writer def-bold-writer bold-impl 1 
   (defmacro bold (&rest args)
@@ -253,6 +238,143 @@
 	`(progn
 	   (assert (symbolp ,label) (,label) "~s is not a symbol" ,label)
 	   (header-ref-impl ,label))))))
+
+
+def-file-ref-writer
+
+
+
+(defparameter *code-tags* (make-hash-table))
+
+(defun add-code-tag (tag &rest code-list)
+  (when (not (get-hash tag *code-tags*))
+      (setf (get-hash tag *code-tags*) (make-array 10 :adjustable t :fill-pointer 0)))
+  (loop for code in code-list
+	do (vector-push-extend code (get-hash tag *code-tags*))))
+
+(defun code-tagp (tag)
+  (get-hash tag *code-tags*))
+
+(defun get-code-tag (tag)
+  (get-hash tag *code-tags*))
+
+(defparameter *hide-symbol* '#:hide)
+
+(defun code-hidep (code)
+  (eq code *hide-symbol*))
+
+(defun plistp (code)
+  (or (null code)
+      (and (consp code)
+	   (plistp (cdr code)))))
+
+(defun remove-code-tag-exprs (code)
+  (labels ((remove-code-tag-exprs-aux (code)
+	     (if (plistp code)
+		 (cond
+		   ((member (car code) '(code-tag code-focus))
+		    (mapcan #'remove-code-tag-exprs-aux (cddr code)))
+		   (t
+		    (list (mapcan #'remove-code-tag-exprs-aux code))))
+		 (list code))))
+    (remove-code-tag-exprs-aux code)))
+
+(defun remove-own-code-focus-exprs (code)
+  (labels ((remove-own-code-focus-exprs-aux (code)
+	     (if (plistp code)
+		 (cond
+		   ((eq (car code) 'code-focus)
+		    (mapcan #'remove-own-code-focus-exprs-aux (cddr code)))
+		   ((eq (car code) 'code-tag)
+		    (list code))
+		   (t
+		    (list (mapcan #'remove-own-code-focus-exprs-aux code))))
+		 (list code))))
+    (remove-own-code-focus-exprs-aux code)))
+
+(defun process-code-tag (tag code)
+  (labels ((process-aux (tag code)
+	     (if (plistp code)
+		 (if (member (car code) '(code-tag code-focus))
+		     (if (and (eq (car code) 'code-focus)
+			      (or (null (cadr code))
+				  (member tag (cadr code))))
+			 (list (list (remove-code-tag-exprs code)) t)
+			 (loop for expr in (cddr code)
+			       for (processed-expr expr-focus-found) = (process-aux tag expr)
+			       for focus-found = (or expr-focus-found focus-found)
+			       count (not expr-focus-found) into hide-count
+			       if expr-focus-found
+				 do (setf hide-count 0)
+			       if (<= hide-count 1)
+				 append processed-expr into processed-code
+			       finally (return (list processed-code focus-found))))
+		     (let* ((car-processed-values (process-aux tag (car code)))
+			    (car-processed (car car-processed-values))
+			    (car-focus-found (cadr car-processed-values)))
+		       (loop for expr in (cdr code)
+			     for (processed-expr expr-focus-found) = (process-aux tag expr)
+			     for focus-found = (or expr-focus-found car-focus-found) then (or expr-focus-found focus-found)
+			     count (not expr-focus-found) into hide-count
+			     if expr-focus-found
+			       do (setf hide-count 0)
+			     if (<= hide-count 1)
+			       append processed-expr into processed-code
+			     finally (return (if focus-found
+						 (if car-focus-found
+						     (list (list (append car-processed processed-code)) t)
+						     (list (list (append (remove-code-tag-exprs (car code)) processed-code)) t))
+						 (list (list *hide-symbol*) nil))))))
+		 (list (list *hide-symbol*) nil))))
+    (destructuring-bind (processed-code focus-found) (process-aux tag code)
+      (if focus-found
+	  (car processed-code)
+	  (remove-code-tag-exprs code)))))
+
+(cl:defamcro code-focus (tags &rest code)
+  `(progn ,@code))
+
+(cl:defmacro code-tag (tags &rest code)
+  (with-gensyms (tag)
+    `(progn
+     ,@(loop for expr in code
+	     collect (remove-own-code-tag-exprs expr))
+     ,@(when *add-documentation*
+	 (assert (or (symbolp tags) (listp tags)) (tags) "~s is not a symbol or a list" tags)
+	 (when (listp tags)
+	   (assert (every #'symbolp tags) (tags) "Thare is a non-symbol in ~s" tags))
+	 `((loop for ,tag in ',tags
+		 do (apply #'add-code-tag ,tag (process-code-tag ,tag ',code))))))))
+
+
+(def-customizable-writer
+    (function (list) nil)
+  *code-block-proc*
+  def-code-block-writer)
+
+(with-customizable-writer def-code-block-writer code-block-impl 1
+  (defmacro code-block (tags &rest code)
+    (when *add-documentation*
+      (with-gensyms (expr)
+	`(code-block-impl (loop for ,expr in ',code
+				if (and (symbolp ,expr)
+					(member ,expr ',tags))
+				  append (get-code-tag ,expr)
+				else
+				  collect ,expr))))))
+
+(with-customizable-writer def-example-writer example-impl 1
+  (defmacro example (&rest code)
+    (when *add-documentation*
+      (with-gensyms (expr output result expressions)
+	(let ((evaluated-code (loop for expr in code
+				    collect `(let* ((,output (make-array 10 :adjustable t :fill-pointer 0 :element-type 'character))
+						    (,result (multiple-value-list (with-output-to-string (*standard-output* ,output)
+										    ,expr))))
+					       (list ',expr ,output ,result)))))
+	  `(example-impl (list ,@evaluated-code)))))))
+
+
 
 
 ;; ----- api functions -----
