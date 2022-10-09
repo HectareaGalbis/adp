@@ -11,15 +11,15 @@
 (deftype adp-element ()
   '(cons keyword list))
 
-(declaim (function create-adp-element (keyword &rest t) t))
+(declaim (ftype (function (keyword &rest t) adp-element) create-adp-element))
 (defun create-adp-element (key-type &rest contents)
   (cons key-type contents))
 
-(declaim (function adp-element-key-type (adp-element) keyword))
+(declaim (ftype (function (adp-element) keyword) adp-element-key-type))
 (defun adp-element-key-type (elem)
   (car elem))
 
-(declaim (function adp-element-contents (adp-element) t))
+(declaim (ftype (function (adp-element) list) adp-element-contents))
 (defun adp-element-contents (elem)
   (cdr elem))
 
@@ -27,62 +27,56 @@
 (declaim (type (vector adp-element) *file-adp-elements*))
 (defparameter *file-adp-elements* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'adp-element))
 
-(declaim (function push-adp-element (adp-element) t)) ; nil or (values &optional)?
+(declaim (ftype (function (adp-element) t)) push-adp-element)
 (defun push-adp-element (elem)
   (vector-push-extend elem *file-adp-elements*))
 
-(declaim (ftype (function (keyword &rest t) nil) emplace-adp-element))
+(declaim (ftype (function (keyword &rest t) t) emplace-adp-element))
 (defun emplace-adp-element (key-type &rest contents)
-  (push-file-adp-element (apply #'create-adp-element key-type contents))
-  (values))
+  (push-file-adp-element (apply #'create-adp-element key-type contents)))
 
-(declaim (ftype (function () nil) empty-adp-elements))
+(declaim (ftype (function () t) empty-adp-elements))
 (defun empty-adp-elements ()
-  (setf (fill-pointer *file-adp-elements*) 0)
-  (values))
+  (setf (fill-pointer *file-adp-elements*) 0))
 
 
 (deftype adp-file ()
   '(cons pathname (vector adp-element)))
 
-(declaim (ftype (function (pathname (vector adp-element)) adp-file)))
+(declaim (ftype (function (pathname (vector adp-element)) adp-file) create-adp-file))
 (defun create-adp-file (path elements)
   (cons path elements))
 
-(declaim (ftype (function (adp-file) keyword) adp-file-path))
+(declaim (ftype (function (adp-file) pathname) adp-file-path))
 (defun adp-file-path (adp-file)
   (car adp-file))
 
 (declaim (ftype (function (adp-file) (vector adp-element)) adp-file-elements))
 (defun adp-file-elements (adp-file)
-  (assert (adp-filep adp-file) (adp-file) "~s is not an adp-file" adp-file)
   (cdr adp-file))
 
 
 (declaim (type (vector adp-file) *project-adp-files*))
 (defparameter *project-adp-files* (make-vector 10 :adjustable t :fill-pointer 0))
 
-(declaim (ftype (function (adp-file) nil) push-adp-file))
+(declaim (ftype (function (adp-file) t) push-adp-file))
 (defun push-adp-file (adp-file)
-  (vector-push-extend adp-file *project-adp-files*)
-  (values))
+  (vector-push-extend adp-file *project-adp-files*))
 
-(declaim (ftype (function (pathname (vector adp-element)) nil) emplace-adp-file))
+(declaim (ftype (function (pathname (vector adp-element)) t) emplace-adp-file))
 (defun emplace-adp-file (path elements)
-  (vector-push-extent (create-adp-file path elements) *project-adp-files*)
-  (values))
+  (vector-push-extent (create-adp-file path elements) *project-adp-files*))
 
-(declaim (ftype (function () nil) empty-adp-files))
+(declaim (ftype (function () t) empty-adp-files))
 (defun empty-adp-files ()
-  (setf (fill-pointer *project-adp-files*) 0)
-  (values))
+  (setf (fill-pointer *project-adp-files*) 0))
 
 
 
 ;; ----- toplevel guide functions -----
 
 (cl:defmacro def-customizable-writer (ftype-decl global-proc-name writer-name)
-  (with-gensyms (global-proc-name writer-arg writer-args body-arg priv-writer-args)
+  (with-gensyms (global-proc-name writer-arg writer-args body-arg)
     `(progn
        (declaim (type ,ftype-decl ,global-proc-name))
        (defparameter ,global-proc-name nil)
@@ -90,9 +84,8 @@
 	 (check-type ,writer-args list)
 	 (loop for ,writer-arg in ,writer-args
 	       do (check-type ,writer-arg symbol))
-	 (let ((,priv-writer-args (list ,@writer-args)))
-	   `(setq ,',global-proc-name (lambda ,,priv-writer-args
-					,@,body-arg)))))))
+	 `(setq ,',global-proc-name (lambda ,,writer-args
+				      ,@,body-arg))))))
 
 (cl:defun slice-format (&rest args)
   (with-output-to-string (str)
@@ -103,7 +96,7 @@
 
 
 (def-customizable-writer
-    (function (string symbol) nil)
+    (function (stream string) t)
   *header-proc*
   def-header-writer)
 
@@ -113,7 +106,7 @@
 
 
 (def-customizable-writer
-    (function (string &optional symbol) nil)
+    (function (stream string) t)
   *subheader-proc*
   def-subheader-writer)
 
@@ -123,7 +116,7 @@
 
 
 (def-customizable-writer
-    (function (string &optional symbol) nil)
+    (function (stream string) t)
   *subsubheader-proc*
   def-subsubheader-writer)
 
@@ -133,7 +126,7 @@
 
 
 (def-customizable-writer
-    (function (string) nil)
+    (function (stream string) t)
   *text-proc*
   def-text-writer)
 
@@ -143,7 +136,7 @@
 
 
 (def-customizable-writer
-    (function (list) nil)
+    (function (stream list) t)
   *table-proc*
   def-table-writer)
 
@@ -160,7 +153,7 @@
 
 
 (def-customizable-writer
-    (function (list) nil)
+    (function (stream list) t)
   *itemize-proc*
   def-itemize-writer)
 
@@ -178,42 +171,72 @@
 
 
 (def-customizable-writer
-    (function (string pathname) nil)
-  **)
+    (function (stream string pathname pathname) t)
+  *image-proc*
+  def-image-writer)
+
+(defmacro image (alt-text path)
+  (when *add-documentation*
+    (with-gensyms (let-alt-text let-path)
+      `(let ((,let-alt-text ,alt-text)
+	     (,let-path ,path))
+	 (declare (type string ,let-alt-text)
+		  (type pathname ,let-path))
+	 (emplace-adp-element :image ,let-alt-text ,let-path)))))
 
 
-(with-customizable-writer def-image-writer image-impl 2
-  (defmacro image (alt-text path)
+(def-customizable-writer
+    (function (stream string) t)
+  *bold-proc*
+  def-bold-writer)
+
+(defmacro bold (&rest args)
+  (when *add-documentation*
+    (with-gensyms (stream)
+      `(with-output-to-string (,stream)
+	 (funcall *bold-proc* ,stream (slice-format ,@args))))))
+
+
+(def-customizable-writer
+    (function (stream string) t)
+  *italic-proc*
+  def-italic-writer)
+
+(defmacro italic (&rest args)
     (when *add-documentation*
-      (once-only (alt-text path)
-	`(progn
-	   (assert (stringp ,alt-text) (,alt-text) "~s is not a string" ,alt-text)
-	   (assert (pathnamep (pathname ,path)) (,path) "~s is not a pathname designator" ,path)
-	   (image-impl (pathname ,alt-text ,path)))))))
+      (with-gensyms (stream)
+	`(with-output-to-string (,stream)
+	   (funcall *italic-proc* ,stream (slice-format ,@args))))))
 
-(with-customizable-writer def-bold-writer bold-impl 1 
-  (defmacro bold (&rest args)
-    (when *add-documentation*
-      `(bold-impl (slice-format ,@args)))))
 
-(with-customizable-writer def-italic-writer 1
-  (defmacro italic (&rest args)
-    (when *add-documentation*
-      `(italic-impl (slice-format ,@args)))))
+(def-customizable-writer
+    (function (stream t) t)
+  *code-inline-proc*
+  def-code-inline-writer)
 
-(with-customizable-writer def-code-inline-writer code-inline-impl 1 
-  (defmacro code-inline (code)
-    (when *add-documentation*
-      `(code-inline-impl ,code))))
+(defmacro code-inline (code)
+  (when *add-documentation*
+    (with-gensyms (stream)
+      `(with-output-to-string (,stream)
+	 (funcall *code-inline-proc* ,stream ',code)))))
 
-(with-customizable-writer def-web-link-writer web-link-impl 2 
-  (defmacro web-link (name link)
-    (when *add-documentation*
-      (once-only (name link)
-	`(progn
-	   (assert (stringp ,name) (,name) "~s is not a string" ,name)
-	   (assert (stringp ,link) (,link) "~s is not a string" ,link)
-	   (web-link-impl ,name ,link))))))
+
+(def-customizable-writer
+    (function (stream string string) t)
+  *web-link-proc*
+  def-web-link-writer)
+
+(defmacro web-link (name link)
+  (when *add-documentation*
+    (with-gensyms (let-name let-link stream)
+      `(let ((,let-name ,name)
+	     (,let-link ,link))
+	 (declare (type string ,let-name ,let-link))
+	 (with-output-to-string (,stream)
+	   (funcall *web-link-proc* ,stream ,let-name ,let-link))))))
+
+
+
 
 (with-customizable-writer def-symbol-ref-writer symbol-ref-impl 1
   (defmacro symbol-ref (label)
