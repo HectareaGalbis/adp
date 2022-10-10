@@ -71,6 +71,48 @@
 (defun empty-adp-files ()
   (setf (fill-pointer *project-adp-files*) 0))
 
+;; Que hacer con los tags repetidos???
+(declaim (type (vector symbol) *header-tags* *symbol-tags* *function-tags*))
+(defparameter *header-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
+(defparameter *symbol-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
+(defparameter *function-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
+(defparameter *type-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
+
+(declaim (ftype (function (symbol) t) push-header-tag))
+(defun push-header-tag (tag)
+  (vector-push-extent tag *header-tags*))
+
+(declaim (ftype (function (symbol) t) push-symbol-tag))
+(defun push-symbol-tag (tag)
+  (vector-push-extent tag *symbol-tags*))
+
+(declaim (ftype (function (symbol) t) push-function-tag))
+(defun push-function-tag (tag)
+  (vector-push-extent tag *function-tags*))
+
+(declaim (ftype (function (symbol) t) push-type-tag))
+(defun push-type-tag (tag)
+  (vector-push-extent tag *type-tags*))
+
+(declaim (ftype (function (symbol) boolean) header-tagp))
+(defun header-tagp (tag)
+  (loop for header-tag across *header-tags*
+	  thereis (eq tag header-tag)))
+
+(declaim (ftype (function (symbol) boolean) symbol-tagp))
+(defun symbol-tagp (tag)
+  (loop for symbol-tag across *symbol-tags*
+	  thereis (eq tag symbol-tag)))
+
+(declaim (ftype (function (symbol) boolean) function-tagp))
+(defun function-tagp (tag)
+  (loop for function-tag across *function-tags*
+	  thereis (eq tag function-tag)))
+
+(declaim (ftype (function (symbol) boolean) type-tagp))
+(defun type-tagp (tag)
+  (loop for type-tag across *type-tags*
+	  thereis (eq tag type-tag)))
 
 
 ;; ----- toplevel guide functions -----
@@ -102,7 +144,10 @@
 
 (defmacro header (str &optional label)
   (when *add-documentation*
-    `(emplace-adp-element :header ,str ,label)))
+    `(progn
+       ,@(when label
+	   `((push-header-tag ,label)))
+       (emplace-adp-element :header ,str ,label))))
 
 
 (def-customizable-writer
@@ -112,7 +157,10 @@
 
 (defmacro subheader (str &optional label)
   (when *add-documentation*
-    `(emplace-adp-element :subheader ,str ,label)))
+    `(progn
+       ,@(when label
+	   `((push-header-tag ,label)))
+       (emplace-adp-element :subheader ,str ,label))))
 
 
 (def-customizable-writer
@@ -122,7 +170,10 @@
 
 (defmacro subsubheader (str &optional label)
   (when *add-documentation*
-    `(emplace-adp-element :subsubheader ,str ,label)))
+    `(progn
+       ,@(when label
+	   `((push-header-tag ,label)))
+       (emplace-adp-element :subsubheader ,str ,label))))
 
 
 (def-customizable-writer
@@ -446,25 +497,217 @@
 	    ,@(when *add-documentation*
 		`((emplace-adp-element ,',(intern (symbol-name name) '#:keyword) ',,definer-body))))))))
 
-;; TODO: Coger tags
-(def-cl-customizable-writer defclass *defclass-proc* def-defclass-writer)
-(def-cl-customizable-writer defconstant *defconstant-proc* def-defconstant-writer)
-(def-cl-customizable-writer defgeneric *defgeneric-proc* def-defgeneric-writer)
-(def-cl-customizable-writer define-compiler-macro *define-compiler-macro-proc* def-define-compiler-macro-writer)
-(def-cl-customizable-writer define-condition *define-condition-proc* def-define-condition-writer)
-(def-cl-customizable-writer define-method-combination *define-method-combination-proc* def-define-method-combination-writer)
-(def-cl-customizable-writer define-modify-macro *define-modify-macro-proc* def-define-modify-macro-writer)
-(def-cl-customizable-writer define-setf-expander *define-setf-expander-proc* def-define-setf-expander-writer)
-(def-cl-customizable-writer define-symbol-macro *define-symbol-macro-proc* def-define-symbol-macro-writer)
-(def-cl-customizable-writer defmacro *defmacro-proc* def-defmacro-writer)
-(def-cl-customizable-writer defmethod *defmethod-proc* def-defmethod-writer)
-(def-cl-customizable-writer defpackage *defpackage-proc* def-defpackage-writer)
-(def-cl-customizable-writer defparameter *defparameter-proc* def-defparameter-writer)
-(def-cl-customizable-writer defsetf *defsetf-proc* def-defsetf-writer)
-(def-cl-customizable-writer defstruct *defstruct-proc* def-defstruct-writer)
-(def-cl-customizable-writer deftype *deftype-proc* def-deftype-writer)
-(def-cl-customizable-writer defun *defun-proc* def-defun-writer)
-(def-cl-customizable-writer defvar *defvar-proc* def-defvar-writer)
+
+(def-customizable-writer
+    (function (stream t) t)
+  *defclass-proc*
+  def-defclass-writer)
+
+(cl:defmacro defclass (&rest defclass-body)
+  `(progn
+     (cl:defclass ,@defclass)
+     (push-type-tag (defclass-class-name ',defclass-body))
+     (emplace-adp-element :defclass ',defclass-body)))
+
+
+(def-customizable-writer
+    (function (stream t) t)
+  *defconstant-proc*
+  def-defconstant-writer)
+
+(cl:defmacro defconstant (&rest defconstant-body)
+  `(progn
+     (cl:defconstant ,@defconstant)
+     (push-symbol-tag (defconstant-name ',defconstant-body))
+     (emplace-adp-element :defconstant ',defconstant-body)))
+
+
+(def-customizable-writer
+    (function (stream t) t)
+  *defgeneric-proc*
+  def-defgeneric-writer)
+
+(cl:defmacro defgeneric (&rest defgeneric-body)
+  `(progn
+     (cl:defgeneric ,@defgeneric)
+     (push-function-tag (defgeneric-function-name ',defgeneric-body))
+     (emplace-adp-element :defgeneric ',defgeneric-body)))
+
+
+(def-customizable-writer
+    (function (stream t) t)
+  *define-compiler-macro-proc*
+  def-define-compiler-macro-writer)
+
+(cl:defmacro define-compiler-macro (&rest define-compiler-macro-body)
+  `(progn
+     (cl:define-compiler-macro ,@define-compiler-macro)
+     (emplace-adp-element :define-compiler-macro ',define-compiler-macro-body)))
+
+
+(def-customizable-writer
+    (function (stream t) t)
+  *define-condition-proc*
+  def-define-condition-writer)
+
+(cl:defmacro define-condition (&rest define-condition-body)
+  `(progn
+     (cl:define-condition ,@define-condition)
+     (push-type-tag (define-condition-name ',define-condition-body))
+     (emplace-adp-element :define-condition ',define-condition-body)))
+
+
+(def-customizable-writer
+    (function (stream t) t)
+  *define-method-combination-proc*
+  def-define-method-combination-writer)
+
+(cl:defmacro define-method-combination (&rest define-method-combination-body)
+  `(progn
+     (cl:define-method-combination ,@define-method-combination)
+     (emplace-adp-element :define-method-combination ',define-method-combination-body)))
+
+
+(def-customizable-writer
+    (function (stream t) t)
+  *define-modify-macro-proc*
+  def-define-modify-macro-writer)
+
+(cl:defmacro define-modify-macro (&rest define-modify-macro-body)
+  `(progn
+     (cl:define-modify-macro ,@define-modify-macro)
+     (push-function-tag (define-modify-macro-name ',define-modify-macro-body))
+     (emplace-adp-element :define-modify-macro ',define-modify-macro-body)))
+
+
+(def-customizable-writer
+    (function (stream t) t)
+  *define-setf-expander-proc*
+  def-define-setf-expander-writer)
+
+(cl:defmacro define-setf-expander (&rest define-setf-expander-body)
+  `(progn
+     (cl:define-setf-expander ,@define-setf-expander)
+     (push-function-tag (list 'cl:setf (define-setf-expander-access-fn ',define-setf-expander-body)))
+     (emplace-adp-element :define-setf-expander ',define-setf-expander-body)))
+
+
+(def-customizable-writer
+    (function (stream t) t)
+  *define-symbol-macro-proc*
+  def-define-symbol-macro-writer)
+
+(cl:defmacro define-symbol-macro (&rest define-symbol-macro-body)
+  `(progn
+     (cl:define-symbol-macro ,@define-symbol-macro)
+     (push-symbol-tag (define-symbol-macro-symbol ',define-symbol-macro-body))
+     (emplace-adp-element :define-symbol-macro ',define-symbol-macro-body)))
+
+
+(def-customizable-writer
+    (function (stream t) t)
+  *defmacro-proc*
+  def-defmacro-writer)
+
+(cl:defmacro defmacro (&rest defmacro-body)
+  `(progn
+     (cl:defmacro ,@defmacro)
+     (push-function-tag (defmacro-name ',defmacro-body))
+     (emplace-adp-element :defmacro ',defmacro-body)))
+
+
+(def-customizable-writer
+    (function (stream t) t)
+  *defmethod-proc*
+  def-defmethod-writer)
+
+(cl:defmacro defmethod (&rest defmethod-body)
+  `(progn
+     (cl:defmethod ,@defmethod)
+     (emplace-adp-element :defmethod ',defmethod-body)))
+
+
+(def-customizable-writer
+    (function (stream t) t)
+  *defpackage-proc*
+  def-defpackage-writer)
+
+(cl:defmacro defpackage (&rest defpackage-body)
+  `(progn
+     (cl:defpackage ,@defpackage)
+     (emplace-adp-element :defpackage ',defpackage-body)))
+
+
+(def-customizable-writer
+    (function (stream t) t)
+  *defparameter-proc*
+  def-defparameter-writer)
+
+(cl:defmacro defparameter (&rest defparameter-body)
+  `(progn
+     (cl:defparameter ,@defparameter)
+     (push-symbol-tag (defparameter-name ',defparameter-body))
+     (emplace-adp-element :defparameter ',defparameter-body)))
+
+
+(def-customizable-writer
+    (function (stream t) t)
+  *defsetf-proc*
+  def-defsetf-writer)
+
+(cl:defmacro defsetf (&rest defsetf-body)
+  `(progn
+     (cl:defsetf ,@defsetf)
+     (push-function-tag (list 'cl:setf (defsetf-access-fn ',defsetf-body)))
+     (emplace-adp-element :defsetf ',defsetf-body)))
+
+
+(def-customizable-writer
+    (function (stream t) t)
+  *defstruct-proc*
+  def-defstruct-writer)
+
+(cl:defmacro defstruct (&rest defstruct-body)
+  `(progn
+     (cl:defstruct ,@defstruct)
+     (push-type-tag (defstruct-structure-name ',defstruct-body))
+     (emplace-adp-element :defstruct ',defstruct-body)))
+
+
+(def-customizable-writer
+    (function (stream t) t)
+  *deftype-proc*
+  def-deftype-writer)
+
+(cl:defmacro deftype (&rest deftype-body)
+  `(progn
+     (cl:deftype ,@deftype)
+     (push-type-tag (deftype-name ',deftype-body))
+     (emplace-adp-element :deftype ',deftype-body)))
+
+
+(def-customizable-writer
+    (function (stream t) t)
+  *defun-proc*
+  def-defun-writer)
+
+(cl:defmacro defun (&rest defun-body)
+  `(progn
+     (cl:defun ,@defun)
+     (push-function-tag (defun-function-name ',defun-body))
+     (emplace-adp-element :defun ',defun-body)))
+
+
+(def-customizable-writer
+    (function (stream t) t)
+  *defvar-proc*
+  def-defvar-writer)
+
+(cl:defmacro defvar (&rest defvar-body)
+  `(progn
+     (cl:defvar ,@defvar)
+     (push-symbol-tag (defvar-name ',defvar-body))
+     (emplace-adp-element :defvar ',defvar-body)))
 
 
 ;; ----- writer functions -----
