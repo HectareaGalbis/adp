@@ -236,61 +236,78 @@
 	   (funcall *web-link-proc* ,stream ,let-name ,let-link))))))
 
 
+(def-customizable-writer
+    (function (stream symbol pathname pathname) t)
+  *symbol-ref-proc*
+  def-symbol-ref-writer)
+
+(defmacro symbol-ref (label)
+  (when *add-documentation*
+    (with-gensyms (let-label)
+      `(let ((,let-label ,label))
+	 (declare (type symbol ,let-label))
+	 '(:symbol-ref ,let-label)))))
 
 
-(with-customizable-writer def-symbol-ref-writer symbol-ref-impl 1
-  (defmacro symbol-ref (label)
-    (when *add-documentation*
-      (once-only (label)
-	`(progn
-	   (assert (symbolp ,label) (,label) "~s is not a symbol" ,label)
-	   (symbol-ref-impl ,label))))))
+(def-customizable-writer
+    (function (stream symbol pathname pathname) t)
+  *function-ref-proc*
+  def-function-ref-writer)
 
-(with-customizable-writer def-function-ref-writer function-ref-impl 1
-  (defmacro function-ref (label)
-    (when *add-documentation*
-      (once-only (label)
-	`(progn
-	   (assert (symbolp ,label) (,label) "~s is not a symbol" ,label)
-	   (function-ref-impl ,label))))))
-
-(with-customizable-writer def-header-ref-writer header-ref-impl 1
-  (defmacro header-ref (label)
-    (when *add-documentation*
-      (once-only (label)
-	`(progn
-	   (assert (symbolp ,label) (,label) "~s is not a symbol" ,label)
-	   (header-ref-impl ,label))))))
+(defmacro function-ref (label)
+  (when *add-documentation*
+    (with-gensyms (let-label)
+      `(let ((,let-label ,label))
+	 (declare (type symbol ,let-label))
+	 '(:function-ref ,let-label)))))
 
 
-def-file-ref-writer
+(def-customizable-writer
+    (function (stream symbol pathname pathname) t)
+  *header-ref-proc*
+  def-header-ref-writer)
+
+(defmacro header-ref (label)
+  (when *add-documentation*
+    (with-gensyms (let-label)
+      `(let ((,let-label ,label))
+	 (declare (type symbol ,let-label))
+	 '(:header-ref ,let-label)))))
 
 
-
+(declaim (type hash-table *code-tags*))
 (defparameter *code-tags* (make-hash-table))
 
-(defun add-code-tag (tag &rest code-list)
+(declaim (ftype (function (symbol &rest t) t) add-code-tag))
+(defun add-code-tag (tag &rest list-code)
   (when (not (get-hash tag *code-tags*))
       (setf (get-hash tag *code-tags*) (make-array 10 :adjustable t :fill-pointer 0)))
-  (loop for code in code-list
+  (loop for code in list-code
 	do (vector-push-extend code (get-hash tag *code-tags*))))
 
+(declaim (ftype (function (symbol) boolean) code-tagp))
 (defun code-tagp (tag)
   (get-hash tag *code-tags*))
 
+(declaim (ftype (function (symbol) vector) get-code-tag))
 (defun get-code-tag (tag)
   (get-hash tag *code-tags*))
 
+
+(declaim (type symbol *hide-symbol*))
 (defparameter *hide-symbol* '#:hide)
 
+(declaim (ftype (function (t) boolean) code-hidep))
 (defun code-hidep (code)
   (eq code *hide-symbol*))
 
+(declaim (ftype (function (t) boolean) plistp))
 (defun plistp (code)
   (or (null code)
       (and (consp code)
 	   (plistp (cdr code)))))
 
+(declaim (ftype (function (t) t) remove-code-tag-exprs))
 (defun remove-code-tag-exprs (code)
   (labels ((remove-code-tag-exprs-aux (code)
 	     (if (plistp code)
@@ -302,6 +319,7 @@ def-file-ref-writer
 		 (list code))))
     (remove-code-tag-exprs-aux code)))
 
+(declaim (ftype (function (t) t) remove-own-code-focus-exprs))
 (defun remove-own-code-focus-exprs (code)
   (labels ((remove-own-code-focus-exprs-aux (code)
 	     (if (plistp code)
@@ -315,6 +333,7 @@ def-file-ref-writer
 		 (list code))))
     (remove-own-code-focus-exprs-aux code)))
 
+(declaim (ftype (function (symbol t) t) process-code-tag))
 (defun process-code-tag (tag code)
   (labels ((process-aux (tag code)
 	     (if (plistp code)
@@ -363,78 +382,89 @@ def-file-ref-writer
      ,@(loop for expr in code
 	     collect (remove-own-code-tag-exprs expr))
      ,@(when *add-documentation*
-	 (assert (or (symbolp tags) (listp tags)) (tags) "~s is not a symbol or a list" tags)
+	 (assert (or (symbolp tags) (listp tags)) (tags) "~s is not a symbol nor a list" tags)
 	 (when (listp tags)
 	   (assert (every #'symbolp tags) (tags) "Thare is a non-symbol in ~s" tags))
 	 `((loop for ,tag in ',tags
-		 do (apply #'add-code-tag ,tag (process-code-tag ,tag ',code))))))))
+		 do (apply #'add-code-tag ,tag ',code)))))))
 
 
 (def-customizable-writer
-    (function (list) nil)
+    (function (list) t)
   *code-block-proc*
   def-code-block-writer)
 
-(with-customizable-writer def-code-block-writer code-block-impl 1
-  (defmacro code-block (tags &rest code)
-    (when *add-documentation*
-      (with-gensyms (expr)
-	`(code-block-impl (loop for ,expr in ',code
-				if (and (symbolp ,expr)
-					(member ,expr ',tags))
-				  append (get-code-tag ,expr)
-				else
-				  collect ,expr))))))
+(defmacro code-block (tags &rest code)
+  (when *add-documentation*
+    (with-gensyms (expr)
+      `(emplace-adp-element :code-block (loop for ,expr in ',code
+					      if (and (symbolp ,expr)
+						      (member ,expr ',tags))
+						append (process-code-tag ,expr (get-code-tag ,expr))
+					      else
+						collect (process-code-tag '#:dummy-tag ,expr))))))
 
-(with-customizable-writer def-example-writer example-impl 1
-  (defmacro example (&rest code)
-    (when *add-documentation*
-      (with-gensyms (expr output result expressions)
-	(let ((evaluated-code (loop for expr in code
-				    collect `(let* ((,output (make-array 10 :adjustable t :fill-pointer 0 :element-type 'character))
-						    (,result (multiple-value-list (with-output-to-string (*standard-output* ,output)
-										    ,expr))))
-					       (list ',expr ,output ,result)))))
-	  `(example-impl (list ,@evaluated-code)))))))
+
+(def-customizable-writer
+    (function (list) t)
+  *code-example-proc*
+  def-code-example-writer)
+ 
+(defmacro code-example (tags &rest code)
+  (when *add-documentation*
+    (let ((evaluated-code (loop for expr in code
+				collect (with-gensyms (output result)
+					  `(let* ((,output (make-array 10 :adjustable t :fill-pointer 0 :element-type 'character))
+						  (,result (multiple-value-list (with-output-to-string (*standard-output* ,output)
+										  ,(remove-code-tag-exprs (if (and (symbolp expr)
+														   (member expr tags))
+													      (get-code-tag expr)
+													      expr))))))
+					     (list ',(if (and (symbolp expr)
+							      (member expr tags))
+							 (process-code-tag expr (get-code-tag expr))
+							 (process-code-tag '#:dummy-tag expr))
+						   ,output
+						   ,result))))))
+      `(emplace-adp-element :code-example (list ,@evaluated-code)))))
 
 
 
 
 ;; ----- api functions -----
 
-(cl:defmacro def-cl-customizable-writer (name)
-  (let* ((definer-body (gensym "DEFINER-BODY"))
-	 (doc-function-global-proc (gensym "DOC-FUNCTION-NAME-PROC"))
-	 (doc-writer-name (intern (concatenate 'string "DEF-" name "-WRITER")))
-	 (writer-definer-body (gensym "ARGS"))
-	 (writer-body (gensym "BODY")))
+(cl:defmacro def-cl-customizable-writer (name name-proc name-writer)
+  (with-gensyms (definer-body)
     `(progn
-       (defparameter ,doc-function-global-proc nil)
-       (defmacro ,doc-writer-name ((,writer-definer-body) &body ,writer-body)
-	 (unless (symbolp ,writer-definer-body)
-	   (error "The argument must be a symbol. Found: ~s" ,writer-defined-body))
-	 `(setq ,',doc-function-global-proc
-		(lambda (,,writer-definer-body)
-		  ,@,writer-body)))
-       (defmacro ,name (&rest ,definer-body)
+       (def-customizable-writer
+	   (function (t) t)
+	 ,name-proc
+	 ,name-writer)
+       (cl:defmacro ,name (&rest ,definer-body)
 	 `(progn
 	    ,(cons ',(find-symbol (symbol-name name) '#:cl) ,definer-body)
 	    ,@(when *add-documentation*
-		`(when ,',doc-function-global-name
-		   (apply ,',doc-function-global-name ,,definer-body))))))))
+		`((emplace-adp-element ,',(intern (symbol-name name) '#:keyword) ',,definer-body))))))))
 
-
-(def-cl-customizable-writer defconstant)
-(def-cl-customizable-writer defparameter)
-(def-cl-customizable-writer defvar)
-(def-cl-customizable-writer defun)
-(def-cl-customizable-writer defmacro)
-(def-cl-customizable-writer define-compiler-macro)
-(def-cl-customizable-writer defstruct)
-(def-cl-customizable-writer defclass)
-(def-cl-customizable-writer defgeneric)
-(def-cl-customizable-writer defmethod)
-(def-cl-customizable-writer defpackage)
+;; TODO: Coger tags
+(def-cl-customizable-writer defclass *defclass-proc* def-defclass-writer)
+(def-cl-customizable-writer defconstant *defconstant-proc* def-defconstant-writer)
+(def-cl-customizable-writer defgeneric *defgeneric-proc* def-defgeneric-writer)
+(def-cl-customizable-writer define-compiler-macro *define-compiler-macro-proc* def-define-compiler-macro-writer)
+(def-cl-customizable-writer define-condition *define-condition-proc* def-define-condition-writer)
+(def-cl-customizable-writer define-method-combination *define-method-combination-proc* def-define-method-combination-writer)
+(def-cl-customizable-writer define-modify-macro *define-modify-macro-proc* def-define-modify-macro-writer)
+(def-cl-customizable-writer define-setf-expander *define-setf-expander-proc* def-define-setf-expander-writer)
+(def-cl-customizable-writer define-symbol-macro *define-symbol-macro-proc* def-define-symbol-macro-writer)
+(def-cl-customizable-writer defmacro *defmacro-proc* def-defmacro-writer)
+(def-cl-customizable-writer defmethod *defmethod-proc* def-defmethod-writer)
+(def-cl-customizable-writer defpackage *defpackage-proc* def-defpackage-writer)
+(def-cl-customizable-writer defparameter *defparameter-proc* def-defparameter-writer)
+(def-cl-customizable-writer defsetf *defsetf-proc* def-defsetf-writer)
+(def-cl-customizable-writer defstruct *defstruct-proc* def-defstruct-writer)
+(def-cl-customizable-writer deftype *deftype-proc* def-deftype-writer)
+(def-cl-customizable-writer defun *defun-proc* def-defun-writer)
+(def-cl-customizable-writer defvar *defvar-proc* def-defvar-writer)
 
 
 ;; ----- writer functions -----
