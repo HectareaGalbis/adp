@@ -71,16 +71,18 @@
 (defun empty-adp-files ()
   (setf (fill-pointer *project-adp-files*) 0))
 
-;; Que hacer con los tags repetidos???
-(declaim (type (vector symbol) *header-tags* *symbol-tags* *function-tags*))
+
+(declaim (type (vector (cons symbol string)) *header-tags*))
 (defparameter *header-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
+
+(declaim (type (vector symbol) *symbol-tags* *function-tags* *type-tags*))
 (defparameter *symbol-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
 (defparameter *function-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
 (defparameter *type-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
 
-(declaim (ftype (function (symbol) t) push-header-tag))
-(defun push-header-tag (tag)
-  (vector-push-extent tag *header-tags*))
+(declaim (ftype (function (symbol string) t) push-header-tag))
+(defun push-header-tag (tag str)
+  (vector-push-extent (cons tag str) *header-tags*))
 
 (declaim (ftype (function (symbol) t) push-symbol-tag))
 (defun push-symbol-tag (tag)
@@ -114,6 +116,57 @@
   (loop for type-tag across *type-tags*
 	  thereis (eq tag type-tag)))
 
+(defun empty-header-tags ()
+  (setf (fill-pointer *header-tags*) 0))
+
+(defun empty-symbol-tags ()
+  (setf (fill-pointer *symbol-tags*) 0))
+
+(defun empty-function-tags ()
+  (setf (fill-pointer *function-tags*) 0))
+
+(defun empty-type-tags ()
+  (setf (fill-pointer *type-tags*) 0))
+
+
+(declaim (type hash-table *header-tags-table* *symbol-tags-table* *function-tags-table* *type-tags-table*))
+(defparameter *header-tags-table* (make-hash-table))
+(defparameter *symbol-tags-table* (make-hash-table))
+(defparameter *function-tags-table* (make-hash-table))
+(defparameter *type-tags-table* (make-hash-table))
+
+(declaim (ftype (function (symbol string pathname) t) add-header-tag-path))
+(defun add-header-tag-path (tag str path)
+  (setf (get-hash tag *header-tags-table*) (cons str path)))
+
+(declaim (ftype (function (symbol pathname) t) add-symbol-tag-path))
+(defun add-symbol-tag-path (tag path)
+  (setf (get-hash tag *symbol-tags-table*) path))
+
+(declaim (ftype (function (symbol pathname) t) add-function-tag-path))
+(defun add-function-tag-path (tag path)
+  (setf (get-hash tag *function-tags-table*) path))
+
+(declaim (ftype (function (symbol pathname) t) add-type-tag-path))
+(defun add-symbol-tag-path (tag path)
+  (setf (get-hash tag *symbol-tags-table*) path))
+
+(declaim (ftype (function (symbol) (cons string pathname)) get-header-tag-path))
+(defun get-header-tag-path (tag)
+  (get-hash tag *header-tags-table*))
+
+(declaim (ftype (function (symbol) pathname) get-symbol-tag-path))
+(defun get-symbol-tag-path (tag)
+  (get-hash tag *symbol-tags-table*))
+
+(declaim (ftype (function (symbol) pathname) get-function-tag-path))
+(defun get-function-tag-path (tag)
+  (get-hash tag *function-tags-table*))
+
+(declaim (ftype (function (symbol) pathname) get-type-tag-path))
+(defun get-type-tag-path (tag)
+  (get-hash tag *type-tags-table*))
+
 
 ;; ----- toplevel guide functions -----
 
@@ -129,16 +182,9 @@
 	 `(setq ,',global-proc-name (lambda ,,writer-args
 				      ,@,body-arg))))))
 
-(cl:defun slice-format (&rest args)
-  (with-output-to-string (str)
-    (loop for arg in args
-	  do (if (stringp arg)
-		 (princ arg str)
-		 (prin1 arg str)))))
-
 
 (def-customizable-writer
-    (function (stream string) t)
+    (function (stream string symbol) t)
   *header-proc*
   def-header-writer)
 
@@ -151,7 +197,7 @@
 
 
 (def-customizable-writer
-    (function (stream string) t)
+    (function (stream string symbol) t)
   *subheader-proc*
   def-subheader-writer)
 
@@ -164,7 +210,7 @@
 
 
 (def-customizable-writer
-    (function (stream string) t)
+    (function (stream string symbol) t)
   *subsubheader-proc*
   def-subsubheader-writer)
 
@@ -183,7 +229,7 @@
 
 (defmacro text (&rest objects)
   (when *add-documentation*
-      `(emplace-adp-element :text (slice-format ,@objects))))
+      `(emplace-adp-element :text ,@objects)))
 
 
 (def-customizable-writer
@@ -194,13 +240,12 @@
 (defmacro table (&rest rows)
   (when *add-documentation*
     (loop for row in rows
-	  do (check-type row list "a list"))
+	  do (check-type row list "a list")
+	     (loop for elem in row
+		   do (assert (eq (car elem) :cell) () "Each cell of a table must be a list starting with :cell. Found: ~s" elem)))
     `(emplace-adp-element :table (list ,(loop for row in rows
 					      collect `(list ,(loop for elem in row
-								    if (listp elem)
-								      collect `(slice-format ,@elem)
-								    else
-								      collect `(slice-format ,elem))))))))
+								    collect (cons 'list elem))))))))
 
 
 (def-customizable-writer
@@ -210,15 +255,14 @@
 
 (defmacro itemize (&rest items)
   (when *add-documentation*
-    (labels ((process-items (item-list)
-	       (cond
-		 ((eq (car item-list) :itemize)
-		  (loop for item in item-list
-			collect (process-items item)))
-		 ((eq (car item-list) :item)
-		  `(:item (slice-format ,@(cdr item-list))))
-		 (t (error "Each item of itemize must be a list starting with :item ot :itemize. Found: ~s" (car item-list))))))
-      `(emplace-adp-element :itemize ,(process-items (cons :itemize items))))))
+    (labels ((check-items (item-list)
+	       (loop for item in item-list
+		     if (not (eq (car item) :item))
+		       do (if (eq (car item) :itemize) 
+			      (check-items (cdr item))
+			      (error "Each item of itemize must be a list starting with :item ot :itemize. Found: ~s" item)))))
+      (check-items items))
+    `(emplace-adp-element :itemize ,@items)))
 
 
 (def-customizable-writer
@@ -288,6 +332,19 @@
 
 
 (def-customizable-writer
+    (function (stream symbol string pathname pathname) t)
+  *header-ref-proc*
+  def-header-ref-writer)
+
+(defmacro header-ref (label)
+  (when *add-documentation*
+    (with-gensyms (let-label)
+      `(let ((,let-label ,label))
+	 (declare (type symbol ,let-label))
+	 '(:header-ref ,let-label)))))
+
+
+(def-customizable-writer
     (function (stream symbol pathname pathname) t)
   *symbol-ref-proc*
   def-symbol-ref-writer)
@@ -315,15 +372,16 @@
 
 (def-customizable-writer
     (function (stream symbol pathname pathname) t)
-  *header-ref-proc*
-  def-header-ref-writer)
+  *type-ref-proc*
+  def-type-ref-writer)
 
-(defmacro header-ref (label)
+(defmacro type-ref (label)
   (when *add-documentation*
     (with-gensyms (let-label)
       `(let ((,let-label ,label))
 	 (declare (type symbol ,let-label))
-	 '(:header-ref ,let-label)))))
+	 '(:type-ref ,let-label)))))
+
 
 
 (declaim (type hash-table *code-tags*))
@@ -711,6 +769,95 @@
 
 
 ;; ----- writer functions -----
+
+(def-customizable-writer
+    (function () string)
+  *get-file-extensions-proc*
+  def-get-file-extensions-writer)
+
+
+(cl:defmacro add-documentation-in-file (file-path)
+  (when *add-documentation*
+    (with-gensyms (let-file-path header-tag header-str symbol-tag function-tag type-tag)
+      (once-only (file-path)
+	`(progn
+	   (assert (pathname-directory ,file-path) (,file-path) "The ~s pathname has not a directory part." ,file-path)
+	   (assert (pathname-name ,file-path) (,file-path) "The ~s pathname has not a name part." ,file-path)
+	   (let ((,let-file-path (make-pathname :directory (cons :relative (cdr (pathname-directory ,file-path)))
+						:name (pathname-name ,file-path))))
+	     (emplace-adp-file ,let-file-path (copy-array *file-adp-elements*))
+	     (empty-adp-elements)
+	     (loop for (,header-tag . ,header-str) across *header-tags*
+		   for ,symbol-tag across *symbol-tags*
+		   for ,function-tag across *function-tags*
+		   for ,type-tag across *type-tags*
+		   do (add-header-tag-path ,header-tag ,header-str ,let-file-path)
+		      (add-symbol-tag-path ,symbol-tag ,let-file-path)
+		      (add-function-tag-path ,function-tag ,let-file-path)
+		      (add-type-tag-path ,type-tag ,let-file-path)
+		   finally (empty-header-tags)
+			   (empty-symbol-tags)
+			   (empty-function-tags)
+			   (empty-type-tags))))))))
+
+
+(cl:defun slice-format (root-path &rest args)
+  (with-output-to-string (stream)
+    (loop for arg in args
+	  do (cond
+	       ((listp arg)
+		(cond
+		  ((eq (car arg) :header-ref)
+		   (assert (get-header-tag-path (cadr arg)) ((cadr arg)) "~s is not a header tag." (cadr arg)) 
+		   (let* ((header-tag (cadr arg))
+			  (header-str-path (get-header-tag-path header-tag))
+			  (header-str (car header-str-path))
+			  (header-rel-path (cdr header-str-path)))
+		     (funcall *header-ref* stream header-str header-tag root-path header-rel-path))))
+		((eq (car arg) :symbol-ref)
+		 (assert (get-header-tag-path (cadr arg)) ((cadr arg)) "~s is not a symbol tag." (cadr arg))
+		 (let* ((symbol-tag (cadr arg))
+			(symbol-path (get-symbol-tag-path symbol-tag)))
+		   (funcall *symbol-ref* stream symbol-tag root-path symbol-path)))
+		((eq (car arg) :function-ref)
+		 (assert (get-function-tag-path (cadr arg)) ((cadr arg)) "~s is not a function tag." (cadr arg))
+		 (let* ((function-tag (cadr arg))
+			(function-path (get-function-tag-path function-tag)))
+		   (funcall *function-ref* stream function-tag root-path function-path)))
+		((eq (car arg) :type-ref)
+		 (assert (get-type-tag-path (cadr arg)) ((cadr arg)) "~s is not a type tag." (cadr arg))
+		 (let* ((type-tag (cadr arg))
+			(type-path (get-type-tag-path type-tag)))
+		   (funcall *type-ref* stream type-tag root-path type-path))))
+	       ((stringp arg)
+		(princ arg stream))
+	       (t (prin1 arg stream))))))
+
+
+(declaim (ftype (function (stream pathname (vector adp-element)) t) write-documentation-stream))
+(cl:defun write-documentation-stream (stream root-path elements)
+  (loop for element across elements
+	do (case (adp-element-key-type element)
+	     (:header (apply *header-proc* stream (adp-element-contents element)))
+	     (:subheader (apply *subheader-proc* stream (adp-element-contents element)))
+	     (:subsubheader (apply *subsubheader-proc* stream (adp-element-contents element)))
+	     (:text (funcall *text-proc* (apply #'slice-format root-path (adp-element-contents element))))
+	     (:table (funcall *table-proc* (loop for row in (adp-element-contents element)
+					       collect (loop for elem in row
+							     collect (apply #'slice-format root-path (cdr elem))))))
+	     (:itemize (labels ((write-itemize (item-list)
+				  (loop for item in item-list
+					if (eq (car item) :item)
+					  collect (apply #'slice-format root-path (cdr item))
+					else
+					  collect (write-itemize (cdr item)))))
+			 (let ((item-list (adp-element-contents element)))
+			   (funcall *itemize-proc* stream (write-itemize item-list)))))
+	     (:image (destructuring-bind (alt-text image-path) (adp-element-contents element)
+		       (funcall *image-proc* stream alt-text root-path image-path)))
+	     (:code-block (apply *code-block-proc* stream (adp-element-contents element)))
+	     (:code-example (apply *code-example-proc* stream (adp-element-contents element))))))
+
 
 (macrolet ((def-add-documentation-in-file-definer ()
 	     (let ((doc-global-proc (gensym "GLOBAL-PROC")))
