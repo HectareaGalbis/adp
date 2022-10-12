@@ -4,71 +4,70 @@
 
 ;; ----- guide functions -----
 
-(def-header-writer (text label)
-    (when label
-      (if (member label *header-labels*)
-	  (warn "The label ~s is already used" label)
-	  (setf *header-labels* (cons label *header-labels*))))
-  (vector-push-extend (format nil "# ~a~%~%" text) *file-documentation*))
+(def-header-writer (stream text tag)
+    (format stream "# ~a~%~%" text))
 
+(def-subheader-writer (stream text tag)
+    (format stream "## ~a~%~%" text))
 
-(def-subheader-writer (text label)
-    (when label
-      (if (member label *header-labels*)
-	  (warn "The label ~s is already used" label)
-	  (setf *header-labels* (cons label *header-labels*))))
-  (vector-push-extend (format nil "## ~a~%~%" text) *file-documentation*))
+(def-subsubheader-writer (stream text tag)
+  (format stream "### ~a~%~%" text))
 
+(def-text-writer (stream text)
+    (format stream "~a~%~%" text))
 
-(def-subsubheader-writer (text label)
-    (when label
-      (if (member label *header-labels*)
-	  (warn "The label ~s is already used" label)
-	  (setf *header-labels* (cons label *header-labels*))))
-  (vector-push-extend (format nil "### ~a~%~%" text) *file-documentation*))
+(def-table-writer (stream table)
+    (format stream "~{| ~a ~}|~%" (car table))
+  (format stream "~v@{| --- ~}|~%" (length (car table)) nil)
+  (format stream "~{~{| ~a ~}|~%~}~%~%" (cdr table)))
 
+(def-itemize-writer (stream items)
+    (labels ((itemize-aux (item-list level)
+	       (loop for item in item-list
+		     if (eq (car item) :item)
+		       do (format stream "~v@{  ~}* ~a~%" level item)
+		     else if (eq (car item) :itemize)
+			    do (itemize-aux item (1+ level))
+		     finally (when (zerop level)
+			       (format stream "~%~%")))))
+      (itemize-aux items 0)))
 
-(def-text-writer (text)
-    (vector-push-extend (format nil "~a~%~%" text) *file-documentation*))
+(def-image-writer (stream alt-text root-path rel-image-path)
+  (format stream "![~a](~a)~%~%" alt-text (merge-pathnames root-path rel-image-path)))
 
+(def-bold-writer (stream text)
+  (format stream "**~a**" text))
 
-(def-table-writer (table)
-    (let ((table-head (car table))
-	  (table-tail (cdr table)))
-      (with-stream-string (stream table-str)
-	(format stream "~{| ~a ~}|~%" table-head)
-	(format stream "~v@{| --- ~}|~%" (length table-head) nil)
-        (format stream "~{~{| ~a ~}|~%~}~%" table-tail)
-	(vector-push-extend table-str *file-documentation*))))
+(def-italic-writer (stream text)
+    (format stream "_~a_" text))
 
+(def-code-inline-writer (stream code)
+    (let ((*print-pretty* nil))
+      (format stream "`~s`" code)))
 
-(def-itemize-writer (items)
-    (labels ((itemize-aux (item-list stream level)
-	       (if (eq (car item-list) :itemize)
-		   (loop for item in item-list
-			 do (itemize-aux item))
-		   (format stream "~v@{  ~}* ~a~%" level item-list))))
-      (with-stream-string (stream str)
-	(itemize-aux items stream 0)
-	(vector-push-extend str *file-documentation*))))
+(def-web-link-writer (stream name link)
+    (format stream "[~a](~a)" name link))
 
+(def-header-ref-writer (stream tag header-text root-path file-path)
+    (format stream "***~a***" header-text))
 
-(def-code-block-writer (code-list)
-    (with-stream-string (stream str)
-      (format stream "```~%~{~s~%~^~%~}~%```~%~%" code-list)
-      (vector-push-extend str *file-documentation*)))
+(def-symbol-ref-writer (stream tag root-path file-path)
+    (format stream "***~a***" tag))
 
+(def-function-ref-writer (stream tag root-path file-path)
+    (format stream "***~a***" tag))
 
-(def-example-writer (evaluated-code-list)
-    (with-stream-string (stream str)
-      (format stream "```~%~{> ~{~s~%~a~%~{~s~%~}~%~}~^~%~}~%```~%~%" code-list)
-      (vector-push-extend str *file-documentation*)))
+(def-type-ref-writer (stream tag root-path file-path)
+  (format stream "***~a***" tag))
 
+(def-code-block-writer (stream code-list)
+    (format stream "```~%~{~s~%~^~%~}~%```~%~%" code-list))
 
-(def-image-writer (alt-text path)
-    (with-stream-string (stream str)
-      (format stream "")
-      (vector-push-extend str *file-documentation*)))
+(def-code-example-writer (stream code-list)
+    (format stream "```~%")
+    (loop for (code output result) in code-list
+	  do (format stream "~s~%Output:~%~a~%Result:~%~{~s~%~}~%" code output result))
+  (format stream "```~%~%"))
 
 
 ;; ----- api functions -----

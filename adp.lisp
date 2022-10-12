@@ -499,7 +499,7 @@
 
 
 (def-customizable-writer
-    (function (list) t)
+    (function (stream list) t)
   *code-block-proc*
   def-code-block-writer)
 
@@ -515,7 +515,7 @@
 
 
 (def-customizable-writer
-    (function (list) t)
+    (function (stream list) t)
   *code-example-proc*
   def-code-example-writer)
  
@@ -829,9 +829,7 @@
 		 (let* ((type-tag (cadr arg))
 			(type-path (get-type-tag-path type-tag)))
 		   (funcall *type-ref* stream type-tag root-path type-path))))
-	       ((stringp arg)
-		(princ arg stream))
-	       (t (prin1 arg stream))))))
+	       (t (princ arg stream))))))
 
 
 (declaim (ftype (function (stream pathname (vector adp-element)) t) write-file-contents))
