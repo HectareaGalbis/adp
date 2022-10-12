@@ -2,26 +2,6 @@
 (in-package :adp)
 
 
-;; ----- parameters -----
-
-(defparameter *file-documentation* (make-array 1000 :fill-pointer 0 :adjustable t :element-type 'string))
-
-(defparameter *system-documentation* (make-array 10 :fill-pointer 0 :adjustable t :element-type 'string))
-
-(defparameter *header-labels* nil)
-(defparameter *name-labels* nil)
-(defparameter *function-labels* nil)
-
-(defparameter *code-tags* (make-hash-table))
-
-
-;; ----- help macros -----
-
-(defmacro with-stream-string (stream str &body body)
-  `(let ((,str (make-array 100 :adjustable t :fill-pointer 0 :element-type 'character)))
-     (with-output-to-string (,stream ,str)
-       ,@body)))
-
 ;; ----- guide functions -----
 
 (def-header-writer (text label)

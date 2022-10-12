@@ -772,8 +772,8 @@
 
 (def-customizable-writer
     (function () string)
-  *get-file-extensions-proc*
-  def-get-file-extensions-writer)
+  *get-file-extension-proc*
+  def-get-file-extension-writer)
 
 
 (cl:defmacro add-documentation-in-file (file-path)
@@ -834,8 +834,8 @@
 	       (t (prin1 arg stream))))))
 
 
-(declaim (ftype (function (stream pathname (vector adp-element)) t) write-documentation-stream))
-(cl:defun write-documentation-stream (stream root-path elements)
+(declaim (ftype (function (stream pathname (vector adp-element)) t) write-file-contents))
+(cl:defun write-file-contents (stream root-path elements)
   (loop for element across elements
 	do (case (adp-element-key-type element)
 	     (:header (apply *header-proc* stream (adp-element-contents element)))
@@ -856,62 +856,131 @@
 	     (:image (destructuring-bind (alt-text image-path) (adp-element-contents element)
 		       (funcall *image-proc* stream alt-text root-path image-path)))
 	     (:code-block (apply *code-block-proc* stream (adp-element-contents element)))
-	     (:code-example (apply *code-example-proc* stream (adp-element-contents element))))))
+	     (:code-example (apply *code-example-proc* stream (adp-element-contents element)))
+	     (:defclass (apply *defclass-proc* stream (adp-element-contents element)))
+	     (:defclass (apply *defclass-proc* stream (adp-element-contents element)))
+	     (:defconstant (apply *defconstant-proc* stream (adp-element-contents element)))
+	     (:defgeneric (apply *defgeneric-proc* stream (adp-element-contents element)))
+	     (:define-compiler-macro (apply *define-compiler-macro-proc* stream (adp-element-contents element)))
+	     (:define-condition (apply *define-condition-proc* stream (adp-element-contents element)))
+	     (:define-method-combination (apply *define-method-combination-proc* stream (adp-element-contents element)))
+	     (:define-modify-macro (apply *define-modify-macro-proc* stream (adp-element-contents element)))
+	     (:define-setf-expander (apply *define-setf-expander-proc* stream (adp-element-contents element)))
+	     (:define-symbol-macro (apply *define-symbol-macro-proc* stream (adp-element-contents element)))
+	     (:defmacro (apply *defmacro-proc* stream (adp-element-contents element)))
+	     (:defmethod (apply *defmethod-proc* stream (adp-element-contents element)))
+	     (:defpackage (apply *defpackage-proc* stream (adp-element-contents element)))
+	     (:defparameter (apply *defparameter-proc* stream (adp-element-contents element)))
+	     (:defsetf (apply *defsetf-proc* stream (adp-element-contents element)))
+	     (:defstruct (apply *defstruct-proc* stream (adp-element-contents element)))
+	     (:deftype (apply *deftype-proc* stream (adp-element-contents element)))
+	     (:defun (apply *defun-proc* stream (adp-element-contents element)))
+	     (:defvar (apply *defvar-proc* stream (adp-element-contents element)))
+	     (t (error "Element not recognized: ~s" (adp-element-key-type element))))))
 
 
-(macrolet ((def-add-documentation-in-file-definer ()
-	     (let ((doc-global-proc (gensym "GLOBAL-PROC")))
-	       `(progn
-		  (defparameter ,doc-global-proc nil)
-		  (defmacro def-add-documentation-in-file-writer ((file-path) &body body)
-		    (unless (symbolp file-path)
-		      (error "The argument must be a symbol. Found: ~s" file-path))
-		    `(setq ,',doc-global-proc (lambda (,file-path)
-						,@body)))
-		  (defun add-documentation-in-file-impl (file-path)
-		    (unless (eq :relative (car (pathname-directory (pathname file-path))))
-		      (error "The pathname ~s is not a relative path." file-path))
-		    (unless (pathname-name (pathname file-path))
-		      (error "The pathname ~s does not designate any file." file-path))
-		    (when ,doc-global-proc
-		      (apply ,doc-global-proc file-path)))
-		  (defmacro add-documentation-in-file (file-path)
-		    (when *add-documentation*
-		      `(add-documentation-in-file-impl ,file-path)))))))
-  (def-add-documentation-in-file-definer))
+(def-customizable-writer
+    (function (stream) t)
+  *file-header-proc*
+  def-file-header-writer)
+
+(def-customizable-writer
+    (function (stream) t)
+  *file-foot-proc*
+  def-file-foot-writer)
 
 
-(cl:defun style-file (style)
-  (let* ((style-name (string style))
-	 (style-file (asdf:system-relative-pathname #:apd (concatenate 'string "/styles/" style-name ".lisp"))))
-    (truename style-file)))
+(declaim (ftype (function (pathname pathname (vector adp-element)) t) write-file))
+(cl:defun write-file (root-path rel-path elements)
+  (let* ((complete-path (make-pathname :host (pathname-host root-path)
+				       :device (pathname-device root-path)
+				       :directory (append (pathname-directory root-path) (cdr (pathname-directory rel-path)))
+				       :name (pathname-name rel-path)
+				       :type (funcall *get-file-extension-proc*))))
+    (multiple-value-bind (file-path created) (ensure-directories-exist complete-path :verbose nil)
+      (when (not created)
+	(error "The directories from ~s could not be created." file-path)))
+    (with-open-file (stream complete-path :direction :output :if-does-not-exist :create :if-exists :supersede)
+      (funcall *file-header-proc* stream)
+      (write-file-contents stream )
+      (funcall *file-foot-proc* stream root-path elements))))
+
+
+(def-customizable-writer
+    (function (pathname) t)
+  *system-files-proc*
+  def-system-files-writer)
+
+
+(cl:defun write-system-files (root-path)
+  (funcall *system-files-proc* root-path)
+  (loop for (rel-path . file-contents) across *project-adp-files*
+	do (write-file root-path rel-path file-contents)))
+
+
+
 
 
 (cl:defun load-style (style)
-  (load (style-file style))
-  (setf *current-style* style))
+  (asdf:load-system style))
 
 
-(macrolet ((def-add-documentation-please-definer ()
-	     (let ((doc-global-proc (gensym "GLOBAL-PROC")))
-	       `(progn
-		  (defparameter ,doc-global-proc nil)
-		  (defmacro def-add-documentation-please-writer ((root-dir) &body body)
-		    (unless (symbolp root-dir)
-		      (error "Expected a symbol. Found: ~s" root-dir))
-		    `(setq ,',doc-global-proc (lambda (,root-dir)
-						,@body)))
-		  (defun add-documentation-please (system root-dir)
-		    (unless (eq :absolute (car (pathname-directory root-dir)))
-		      (error "The pathname ~s is not absolute." root-dir))
-		    (unless (uiop:directory-exists-p root-dir)
-		      (error "The directory ~s does no exist." root-dir))
-		    (when (not *current-style*)
-		      (load-style :markdown))
-		    (let ((*add-documentation* t))
-		      (asdf:load-system system :force t))
-		    (funcall ,doc-global-proc root-dir))))))
-  (def-add-documentation-please-definer))
+(declaim (type list *style-parameters*))
+(cl:defparameter *style-parameters* nil)
+
+(cl:defun add-style-parameter (name key-name required)
+  (push (list name key-name type) *style-parameters*))
+
+(cl:defun style-parameterp (key-name)
+  (member key-name *style-parameters* :key #'cadr))
+
+(cl:defun style-parameter-requiredp (key-name)
+  (cadar (member key-name *style-parameters* :key #'cadr)))
+
+(cl:defun style-required-parameters ()
+  (loop for (name key-name requiredp) in *style-parameters*
+	if requiredp
+	  collect key-name))
+
+(cl:defun set-parameter-value (key-name value)
+  (loop for (name key requiredp) in *style-parameters*
+	until (eq key key-name)
+	finally (setf (symbol-value name) value)))
+
+(cl:defmacro def-style-parameter (name &key (value nil) (key-name nil) (required nil))
+  (check-type symbolp name "a symbol")
+  (check-type keywordp key-name "a keyword")
+  `(progn
+     (defparameter ,name ,value)
+     (if ,key-name
+	 (add-style-parameter ,name ,key-name ,required)
+	 (add-style-parameter ,name (intern (symbol-name ,name) :keyword) *style-parameters*))))
+
+(cl:defun check-style-parameters (style-params)
+  (let ((required-parameters (style-required-parameters))
+	(style-parameter-key-names (loop for key-name in style-params by #'cddr
+					 collect key-name)))
+    (loop for style-parameter-key-name in style-parameter-key-names
+	  if (not (style-parameterp style-parameter-key-name))
+	    do (error "The parameter ~s is not allowed." style-parameter-key-name))
+    (loop for required-param in required-params
+	  if (not (member required-param style-parameter-key-names))
+	    do (error "The required param ~s is not used." required-param))))
+
+
+(cl:defun load-documentation-system (system root-path &rest style-args)
+  (check-style-parameters style-args)
+  (let ((*add-documentation*))
+    (asdf:load-system system :force t))
+  (loop for (name value) in style-args by #'cddr
+	do (set-parameter-value name value))
+  (let ((fixed-root-path (make-pathname :host (pathname-host root-path)
+					:device (pathname-device root-path)
+					:directory (cons :absolute (cdr (pathname-directory root-path))))))
+    (write-system-files fixed-root-path)))
+
+
+
 
 
 
