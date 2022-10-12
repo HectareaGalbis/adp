@@ -38,6 +38,121 @@
 	      ,@,body-arg))))))
 
 
+;; ----- defclass components -----
+
+(defun defclass-class-name (defclass-body)
+  (car defclass-body))
+
+(defun defclass-superclass-names (defclass-body)
+  (cadr defclass-body))
+
+(defun defclass-slot-specifiers (defclass-body)
+  (caddr defclass-body))
+
+(defun defclass-slot-names (defclass-body)
+  (let ((slot-specifiers (defclass-slot-specifiers defclass-body)))
+    (and slot-specifiers
+	 (loop for slot-specifier in slot-specifiers
+	       collect (if (listp slot-specifier)
+			   (car slot-specifier)
+			   slot-specifier)))))
+
+(defun defclass-slot-options (defclass-body)
+  (let ((slot-specifiers (defclass-slot-specifiers defclass-body)))
+    (and slot-specifiers
+	 (loop for slot-specifier in slot-specifiers
+	       collect (if (listp slot-specifier)
+			   (cdr slot-specifier)
+			   nil)))))
+
+(defun defclass-reader-function-names (defclass-body)
+  (let ((slot-options (defclass-slot-options defclass-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (loop for rest-slot-option on slot-option by #'cddr
+				  if (eq (car rest-slot-option) :reader)
+				    collect (cadr rest-slot-option)))))))
+
+(defun defclass-writer-function-names (defclass-body)
+  (let ((slot-options (defclass-slot-options defclass-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (loop for rest-slot-option on slot-option by #'cddr
+				  if (eq (car rest-slot-option) :writer)
+				    collect (cadr rest-slot-option)))))))
+
+(defun defclass-accessor-function-names (defclass-body)
+  (let ((slot-options (defclass-slot-options defclass-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (loop for rest-slot-option on slot-option by #'cddr
+				  if (eq (car rest-slot-option) :accessor)
+				    collect (cadr rest-slot-option)))))))
+
+(defun defclass-allocation-types (defclass-body)
+  (let ((slot-options (defclass-slot-options defclass-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (cadr (member :allocation slot-option)))))))
+
+(defun defclass-initarg-names (defclass-body)
+  (let ((slot-options (defclass-slot-options defclass-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (loop for rest-slot-option on slot-option by #'cddr
+				  if (eq (car rest-slot-option) :initarg)
+				    collect (cadr rest-slot-option)))))))
+
+(defun defclass-initforms (defclass-body)
+  (let ((slot-options (defclass-slot-options defclass-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (cadr (member :initform slot-option)))))))
+
+(defun defclass-type-specifiers (defclass-body)
+  (let ((slot-options (defclass-slot-options defclass-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (cadr (member :type slot-option)))))))
+
+(defun defclass-slot-documentations (defclass-body)
+  (let ((slot-options (defclass-slot-options defclass-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (cadr (member :documentation slot-option)))))))
+
+(defun defclass-class-options (defclass-body)
+  (cdddr defclass-body))
+
+(defun defclass-default-initargs (defclass-body)
+  (let ((class-options (defclass-class-options defclass-body)))
+    (and class-options
+	 (cdr (member :default-initargs class-options :key #'car)))))
+
+(defun defclass-documentation (defclass-body)
+  (let ((class-options (defclass-class-options defclass-body)))
+    (and class-options
+	 (cadr (member :documentation class-options :key #'car)))))
+
+(defun defclass-metaclass (defclass-body)
+  (let ((class-options (defclass-class-options defclass-body)))
+    (and class-options
+	 (cadr (member :metaclass class-options :key #'car)))))
+
+(def-with-components defclass class-name superclass-names slot-specifiers slot-names slot-options
+  reader-function-names writer-function-names accessor-function-names allocation-types
+  initarg-names initforms type-specifiers slot-documentations class-options default-initargs
+  documentation metaclass)
+
+
 ;; ----- defconstant components -----
 
 (defun defconstant-name (defconstant-body)
@@ -50,6 +165,201 @@
   (caddr defconstant-body))
 
 (def-with-components defconstant name initial-value documentation)
+
+
+;; ----- defgeneric components -----
+
+(defun defgeneric-function-name (defgeneric-body)
+  (car defgeneric-body))
+
+(defun defgeneric-gf-lambda-list (defgeneric-body)
+  (cadr defgeneric-body))
+
+(defun defgeneric-options (defgeneric-body)
+  (remove-if (lambda (x)
+	       (eq (car x) :method))
+	     (cddr defgeneric-body)))
+
+(defun defgeneric-argument-precedence-order (defgeneric-body)
+  (let ((options (defgeneric-options defgeneric-body)))
+    (and options
+	 (cdr (member :argument-precedence-order :key #'car)))))
+
+(defun defgeneric-gf-declarations (defgeneric-body)
+  (let ((options (defgeneric-options defgeneric-body)))
+    (and options
+	 (cdr (member 'cl:declare :key #'car)))))
+
+(defun defgeneric-documentation (defgeneric-body)
+  (let ((options (defgeneric-options defgeneric-body)))
+    (and options
+	 (cadr (member :documentation :key #'car)))))
+
+(defun defgeneric-method-combination (defgeneric-body)
+  (let ((options (defgeneric-options defgeneric-body)))
+    (and options
+	 (cdr (member :method-combination :key #'car)))))
+
+(defun defgeneric-generic-function-class (defgeneric-body)
+  (let ((options (defgeneric-options defgeneric-body)))
+    (and options
+	 (cadr (member :generic-function-class :key #'car)))))
+
+(defun defgeneric-method-class (defgeneric-body)
+  (let ((options (defgeneric-options defgeneric-body)))
+    (and options
+	 (cadr (member :method-class :key #'car)))))
+
+(defun defgeneric-method-descriptions (defgeneric-body)
+  (remove-if-not (lambda (x)
+		   (eq (car x) :method))
+		 (cddr defgeneric-body)))
+
+(def-with-components function-name gf-lambda-list options argument-precedence-order gf-declarations
+  documentation method-combination generic-function-class method-class method-descriptions)
+
+
+;; ----- define-compiler-macro components -----
+
+(defun define-compiler-macro-name (define-compiler-macro-body)
+  (car define-compiler-macro-body))
+
+(defun define-compiler-macro-lambda-list (define-compiler-macro-body)
+  (cadr define-compiler-macro-body))
+
+(defun define-compiler-macro-declarations (define-compiler-macro-body)
+  (let ((post-lambda-list (cddr define-compiler-macro-body)))
+    (loop for expr in post-lambda-list
+	  while (or (declarationp expr)
+		    (documentationp expr))
+	  when (declarationp expr)
+	    collect expr)))
+
+(defun define-compiler-macro-documentation (define-compiler-macro-body)
+  (let ((post-lambda-list (cddr define-compiler-macro-body)))
+    (loop for expr in post-lambda-list
+	  while (or (declarationp expr)
+		    (documentationp expr))
+	  when (documentationp expr)
+	    return expr)))
+
+(defun define-compiler-macro-forms (define-compiler-macro-body)
+  (let ((post-lambda-list (cddr define-compiler-macro-body)))
+    (loop for expr on post-lambda-list
+	  while (or (declarationp (car expr))
+		    (documentationp (car expr)))
+	  finally return expr)))
+
+(def-with-components define-compiler-macro name lambda-list declarations documentation forms)
+
+
+;; ----- define-condition components -----
+
+(defun define-condition-name (define-condition-body)
+  (car define-condition-body))
+
+(defun define-condition-parent-types (define-condition-body)
+  (cadr define-condition-body))
+
+(defun define-condition-slot-specs (define-condition-body)
+  (caddr defince-condition-body))
+
+(defun define-condition-slot-names (define-condition-body)
+  (let ((slot-specs (define-condition-slot-specs define-condition-body)))
+    (and slot-specs
+	 (loop for slot-spec in slot-specs
+	       if (symbolp slot-spec)
+		 collect slot-spec
+	       else
+		 collect (car slot-spec)))))
+
+(defun define-condition-slot-options (define-condition-body)
+  (let ((slot-specs (define-condition-slot-specs defince-condition-body)))
+    (and slot-specs
+	 (loop for slot-spec in slot-specs
+	       if (symbolp slot-spec)
+		 collect nil
+	       else
+		 collect (cdr slot-spec)))))
+
+(defun define-condition-slot-readers (define-condition-body)
+  (let ((slot-options (define-condition-slot-options define-condition-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (loop for rest-slot-option on slot-option by #'cddr
+				  if (eq (car rest-slot-option) :reader)
+				    collect (cadr rest-slot-option)))))))
+
+(defun define-condition-slot-writers (define-condition-body)
+  (let ((slot-options (define-condition-slot-options define-condition-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (loop for rest-slot-option on slot-option by #'cddr
+				  if (eq (car rest-slot-option) :writer)
+				    collect (cadr rest-slot-option)))))))
+
+(defun define-condition-slot-accessors (define-condition-body)
+  (let ((slot-options (define-condition-slot-options define-condition-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (loop for rest-slot-option on slot-option by #'cddr
+				  if (eq (car rest-slot-option) :accessor)
+				    collect (cadr rest-slot-option)))))))
+
+(defun define-condition-slot-allocations (define-condition-body)
+  (let ((slot-options (define-condition-slot-options define-condition-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (cadr (member :allocation slot-option)))))))
+
+(defun define-condition-slot-initargs (define-condition-body)
+  (let ((slot-options (define-condition-slot-options define-condition-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (loop for rest-slot-option on slot-option by #'cddr
+				  if (eq (car rest-slot-option) :initarg)
+				    collect (cadr rest-slot-option)))))))
+
+(defun define-condition-slot-initforms (define-condition-body)
+  (let ((slot-options (define-condition-slot-options define-condition-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (cadr (member :initform slot-option)))))))
+
+(defun define-condition-slot-types (define-condition-body)
+  (let ((slot-options (define-condition-slot-options define-condition-body)))
+    (and slot-options
+	 (loop for slot-option in slot-options
+	       collect (and slot-option
+			    (cadr (member :type slot-option)))))))
+
+(defun define-condition-options (define-condition-body)
+  (cdddr define-condition-body))
+
+(defun define-condition-default-initargs (define-condition-body)
+  (let ((options (define-condition-options define-condition-body)))
+    (and options
+	 (cdr (member :default-initargs options :key #'car)))))
+
+(defun define-condition-documentation (define-condition-body)
+  (let ((options (define-condition-options define-condition-body)))
+    (and options
+	 (cadr (member :documentation options :key #'car)))))
+
+(defun define-condition-report-name (define-condition-body)
+  (let ((options (define-condition-options define-condition-body)))
+    (and options
+	 (cadr (member :report options :key #'car)))))
+
+(def-with-components define-condition name parent-types slot-specs slot-names slot-options slot-readers
+  slot-writers slot-accessors slot-allocations slot-initargs slot-initforms slot-types options
+  default-initargs documentation report-name)
 
 
 ;; ----- defparameter components -----
@@ -147,39 +457,6 @@
 
 (def-with-components defmacro name lambda-list declarations documentation forms)
 
-
-;; ----- define-compiler-macro components -----
-
-(defun define-compiler-macro-name (define-compiler-macro-body)
-  (car define-compiler-macro-body))
-
-(defun define-compiler-macro-lambda-list (define-compiler-macro-body)
-  (cadr define-compiler-macro-body))
-
-(defun define-compiler-macro-declarations (define-compiler-macro-body)
-  (let ((post-lambda-list (cddr define-compiler-macro-body)))
-    (loop for expr in post-lambda-list
-	  while (or (declarationp expr)
-		    (documentationp expr))
-	  when (declarationp expr)
-	    collect expr)))
-
-(defun define-compiler-macro-documentation (define-compiler-macro-body)
-  (let ((post-lambda-list (cddr define-compiler-macro-body)))
-    (loop for expr in post-lambda-list
-	  while (or (declarationp expr)
-		    (documentationp expr))
-	  when (documentationp expr)
-	    return expr)))
-
-(defun define-compiler-macro-forms (define-compiler-macro-body)
-  (let ((post-lambda-list (cddr define-compiler-macro-body)))
-    (loop for expr on post-lambda-list
-	  while (or (declarationp (car expr))
-		    (documentationp (car expr)))
-	  finally return expr)))
-
-(def-with-components define-compiler-macro name lambda-list declarations documentation forms)
 
 
 ;; ----- defstruct -----
@@ -383,171 +660,10 @@
   documentation)
 
 
-;; ----- defclass components -----
-
-(defun defclass-class-name (defclass-body)
-  (car defclass-body))
-
-(defun defclass-superclass-names (defclass-body)
-  (cadr defclass-body))
-
-(defun defclass-slot-specifiers (defclass-body)
-  (caddr defclass-body))
-
-(defun defclass-slot-names (defclass-body)
-  (let ((slot-specifiers (defclass-slot-specifiers defclass-body)))
-    (and slot-specifiers
-	 (loop for slot-specifier in slot-specifiers
-	       collect (if (listp slot-specifier)
-			   (car slot-specifier)
-			   slot-specifier)))))
-
-(defun defclass-slot-options (defclass-body)
-  (let ((slot-specifiers (defclass-slot-specifiers defclass-body)))
-    (and slot-specifiers
-	 (loop for slot-specifier in slot-specifiers
-	       collect (if (listp slot-specifier)
-			   (cdr slot-specifier)
-			   nil)))))
-
-(defun defclass-reader-function-names (defclass-body)
-  (let ((slot-options (defclass-slot-options defclass-body)))
-    (and slot-options
-	 (loop for slot-option in slot-options
-	       collect (and slot-option
-			    (loop for rest-slot-option on slot-option by #'cddr
-				  if (eq (car rest-slot-option) :reader)
-				    collect (cadr rest-slot-option)))))))
-
-(defun defclass-writer-function-names (defclass-body)
-  (let ((slot-options (defclass-slot-options defclass-body)))
-    (and slot-options
-	 (loop for slot-option in slot-options
-	       collect (and slot-option
-			    (loop for rest-slot-option on slot-option by #'cddr
-				  if (eq (car rest-slot-option) :writer)
-				    collect (cadr rest-slot-option)))))))
-
-(defun defclass-accessor-function-names (defclass-body)
-  (let ((slot-options (defclass-slot-options defclass-body)))
-    (and slot-options
-	 (loop for slot-option in slot-options
-	       collect (and slot-option
-			    (loop for rest-slot-option on slot-option by #'cddr
-				  if (eq (car rest-slot-option) :accessor)
-				    collect (cadr rest-slot-option)))))))
-
-(defun defclass-allocation-types (defclass-body)
-  (let ((slot-options (defclass-slot-options defclass-body)))
-    (and slot-options
-	 (loop for slot-option in slot-options
-	       collect (and slot-option
-			    (cadr (member :allocation slot-option)))))))
-
-(defun defclass-initarg-names (defclass-body)
-  (let ((slot-options (defclass-slot-options defclass-body)))
-    (and slot-options
-	 (loop for slot-option in slot-options
-	       collect (and slot-option
-			    (loop for rest-slot-option on slot-option by #'cddr
-				  if (eq (car rest-slot-option) :initarg)
-				    collect (cadr rest-slot-option)))))))
-
-(defun defclass-initforms (defclass-body)
-  (let ((slot-options (defclass-slot-options defclass-body)))
-    (and slot-options
-	 (loop for slot-option in slot-options
-	       collect (and slot-option
-			    (cadr (member :initform slot-option)))))))
-
-(defun defclass-type-specifiers (defclass-body)
-  (let ((slot-options (defclass-slot-options defclass-body)))
-    (and slot-options
-	 (loop for slot-option in slot-options
-	       collect (and slot-option
-			    (cadr (member :type slot-option)))))))
-
-(defun defclass-slot-documentations (defclass-body)
-  (let ((slot-options (defclass-slot-options defclass-body)))
-    (and slot-options
-	 (loop for slot-option in slot-options
-	       collect (and slot-option
-			    (cadr (member :documentation slot-option)))))))
-
-(defun defclass-class-options (defclass-body)
-  (cdddr defclass-body))
-
-(defun defclass-default-initargs (defclass-body)
-  (let ((class-options (defclass-class-options defclass-body)))
-    (and class-options
-	 (cdr (member :default-initargs class-options :key #'car)))))
-
-(defun defclass-documentation (defclass-body)
-  (let ((class-options (defclass-class-options defclass-body)))
-    (and class-options
-	 (cadr (member :documentation class-options :key #'car)))))
-
-(defun defclass-metaclass (defclass-body)
-  (let ((class-options (defclass-class-options defclass-body)))
-    (and class-options
-	 (cadr (member :metaclass class-options :key #'car)))))
-
-(def-with-components defclass class-name superclass-names slot-specifiers slot-names slot-options
-  reader-function-names writer-function-names accessor-function-names allocation-types
-  initarg-names initforms type-specifiers slot-documentations class-options default-initargs
-  documentation metaclass)
 
 
-;; ----- defgeneric components -----
 
-(defun defgeneric-function-name (defgeneric-body)
-  (car defgeneric-body))
 
-(defun defgeneric-gf-lambda-list (defgeneric-body)
-  (cadr defgeneric-body))
-
-(defun defgeneric-options (defgeneric-body)
-  (remove-if (lambda (x)
-	       (eq (car x) :method))
-	     (cddr defgeneric-body)))
-
-(defun defgeneric-argument-precedence-order (defgeneric-body)
-  (let ((options (defgeneric-options defgeneric-body)))
-    (and options
-	 (cdr (member :argument-precedence-order :key #'car)))))
-
-(defun defgeneric-gf-declarations (defgeneric-body)
-  (let ((options (defgeneric-options defgeneric-body)))
-    (and options
-	 (cdr (member 'cl:declare :key #'car)))))
-
-(defun defgeneric-documentation (defgeneric-body)
-  (let ((options (defgeneric-options defgeneric-body)))
-    (and options
-	 (cadr (member :documentation :key #'car)))))
-
-(defun defgeneric-method-combination (defgeneric-body)
-  (let ((options (defgeneric-options defgeneric-body)))
-    (and options
-	 (cdr (member :method-combination :key #'car)))))
-
-(defun defgeneric-generic-function-class (defgeneric-body)
-  (let ((options (defgeneric-options defgeneric-body)))
-    (and options
-	 (cadr (member :generic-function-class :key #'car)))))
-
-(defun defgeneric-method-class (defgeneric-body)
-  (let ((options (defgeneric-options defgeneric-body)))
-    (and options
-	 (cadr (member :method-class :key #'car)))))
-
-(defun defgeneric-method-descriptions (defgeneric-body)
-  (remove-if-not (lambda (x)
-		   (eq (car x) :method))
-		 (cddr defgeneric-body)))
-
-(def-with-components function-name gf-lambda-list options argument-precedence-order gf-declarations
-  documentation method-combination generic-function-class method-class method-descriptions)
 
 
 ;; ----- defmethod components -----
