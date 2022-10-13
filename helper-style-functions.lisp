@@ -362,66 +362,194 @@
   default-initargs documentation report-name)
 
 
-;; ----- defparameter components -----
+;; ----- define-method-combination components -----
 
-(defun defparameter-name (defparameter-body)
-  (car defparameter-body))
+(defun define-method-combination-name (define-method-combination-body)
+  (car define-method-combination-body))
 
-(defun defparameter-initial-value (defparameter-body)
-  (cadr defparameter-body))
+(defun define-method-combination-short-form-options (define-method-combination-body)
+  (let ((possible-short-form-options (cdr define-method-combination-body)))
+    (if (keywordp (car possible-short-form-options))
+	possible-short-form-options
+	nil)))
 
-(defun defparameter-documentation (defparameter-body)
-  (caddr defparameter-body))
+(defun define-method-combination-identity-with-one-argument (define-method-combination-body)
+  (let ((short-form-options (define-method-combination-short-form-options define-method-combination-body)))
+    (and short-form-options
+	 (cadr (member :identity-with-one-argument short-form-options)))))
 
-(def-with-components defparameter name initial-value documentation)
+(defun define-method-combination-operator (define-method-combination-body)
+  (let ((short-form-options (define-method-combination-short-form-options define-method-combination-body)))
+    (and short-form-options
+	 (cadr (member :operator short-form-options)))))
+
+(defun define-method-combination-lambda-list (define-method-combination-body)
+  (cadr define-method-combination-body))
+
+(defun define-method-combination-method-group-specifiers (define-method-combination-body)
+  (caddr define-method-combination-body))
+
+(defun define-method-combination-method-group-specifier-names (define-method-combination-body)
+  (let ((method-group-specifiers (define-method-combination-method-group-specifiers define-method-combination-body)))
+    (and method-group-specifiers
+	 (mapcar #'car method-group-specifiers))))
+
+(defun define-method-combination-qualifier-patterns (define-method-combination-body)
+  (let ((method-group-specifiers (define-method-combination-method-group-specifiers define-method-combination-body)))
+    (and method-group-specifiers
+	 (loop for method-group-specifier in method-group-specifiers
+	       collect (loop for possible-qualifier-pattern in (cdr method-group-specifier)
+			     while (listp possible-qualifier-pattern)
+			     collect possible-qualifier-pattern)))))
+
+(defun define-method-combination-predicates (define-method-combination-body)
+  (let ((method-group-specifiers (define-method-combination-method-group-specifiers define-method-combination-body)))
+    (and method-group-specifiers
+	 (loop for method-group-specifier in method-group-specifiers
+	       collect (let ((possible-predicate (cadr method-group-specifier)))
+			 (if (listp possible-predicate)
+			     nil
+			     possible-predicate))))))
+
+(defun define-method-combination-long-form-options (define-method-combination-body)
+  (let ((method-group-specifiers (define-method-combination-method-group-specifiers define-method-combination-body)))
+    (and method-group-specifiers
+	 (loop for method-group-specifier in method-group-specifiers
+	       collect (if (symbolp (cadr method-group-specifier))
+			   (cddr method-group-specifier)
+			   (loop for rest-method-group-specifier on (cdr method-group-specifier)
+				 while (listp (car rest-method-group-specifier))
+				 finally (return rest-method-group-specifier)))))))
+
+(defun define-method-combination-descriptions (define-method-combination-body)
+  (let ((long-form-options (define-method-combination-long-form-options define-method-combination-body)))
+    (and long-form-options
+	 (loop for long-form-option in long-form-options
+	       collect (cadr (member :description long-form-option))))))
+
+(defun define-method-combination-orders (define-method-combination-body)
+  (let ((long-form-options (define-method-combination-long-form-options define-method-combination-body)))
+    (and long-form-options
+	 (loop for long-form-option in long-form-options
+	       collect (cadr (member :order long-form-option))))))
+
+(defun define-method-combination-requireds (define-method-combination-body)
+  (let ((long-form-options (define-method-combination-long-form-options define-method-combination-body)))
+    (and long-form-options
+	 (loop for long-form-option in long-form-options
+	       collect (cadr (member :required long-form-option))))))
+
+(defun define-method-combination-arguments (define-method-combination-body)
+  (let ((possible-arguments (cadddr define-method-combination-body)))
+    (if (and (listp possible-arguments)
+	     (eq (car possible-arguments) :arguments))
+	(cdr possible-arguments)
+	nil)))
+
+(defun define-method-combination-generic-function (define-method-combination-body)
+  (let ((rest-possible-generic-function (cdddr define-method-combination-body)))
+    (if (and (listp (car rest-possible-generic-function))
+	     (eq (caar rest-possible-generic-function) :generic-function))
+	(cadar rest-possible-generic-function)
+	(let ((last-possible-generic-function (cadr rest-possible-generic-function)))
+	  (if (and (listp last-possible-generic-function)
+		   (eq (car last-possible-generic-function) :generic-function))
+	      (cadr last-possible-generic-function))))))
+
+(defun define-method-combination-declarations (define-method-combination-body)
+  (loop for possible-declaration in (cdddr define-method-combination-body)
+	while (or (declarationp possible-declaration)
+		  (documentationp possible-declaration)
+		  (and (listp possible-declaration)
+		       (member (car possible-declaration) '(:arguments :generic-function))))
+	when (declarationp possible-declaration)
+	  collect possible-declaration))
+
+(defun define-method-combination-documentation (define-method-combination-body)
+  (let ((short-form-options (define-method-combination-short-form-options)))
+    (if short-form-options
+	(cadr (member :documentation short-form-options))
+	(loop for possible-documentation in (cdddr define-method-combination-body)
+	      while (or (declarationp possible-documentation)
+			(documentationp possible-documentation)
+			(and (listp possible-documentation)
+			     (member (car possible-documentation) '(:arguments :generic-function))))
+	      when (documentationp possible-documentation)
+		return possible-documentation))))
+
+(defun define-method-combination-forms (define-method-combination-body)
+  (loop for possible-forms on (cdddr define-method-combination-body)
+	      while (or (declarationp possible-documentation)
+			(documentationp possible-documentation)
+			(and (listp possible-documentation)
+			     (member (car possible-documentation) '(:arguments :generic-function))))
+	      finally (return possible-forms)))
+
+(def-with-components define-method-combination name short-form-options identity-with-one-argument operator
+  lambda-list method-group-specifiers method-group-specifier-names qualifier-patterns predicates
+  long-form-options descriptions orders requireds arguments generic-function declarations documentation forms)
 
 
-;; ----- defvar components -----
+;; ----- define-modify-macro components -----
 
-(defun defvar-name (defvar-body)
-  (car defvar-body))
+(defun define-modify-macro-name (define-modify-macro-body)
+  (car define-modify-macro-body))
 
-(defun defvar-initial-value (defvar-body)
-  (cadr defvar-body))
+(defun define-modify-macro-lambda-list (define-modify-macro-body)
+  (cadr define-modify-macro-body))
 
-(defun defvar-documentation (defvar-body)
-  (caddr defvar-body))
+(defun define-modify-macro-function (define-modify-macro-body)
+  (caddr define-modify-macro-body))
 
-(def-with-components defvar name initial-value documentation)
+(defun define-modify-macro-documentation (define-modify-macro-body)
+  (cadddr define-modify-macro-body))
+
+(def-with-components define-modify-macro name lambda-list function documentation) 
 
 
-;; ----- defun components -----
+;; ----- define-setf-expander components -----
 
-(defun defun-function-name (defun-body)
-  (car defun-body))
+(defun define-setf-expander-access-fn (define-setf-expander-body)
+  (car define-setf-expander-body))
 
-(defun defun-lambda-list (defun-body)
-  (cadr defun-body))
+(defun define-setf-expander-lambda-list (define-setf-expander-body)
+  (cadr define-setf-expander-body))
 
-(defun defun-declarations (defun-body)
-  (let ((post-lambda-list (cddr defun-body)))
+(defun define-setf-expander-declarations (define-setf-expander-body)
+  (let ((post-lambda-list (cddr define-setf-expander-body)))
     (loop for expr in post-lambda-list
 	  while (or (declarationp expr)
 		    (documentationp expr))
 	  when (declarationp expr)
 	    collect expr)))
 
-(defun defun-documentation (defun-body)
-  (let ((post-lambda-list (cddr defun-body)))
+(defun define-setf-expander-documentation (define-setf-expander-body)
+  (let ((post-lambda-list (cddr define-setf-expander-body)))
     (loop for expr in post-lambda-list
 	  while (or (declarationp expr)
 		    (documentationp expr))
 	  when (documentationp expr)
 	    return expr)))
 
-(defun defun-forms (defun-body)
-  (let ((post-lambda-list (cddr defun-body)))
+(defun define-setf-expander-forms (define-setf-expander-body)
+  (let ((post-lambda-list (cddr define-setf-expander-body)))
     (loop for expr on post-lambda-list
 	  while (or (declarationp (car expr))
 		    (documentationp (car expr)))
-	  finally return expr)))
+	  finally (return expr))))
 
-(def-with-components defun function-name lambda-list declarations documentation forms)
+(def-with-components define-setf-expander access-fn lambda-list declarations documentation forms)
+
+
+;; ----- define-symbol-macro components -----
+
+(defun define-symbol-macro-symbol (define-symbol-macro-body)
+  (car define-symbol-macro-body))
+
+(defun define-symbol-macro-expansion (define-symbol-macro-body)
+  (cadr define-symbol-macro-body))
+
+(def-with-components define-symbol-macro symbol expansion)
 
 
 ;; ----- defmacro components -----
@@ -457,6 +585,151 @@
 
 (def-with-components defmacro name lambda-list declarations documentation forms)
 
+
+;; ----- defmethod components -----
+
+(defun defmethod-function-name (defmethod-body)
+  (car defmethod-body))
+
+(defun defmethod-method-qualifiers (defmethod-body)
+  (loop for qualifier in (cdr defmethod-body)
+	while (not (listp qualifier))
+	collect qualifier))
+
+(defun defmethod-specialized-lambda-list (defmethod-body)
+  (loop for possible-lambda-list in (cdr defmethod-body)
+	when (listp possible-lambda-list)
+	  return possible-lambda-list))
+
+(defun defmethod-declarations (defmethod-body)
+  (loop for rest-defmethod-body on (cdr defmethod-body)
+	when (listp (car rest-defmathod-body))
+	  return (loop for possible-declaration in (cdr rest-defmethod-body)
+		       while (or (declarationp possible-declaration)
+				 (documentationp possible-declaration))
+		       if (declarationp possible-declaration)
+			 collect possible-declaration)))
+
+(defun defmethod-documentation (defmethod-body)
+  (loop for rest-defmethod-body on (cdr defmethod-body)
+	when (listp (car rest-defmathod-body))
+	  return (loop for possible-documentation in (cdr rest-defmethod-body)
+		       while (or (declarationp possible-documentation)
+				 (documentationp possible-documentation))
+		       if (documentationp possible-documentation)
+			 return possible-documentation)))
+
+(defun defmethod-forms (defmethod-body)
+  (loop for rest-defmethod-body on (cdr defmethod-body)
+	when (listp (car rest-defmathod-body))
+	  return (loop for rest-possible-forms on (cdr rest-defmethod-body)
+		       while (or (declarationp (car rest-possible-forms))
+				 (documentationp (car rest-possible-forms)))
+		       finally return rest-possible-forms)))
+
+(def-with-components defmethod function-name method-qualifiers specialized-lambda-list declarations
+  documentation forms)
+
+
+;; ----- defpackage components -----
+
+(defun defpackage-options (defpackage-body)
+  (cdr defpackage-body))
+
+(defun defpackage-defined-package-name (defpackage-body)
+  (car defpackage-body))
+
+(defun defpackage-nicknames (defpackage-body)
+  (let ((options (defpackage-options defpackage-body)))
+    (mapcan #'cdr (remove-if-not (lambda (x)
+				   (eq (car x) :nicknames))
+				 options))))
+
+(defun defpackage-use-package-names (defpackage-body)
+  (let ((options (defpackage-options defpackage-body)))
+    (mapcan #'cdr (remove-if-not (lambda (x)
+				   (eq (car x) :use))
+				 options))))
+
+(defun defpackage-shadow-symbol-names (defpackage-body)
+  (let ((options (defpackage-options defpackage-body)))
+    (mapcan #'cdr (remove-if-not (lambda (x)
+				   (eq (car x) :shadow))
+				 options))))
+
+(defun defpackage-shadowing-import-from-package-names (defpackage-body)
+  (let ((options (defpackage-options defpackage-body)))
+    (mapcar #'cadr (remove-if-not (lambda (x)
+				   (eq (car x) :shadowing-import-from))
+				  options))))
+
+(defun defpackage-shadowing-import-from-symbol-names (defpackage-body)
+  (let ((options (defpackage-options defpackage-body)))
+    (mapcan #'cddr (remove-if-not (lambda (x)
+				   (eq (car x) :shadowing-import-from))
+				 options))))
+
+(defun defpackage-import-from-package-names (defpackage-body)
+  (let ((options (defpackage-options defpackage-body)))
+    (mapcar #'cadr (remove-if-not (lambda (x)
+				   (eq (car x) :import-from))
+				  options))))
+
+(defun defpackage-import-from-symbol-names (defpackage-body)
+  (let ((options (defpackage-options defpackage-body)))
+    (mapcan #'cddr (remove-if-not (lambda (x)
+				   (eq (car x) :import-from))
+				  options))))
+
+(defun defpackage-export-symbol-names (defpackage-body)
+  (let ((options (defpackage-options defpackage-body)))
+    (mapcan #'cdr (remove-if-not (lambda (x)
+				   (eq (car x) :export))
+				 options))))
+
+(defun defpackage-import-symbol-names (defpackage-body)
+  (let ((options (defpackage-options defpackage-body)))
+    (mapcan #'cdr (remove-if-not (lambda (x)
+				   (eq (car x) :export))
+				 options))))
+
+(defun defpackage-size (defpackage-body)
+  (let ((options (defpackage-options defpackage-body)))
+    (cadar (member :size options :key #'car))))
+
+(def-with-components defpackage options defined-package-name nicknames use-package-names shadow-symbol-names
+  shadowing-import-from-package-names shadowing-import-from-symbol-names import-from-package-names
+  import-from-symbol-names export-symbol-names import-symbol-names size)
+
+
+;; ----- defparameter components -----	 
+
+(defun defparameter-name (defparameter-body)
+  (car defparameter-body))
+
+(defun defparameter-initial-value (defparameter-body)
+  (cadr defparameter-body))
+
+(defun defparameter-documentation (defparameter-body)
+  (caddr defparameter-body))
+
+(def-with-components defparameter name initial-value documentation)
+
+
+;; ----- defsetf components -----
+
+(defun defsetf-access-fn (defsetf-body)
+  (car defsetf-body))
+
+(defun defsetf-update-fn (defsetf-body)
+  (let ((possible-update-fn (cadr defsetf-body)))
+    (if (symbolp possible-update-fn)
+	possible-update-fn)))
+
+(defun defsetf-documentation (defsetf-body)
+  (caddr defsetf-body))
+
+(def-with-components defsetf access-fn update-fn documentation)
 
 
 ;; ----- defstruct -----
@@ -660,123 +933,83 @@
   documentation)
 
 
+;; ----- deftype components -----
+
+(defun deftype-name (deftype-body)
+  (car deftype-body))
+
+(defun deftype-lambda-list (deftype-body)
+  (cadr deftype-body))
+
+(defun deftype-declarations (deftype-body)
+  (let ((post-lambda-list (cddr deftype-body)))
+    (loop for expr in post-lambda-list
+	  while (or (declarationp expr)
+		    (documentationp expr))
+	  when (declarationp expr)
+	    collect expr)))
+
+(defun deftype-documentation (deftype-body)
+  (let ((post-lambda-list (cddr deftype-body)))
+    (loop for expr in post-lambda-list
+	  while (or (declarationp expr)
+		    (documentationp expr))
+	  when (documentationp expr)
+	    return expr)))
+
+(defun deftype-forms (deftype-body)
+  (let ((post-lambda-list (cddr deftype-body)))
+    (loop for expr on post-lambda-list
+	  while (or (declarationp (car expr))
+		    (documentationp (car expr)))
+	  finally (return expr))))
+
+(def-with-components deftype name lambda-list declarations documentation forms)
 
 
+;; ----- defun components -----
+
+(defun defun-function-name (defun-body)
+  (car defun-body))
+
+(defun defun-lambda-list (defun-body)
+  (cadr defun-body))
+
+(defun defun-declarations (defun-body)
+  (let ((post-lambda-list (cddr defun-body)))
+    (loop for expr in post-lambda-list
+	  while (or (declarationp expr)
+		    (documentationp expr))
+	  when (declarationp expr)
+	    collect expr)))
+
+(defun defun-documentation (defun-body)
+  (let ((post-lambda-list (cddr defun-body)))
+    (loop for expr in post-lambda-list
+	  while (or (declarationp expr)
+		    (documentationp expr))
+	  when (documentationp expr)
+	    return expr)))
+
+(defun defun-forms (defun-body)
+  (let ((post-lambda-list (cddr defun-body)))
+    (loop for expr on post-lambda-list
+	  while (or (declarationp (car expr))
+		    (documentationp (car expr)))
+	  finally return expr)))
+
+(def-with-components defun function-name lambda-list declarations documentation forms)
 
 
+;; ----- defvar components -----
 
+(defun defvar-name (defvar-body)
+  (car defvar-body))
 
-;; ----- defmethod components -----
+(defun defvar-initial-value (defvar-body)
+  (cadr defvar-body))
 
-(defun defmethod-function-name (defmethod-body)
-  (car defmethod-body))
+(defun defvar-documentation (defvar-body)
+  (caddr defvar-body))
 
-(defun defmethod-method-qualifiers (defmethod-body)
-  (loop for qualifier in (cdr defmethod-body)
-	while (not (listp qualifier))
-	collect qualifier))
-
-(defun defmethod-specialized-lambda-list (defmethod-body)
-  (loop for possible-lambda-list in (cdr defmethod-body)
-	when (listp possible-lambda-list)
-	  return possible-lambda-list))
-
-(defun defmethod-declarations (defmethod-body)
-  (loop for rest-defmethod-body on (cdr defmethod-body)
-	when (listp (car rest-defmathod-body))
-	  return (loop for possible-declaration in (cdr rest-defmethod-body)
-		       while (or (declarationp possible-declaration)
-				 (documentationp possible-declaration))
-		       if (declarationp possible-declaration)
-			 collect possible-declaration)))
-
-(defun defmethod-documentation (defmethod-body)
-  (loop for rest-defmethod-body on (cdr defmethod-body)
-	when (listp (car rest-defmathod-body))
-	  return (loop for possible-documentation in (cdr rest-defmethod-body)
-		       while (or (declarationp possible-documentation)
-				 (documentationp possible-documentation))
-		       if (documentationp possible-documentation)
-			 return possible-documentation)))
-
-(defun defmethod-forms (defmethod-body)
-  (loop for rest-defmethod-body on (cdr defmethod-body)
-	when (listp (car rest-defmathod-body))
-	  return (loop for rest-possible-forms on (cdr rest-defmethod-body)
-		       while (or (declarationp (car rest-possible-forms))
-				 (documentationp (car rest-possible-forms)))
-		       finally return rest-possible-forms)))
-
-(def-with-components defmethod function-name method-qualifiers specialized-lambda-list declarations
-  documentation forms)
-
-
-;; ----- defpackage components -----
-
-(defun defpackage-options (defpackage-body)
-  (cdr defpackage-body))
-
-(defun defpackage-defined-package-name (defpackage-body)
-  (car defpackage-body))
-
-(defun defpackage-nicknames (defpackage-body)
-  (let ((options (defpackage-options defpackage-body)))
-    (mapcan #'cdr (remove-if-not (lambda (x)
-				   (eq (car x) :nicknames))
-				 options))))
-
-(defun defpackage-use-package-names (defpackage-body)
-  (let ((options (defpackage-options defpackage-body)))
-    (mapcan #'cdr (remove-if-not (lambda (x)
-				   (eq (car x) :use))
-				 options))))
-
-(defun defpackage-shadow-symbol-names (defpackage-body)
-  (let ((options (defpackage-options defpackage-body)))
-    (mapcan #'cdr (remove-if-not (lambda (x)
-				   (eq (car x) :shadow))
-				 options))))
-
-(defun defpackage-shadowing-import-from-package-names (defpackage-body)
-  (let ((options (defpackage-options defpackage-body)))
-    (mapcar #'cadr (remove-if-not (lambda (x)
-				   (eq (car x) :shadowing-import-from))
-				  options))))
-
-(defun defpackage-shadowing-import-from-symbol-names (defpackage-body)
-  (let ((options (defpackage-options defpackage-body)))
-    (mapcan #'cddr (remove-if-not (lambda (x)
-				   (eq (car x) :shadowing-import-from))
-				 options))))
-
-(defun defpackage-import-from-package-names (defpackage-body)
-  (let ((options (defpackage-options defpackage-body)))
-    (mapcar #'cadr (remove-if-not (lambda (x)
-				   (eq (car x) :import-from))
-				  options))))
-
-(defun defpackage-import-from-symbol-names (defpackage-body)
-  (let ((options (defpackage-options defpackage-body)))
-    (mapcan #'cddr (remove-if-not (lambda (x)
-				   (eq (car x) :import-from))
-				  options))))
-
-(defun defpackage-export-symbol-names (defpackage-body)
-  (let ((options (defpackage-options defpackage-body)))
-    (mapcan #'cdr (remove-if-not (lambda (x)
-				   (eq (car x) :export))
-				 options))))
-
-(defun defpackage-import-symbol-names (defpackage-body)
-  (let ((options (defpackage-options defpackage-body)))
-    (mapcan #'cdr (remove-if-not (lambda (x)
-				   (eq (car x) :export))
-				 options))))
-
-(defun defpackage-size (defpackage-body)
-  (let ((options (defpackage-options defpackage-body)))
-    (cadar (member :size options :key #'car))))
-
-(def-with-components defpackage options defined-package-name nicknames use-package-names shadow-symbol-names
-  shadowing-import-from-package-names shadowing-import-from-symbol-names import-from-package-names
-  import-from-symbol-names export-symbol-names import-symbol-names size)
+(def-with-components defvar name initial-value documentation)
