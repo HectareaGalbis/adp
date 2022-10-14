@@ -2,8 +2,32 @@
 
 (asdf:defsystem #:adp
   :author "Héctor Galbis Sanchis"
-  :description "Documentation generator facility"
+  :description "Add Documentation, Please. A documentation generator."
   :license "The Unlicense"
   :depends-on (:uiop :alexandria)
   :components ((:file "package")
-	       (:file "adp")))
+	       (:file "adp")
+	       (:file "helper-style-functions")))
+
+
+(asdf:defsystem #:adp/doc
+  :author "Héctor Galbis Sanchis"
+  :description "ADP, Add Documentation, Please."
+  :license "The Unlicense"
+  :depends-on (:uiop :alexandria)
+  :components ((:file "package")
+	       (:file "adp")
+	       (:file "helper-style-functions")
+	       (:file "readme")))
+
+
+;; ----- ADP styles -----
+
+(asdf:defsystem #:adp/markdown
+  :author "Héctor Galbis Sanchis"
+  :description "Markdown style for adp"
+  :license "The Unlicense"
+  :depends-on (:alexandria :adp)
+  :components ((:module "styles/markdown"
+		:components ((:file "package")
+			     (:file "markdown")))))
