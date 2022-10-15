@@ -6,16 +6,18 @@
   :license "The Unlicense"
   :depends-on (:uiop :alexandria)
   :components ((:file "package")
+	       (:file "adp-core")
 	       (:file "adp")
 	       (:file "helper-style-functions")))
 
 
 (asdf:defsystem #:adp/doc
   :author "Héctor Galbis Sanchis"
-  :description "ADP, Add Documentation, Please."
+  :description "ADP, add documentation, please."
   :license "The Unlicense"
   :depends-on (:uiop :alexandria)
   :components ((:file "package")
+	       (:file "adp-core")
 	       (:file "adp")
 	       (:file "helper-style-functions")
 	       (:file "readme")))
