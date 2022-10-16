@@ -8,7 +8,7 @@
   :components ((:file "package")
 	       (:file "adp-core")
 	       (:file "adp")
-	       (:file "adp-writers")
+	       (:file "adp-writerspac")
 	       (:file "helper-style-functions")))
 
 
