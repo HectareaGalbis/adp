@@ -8,6 +8,7 @@
   :components ((:file "package")
 	       (:file "adp-core")
 	       (:file "adp")
+	       (:file "adp-writers")
 	       (:file "helper-style-functions")))
 
 
@@ -19,6 +20,7 @@
   :components ((:file "package")
 	       (:file "adp-core")
 	       (:file "adp")
+	       (:file "adp-writers")
 	       (:file "helper-style-functions")
 	       (:file "readme")))
 

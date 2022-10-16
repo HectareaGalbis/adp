@@ -4,7 +4,7 @@
 
 ;; ----- adp parameters -----
 
-(defparameter *add-documentation* nil)
+(defvar *add-documentation* nil)
 (defparameter *current-style* nil)
 
 
@@ -27,7 +27,7 @@
 
 
 (declaim (type (vector adp-element) *file-adp-elements*))
-(defparameter *file-adp-elements* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'adp-element))
+(defvar *file-adp-elements* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'adp-element))
 
 (declaim (ftype (function (adp-element) t) push-adp-element))
 (defun push-adp-element (elem)
@@ -61,7 +61,7 @@
 
 
 (declaim (type (vector adp-file) *project-adp-files*))
-(defparameter *project-adp-files* (make-array 10 :adjustable t :fill-pointer 0))
+(defvar *project-adp-files* (make-array 10 :adjustable t :fill-pointer 0))
 
 (declaim (ftype (function (adp-file) t) push-adp-file))
 (defun push-adp-file (adp-file)
@@ -79,12 +79,12 @@
 ;; ----- adp ref tags -----
 
 (declaim (type (vector (cons symbol string)) *header-tags*))
-(defparameter *header-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
+(defvar *header-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
 
 (declaim (type (vector symbol) *symbol-tags* *function-tags* *type-tags*))
-(defparameter *symbol-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
-(defparameter *function-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
-(defparameter *type-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
+(defvar *symbol-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
+(defvar *function-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
+(defvar *type-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
 
 (declaim (ftype (function (symbol string) t) push-header-tag))
 (defun push-header-tag (tag str)
@@ -136,10 +136,10 @@
 
 
 (declaim (type hash-table *header-tags-table* *symbol-tags-table* *function-tags-table* *type-tags-table*))
-(defparameter *header-tags-table* (make-hash-table))
-(defparameter *symbol-tags-table* (make-hash-table))
-(defparameter *function-tags-table* (make-hash-table))
-(defparameter *type-tags-table* (make-hash-table))
+(defvar *header-tags-table* (make-hash-table))
+(defvar *symbol-tags-table* (make-hash-table))
+(defvar *function-tags-table* (make-hash-table))
+(defvar *type-tags-table* (make-hash-table))
 
 (declaim (ftype (function (symbol string pathname) t) add-header-tag-path))
 (defun add-header-tag-path (tag str path)
@@ -177,7 +177,7 @@
 ;; ----- adp code tags -----
 
 (declaim (type hash-table *code-tags*))
-(defparameter *code-tags* (make-hash-table))
+(defvar *code-tags* (make-hash-table))
 
 (declaim (ftype (function (symbol &rest t) t) add-code-tag))
 (defun add-code-tag (tag &rest list-code)
@@ -277,7 +277,7 @@
 
 ;; ----- text variations -----
 
-(declaim (type keyword *bold-symbol* *italic-symbol* *code-inline-symbol* *header-ref-symbol*
+(declaim (type symbol *bold-symbol* *italic-symbol* *code-inline-symbol* *header-ref-symbol*
 	       *symbol-ref-symbol* *function-ref-symbol* *type-ref-symbol*))
 (defparameter *bold-symbol* '#:bold)
 (defparameter *italic-symbol* '#:italic)
@@ -287,7 +287,7 @@
 (defparameter *function-ref-symbol* '#:bold)
 (defparameter *type-ref-symbol* '#:bold)
 
-(declaim (ftype (funtion (&rest t) (cons keyword list)) create-bold-text create-italic-text
+(declaim (ftype (function (&rest t) (cons keyword list)) create-bold-text create-italic-text
 		create-code-inline-text))
 (defun create-bold-text (&rest args)
   (cons *bold-symbol* args))
@@ -342,9 +342,128 @@
   (and (listp arg)
        (eq (car arg) *type-ref-symbol*)))
 
+
+;; ----- style parameters -----
+
+(declaim (type list *style-parameters*))
+(defvar *style-parameters* nil)
+
+(defun add-style-parameter (name key-name required)
+  (push (list name key-name required) *style-parameters*))
+
+(defun style-parameterp (key-name)
+  (member key-name *style-parameters* :key #'cadr))
+
+(defun style-parameter-requiredp (key-name)
+  (cadar (member key-name *style-parameters* :key #'cadr)))
+
+(defun style-required-parameters ()
+  (loop for (name key-name requiredp) in *style-parameters*
+	if requiredp
+	  collect key-name))
+
+(defun set-parameter-value (key-name value)
+  (loop for (name key requiredp) in *style-parameters*
+	until (eq key key-name)
+	finally (setf (symbol-value name) value)))
+
+(defun check-style-parameters (style-params)
+  (let ((required-parameters (style-required-parameters))
+	(style-parameter-key-names (loop for key-name in style-params by #'cddr
+					 collect key-name)))
+    (loop for style-parameter-key-name in style-parameter-key-names
+	  if (not (style-parameterp style-parameter-key-name))
+	    do (error "The parameter ~s is not allowed." style-parameter-key-name))
+    (loop for required-param in required-parameters
+	  if (not (member required-param style-parameter-key-names))
+	    do (error "The required param ~s is not used." required-param))))
+
+
 ;; ----- writing functions -----
 
-(declaim (ftype (funtion (pathname &rest t) string) slice-format))
+(declaim (type (or null (function (stream string symbol) t)) *header-proc* *subheader-proc* *subsubheader-proc*))
+(defvar *header-proc* nil)
+(defvar *subheader-proc* nil)
+(defvar *subsubheader-proc* nil)
+
+(declaim (type (or null (function (stream string) t)) *text-proc*))
+(defvar *text-proc* nil)
+
+(declaim (type (or null (function (stream list) t)) *table-proc*))
+(defvar *table-proc* nil)
+
+(declaim (type (or null (function (stream list) t)) *itemize-proc*))
+(defvar *itemize-proc* nil)
+
+(declaim (type (or null (function (stream string pathname pathname) t)) *image-proc*))
+(defvar *image-proc* nil)
+
+(declaim (type (or null (function (stream string) t)) *bold-proc*))
+(defvar *bold-proc* nil)
+
+(declaim (type (or null (function (stream string) t)) *italic-proc*))
+(defvar *italic-proc* nil)
+
+(declaim (type (or null (function (stream t) t)) *code-inline-proc*))
+(defvar *code-inline-proc* nil)
+
+(declaim (type (or null (function (stream string string) t)) *web-link-proc*))
+(defvar *web-link-proc* nil)
+
+(declaim (type (or null (function (stream symbol string pathname pathname) t)) *header-ref-proc*))
+(defvar *header-ref-proc* nil)
+
+(declaim (type (or null (function (stream symbol pathname pathname) t)) *symbol-ref-proc*))
+(defvar *symbol-ref-proc* nil)
+
+(declaim (type (or null (function (stream symbol pathname pathname) t)) *function-ref-proc*))
+(defvar *function-ref-proc* nil)
+
+(declaim (type (or null (function (stream symbol pathname pathname) t)) *type-ref-proc*))
+(defvar *type-ref-proc* nil)
+
+(declaim (type (or null (function (stream list) t)) *code-block-proc*))
+(defvar *code-block-proc* nil)
+
+(declaim (type (or null (function (stream list) t)) *code-example-proc*))
+(defvar *code-example-proc* nil)
+
+(declaim (type (or null (function (stream t) t)) *defclass-proc* *defconstant-proc* *defgeneric-proc*
+	       *define-compiler-macro-proc* *define-condition-proc* *define-method-combination-proc*
+	       *define-modify-macro-proc* *define-setf-expander-proc* *define-symbol-macro-proc*
+	       *defmacro-proc* *defmethod-proc* *defpackage-proc* *defparameter-proc* *defsetf-proc*
+	       *defstruct-proc* *deftype-proc* *defun-proc* *defvar-proc*))
+(defvar *defclass-proc* nil)
+(defvar *defconstant-proc* nil)
+(defvar *defgeneric-proc* nil)
+(defvar *define-compiler-macro-proc* nil)
+(defvar *define-condition-proc* nil)
+(defvar *define-method-combination-proc* nil)
+(defvar *define-modify-macro-proc* nil)
+(defvar *define-setf-expander-proc* nil)
+(defvar *define-symbol-macro-proc* nil)
+(defvar *defmacro-proc* nil)
+(defvar *defmethod-proc* nil)
+(defvar *defpackage-proc* nil)
+(defvar *defparameter-proc* nil)
+(defvar *defsetf-proc* nil)
+(defvar *defstruct-proc* nil)
+(defvar *deftype-proc* nil)
+(defvar *defun-proc* nil)
+(defvar *defvar-proc* nil)
+
+(declaim (type (or null (function () string)) *get-file-extension-proc*))
+(defvar *get-file-extension-proc* nil)
+
+(declaim (type (or null (function (stream) t)) *file-header-proc* *file-foot-proc*))
+(defvar *file-header-proc* nil)
+(defvar *file-foot-proc* nil)
+
+(declaim (type (or null (function (pathname) t)) *system-files-proc*))
+(defvar *system-files-proc* nil)
+
+
+(declaim (ftype (function (pathname &rest t) string) slice-format))
 (defun slice-format (root-path &rest args)
   (with-output-to-string (stream)
     (loop for arg in args
@@ -434,9 +553,7 @@
 				       :directory (append (pathname-directory root-path) (cdr (pathname-directory rel-path)))
 				       :name (pathname-name rel-path)
 				       :type (funcall *get-file-extension-proc*))))
-    (multiple-value-bind (file-path created) (ensure-directories-exist complete-path :verbose nil)
-      (when (not created)
-	(error "The directories from ~s could not be created." file-path)))
+    (ensure-directories-exist complete-path :verbose nil)
     (with-open-file (stream complete-path :direction :output :if-does-not-exist :create :if-exists :supersede)
       (funcall *file-header-proc* stream)
       (write-file-contents stream root-path elements)
@@ -445,321 +562,7 @@
 
 (defun write-system-files (root-path)
   (funcall *system-files-proc* root-path)
-  (loop for (rel-path . file-contents) across *project-adp-files*
-	do (write-file root-path rel-path file-contents)))
-
-
-;; ----- style parameters -----
-
-(declaim (type list *style-parameters*))
-(defparameter *style-parameters* nil)
-
-(defun add-style-parameter (name key-name required)
-  (push (list name key-name required) *style-parameters*))
-
-(defun style-parameterp (key-name)
-  (member key-name *style-parameters* :key #'cadr))
-
-(defun style-parameter-requiredp (key-name)
-  (cadar (member key-name *style-parameters* :key #'cadr)))
-
-(defun style-required-parameters ()
-  (loop for (name key-name requiredp) in *style-parameters*
-	if requiredp
-	  collect key-name))
-
-(defun set-parameter-value (key-name value)
-  (loop for (name key requiredp) in *style-parameters*
-	until (eq key key-name)
-	finally (setf (symbol-value name) value)))
-
- (defmacro def-style-parameter (name &key (value nil) (key-name nil) (required nil))
-  (check-type name symbol "a symbol")
-  (check-type key-name keyword "a keyword")
-  `(progn
-     (defparameter ,name ,value)
-     (if ,key-name
-	 (add-style-parameter ,name ,key-name ,required)
-	 (add-style-parameter ,name (intern (symbol-name ,name) :keyword) *style-parameters*))))
-
-(defun check-style-parameters (style-params)
-  (let ((required-parameters (style-required-parameters))
-	(style-parameter-key-names (loop for key-name in style-params by #'cddr
-					 collect key-name)))
-    (loop for style-parameter-key-name in style-parameter-key-names
-	  if (not (style-parameterp style-parameter-key-name))
-	    do (error "The parameter ~s is not allowed." style-parameter-key-name))
-    (loop for required-param in required-parameters
-	  if (not (member required-param style-parameter-key-names))
-	    do (error "The required param ~s is not used." required-param))))
-
-
-;; ----- def-writer macros -----
-
-(defmacro def-customizable-writer (ftype-decl global-proc-name writer-name)
-  (with-gensyms (writer-arg writer-args body-arg)
-    `(progn
-       (declaim (type (or ,ftype-decl null) ,global-proc-name))
-       (defparameter ,global-proc-name nil)
-       (defmacro ,writer-name (,writer-args &body ,body-arg)
-	 (check-type ,writer-args list)
-	 (loop for ,writer-arg in ,writer-args
-	       do (check-type ,writer-arg symbol))
-	 `(setq ,',global-proc-name (lambda ,,writer-args
-				      ,@,body-arg))))))
-
-
-(defmacro def-cl-customizable-writer (name name-proc name-writer)
-  (with-gensyms (definer-body)
-    `(progn
-       (def-customizable-writer
-	   (function (t) t)
-	 ,name-proc
-	 ,name-writer)
-       (defmacro ,name (&rest ,definer-body)
-	 `(progn
-	    ,(cons ',(find-symbol (symbol-name name) '#:cl) ,definer-body)
-	    ,@(when *add-documentation*
-		`((emplace-adp-element ,',(intern (symbol-name name) '#:keyword) ',,definer-body))))))))
-
-
-;; ----- guide functions -----
-
-(def-customizable-writer
-    (function (stream string symbol) t)
-  *header-proc*
-  def-header-writer)
-
-
-(def-customizable-writer
-    (function (stream string symbol) t)
-  *subheader-proc*
-  def-subheader-writer)
-
-
-(def-customizable-writer
-    (function (stream string symbol) t)
-  *subsubheader-proc*
-  def-subsubheader-writer)
-
-
-(def-customizable-writer
-    (function (stream string) t)
-  *text-proc*
-  def-text-writer)
-
-
-(def-customizable-writer
-    (function (stream list) t)
-  *table-proc*
-  def-table-writer)
-
-
-(def-customizable-writer
-    (function (stream list) t)
-  *itemize-proc*
-  def-itemize-writer)
-
-
-(def-customizable-writer
-    (function (stream string pathname pathname) t)
-  *image-proc*
-  def-image-writer)
-
-
-(def-customizable-writer
-    (function (stream string) t)
-  *bold-proc*
-  def-bold-writer)
-
-
-(def-customizable-writer
-    (function (stream string) t)
-  *italic-proc*
-  def-italic-writer)
-
-
-(def-customizable-writer
-    (function (stream t) t)
-  *code-inline-proc*
-  def-code-inline-writer)
-
-
-(def-customizable-writer
-    (function (stream string string) t)
-  *web-link-proc*
-  def-web-link-writer)
-
-
-(def-customizable-writer
-    (function (stream symbol string pathname pathname) t)
-  *header-ref-proc*
-  def-header-ref-writer)
-
-
-(def-customizable-writer
-    (function (stream symbol pathname pathname) t)
-  *symbol-ref-proc*
-  def-symbol-ref-writer)
-
-
-(def-customizable-writer
-    (function (stream symbol pathname pathname) t)
-  *function-ref-proc*
-  def-function-ref-writer)
-
-
-(def-customizable-writer
-    (function (stream symbol pathname pathname) t)
-  *type-ref-proc*
-  def-type-ref-writer)
-
-
-(def-customizable-writer
-    (function (stream list) t)
-  *code-block-proc*
-  def-code-block-writer)
-
-
-(def-customizable-writer
-    (function (stream list) t)
-  *code-example-proc*
-  def-code-example-writer)
-
-
-;; ----- api functions -----
-
-(def-customizable-writer
-    (function (stream t) t)
-  *defclass-proc*
-  def-defclass-writer)
-
-
-(def-customizable-writer
-    (function (stream t) t)
-  *defconstant-proc*
-  def-defconstant-writer)
-
-
-(def-customizable-writer
-    (function (stream t) t)
-  *defgeneric-proc*
-  def-defgeneric-writer)
-
-
-(def-customizable-writer
-    (function (stream t) t)
-  *define-compiler-macro-proc*
-  def-define-compiler-macro-writer)
-
-
-(def-customizable-writer
-    (function (stream t) t)
-  *define-condition-proc*
-  def-define-condition-writer)
-
-
-(def-customizable-writer
-    (function (stream t) t)
-  *define-method-combination-proc*
-  def-define-method-combination-writer)
-
-
-(def-customizable-writer
-    (function (stream t) t)
-  *define-modify-macro-proc*
-  def-define-modify-macro-writer)
-
-
-(def-customizable-writer
-    (function (stream t) t)
-  *define-setf-expander-proc*
-  def-define-setf-expander-writer)
-
-
-(def-customizable-writer
-    (function (stream t) t)
-  *define-symbol-macro-proc*
-  def-define-symbol-macro-writer)
-
-
-(def-customizable-writer
-    (function (stream t) t)
-  *defmacro-proc*
-  def-defmacro-writer)
-
-
-(def-customizable-writer
-    (function (stream t) t)
-  *defmethod-proc*
-  def-defmethod-writer)
-
-
-(def-customizable-writer
-    (function (stream t) t)
-  *defpackage-proc*
-  def-defpackage-writer)
-
-
-(def-customizable-writer
-    (function (stream t) t)
-  *defparameter-proc*
-  def-defparameter-writer)
-
-
-(def-customizable-writer
-    (function (stream t) t)
-  *defsetf-proc*
-  def-defsetf-writer)
-
-
-(def-customizable-writer
-    (function (stream t) t)
-  *defstruct-proc*
-  def-defstruct-writer)
-
-
-(def-customizable-writer
-    (function (stream t) t)
-  *deftype-proc*
-  def-deftype-writer)
-
-
-(def-customizable-writer
-    (function (stream t) t)
-  *defun-proc*
-  def-defun-writer)
-
-
-(def-customizable-writer
-    (function (stream t) t)
-  *defvar-proc*
-  def-defvar-writer)
-
-
-;; ----- documentation functions -----
-
-(def-customizable-writer
-    (function () string)
-  *get-file-extension-proc*
-  def-get-file-extension-writer)
-
-
-(def-customizable-writer
-    (function (stream) t)
-  *file-header-proc*
-  def-file-header-writer)
-
-
-(def-customizable-writer
-    (function (stream) t)
-  *file-foot-proc*
-  def-file-foot-writer)
-
-
-(def-customizable-writer
-    (function (pathname) t)
-  *system-files-proc*
-  def-system-files-writer)
-
-
+  (loop for file-content across *project-adp-files*
+	do (let ((rel-path (adp-file-path file-content))
+		 (file-elements (adp-file-elements file-content)))
+	     (write-file root-path rel-path file-elements))))

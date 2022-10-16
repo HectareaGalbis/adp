@@ -1,6 +1,8 @@
 
 
-(in-package :adp)
+(in-package :adppvt)
+
+(adp:header "Style-maker helper functions/macros" style-helper-header)
 
 ;; ----- helper-helper-functions -----
 
@@ -19,36 +21,35 @@
 	     (error "Expected one of the following symbols: ~s~%Found: ~s" components sym))))
 
 (defmacro def-with-components (name &rest components)
-  (let ((name-arg (intern (concatenate 'string "WITH-" (symbol-name name) "-COMPONENTS")))
-	(component-rest-args (gensym "COMPONENTS-ARGS"))
-	(function-body-arg (gensym (concatenate 'string (symbol-name name) "-BODY")))
-	(body-arg (gensym "BODY"))
-	(function-body-value-var (gensym "FUNCTION-BODY-VALUE"))
-	(let-bindings-var (gensym))
-	(lambda-var (gensym)))
-    `(defmacro ,name-arg (((&rest ,component-rest-args) ,function-body-arg) &body ,body-arg)
-       (check-component-symbols ',component-rest-args ',components)
+  (let ((name-arg (intern (concatenate 'string "WITH-" (symbol-name name) "-COMPONENTS"))))
+    (with-gensyms (component-rest-args function-body-arg body-arg function-body-value-var let-bindings-var lambda-var)
+      `(adp:defmacro ,name-arg (((&rest ,component-rest-args) ,function-body-arg) &body ,body-arg)
+       (check-component-symbols ,component-rest-args ',components)
        (let* ((,function-body-value-var (gensym))
 	      (,let-bindings-var (mapcar (lambda (,lambda-var)
-					   (list ,lambda-var (list (find-symbol (concatenate 'string ,(symbol-name name) "-" (symbol-name ,lambda-var))) ,function-body-value-var)))
+					   (list ,lambda-var (list (find-symbol (concatenate 'string ,(symbol-name name) "-" (symbol-name ,lambda-var)) :adppvt) ,function-body-value-var)))
 					 ,component-rest-args)))
 	 `(let ((,,function-body-value-var ,,function-body-arg))
-	    (let (,,let-bindings-var)
-	      ,@,body-arg))))))
+	    (let ,,let-bindings-var
+	      ,@,body-arg)))))))
 
+
+(adp:subheader "API function components" api-components-subheader)
 
 ;; ----- defclass components -----
 
-(defun defclass-class-name (defclass-source)
+(adp:subsubheader "Defclass components" defclass-components-subsubheader)
+
+(adp:defun defclass-class-name (defclass-source)
   (cadr defclass-source))
 
-(defun defclass-superclass-names (defclass-source)
+(adp:defun defclass-superclass-names (defclass-source)
   (caddr defclass-source))
 
-(defun defclass-slot-specifiers (defclass-source)
+(adp:defun defclass-slot-specifiers (defclass-source)
   (cadddr defclass-source))
 
-(defun defclass-slot-names (defclass-source)
+(adp:defun defclass-slot-names (defclass-source)
   (let ((slot-specifiers (defclass-slot-specifiers defclass-source)))
     (and slot-specifiers
 	 (loop for slot-specifier in slot-specifiers
@@ -56,7 +57,7 @@
 			   (car slot-specifier)
 			   slot-specifier)))))
 
-(defun defclass-slot-options (defclass-source)
+(adp:defun defclass-slot-options (defclass-source)
   (let ((slot-specifiers (defclass-slot-specifiers defclass-source)))
     (and slot-specifiers
 	 (loop for slot-specifier in slot-specifiers
@@ -64,7 +65,7 @@
 			   (cdr slot-specifier)
 			   nil)))))
 
-(defun defclass-reader-function-names (defclass-source)
+(adp:defun defclass-reader-function-names (defclass-source)
   (let ((slot-options (defclass-slot-options defclass-source)))
     (and slot-options
 	 (loop for slot-option in slot-options
@@ -73,7 +74,7 @@
 				  if (eq (car rest-slot-option) :reader)
 				    collect (cadr rest-slot-option)))))))
 
-(defun defclass-writer-function-names (defclass-source)
+(adp:defun defclass-writer-function-names (defclass-source)
   (let ((slot-options (defclass-slot-options defclass-source)))
     (and slot-options
 	 (loop for slot-option in slot-options
@@ -82,7 +83,7 @@
 				  if (eq (car rest-slot-option) :writer)
 				    collect (cadr rest-slot-option)))))))
 
-(defun defclass-accessor-function-names (defclass-source)
+(adp:defun defclass-accessor-function-names (defclass-source)
   (let ((slot-options (defclass-slot-options defclass-source)))
     (and slot-options
 	 (loop for slot-option in slot-options
@@ -91,14 +92,14 @@
 				  if (eq (car rest-slot-option) :accessor)
 				    collect (cadr rest-slot-option)))))))
 
-(defun defclass-allocation-types (defclass-source)
+(adp:defun defclass-allocation-types (defclass-source)
   (let ((slot-options (defclass-slot-options defclass-source)))
     (and slot-options
 	 (loop for slot-option in slot-options
 	       collect (and slot-option
 			    (cadr (member :allocation slot-option)))))))
 
-(defun defclass-initarg-names (defclass-source)
+(adp:defun defclass-initarg-names (defclass-source)
   (let ((slot-options (defclass-slot-options defclass-source)))
     (and slot-options
 	 (loop for slot-option in slot-options
@@ -107,41 +108,41 @@
 				  if (eq (car rest-slot-option) :initarg)
 				    collect (cadr rest-slot-option)))))))
 
-(defun defclass-initforms (defclass-source)
+(adp:defun defclass-initforms (defclass-source)
   (let ((slot-options (defclass-slot-options defclass-source)))
     (and slot-options
 	 (loop for slot-option in slot-options
 	       collect (and slot-option
 			    (cadr (member :initform slot-option)))))))
 
-(defun defclass-type-specifiers (defclass-source)
+(adp:defun defclass-type-specifiers (defclass-source)
   (let ((slot-options (defclass-slot-options defclass-source)))
     (and slot-options
 	 (loop for slot-option in slot-options
 	       collect (and slot-option
 			    (cadr (member :type slot-option)))))))
 
-(defun defclass-slot-documentations (defclass-source)
+(adp:defun defclass-slot-documentations (defclass-source)
   (let ((slot-options (defclass-slot-options defclass-source)))
     (and slot-options
 	 (loop for slot-option in slot-options
 	       collect (and slot-option
 			    (cadr (member :documentation slot-option)))))))
 
-(defun defclass-class-options (defclass-source)
+(adp:defun defclass-class-options (defclass-source)
   (cdddr defclass-source))
 
-(defun defclass-default-initargs (defclass-source)
+(adp:defun defclass-default-initargs (defclass-source)
   (let ((class-options (defclass-class-options defclass-source)))
     (and class-options
 	 (cdr (member :default-initargs class-options :key #'car)))))
 
-(defun defclass-documentation (defclass-source)
+(adp:defun defclass-documentation (defclass-source)
   (let ((class-options (defclass-class-options defclass-source)))
     (and class-options
 	 (cadr (member :documentation class-options :key #'car)))))
 
-(defun defclass-metaclass (defclass-source)
+(adp:defun defclass-metaclass (defclass-source)
   (let ((class-options (defclass-class-options defclass-source)))
     (and class-options
 	 (cadr (member :metaclass class-options :key #'car)))))
@@ -154,13 +155,15 @@
 
 ;; ----- defconstant components -----
 
-(defun defconstant-name (defconstant-source)
+(adp:subsubheader "Defconstant components" defconstant-components-subsubheader)
+
+(adp:defun defconstant-name (defconstant-source)
   (cadr defconstant-source))
 
-(defun defconstant-initial-value (defconstant-source)
+(adp:defun defconstant-initial-value (defconstant-source)
   (caddr defconstant-source))
 
-(defun defconstant-documentation (defconstant-source)
+(adp:defun defconstant-documentation (defconstant-source)
   (cadddr defconstant-source))
 
 (def-with-components defconstant name initial-value documentation)
@@ -168,65 +171,69 @@
 
 ;; ----- defgeneric components -----
 
-(defun defgeneric-function-name (defgeneric-source)
+(adp:subsubheader "Defgeneric components" defgeneric-components-subsubheader)
+
+(adp:defun defgeneric-function-name (defgeneric-source)
   (cadr defgeneric-source))
 
-(defun defgeneric-gf-lambda-list (defgeneric-source)
+(adp:defun defgeneric-gf-lambda-list (defgeneric-source)
   (caddr defgeneric-source))
 
-(defun defgeneric-options (defgeneric-source)
+(adp:defun defgeneric-options (defgeneric-source)
   (remove-if (lambda (x)
 	       (eq (car x) :method))
 	     (cdddr defgeneric-source)))
 
-(defun defgeneric-argument-precedence-order (defgeneric-source)
+(adp:defun defgeneric-argument-precedence-order (defgeneric-source)
   (let ((options (defgeneric-options defgeneric-source)))
     (and options
 	 (cdr (member :argument-precedence-order options :key #'car)))))
 
-(defun defgeneric-gf-declarations (defgeneric-source)
+(adp:defun defgeneric-gf-declarations (defgeneric-source)
   (let ((options (defgeneric-options defgeneric-source)))
     (and options
 	 (cdr (member 'cl:declare options :key #'car)))))
 
-(defun defgeneric-documentation (defgeneric-source)
+(adp:defun defgeneric-documentation (defgeneric-source)
   (let ((options (defgeneric-options defgeneric-source)))
     (and options
 	 (cadr (member :documentation options :key #'car)))))
 
-(defun defgeneric-method-combination (defgeneric-source)
+(adp:defun defgeneric-method-combination (defgeneric-source)
   (let ((options (defgeneric-options defgeneric-source)))
     (and options
 	 (cdr (member :method-combination options :key #'car)))))
 
-(defun defgeneric-generic-function-class (defgeneric-source)
+(adp:defun defgeneric-generic-function-class (defgeneric-source)
   (let ((options (defgeneric-options defgeneric-source)))
     (and options
 	 (cadr (member :generic-function-class options :key #'car)))))
 
-(defun defgeneric-method-class (defgeneric-source)
+(adp:defun defgeneric-method-class (defgeneric-source)
   (let ((options (defgeneric-options defgeneric-source)))
     (and options
 	 (cadr (member :method-class options :key #'car)))))
 
-(defun defgeneric-method-descriptions (defgeneric-source)
+(adp:defun defgeneric-method-descriptions (defgeneric-source)
   (remove-if-not (lambda (x)
 		   (eq (car x) :method))
 		 (cdddr defgeneric-source)))
 
-(def-with-components function-name gf-lambda-list options argument-precedence-order gf-declarations
+(def-with-components defgeneric function-name gf-lambda-list options argument-precedence-order gf-declarations
   documentation method-combination generic-function-class method-class method-descriptions)
 
 
 ;; ----- define-compiler-macro components -----
 
-(defun define-compiler-macro-name (define-compiler-macro-source)
+(adp:subsubheader "Define-compiler-macro components" define-compiler-macro-components-subsubheader)
+
+(adp:defun define-compiler-macro-name (define-compiler-macro-source)
   (cadr define-compiler-macro-source))
 
-(defun define-compiler-macro-lambda-list (define-compiler-macro-source)
+(adp:defun define-compiler-macro-lambda-list (define-compiler-macro-source)
   (caddr define-compiler-macro-source))
 
-(defun define-compiler-macro-declarations (define-compiler-macro-source)
+(adp:defun define-compiler-macro-declarations (define-compiler-macro-source)
   (let ((post-lambda-list (cdddr define-compiler-macro-source)))
     (loop for expr in post-lambda-list
 	  while (or (declarationp expr)
@@ -234,7 +241,7 @@
 	  when (declarationp expr)
 	    collect expr)))
 
-(defun define-compiler-macro-documentation (define-compiler-macro-source)
+(adp:defun define-compiler-macro-documentation (define-compiler-macro-source)
   (let ((post-lambda-list (cdddr define-compiler-macro-source)))
     (loop for expr in post-lambda-list
 	  while (or (declarationp expr)
@@ -242,7 +249,7 @@
 	  when (documentationp expr)
 	    return expr)))
 
-(defun define-compiler-macro-forms (define-compiler-macro-source)
+(adp:defun define-compiler-macro-forms (define-compiler-macro-source)
   (let ((post-lambda-list (cdddr define-compiler-macro-source)))
     (loop for expr on post-lambda-list
 	  while (or (declarationp (car expr))
@@ -254,16 +261,18 @@
 
 ;; ----- define-condition components -----
 
-(defun define-condition-name (define-condition-source)
+(adp:subsubheader "Define-condition components" define-condition-components-subsubheader)
+
+(adp:defun define-condition-name (define-condition-source)
   (cadr define-condition-source))
 
-(defun define-condition-parent-types (define-condition-source)
+(adp:defun define-condition-parent-types (define-condition-source)
   (caddr define-condition-source))
 
-(defun define-condition-slot-specs (define-condition-source)
+(adp:defun define-condition-slot-specs (define-condition-source)
   (cadddr define-condition-source))
 
-(defun define-condition-slot-names (define-condition-source)
+(adp:defun define-condition-slot-names (define-condition-source)
   (let ((slot-specs (define-condition-slot-specs define-condition-source)))
     (and slot-specs
 	 (loop for slot-spec in slot-specs
@@ -272,7 +281,7 @@
 	       else
 		 collect (car slot-spec)))))
 
-(defun define-condition-slot-options (define-condition-source)
+(adp:defun define-condition-slot-options (define-condition-source)
   (let ((slot-specs (define-condition-slot-specs define-condition-source)))
     (and slot-specs
 	 (loop for slot-spec in slot-specs
@@ -281,7 +290,7 @@
 	       else
 		 collect (cdr slot-spec)))))
 
-(defun define-condition-slot-readers (define-condition-source)
+(adp:defun define-condition-slot-readers (define-condition-source)
   (let ((slot-options (define-condition-slot-options define-condition-source)))
     (and slot-options
 	 (loop for slot-option in slot-options
@@ -290,7 +299,7 @@
 				  if (eq (car rest-slot-option) :reader)
 				    collect (cadr rest-slot-option)))))))
 
-(defun define-condition-slot-writers (define-condition-source)
+(adp:defun define-condition-slot-writers (define-condition-source)
   (let ((slot-options (define-condition-slot-options define-condition-source)))
     (and slot-options
 	 (loop for slot-option in slot-options
@@ -299,7 +308,7 @@
 				  if (eq (car rest-slot-option) :writer)
 				    collect (cadr rest-slot-option)))))))
 
-(defun define-condition-slot-accessors (define-condition-source)
+(adp:defun define-condition-slot-accessors (define-condition-source)
   (let ((slot-options (define-condition-slot-options define-condition-source)))
     (and slot-options
 	 (loop for slot-option in slot-options
@@ -308,14 +317,14 @@
 				  if (eq (car rest-slot-option) :accessor)
 				    collect (cadr rest-slot-option)))))))
 
-(defun define-condition-slot-allocations (define-condition-source)
+(adp:defun define-condition-slot-allocations (define-condition-source)
   (let ((slot-options (define-condition-slot-options define-condition-source)))
     (and slot-options
 	 (loop for slot-option in slot-options
 	       collect (and slot-option
 			    (cadr (member :allocation slot-option)))))))
 
-(defun define-condition-slot-initargs (define-condition-source)
+(adp:defun define-condition-slot-initargs (define-condition-source)
   (let ((slot-options (define-condition-slot-options define-condition-source)))
     (and slot-options
 	 (loop for slot-option in slot-options
@@ -324,34 +333,34 @@
 				  if (eq (car rest-slot-option) :initarg)
 				    collect (cadr rest-slot-option)))))))
 
-(defun define-condition-slot-initforms (define-condition-source)
+(adp:defun define-condition-slot-initforms (define-condition-source)
   (let ((slot-options (define-condition-slot-options define-condition-source)))
     (and slot-options
 	 (loop for slot-option in slot-options
 	       collect (and slot-option
 			    (cadr (member :initform slot-option)))))))
 
-(defun define-condition-slot-types (define-condition-source)
+(adp:defun define-condition-slot-types (define-condition-source)
   (let ((slot-options (define-condition-slot-options define-condition-source)))
     (and slot-options
 	 (loop for slot-option in slot-options
 	       collect (and slot-option
 			    (cadr (member :type slot-option)))))))
 
-(defun define-condition-options (define-condition-source)
+(adp:defun define-condition-options (define-condition-source)
   (cddddr define-condition-source))
 
-(defun define-condition-default-initargs (define-condition-source)
+(adp:defun define-condition-default-initargs (define-condition-source)
   (let ((options (define-condition-options define-condition-source)))
     (and options
 	 (cdr (member :default-initargs options :key #'car)))))
 
-(defun define-condition-documentation (define-condition-source)
+(adp:defun define-condition-documentation (define-condition-source)
   (let ((options (define-condition-options define-condition-source)))
     (and options
 	 (cadr (member :documentation options :key #'car)))))
 
-(defun define-condition-report-name (define-condition-source)
+(adp:defun define-condition-report-name (define-condition-source)
   (let ((options (define-condition-options define-condition-source)))
     (and options
 	 (cadr (member :report options :key #'car)))))
@@ -363,37 +372,39 @@
 
 ;; ----- define-method-combination components -----
 
-(defun define-method-combination-name (define-method-combination-source)
+(adp:subsubheader "Define-method-combination components" define-method-combination-components-subsubheader)
+
+(adp:defun define-method-combination-name (define-method-combination-source)
   (cadr define-method-combination-source))
 
-(defun define-method-combination-short-form-options (define-method-combination-source)
+(adp:defun define-method-combination-short-form-options (define-method-combination-source)
   (let ((possible-short-form-options (cddr define-method-combination-source)))
     (if (keywordp (car possible-short-form-options))
 	possible-short-form-options
 	nil)))
 
-(defun define-method-combination-identity-with-one-argument (define-method-combination-source)
+(adp:defun define-method-combination-identity-with-one-argument (define-method-combination-source)
   (let ((short-form-options (define-method-combination-short-form-options define-method-combination-source)))
     (and short-form-options
 	 (cadr (member :identity-with-one-argument short-form-options)))))
 
-(defun define-method-combination-operator (define-method-combination-source)
+(adp:defun define-method-combination-operator (define-method-combination-source)
   (let ((short-form-options (define-method-combination-short-form-options define-method-combination-source)))
     (and short-form-options
 	 (cadr (member :operator short-form-options)))))
 
-(defun define-method-combination-lambda-list (define-method-combination-source)
+(adp:defun define-method-combination-lambda-list (define-method-combination-source)
   (caddr define-method-combination-source))
 
-(defun define-method-combination-method-group-specifiers (define-method-combination-source)
+(adp:defun define-method-combination-method-group-specifiers (define-method-combination-source)
   (cadddr define-method-combination-source))
 
-(defun define-method-combination-method-group-specifier-names (define-method-combination-source)
+(adp:defun define-method-combination-method-group-specifier-names (define-method-combination-source)
   (let ((method-group-specifiers (define-method-combination-method-group-specifiers define-method-combination-source)))
     (and method-group-specifiers
 	 (mapcar #'car method-group-specifiers))))
 
-(defun define-method-combination-qualifier-patterns (define-method-combination-source)
+(adp:defun define-method-combination-qualifier-patterns (define-method-combination-source)
   (let ((method-group-specifiers (define-method-combination-method-group-specifiers define-method-combination-source)))
     (and method-group-specifiers
 	 (loop for method-group-specifier in method-group-specifiers
@@ -401,7 +412,7 @@
 			     while (listp possible-qualifier-pattern)
 			     collect possible-qualifier-pattern)))))
 
-(defun define-method-combination-predicates (define-method-combination-source)
+(adp:defun define-method-combination-predicates (define-method-combination-source)
   (let ((method-group-specifiers (define-method-combination-method-group-specifiers define-method-combination-source)))
     (and method-group-specifiers
 	 (loop for method-group-specifier in method-group-specifiers
@@ -410,7 +421,7 @@
 			     nil
 			     possible-predicate))))))
 
-(defun define-method-combination-long-form-options (define-method-combination-source)
+(adp:defun define-method-combination-long-form-options (define-method-combination-source)
   (let ((method-group-specifiers (define-method-combination-method-group-specifiers define-method-combination-source)))
     (and method-group-specifiers
 	 (loop for method-group-specifier in method-group-specifiers
@@ -420,32 +431,32 @@
 				 while (listp (car rest-method-group-specifier))
 				 finally (return rest-method-group-specifier)))))))
 
-(defun define-method-combination-descriptions (define-method-combination-source)
+(adp:defun define-method-combination-descriptions (define-method-combination-source)
   (let ((long-form-options (define-method-combination-long-form-options define-method-combination-source)))
     (and long-form-options
 	 (loop for long-form-option in long-form-options
 	       collect (cadr (member :description long-form-option))))))
 
-(defun define-method-combination-orders (define-method-combination-source)
+(adp:defun define-method-combination-orders (define-method-combination-source)
   (let ((long-form-options (define-method-combination-long-form-options define-method-combination-source)))
     (and long-form-options
 	 (loop for long-form-option in long-form-options
 	       collect (cadr (member :order long-form-option))))))
 
-(defun define-method-combination-requireds (define-method-combination-source)
+(adp:defun define-method-combination-requireds (define-method-combination-source)
   (let ((long-form-options (define-method-combination-long-form-options define-method-combination-source)))
     (and long-form-options
 	 (loop for long-form-option in long-form-options
 	       collect (cadr (member :required long-form-option))))))
 
-(defun define-method-combination-arguments (define-method-combination-source)
+(adp:defun define-method-combination-arguments (define-method-combination-source)
   (let ((possible-arguments (car (cddddr define-method-combination-source))))
     (if (and (listp possible-arguments)
 	     (eq (car possible-arguments) :arguments))
 	(cdr possible-arguments)
 	nil)))
 
-(defun define-method-combination-generic-function (define-method-combination-source)
+(adp:defun define-method-combination-generic-function (define-method-combination-source)
   (let ((rest-possible-generic-function (cddddr define-method-combination-source)))
     (if (and (listp (car rest-possible-generic-function))
 	     (eq (caar rest-possible-generic-function) :generic-function))
@@ -455,7 +466,7 @@
 		   (eq (car last-possible-generic-function) :generic-function))
 	      (cadr last-possible-generic-function))))))
 
-(defun define-method-combination-declarations (define-method-combination-source)
+(adp:defun define-method-combination-declarations (define-method-combination-source)
   (loop for possible-declaration in (cddddr define-method-combination-source)
 	while (or (declarationp possible-declaration)
 		  (documentationp possible-declaration)
@@ -464,7 +475,7 @@
 	when (declarationp possible-declaration)
 	  collect possible-declaration))
 
-(defun define-method-combination-documentation (define-method-combination-source)
+(adp:defun define-method-combination-documentation (define-method-combination-source)
   (let ((short-form-options (define-method-combination-short-form-options define-method-combination-source)))
     (if short-form-options
 	(cadr (member :documentation short-form-options))
@@ -476,7 +487,7 @@
 	      when (documentationp possible-documentation)
 		return possible-documentation))))
 
-(defun define-method-combination-forms (define-method-combination-source)
+(adp:defun define-method-combination-forms (define-method-combination-source)
   (loop for possible-forms on (cddddr define-method-combination-source)
 	while (or (declarationp (car possible-forms))
 		  (documentationp (car possible-forms))
@@ -491,16 +502,18 @@
 
 ;; ----- define-modify-macro components -----
 
-(defun define-modify-macro-name (define-modify-macro-source)
+(adp:subsubheader "Define-modify-macro components" define-modify-macro-components-subsubheader)
+
+(adp:defun define-modify-macro-name (define-modify-macro-source)
   (cadr define-modify-macro-source))
 
-(defun define-modify-macro-lambda-list (define-modify-macro-source)
+(adp:defun define-modify-macro-lambda-list (define-modify-macro-source)
   (caddr define-modify-macro-source))
 
-(defun define-modify-macro-function (define-modify-macro-source)
+(adp:defun define-modify-macro-function (define-modify-macro-source)
   (cadddr define-modify-macro-source))
 
-(defun define-modify-macro-documentation (define-modify-macro-source)
+(adp:defun define-modify-macro-documentation (define-modify-macro-source)
   (car (cddddr define-modify-macro-source)))
 
 (def-with-components define-modify-macro name lambda-list function documentation) 
@@ -508,13 +521,15 @@
 
 ;; ----- define-setf-expander components -----
 
-(defun define-setf-expander-access-fn (define-setf-expander-source)
+(adp:subsubheader "Define-setf-expander components" define-setf-expander-components-subsubheader)
+
+(adp:defun define-setf-expander-access-fn (define-setf-expander-source)
   (cadr define-setf-expander-source))
 
-(defun define-setf-expander-lambda-list (define-setf-expander-source)
+(adp:defun define-setf-expander-lambda-list (define-setf-expander-source)
   (caddr define-setf-expander-source))
 
-(defun define-setf-expander-declarations (define-setf-expander-source)
+(adp:defun define-setf-expander-declarations (define-setf-expander-source)
   (let ((post-lambda-list (cdddr define-setf-expander-source)))
     (loop for expr in post-lambda-list
 	  while (or (declarationp expr)
@@ -522,7 +537,7 @@
 	  when (declarationp expr)
 	    collect expr)))
 
-(defun define-setf-expander-documentation (define-setf-expander-source)
+(adp:defun define-setf-expander-documentation (define-setf-expander-source)
   (let ((post-lambda-list (cdddr define-setf-expander-source)))
     (loop for expr in post-lambda-list
 	  while (or (declarationp expr)
@@ -530,7 +545,7 @@
 	  when (documentationp expr)
 	    return expr)))
 
-(defun define-setf-expander-forms (define-setf-expander-source)
+(adp:defun define-setf-expander-forms (define-setf-expander-source)
   (let ((post-lambda-list (cdddr define-setf-expander-source)))
     (loop for expr on post-lambda-list
 	  while (or (declarationp (car expr))
@@ -542,10 +557,12 @@
 
 ;; ----- define-symbol-macro components -----
 
-(defun define-symbol-macro-symbol (define-symbol-macro-source)
+(adp:subsubheader "Define-symbol-macro components" define-symbol-macro-components-subsubheader)
+
+(adp:defun define-symbol-macro-symbol (define-symbol-macro-source)
   (cadr define-symbol-macro-source))
 
-(defun define-symbol-macro-expansion (define-symbol-macro-source)
+(adp:defun define-symbol-macro-expansion (define-symbol-macro-source)
   (caddr define-symbol-macro-source))
 
 (def-with-components define-symbol-macro symbol expansion)
@@ -553,13 +570,15 @@
 
 ;; ----- defmacro components -----
 
-(defun defmacro-name (defmacro-source)
+(adp:subsubheader "Defmacro components" defmacro-components-subsubheader)
+
+(adp:defun defmacro-name (defmacro-source)
   (cadr defmacro-source))
 
-(defun defmacro-lambda-list (defmacro-source)
+(adp:defun defmacro-lambda-list (defmacro-source)
   (caddr defmacro-source))
 
-(defun defmacro-declarations (defmacro-source)
+(adp:defun defmacro-declarations (defmacro-source)
   (let ((post-lambda-list (cdddr defmacro-source)))
     (loop for expr in post-lambda-list
 	  while (or (declarationp expr)
@@ -567,7 +586,7 @@
 	  when (declarationp expr)
 	    collect expr)))
 
-(defun defmacro-documentation (defmacro-source)
+(adp:defun defmacro-documentation (defmacro-source)
   (let ((post-lambda-list (cdddr defmacro-source)))
     (loop for expr in post-lambda-list
 	  while (or (declarationp expr)
@@ -575,7 +594,7 @@
 	  when (documentationp expr)
 	    return expr)))
 
-(defun defmacro-forms (defmacro-source)
+(adp:defun defmacro-forms (defmacro-source)
   (let ((post-lambda-list (cdddr defmacro-source)))
     (loop for expr on post-lambda-list
 	  while (or (declarationp (car expr))
@@ -587,20 +606,22 @@
 
 ;; ----- defmethod components -----
 
-(defun defmethod-function-name (defmethod-source)
+(adp:subsubheader "defmethod components" defmethod-components-subsubheader)
+
+(adp:defun defmethod-function-name (defmethod-source)
   (cadr defmethod-source))
 
-(defun defmethod-method-qualifiers (defmethod-source)
+(adp:defun defmethod-method-qualifiers (defmethod-source)
   (loop for qualifier in (cddr defmethod-source)
 	while (not (listp qualifier))
 	collect qualifier))
 
-(defun defmethod-specialized-lambda-list (defmethod-source)
+(adp:defun defmethod-specialized-lambda-list (defmethod-source)
   (loop for possible-lambda-list in (cddr defmethod-source)
 	when (listp possible-lambda-list)
 	  return possible-lambda-list))
 
-(defun defmethod-declarations (defmethod-source)
+(adp:defun defmethod-declarations (defmethod-source)
   (loop for rest-defmethod-source on (cddr defmethod-source)
 	when (listp (car rest-defmethod-source))
 	  return (loop for possible-declaration in (cdr rest-defmethod-source)
@@ -609,7 +630,7 @@
 		       if (declarationp possible-declaration)
 			 collect possible-declaration)))
 
-(defun defmethod-documentation (defmethod-source)
+(adp:defun defmethod-documentation (defmethod-source)
   (loop for rest-defmethod-source on (cddr defmethod-source)
 	when (listp (car rest-defmethod-source))
 	  return (loop for possible-documentation in (cdr rest-defmethod-source)
@@ -618,7 +639,7 @@
 		       if (documentationp possible-documentation)
 			 return possible-documentation)))
 
-(defun defmethod-forms (defmethod-source)
+(adp:defun defmethod-forms (defmethod-source)
   (loop for rest-defmethod-source on (cddr defmethod-source)
 	when (listp (car rest-defmethod-source))
 	  return (loop for rest-possible-forms on (cdr rest-defmethod-source)
@@ -632,84 +653,93 @@
 
 ;; ----- defpackage components -----
 
-(defun defpackage-options (defpackage-source)
+(adp:subsubheader "Defpackage components" defpackage-components-subsubheader)
+
+(adp:defun defpackage-options (defpackage-source)
   (cddr defpackage-source))
 
-(defun defpackage-defined-package-name (defpackage-source)
+(adp:defun defpackage-defined-package-name (defpackage-source)
   (cadr defpackage-source))
 
-(defun defpackage-nicknames (defpackage-source)
+(adp:defun defpackage-nicknames (defpackage-source)
   (let ((options (defpackage-options defpackage-source)))
     (mapcan #'cdr (remove-if-not (lambda (x)
 				   (eq (car x) :nicknames))
 				 options))))
 
-(defun defpackage-use-package-names (defpackage-source)
+(adp:defun defpackage-documentation (defpackage-source)
+  (let ((options (defpackage-options defpackage-source)))
+    (and options
+	 (cadr (member :documentation options)))))
+
+(adp:defun defpackage-use-package-names (defpackage-source)
   (let ((options (defpackage-options defpackage-source)))
     (mapcan #'cdr (remove-if-not (lambda (x)
 				   (eq (car x) :use))
 				 options))))
 
-(defun defpackage-shadow-symbol-names (defpackage-source)
+(adp:defun defpackage-shadow-symbol-names (defpackage-source)
   (let ((options (defpackage-options defpackage-source)))
     (mapcan #'cdr (remove-if-not (lambda (x)
 				   (eq (car x) :shadow))
 				 options))))
 
-(defun defpackage-shadowing-import-from-package-names (defpackage-source)
+(adp:defun defpackage-shadowing-import-from-package-names (defpackage-source)
   (let ((options (defpackage-options defpackage-source)))
     (mapcar #'cadr (remove-if-not (lambda (x)
 				   (eq (car x) :shadowing-import-from))
 				  options))))
 
-(defun defpackage-shadowing-import-from-symbol-names (defpackage-source)
+(adp:defun defpackage-shadowing-import-from-symbol-names (defpackage-source)
   (let ((options (defpackage-options defpackage-source)))
     (mapcan #'cddr (remove-if-not (lambda (x)
 				   (eq (car x) :shadowing-import-from))
 				 options))))
 
-(defun defpackage-import-from-package-names (defpackage-source)
+(adp:defun defpackage-import-from-package-names (defpackage-source)
   (let ((options (defpackage-options defpackage-source)))
     (mapcar #'cadr (remove-if-not (lambda (x)
 				   (eq (car x) :import-from))
 				  options))))
 
-(defun defpackage-import-from-symbol-names (defpackage-source)
+(adp:defun defpackage-import-from-symbol-names (defpackage-source)
   (let ((options (defpackage-options defpackage-source)))
     (mapcan #'cddr (remove-if-not (lambda (x)
 				   (eq (car x) :import-from))
 				  options))))
 
-(defun defpackage-export-symbol-names (defpackage-source)
+(adp:defun defpackage-export-symbol-names (defpackage-source)
   (let ((options (defpackage-options defpackage-source)))
     (mapcan #'cdr (remove-if-not (lambda (x)
 				   (eq (car x) :export))
 				 options))))
 
-(defun defpackage-import-symbol-names (defpackage-source)
+(adp:defun defpackage-import-symbol-names (defpackage-source)
   (let ((options (defpackage-options defpackage-source)))
     (mapcan #'cdr (remove-if-not (lambda (x)
 				   (eq (car x) :export))
 				 options))))
 
-(defun defpackage-size (defpackage-source)
+(adp:defun defpackage-size (defpackage-source)
   (let ((options (defpackage-options defpackage-source)))
     (cadar (member :size options :key #'car))))
 
-(def-with-components defpackage options defined-package-name nicknames use-package-names shadow-symbol-names
-  shadowing-import-from-package-names shadowing-import-from-symbol-names import-from-package-names
-  import-from-symbol-names export-symbol-names import-symbol-names size)
+(def-with-components defpackage options defined-package-name nicknames documentation use-package-names
+  shadow-symbol-names shadowing-import-from-package-names shadowing-import-from-symbol-names
+  import-from-package-names import-from-symbol-names export-symbol-names import-symbol-names size)
 
 
-;; ----- defparameter components -----	 
+;; ----- defparameter components -----
 
-(defun defparameter-name (defparameter-source)
+(adp:subsubheader "Defparameter components" defparameter-components-subsubheader)
+
+(adp:defun defparameter-name (defparameter-source)
   (cadr defparameter-source))
 
-(defun defparameter-initial-value (defparameter-source)
+(adp:defun defparameter-initial-value (defparameter-source)
   (caddr defparameter-source))
 
-(defun defparameter-documentation (defparameter-source)
+(adp:defun defparameter-documentation (defparameter-source)
   (cadddr defparameter-source))
 
 (def-with-components defparameter name initial-value documentation)
@@ -717,15 +747,17 @@
 
 ;; ----- defsetf components -----
 
-(defun defsetf-access-fn (defsetf-source)
+(adp:subsubheader "Defsetf components" defsetf-components-subsubheader)
+
+(adp:defun defsetf-access-fn (defsetf-source)
   (cadr defsetf-source))
 
-(defun defsetf-update-fn (defsetf-source)
+(adp:defun defsetf-update-fn (defsetf-source)
   (let ((possible-update-fn (caddr defsetf-source)))
     (if (symbolp possible-update-fn)
 	possible-update-fn)))
 
-(defun defsetf-documentation (defsetf-source)
+(adp:defun defsetf-documentation (defsetf-source)
   (cadddr defsetf-source))
 
 (def-with-components defsetf access-fn update-fn documentation)
@@ -733,23 +765,31 @@
 
 ;; ----- defstruct -----
 
-(defun defstruct-name-and-options (defstruct-source)
+(adp:subsubheader "Defstruct components" defstruct-components-subsubheader)
+
+(adp:defun defstruct-name-and-options (defstruct-source)
   (cadr defstruct-source))
 
-(defun defstruct-options (defstruct-source)
+(adp:defun defstruct-structure-name (defstruct-source)
+  (let ((name-and-options (defstruct-name-and-options defstruct-source)))
+    (if (listp name-and-options)
+	(car name-and-options)
+	name-and-options)))
+
+(adp:defun defstruct-options (defstruct-source)
   (let ((name-and-options (defstruct-name-and-options defstruct-source)))
     (if (listp name-and-options)
 	(cdr name-and-options)
 	nil)))
 
-(defun defstruct-conc-name-option (defstruct-source)
+(adp:defun defstruct-conc-name-option (defstruct-source)
   (let ((options (defstruct-options defstruct-source)))
     (if (not (null options))
 	(or (car (member :conc-name options))
 	    (car (member :conc-name options :key #'car)))
 	nil)))
 
-(defun defstruct-constructor-options (defstruct-source)
+(adp:defun defstruct-constructor-options (defstruct-source)
   (let ((options (defstruct-options defstruct-source)))
     (remove-if-not (lambda (x)
 		     (if (listp x)
@@ -757,87 +797,87 @@
 			 (eq x :constructor)))
 		   options)))
 
-(defun defstruct-copier-option (defstruct-source)
+(adp:defun defstruct-copier-option (defstruct-source)
   (let ((options (defstruct-options defstruct-source)))
     (if (not (null options))
 	(or (car (member :copier options))
 	    (car (member :copier options :key #'car)))
 	nil)))
 
-(defun defstruct-predicate-option (defstruct-source)
+(adp:defun defstruct-predicate-option (defstruct-source)
   (let ((options (defstruct-options defstruct-source)))
     (if (not (null options))
 	(or (car (member :predicate options))
 	    (car (member :predicate options :key #'car)))
 	nil)))
 
-(defun defstruct-include-option (defstruct-source)
+(adp:defun defstruct-include-option (defstruct-source)
   (let ((options (defstruct-options defstruct-source)))
     (if (not (null options))
 	(or (car (member :include options))
 	    (car (member :include options :key #'car)))
 	nil)))
 
-(defun defstruct-printer-option (defstruct-source)
+(adp:defun defstruct-printer-option (defstruct-source)
   (let ((options (defstruct-options defstruct-source)))
     (if (not (null options))
 	(or (car (member :print-object options :key #'car))
 	    (car (member :print-function options :key #'car)))
 	nil)))
 
-(defun defstruct-print-object-option (defstruct-source)
+(adp:defun defstruct-print-object-option (defstruct-source)
   (let ((printer-option (defstruct-printer-option defstruct-source)))
     (if (and (not (null printer-option))
 	     (eq (car printer-option) :print-object))
 	printer-option
 	nil)))
 
-(defun defstruct-print-function-option (defstruct-source)
+(adp:defun defstruct-print-function-option (defstruct-source)
   (let ((printer-option (defstruct-printer-option defstruct-source)))
     (if (and (not (null printer-option))
 	     (eq (car printer-option) :print-function))
 	printer-option
 	nil)))
 
-(defun defstruct-type-option (defstruct-source)
+(adp:defun defstruct-type-option (defstruct-source)
   (let ((options (defstruct-options defstruct-source)))
     (if (not (null options))
 	(car (member :type options :key #'car))
 	nil)))
 
-(defun defstruct-named-option (defstruct-source)
+(adp:defun defstruct-named-option (defstruct-source)
   (let ((options (defstruct-options defstruct-source)))
     (if (not (null options))
 	(car (member :named options))
 	nil)))
 
-(defun defstruct-initial-offset-option (defstruct-source)
+(adp:defun defstruct-initial-offset-option (defstruct-source)
   (let ((options (defstruct-options defstruct-source)))
     (if (not (null options))
 	(car (member :initial-offset options :key #'car))
 	nil)))
 
-(defun defstruct-slot-descriptions (defstruct-source)
+(adp:defun defstruct-slot-descriptions (defstruct-source)
   (let ((possible-descriptions (cddr defstruct-source)))
     (if (documentationp (car possible-descriptions))
 	(cdr possible-descriptions)
 	possible-descriptions)))
 
-(defun defstruct-slot-options (defstruct-source)
+(adp:defun defstruct-slot-options (defstruct-source)
   (let ((slot-descriptions (defstruct-slot-descriptions defstruct-source)))
     (loop for slot-description in slot-descriptions
 	  collect (if (listp slot-description)
 		      (cddr slot-description)
 		      nil))))
 
-(defun defstruct-conc-name (defstruct-source)
+(adp:defun defstruct-conc-name (defstruct-source)
   (let ((conc-name-option (defstruct-conc-name-option defstruct-source)))
     (and conc-name-option
 	 (if (listp conc-name-option)
 	     (cadr conc-name-option)
 	     nil))))
 
-(defun defstruct-constructor-arglists (defstruct-source)
+(adp:defun defstruct-constructor-arglists (defstruct-source)
   (let ((constructor-options (defstruct-constructor-options defstruct-source)))
     (and constructor-options
 	 (loop for constructor-option in constructor-options
@@ -845,7 +885,7 @@
 			   (caddr constructor-option)
 			   nil)))))
 
-(defun defstruct-constructor-names (defstruct-source)
+(adp:defun defstruct-constructor-names (defstruct-source)
   (let ((constructor-options (defstruct-constructor-options defstruct-source)))
     (and constructor-options
 	 (loop for constructor-option in constructor-options
@@ -853,39 +893,39 @@
 			   (cadr constructor-option)
 			   nil)))))
 
-(defun defstruct-copier-name (defstruct-source)
+(adp:defun defstruct-copier-name (defstruct-source)
   (let ((copier-option (defstruct-copier-option defstruct-source)))
     (and copier-option
 	 (if (listp copier-option)
 	     (cadr copier-option)
 	     nil))))
 
-(defun defstruct-included-structure-name (defstruct-source)
+(adp:defun defstruct-included-structure-name (defstruct-source)
   (let ((include-option (defstruct-include-option defstruct-source)))
     (and include-option
 	 (cadr include-option))))
 
-(defun defstruct-include-option-slot-descriptors (defstruct-source)
+(adp:defun defstruct-include-option-slot-descriptors (defstruct-source)
   (let ((include-option (defstruct-include-option defstruct-source)))
     (and include-option
 	 (cddr include-option))))
 
-(defun defstruct-initial-offset (defstruct-source)
+(adp:defun defstruct-initial-offset (defstruct-source)
   (let ((initial-offset-option (defstruct-initial-offset-option defstruct-source)))
     (and initial-offset-option
 	 (cadr initial-offset-option))))
 
-(defun defstruct-predicate-name (defstruct-source)
+(adp:defun defstruct-predicate-name (defstruct-source)
   (let ((predicate-option (defstruct-predicate-option defstruct-source)))
     (and predicate-option
 	 (cadr predicate-option))))
 
-(defun defstruct-printer-name (defstruct-source)
+(adp:defun defstruct-printer-name (defstruct-source)
   (let ((printer-option (defstruct-printer-option defstruct-source)))
     (and printer-option
 	 (cadr printer-option))))
 
-(defun defstruct-slot-names (defstruct-source)
+(adp:defun defstruct-slot-names (defstruct-source)
   (let ((slot-descriptions (defstruct-slot-descriptions defstruct-source)))
     (and slot-descriptions
 	 (loop for slot-description in slot-descriptions
@@ -893,7 +933,7 @@
 			   (car slot-description)
 			   slot-description)))))
 
-(defun defstruct-slot-initforms (defstruct-source)
+(adp:defun defstruct-slot-initforms (defstruct-source)
   (let ((slot-descriptions (defstruct-slot-descriptions defstruct-source)))
     (and slot-descriptions
 	 (loop for slot-description in slot-descriptions
@@ -901,24 +941,24 @@
 			   (cadr slot-description)
 			   nil)))))
 
-(defun defstruct-slot-types (defstruct-source)
+(adp:defun defstruct-slot-types (defstruct-source)
   (let ((slot-options (defstruct-slot-options defstruct-source)))
     (and slot-options
 	 (loop for slot-option in slot-options
 	       collect (cadr (member :type slot-option))))))
 
-(defun defstruct-slot-read-only-ps (defstruct-source)
+(adp:defun defstruct-slot-read-only-ps (defstruct-source)
   (let ((slot-options (defstruct-slot-options defstruct-source)))
     (and slot-options
 	 (loop for slot-option in slot-options
 	       collect (cadr (member :read-only slot-option))))))
 
-(defun defstruct-type (defstruct-source)
+(adp:defun defstruct-type (defstruct-source)
   (let ((type-option (defstruct-type-option defstruct-source)))
     (and type-option
 	 (cadr type-option))))
 
-(defun defstruct-documentation (defstruct-source)
+(adp:defun defstruct-documentation (defstruct-source)
   (let ((possible-documentation (caddr defstruct-source)))
     (when (documentationp possible-documentation)
       possible-documentation)))
@@ -934,13 +974,15 @@
 
 ;; ----- deftype components -----
 
-(defun deftype-name (deftype-source)
+(adp:subsubheader "Deftype components" deftype-components-subsubheader)
+
+(adp:defun deftype-name (deftype-source)
   (cadr deftype-source))
 
-(defun deftype-lambda-list (deftype-source)
+(adp:defun deftype-lambda-list (deftype-source)
   (caddr deftype-source))
 
-(defun deftype-declarations (deftype-source)
+(adp:defun deftype-declarations (deftype-source)
   (let ((post-lambda-list (cdddr deftype-source)))
     (loop for expr in post-lambda-list
 	  while (or (declarationp expr)
@@ -948,7 +990,7 @@
 	  when (declarationp expr)
 	    collect expr)))
 
-(defun deftype-documentation (deftype-source)
+(adp:defun deftype-documentation (deftype-source)
   (let ((post-lambda-list (cdddr deftype-source)))
     (loop for expr in post-lambda-list
 	  while (or (declarationp expr)
@@ -956,7 +998,7 @@
 	  when (documentationp expr)
 	    return expr)))
 
-(defun deftype-forms (deftype-source)
+(adp:defun deftype-forms (deftype-source)
   (let ((post-lambda-list (cdddr deftype-source)))
     (loop for expr on post-lambda-list
 	  while (or (declarationp (car expr))
@@ -968,13 +1010,15 @@
 
 ;; ----- defun components -----
 
-(defun defun-function-name (defun-source)
+(adp:subsubheader "Defun components" defun-components-subsubheader)
+
+(adp:defun defun-function-name (defun-source)
   (cadr defun-source))
 
-(defun defun-lambda-list (defun-source)
+(adp:defun defun-lambda-list (defun-source)
   (caddr defun-source))
 
-(defun defun-declarations (defun-source)
+(adp:defun defun-declarations (defun-source)
   (let ((post-lambda-list (cdddr defun-source)))
     (loop for expr in post-lambda-list
 	  while (or (declarationp expr)
@@ -982,7 +1026,7 @@
 	  when (declarationp expr)
 	    collect expr)))
 
-(defun defun-documentation (defun-source)
+(adp:defun defun-documentation (defun-source)
   (let ((post-lambda-list (cdddr defun-source)))
     (loop for expr in post-lambda-list
 	  while (or (declarationp expr)
@@ -990,7 +1034,7 @@
 	  when (documentationp expr)
 	    return expr)))
 
-(defun defun-forms (defun-source)
+(adp:defun defun-forms (defun-source)
   (let ((post-lambda-list (cdddr defun-source)))
     (loop for expr on post-lambda-list
 	  while (or (declarationp (car expr))
@@ -1002,13 +1046,18 @@
 
 ;; ----- defvar components -----
 
-(defun defvar-name (defvar-source)
+(adp:subsubheader "Defvar components" defvar-components-subsubheader)
+
+(adp:defun defvar-name (defvar-source)
   (cadr defvar-source))
 
-(defun defvar-initial-value (defvar-source)
+(adp:defun defvar-initial-value (defvar-source)
   (caddr defvar-source))
 
-(defun defvar-documentation (defvar-source)
+(adp:defun defvar-documentation (defvar-source)
   (cadddr defvar-source))
 
 (def-with-components defvar name initial-value documentation)
+
+
+(adp:write-in-file "docs/style-maker-help")

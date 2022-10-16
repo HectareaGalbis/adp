@@ -5,4 +5,4 @@
 (header "Add Documentation, Please")
 
 
-(add-documentation-in-file #P"README")
+(write-in-file #P"README")
