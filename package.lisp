@@ -16,13 +16,13 @@
 (defpackage #:adp-private
   (:use #:cl #:alexandria)
   (:nicknames #:adppvt)
-  (:export #:*add-documentation* #:*file-adp-elements* #:*header-tags* #:*symbol-tags* #:*function-tags*
-	   #:*type-tags* #:push-header-tag #:push-symbol-tag #:push-function-tag #:push-type-tag
-	   #:add-header-tag-path #:add-symbol-tag-path #:add-function-tag-path #:add-type-tag-path
-	   #:empty-header-tags #:empty-symbol-tags #:empty-function-tags #:empty-type-tags #:emplace-adp-element
-	   #:emplace-adp-file #:empty-adp-elements #:check-style-parameters #:set-parameter-value
-	   #:write-system-files #:get-code-tag #:process-code-tag #:remove-code-tag-exprs
-	   #:remove-own-code-focus-exprs
+  (:export #:*add-documentation* #:current-style #:*file-adp-elements* #:*header-tags* #:*symbol-tags*
+	   #:*function-tags* #:*type-tags* #:push-header-tag #:push-symbol-tag #:push-function-tag
+	   #:push-type-tag #:add-header-tag-path #:add-symbol-tag-path #:add-function-tag-path
+	   #:add-type-tag-path #:empty-header-tags #:empty-symbol-tags #:empty-function-tags #:empty-type-tags
+	   #:emplace-adp-element #:emplace-adp-file #:empty-adp-elements #:check-style-parameters
+	   #:set-parameter-value #:write-system-files #:get-code-tag #:process-code-tag #:remove-code-tag-exprs
+	   #:remove-own-code-focus-exprs #:remove-current-data #:remove-current-procs #:check-current-procs
 
 	   #:def-header-writer #:def-subheader-writer #:def-subsubheader-writer #:def-text-writer
 	   #:def-table-writer #:def-itemize-writer #:def-image-writer #:def-bold-writer #:def-italic-writer

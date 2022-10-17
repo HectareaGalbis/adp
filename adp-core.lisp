@@ -5,7 +5,7 @@
 ;; ----- adp parameters -----
 
 (defvar *add-documentation* nil)
-(defparameter *current-style* nil)
+(defvar *current-style* nil)
 
 
 ;; ----- adp elements -----
@@ -198,8 +198,8 @@
 (declaim (type symbol *hide-symbol*))
 (defparameter *hide-symbol* '#:hide)
 
-(declaim (ftype (function (t) boolean) code-hidep))
-(defun code-hidep (code)
+(declaim (ftype (function (t) boolean) hide-symbolp))
+(defun hide-symbolp (code)
   (eq code *hide-symbol*))
 
 (declaim (ftype (function (t) boolean) plistp))
@@ -208,71 +208,48 @@
       (and (consp code)
 	   (plistp (cdr code)))))
 
+
 (declaim (ftype (function (t) t) remove-code-tag-exprs))
 (defun remove-code-tag-exprs (code)
   (labels ((remove-code-tag-exprs-aux (code)
 	     (if (plistp code)
 		 (cond
-		   ((member (car code) '(code-tag code-focus))
+		   ((member (car code) '(code-tag code-hide))
 		    (mapcan #'remove-code-tag-exprs-aux (cddr code)))
 		   (t
 		    (list (mapcan #'remove-code-tag-exprs-aux code))))
 		 (list code))))
-    (remove-code-tag-exprs-aux code)))
+    (car (remove-code-tag-exprs-aux code))))
 
 (declaim (ftype (function (t) t) remove-own-code-focus-exprs))
-(defun remove-own-code-focus-exprs (code)
-  (labels ((remove-own-code-focus-exprs-aux (code)
+(defun remove-own-code-hide-exprs (code)
+  (labels ((remove-own-code-hide-exprs-aux (code)
 	     (if (plistp code)
 		 (cond
-		   ((eq (car code) 'code-focus)
-		    (mapcan #'remove-own-code-focus-exprs-aux (cddr code)))
+		   ((eq (car code) 'code-hide)
+		    (mapcan #'remove-own-code-hide-exprs-aux (cddr code)))
 		   ((eq (car code) 'code-tag)
 		    (list code))
 		   (t
-		    (list (mapcan #'remove-own-code-focus-exprs-aux code))))
+		    (list (mapcan #'remove-own-code-hide-exprs-aux code))))
 		 (list code))))
-    (remove-own-code-focus-exprs-aux code)))
+    (car (remove-own-code-hide-exprs-aux code))))
 
 (declaim (ftype (function (symbol t) t) process-code-tag))
 (defun process-code-tag (tag code)
   (labels ((process-aux (tag code)
 	     (if (plistp code)
-		 (if (member (car code) '(code-tag code-focus))
-		     (if (and (eq (car code) 'code-focus)
+		 (if (member (car code) '(code-hide code-tag))
+		     (if (and (eq (car code) 'code-hide)
 			      (or (null (cadr code))
 				  (member tag (cadr code))))
-			 (list (list (remove-code-tag-exprs code)) t)
+			 (list *hide-symbol*)
 			 (loop for expr in (cddr code)
-			       for (processed-expr expr-focus-found) = (process-aux tag expr)
-			       for focus-found = (or expr-focus-found focus-found)
-			       count (not expr-focus-found) into hide-count
-			       if expr-focus-found
-				 do (setf hide-count 0)
-			       if (<= hide-count 1)
-				 append processed-expr into processed-code
-			       finally (return (list processed-code focus-found))))
-		     (let* ((car-processed-values (process-aux tag (car code)))
-			    (car-processed (car car-processed-values))
-			    (car-focus-found (cadr car-processed-values)))
-		       (loop for expr in (cdr code)
-			     for (processed-expr expr-focus-found) = (process-aux tag expr)
-			     for focus-found = (or expr-focus-found car-focus-found) then (or expr-focus-found focus-found)
-			     count (not expr-focus-found) into hide-count
-			     if expr-focus-found
-			       do (setf hide-count 0)
-			     if (<= hide-count 1)
-			       append processed-expr into processed-code
-			     finally (return (if focus-found
-						 (if car-focus-found
-						     (list (list (append car-processed processed-code)) t)
-						     (list (list (append (remove-code-tag-exprs (car code)) processed-code)) t))
-						 (list (list *hide-symbol*) nil))))))
-		 (list (list *hide-symbol*) nil))))
-    (destructuring-bind (processed-code focus-found) (process-aux tag code)
-      (if focus-found
-	  (car processed-code)
-	  (remove-code-tag-exprs code)))))
+			       append (process-aux tag expr)))
+		     (list (loop for expr in code
+				 append (process-aux tag expr))))
+		 (list code))))
+    (car (process-aux tag code))))
 
 
 ;; ----- text variations -----
@@ -379,6 +356,24 @@
 	    do (error "The required param ~s is not used." required-param))))
 
 
+;; ----- current data -----
+
+(declaim (ftype (function () t) remove-current-data))
+(defun remove-current-data ()
+  (setf (fill-pointer *file-adp-elements*) 0
+	(fill-pointer *project-adp-files*) 0
+	(fill-pointer *header-tags*) 0
+	(fill-pointer *symbol-tags*) 0
+	(fill-pointer *function-tags*) 0
+	(fill-pointer *type-tags*) 0
+	*header-tags-table* (make-hash-table)
+	*symbol-tags-table* (make-hash-table)
+	*function-tags-table* (make-hash-table)
+	*type-tags-table* (make-hash-table)
+	*code-tags* (make-hash-table)
+	*style-parameters* nil))
+
+
 ;; ----- writing functions -----
 
 (declaim (type (or null (function (stream string symbol) t)) *header-proc* *subheader-proc* *subsubheader-proc*))
@@ -461,6 +456,125 @@
 
 (declaim (type (or null (function (pathname) t)) *system-files-proc*))
 (defvar *system-files-proc* nil)
+
+
+(declaim (ftype (function () t) remove-current-procs))
+(defun remove-current-procs ()
+  (setf *header-proc* nil
+	*subheader-proc* nil
+	*subsubheader-proc* nil
+	*text-proc* nil
+	*table-proc* nil
+	*itemize-proc* nil
+	*image-proc* nil
+	*bold-proc* nil
+	*italic-proc* nil
+	*code-inline-proc* nil
+	*web-link-proc* nil
+	*header-ref-proc* nil
+	*symbol-ref-proc* nil
+	*function-ref-proc* nil
+	*type-ref-proc* nil
+	*code-block-proc* nil
+	*code-example-proc* nil
+	*defclass-proc* nil
+	*defconstant-proc* nil
+	*defgeneric-proc* nil
+	*define-compiler-macro-proc* nil
+	*define-condition-proc* nil
+	*define-method-combination-proc* nil
+	*define-modify-macro-proc* nil
+	*define-setf-expander-proc* nil
+	*define-symbol-macro-proc* nil
+	*defmacro-proc* nil
+	*defmethod-proc* nil
+	*defpackage-proc* nil
+	*defparameter-proc* nil
+	*defsetf-proc* nil
+	*defstruct-proc* nil
+	*deftype-proc* nil
+	*defun-proc* nil
+	*defvar-proc* nil
+	*get-file-extension-proc* nil
+	*file-header-proc* nil
+	*file-foot-proc* nil
+	*system-files-proc* nil))
+
+
+(declaim (ftype (function () t) check-current-procs))
+(defun check-current-procs ()
+  (unless *header-proc*
+    (error "The function header is not defined in the current style."))
+  (unless *subheader-proc*
+    (error "The function subheader is not defined in the current style."))
+  (unless *subsubheader-proc*
+    (error "The function subsubheader is not defined in the current style."))
+  (unless *text-proc*
+    (error "The function text is not defined in the current style."))
+  (unless *table-proc*
+    (error "The function table is not defined in the current style."))
+  (unless *itemize-proc*
+    (error "The function itemize is not defined in the current style."))
+  (unless *image-proc*
+    (error "The function image is not defined in the current style."))
+  (unless *bold-proc*
+    (error "The function bold is not defined in the current style."))
+  (unless *italic-proc*
+    (error "The function italic is not defined in the current style."))
+  (unless *code-inline-proc*
+    (error "The function code-inline is not defined in the current style."))
+  (unless *web-link-proc*
+    (error "The function web-link is not defined in the current style."))
+  (unless *header-ref-proc*
+    (error "The function header-ref is not defined in the current style."))
+  (unless *symbol-ref-proc*
+    (error "The function symbol-ref is not defined in the current style."))
+  (unless *function-ref-proc*
+    (error "The function function-ref is not defined in the current style."))
+  (unless *type-ref-proc*
+    (error "The function type-ref is not defined in the current style."))
+  (unless *code-block-proc*
+    (error "The function code-block is not defined in the current style."))
+  (unless *code-example-proc*
+    (error "The function code-example is not defined in the current style."))
+  (unless *defclass-proc*
+    (error "The function defclass is not defined in the current style."))
+  (unless *defconstant-proc*
+    (error "The function defconstant is not defined in the current style."))
+  (unless *defgeneric-proc*
+    (error "The function defgeneric is not defined in the current style."))
+  (unless *define-compiler-macro-proc*
+    (error "The function define-compiler-macro is not defined in the current style."))
+  (unless *define-condition-proc*
+    (error "The function define-condition is not defined in the current style."))
+  (unless *define-method-combination-proc*
+    (error "The function define-method-combination is not defined in the current style."))
+  (unless *define-modify-macro-proc*
+    (error "The function define-modify-macro is not defined in the current style."))
+  (unless *define-setf-expander-proc*
+    (error "The function define-setf-expander is not defined in the current style."))
+  (unless *define-symbol-macro-proc*
+    (error "The function define-symbol-macro is not defined in the current style."))
+  (unless *defmacro-proc*
+    (error "The function defmacro is not defined in the current style."))
+  (unless *defmethod-proc*
+    (error "The function defmethod is not defined in the current style."))
+  (unless *defpackage-proc*
+    (error "The function defpackage is not defined in the current style."))
+  (unless *defparameter-proc*
+    (error "The function defparameter is not defined in the current style."))
+  (unless *defsetf-proc*
+    (error "The function defsetf is not defined in the current style."))
+  (unless *defstruct-proc*
+    (error "The function defstruct is not defined in the current style."))
+  (unless *deftype-proc*
+    (error "The function deftype is not defined in the current style."))
+  (unless *defun-proc*
+    (error "The function defun is not defined in the current style."))
+  (unless *defvar-proc*
+    (error "The function defvar is not defined in the current style."))
+  (unless *get-file-extension-proc*
+    (error "The function get-file-extension is not defined in the current style.")))
 
 
 (declaim (ftype (function (pathname &rest t) string) slice-format))
@@ -555,13 +669,16 @@
 				       :type (funcall *get-file-extension-proc*))))
     (ensure-directories-exist complete-path :verbose nil)
     (with-open-file (stream complete-path :direction :output :if-does-not-exist :create :if-exists :supersede)
-      (funcall *file-header-proc* stream)
+      (when *file-header-proc*
+	(funcall *file-header-proc* stream))
       (write-file-contents stream root-path elements)
-      (funcall *file-foot-proc* stream))))
+      (when *file-foot-proc*
+	(funcall *file-foot-proc* stream)))))
 
 
 (defun write-system-files (root-path)
-  (funcall *system-files-proc* root-path)
+  (when *system-files-proc*
+    (funcall *system-files-proc* root-path))
   (loop for file-content across *project-adp-files*
 	do (let ((rel-path (adp-file-path file-content))
 		 (file-elements (adp-file-elements file-content)))

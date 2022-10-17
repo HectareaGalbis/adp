@@ -57,15 +57,15 @@
 
 (adppvt:def-symbol-ref-writer (stream tag root-path file-path)
   (declare (ignore root-path file-path))
-  (format stream "***~a***" tag))
+  (format stream "`~a`" tag))
 
 (adppvt:def-function-ref-writer (stream tag root-path file-path)
   (declare (ignore root-path file-path))
-  (format stream "***~a***" tag))
+  (format stream "`~a`" tag))
 
 (adppvt:def-type-ref-writer (stream tag root-path file-path)
   (declare (ignore root-path file-path))
-  (format stream "***~a***" tag))
+  (format stream "`~a`" tag))
 
 (adppvt:def-code-block-writer (stream code-list)
   (format stream "```~%~{~s~%~^~%~}~%```~%~%" code-list))
@@ -115,12 +115,3 @@
 
 (adppvt:def-get-file-extension-writer ()
   "md")
-
-(adppvt:def-file-header-writer (stream)
-  (declare (ignore stream)))
-
-(adppvt:def-file-foot-writer (stream)
-  (declare (ignore stream)))
-
-(adppvt:def-system-files-writer (root-path)
-  (declare (ignore root-path)))

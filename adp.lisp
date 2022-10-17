@@ -35,28 +35,28 @@
 
 
 (cl:defmacro adv-write-in-file (file-path)
-	      (when adppvt:*add-documentation*
-		(assert (pathname-directory file-path) (file-path) "The ~s pathname has not a directory part." file-path)
-		(assert (pathname-name file-path) (file-path) "The ~s pathname has not a name part." file-path)
-		(with-gensyms (let-file-path header-tag header-str symbol-tag function-tag type-tag)
-		  (once-only (file-path)
-			     `(progn
-				(let ((,let-file-path (make-pathname :directory (cons :relative (cdr (pathname-directory ,file-path)))
-								     :name (pathname-name ,file-path))))
-				  (adppvt:emplace-adp-file ,let-file-path (copy-array adppvt:*file-adp-elements*))
-				  (adppvt:empty-adp-elements)
-				  (loop for (,header-tag . ,header-str) across adppvt:*header-tags*
-					for ,symbol-tag across adppvt:*symbol-tags*
-					for ,function-tag across adppvt:*function-tags*
-					for ,type-tag across adppvt:*type-tags*
-					do (adppvt:add-header-tag-path ,header-tag ,header-str ,let-file-path)
-					   (adppvt:add-symbol-tag-path ,symbol-tag ,let-file-path)
-					   (adppvt:add-function-tag-path ,function-tag ,let-file-path)
-					   (adppvt:add-type-tag-path ,type-tag ,let-file-path)
-					finally (adppvt:empty-header-tags)
-						(adppvt:empty-symbol-tags)
-						(adppvt:empty-function-tags)
-						(adppvt:empty-type-tags))))))))
+  (when adppvt:*add-documentation*
+    (assert (pathname-directory file-path) (file-path) "The ~s pathname has not a directory part." file-path)
+    (assert (pathname-name file-path) (file-path) "The ~s pathname has not a name part." file-path)
+    (with-gensyms (let-file-path header-tag header-str symbol-tag function-tag type-tag)
+      (once-only (file-path)
+	`(progn
+	   (let ((,let-file-path (make-pathname :directory (cons :relative (cdr (pathname-directory ,file-path)))
+						:name (pathname-name ,file-path))))
+	     (adppvt:emplace-adp-file ,let-file-path (copy-array adppvt:*file-adp-elements*))
+	     (adppvt:empty-adp-elements)
+	     (loop for (,header-tag . ,header-str) across adppvt:*header-tags*
+		   for ,symbol-tag across adppvt:*symbol-tags*
+		   for ,function-tag across adppvt:*function-tags*
+		   for ,type-tag across adppvt:*type-tags*
+		   do (adppvt:add-header-tag-path ,header-tag ,header-str ,let-file-path)
+		      (adppvt:add-symbol-tag-path ,symbol-tag ,let-file-path)
+		      (adppvt:add-function-tag-path ,function-tag ,let-file-path)
+		      (adppvt:add-type-tag-path ,type-tag ,let-file-path)
+		   finally (adppvt:empty-header-tags)
+			   (adppvt:empty-symbol-tags)
+			   (adppvt:empty-function-tags)
+			   (adppvt:empty-type-tags))))))))
 
 
 ;; ----- ADP interface -----
@@ -104,8 +104,8 @@
 	     (loop for elem in row
 		   do (assert (eq (car elem) :cell) () "Each cell of a table must be a list starting with :cell. Found: ~s" elem)))
     `(adppvt:emplace-adp-element :table (list ,(loop for row in rows
-					      collect `(list ,(loop for elem in row
-								    collect (cons 'list elem))))))))
+						     collect `(list ,(loop for elem in row
+									   collect (cons 'list elem))))))))
 
 
 (adv-defmacro itemize (&rest items)
@@ -136,8 +136,8 @@
 
 
 (adv-defmacro italic (&rest args)
-    (when adppvt:*add-documentation*
-      `(create-italic-text ,@args)))
+  (when adppvt:*add-documentation*
+    `(create-italic-text ,@args)))
 
 
 (adv-defmacro code-inline (code)
@@ -182,25 +182,25 @@
 (adv-defmacro code-tag (tags &body code)
   (with-gensyms (tag)
     `(progn
-     ,@(loop for expr in code
-	     collect (adppvt:remove-own-code-focus-exprs expr))
-     ,@(when adppvt:*add-documentation*
-	 (assert (or (symbolp tags) (listp tags)) (tags) "~s is not a symbol nor a list" tags)
-	 (when (listp tags)
-	   (assert (every #'symbolp tags) (tags) "Thare is a non-symbol in ~s" tags))
-	 `((loop for ,tag in ',tags
-		 do (apply #'add-code-tag ,tag ',code)))))))
+       ,@(loop for expr in code
+	       collect (adppvt:remove-own-code-focus-exprs expr))
+       ,@(when adppvt:*add-documentation*
+	   (assert (or (symbolp tags) (listp tags)) (tags) "~s is not a symbol nor a list" tags)
+	   (when (listp tags)
+	     (assert (every #'symbolp tags) (tags) "Thare is a non-symbol in ~s" tags))
+	   `((loop for ,tag in ',tags
+		   do (funcall #'process-code-tag ,tag ',code)))))))
 
 
 (adv-defmacro code-block (tags &body code)
   (when adppvt:*add-documentation*
     (with-gensyms (expr)
       `(adppvt:emplace-adp-element :code-block (loop for ,expr in ',code
-					      if (and (symbolp ,expr)
-						      (member ,expr ',tags))
-						append (process-code-tag ,expr (get-code-tag ,expr))
-					      else
-						collect (process-code-tag '#:dummy-tag ,expr))))))
+						     if (and (symbolp ,expr)
+							     (member ,expr ',tags))
+						       append (process-code-tag ,expr (get-code-tag ,expr))
+						     else
+						       collect (process-code-tag '#:dummy-tag ,expr))))))
 
 
 (adv-defmacro code-example (tags &body code)
@@ -210,9 +210,9 @@
 					  `(let* ((,output (make-array 10 :adjustable t :fill-pointer 0 :element-type 'character))
 						  (,result (multiple-value-list (with-output-to-string (*standard-output* ,output)
 										  ,(adppvt:remove-code-tag-exprs (if (and (symbolp expr)
-														   (member expr tags))
-													      (adppvt:get-code-tag expr)
-													      expr))))))
+															  (member expr tags))
+														     (adppvt:get-code-tag expr)
+														     expr))))))
 					     (list ',(if (and (symbolp expr)
 							      (member expr tags))
 							 (adppvt:process-code-tag expr (adppvt:get-code-tag expr))
@@ -372,35 +372,38 @@
 
 
 (adv-defmacro write-in-file (file-path)
-	      (when adppvt:*add-documentation*
-		(assert (pathname-name file-path) (file-path) "The ~s pathname has not a name part." file-path)
-		(with-gensyms (let-file-path header-tag header-str symbol-tag function-tag type-tag)
-		  (once-only (file-path)
-			     `(progn
-				(let ((,let-file-path (make-pathname :directory (if (pathname-directory ,file-path)
-										    (cons :relative (cdr (pathname-directory ,file-path)))
-										    nil)
-								     :name (pathname-name ,file-path))))
-				  (adppvt:emplace-adp-file ,let-file-path (copy-array adppvt:*file-adp-elements*))
-				  (adppvt:empty-adp-elements)
-				  (loop for (,header-tag . ,header-str) across adppvt:*header-tags*
-					for ,symbol-tag across adppvt:*symbol-tags*
-					for ,function-tag across adppvt:*function-tags*
-					for ,type-tag across adppvt:*type-tags*
-					do (adppvt:add-header-tag-path ,header-tag ,header-str ,let-file-path)
-					   (adppvt:add-symbol-tag-path ,symbol-tag ,let-file-path)
-					   (adppvt:add-function-tag-path ,function-tag ,let-file-path)
-					   (adppvt:add-type-tag-path ,type-tag ,let-file-path)
-					finally (adppvt:empty-header-tags)
-						(adppvt:empty-symbol-tags)
-						(adppvt:empty-function-tags)
-						(adppvt:empty-type-tags))))))))
+  (when adppvt:*add-documentation*
+    (assert (pathname-name file-path) (file-path) "The ~s pathname has not a name part." file-path)
+    (with-gensyms (let-file-path header-tag header-str symbol-tag function-tag type-tag)
+      (once-only (file-path)
+	`(progn
+	   (let ((,let-file-path (make-pathname :directory (if (pathname-directory ,file-path)
+							       (cons :relative (cdr (pathname-directory ,file-path)))
+							       nil)
+						:name (pathname-name ,file-path))))
+	     (adppvt:emplace-adp-file ,let-file-path (copy-array adppvt:*file-adp-elements*))
+	     (adppvt:empty-adp-elements)
+	     (loop for (,header-tag . ,header-str) across adppvt:*header-tags*
+		   for ,symbol-tag across adppvt:*symbol-tags*
+		   for ,function-tag across adppvt:*function-tags*
+		   for ,type-tag across adppvt:*type-tags*
+		   do (adppvt:add-header-tag-path ,header-tag ,header-str ,let-file-path)
+		      (adppvt:add-symbol-tag-path ,symbol-tag ,let-file-path)
+		      (adppvt:add-function-tag-path ,function-tag ,let-file-path)
+		      (adppvt:add-type-tag-path ,type-tag ,let-file-path)
+		   finally (adppvt:empty-header-tags)
+			   (adppvt:empty-symbol-tags)
+			   (adppvt:empty-function-tags)
+			   (adppvt:empty-type-tags))))))))
 
 
 (adv-defun load-documentation-system (system style root-path &rest style-args)
-  (adppvt:check-style-parameters style-args)
+  (adppvt:remove-current-procs)
   (let ((style-system (intern (concatenate 'string "ADP/" (symbol-name style)) :keyword)))
-    (asdf:load-system style-system))
+    (asdf:load-system style-system :force t))
+  (adppvt:check-current-procs)
+  (adppvt:check-style-parameters style-args)
+  (adppvt:remove-current-data)
   (let ((adppvt:*add-documentation* t))
     (asdf:load-system system :force t))
   (loop for (name value) in style-args by #'cddr
