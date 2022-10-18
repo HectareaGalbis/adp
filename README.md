@@ -2,6 +2,8 @@
 
 _Add Documentation, Please_ is a library for literate programming and semi-automatic API generation.
 
+Let's try to use some links. For example: [Hyperspec](http://www.lispworks.com/documentation/HyperSpec/Front/)
+
 #### ***Function*** ADP::PRUEBA
 
 ```Lisp

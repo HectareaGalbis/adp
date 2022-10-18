@@ -6,6 +6,8 @@
 
 (text (italic "Add Documentation, Please") " is a library for literate programming and semi-automatic API generation.")
 
+(text "Let's try to use some links. For example: " (web-link "Hyperspec" "http://www.lispworks.com/documentation/HyperSpec/Front/"))
+
 (code-tag (prueba)
   (defun prueba (x y z)
     (let ((code-hide (prueba) (h x) (u y) (l z)))

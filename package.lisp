@@ -24,7 +24,8 @@
 	   #:set-parameter-value #:write-system-files #:add-code-tag #:get-code-tag #:process-code-tag
 	   #:remove-code-tag-exprs #:remove-own-code-hide-exprs #:remove-current-data #:remove-current-procs
 	   #:check-current-procs #:hide-symbolp #:create-bold-text #:create-italic-text #:create-code-inline-text
-	   #:create-header-ref-text #:create-symbol-ref-text #:create-function-ref-text #:create-type-ref-text
+	   #:create-web-link-text #:create-header-ref-text #:create-symbol-ref-text #:create-function-ref-text
+	   #:create-type-ref-text
 
 	   #:def-header-writer #:def-subheader-writer #:def-subsubheader-writer #:def-text-writer
 	   #:def-table-writer #:def-itemize-writer #:def-image-writer #:def-bold-writer #:def-italic-writer

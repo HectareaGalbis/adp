@@ -261,6 +261,7 @@
 (defparameter *bold-symbol* '#:bold)
 (defparameter *italic-symbol* '#:italic)
 (defparameter *code-inline-symbol* '#:code-inline)
+(defparameter *web-link-symbol* '#:web-link)
 (defparameter *header-ref-symbol* '#:header)
 (defparameter *symbol-ref-symbol* '#:symbol)
 (defparameter *function-ref-symbol* '#:function)
@@ -277,6 +278,10 @@
 (defun create-code-inline-text (&rest args)
   (cons *code-inline-symbol* args))
 
+(declaim (ftype (function (string string) list) create-web-link-text))
+(defun create-web-link-text (text link)
+  (list *web-link-symbol* text link))
+
 (declaim (ftype (function (symbol) (cons symbol list)) create-header-ref-text create-symbol-ref-text
 		create-function-ref-text create-type-ref-text))
 (defun create-header-ref-text (label)
@@ -291,7 +296,7 @@
 (defun create-type-ref-text (label)
   (list *type-ref-symbol* label))
 
-(declaim (ftype (function (t) boolean) bold-textp italic-textp code-inline-textp header-ref-textp
+(declaim (ftype (function (t) boolean) bold-textp italic-textp code-inline-textp web-link-textp header-ref-textp
 		symbol-ref-textp function-ref-textp type-ref-textp))
 (defun bold-textp (arg)
   (and (listp arg)
@@ -304,6 +309,10 @@
 (defun code-inline-textp (arg)
   (and (listp arg)
        (eq (car arg) *code-inline-symbol*)))
+
+(defun web-link-textp (arg)
+  (and (listp arg)
+       (eq (car arg) *web-link-symbol*)))
 
 (defun header-ref-textp (arg)
   (and (listp arg)
@@ -593,6 +602,9 @@
 	       ((code-inline-textp arg)
 		(let ((code-inline-args (cdr arg)))
 		  (funcall *code-inline-proc* stream (apply #'slice-format root-path code-inline-args))))
+	       ((web-link-textp arg)
+		(destructuring-bind (name link) (cdr arg)
+		  (funcall *web-link-proc* stream name link)))
 	       ((header-ref-textp arg)
 		(assert (get-header-tag-path (cadr arg)) ((cadr arg)) "~s is not a header tag." (cadr arg)) 
 		(let* ((header-tag (cadr arg))

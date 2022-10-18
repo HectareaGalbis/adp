@@ -153,12 +153,7 @@
 
 (adv-defmacro web-link (name link)
   (when adppvt:*add-documentation*
-    (with-gensyms (let-name let-link stream)
-      `(let ((,let-name ,name)
-	     (,let-link ,link))
-	 (declare (type string ,let-name ,let-link))
-	 (with-output-to-string (,stream)
-	   (funcall *web-link-proc* ,stream ,let-name ,let-link))))))
+    `(adppvt:create-web-link-text ,name ,link)))
 
 
 (adv-defmacro header-ref (label)
