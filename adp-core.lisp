@@ -632,9 +632,9 @@
 	     (:itemize (labels ((write-itemize (item-list)
 				  (loop for item in item-list
 					if (eq (car item) :item)
-					  collect (apply #'slice-format root-path (cdr item))
+					  collect (list :item (apply #'slice-format root-path (cdr item)))
 					else
-					  collect (write-itemize (cdr item)))))
+					  collect (list* :itemize (write-itemize (cdr item))))))
 			 (let ((item-list (adp-element-contents element)))
 			   (funcall *itemize-proc* stream (write-itemize item-list)))))
 	     (:image (destructuring-bind (alt-text image-path) (adp-element-contents element)

@@ -28,11 +28,11 @@
   (labels ((itemize-aux (item-list level)
 	     (loop for item in item-list
 		   if (eq (car item) :item)
-		     do (format stream "~v@{  ~}* ~a~%" level item)
+		     do (format stream "~v@{  ~}* ~a~%" level (cadr item))
 		   else if (eq (car item) :itemize)
-			  do (itemize-aux item (1+ level))
+			  do (itemize-aux (cdr item) (1+ level))
 		   finally (when (zerop level)
-			     (format stream "~%~%")))))
+			     (format stream "~%")))))
     (itemize-aux items 0)))
 
 (adppvt:def-image-writer (stream alt-text root-path rel-image-path)
@@ -92,7 +92,7 @@
   (loop for (code output result) in code-list
 	do (terpri stream)
 	   (prin1-with-hide-string stream code "...")
-	   (format stream "~a~%~{~s~%~}~%" output result))
+	   (format stream "~%~a~{~s~^~%~}~%" output result))
   (format stream "```~%~%"))
 
 

@@ -56,13 +56,12 @@
                                                     "Each cell of a table must be a list starting with :cell. Found: ~s"
                                                     ADP::ELEM)))
     `(ADP-PRIVATE:EMPLACE-ADP-ELEMENT :TABLE
-                                      (LIST
-                                       ,(LOOP ADP::FOR ADP::ROW ADP::IN ADP::ROWS
-                                              ADP::COLLECT `(LIST
-                                                             ,(LOOP ADP::FOR ADP::ELEM ADP::IN ADP::ROW
-                                                                    ADP::COLLECT (CONS
-                                                                                  'LIST
-                                                                                  ADP::ELEM))))))))
+                                      ,@(LOOP ADP::FOR ADP::ROW ADP::IN ADP::ROWS
+                                              ADP::COLLECT (CONS 'LIST
+                                                                 (LOOP ADP::FOR ADP::ELEM ADP::IN ADP::ROW
+                                                                       ADP::COLLECT (CONS
+                                                                                     'LIST
+                                                                                     ADP::ELEM)))))))
 ```
 
 #### ***Macro*** ADP:ITEMIZE
@@ -79,7 +78,16 @@
                              "Each item of itemize must be a list starting with :item ot :itemize. Found: ~s"
                              ADP::ITEM)))))
       (ADP::CHECK-ITEMS ADP::ITEMS))
-    `(ADP-PRIVATE:EMPLACE-ADP-ELEMENT :ITEMIZE ,@ADP::ITEMS)))
+    (LABELS ((ADP::PROCESS-ITEMIZE-ITEMS (ADP::ITEM-LIST)
+               (LOOP ADP::FOR ADP::ITEM ADP::IN ADP::ITEM-LIST
+                     IF (EQ (CAR ADP::ITEM) :ITEM)
+                     ADP::COLLECT (CONS 'LIST ADP::ITEM) ADP::ELSE
+                     ADP::COLLECT (LIST* 'LIST :ITEMIZE
+                                         (ADP::PROCESS-ITEMIZE-ITEMS
+                                          (CDR ADP::ITEM))))))
+      `(ADP-PRIVATE:EMPLACE-ADP-ELEMENT :ITEMIZE
+                                        ,@(ADP::PROCESS-ITEMIZE-ITEMS
+                                           ADP::ITEMS)))))
 ```
 
 #### ***Macro*** ADP:IMAGE
@@ -179,8 +187,7 @@
                     "Thare is a non-symbol in ~s" ADP::TAGS))
           `((LOOP ADP::FOR ,ADP::TAG ADP::IN ',ADP::TAGS
                   DO (APPLY #'ADP-PRIVATE:ADD-CODE-TAG ,ADP::TAG
-                            (FUNCALL #'ADP-PRIVATE:PROCESS-CODE-TAG ,ADP::TAG
-                                     ',ADP::CODE))))))))
+                            ',ADP::CODE)))))))
 ```
 
 #### ***Macro*** ADP:CODE-BLOCK
@@ -208,7 +215,7 @@
 #### ***Macro*** ADP:CODE-EXAMPLE
 
 ```Lisp
-(DEFMACRO ADP:CODE-EXAMPLE (ADP::TAGS &BODY ADP::CODE)
+(DEFMACRO ADP:CODE-EXAMPLE (&BODY ADP::CODE)
   (WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
     (LET ((ADP::EVALUATED-CODE
            (LOOP ADP::FOR ADP::EXPR ADP::IN ADP::CODE
@@ -222,21 +229,10 @@
                                           (WITH-OUTPUT-TO-STRING
                                               (*STANDARD-OUTPUT* ,ADP::OUTPUT)
                                             ,(ADP-PRIVATE:REMOVE-CODE-TAG-EXPRS
-                                              (IF (AND (SYMBOLP ADP::EXPR)
-                                                       (MEMBER ADP::EXPR
-                                                               ADP::TAGS))
-                                                  (ADP-PRIVATE:GET-CODE-TAG
-                                                   ADP::EXPR)
-                                                  ADP::EXPR))))))
+                                              ADP::EXPR)))))
                                    (LIST
-                                    ',(IF (AND (SYMBOLP ADP::EXPR)
-                                               (MEMBER ADP::EXPR ADP::TAGS))
-                                          (ADP-PRIVATE:PROCESS-CODE-TAG
-                                           ADP::EXPR
-                                           (ADP-PRIVATE:GET-CODE-TAG
-                                            ADP::EXPR))
-                                          (ADP-PRIVATE:PROCESS-CODE-TAG
-                                           '#:DUMMY-TAG ADP::EXPR))
+                                    ',(ADP-PRIVATE:PROCESS-CODE-TAG
+                                       '#:DUMMY-TAG ADP::EXPR)
                                     ,ADP::OUTPUT ,ADP::RESULT))))))
       `(ADP-PRIVATE:EMPLACE-ADP-ELEMENT :CODE-EXAMPLE
                                         (LIST ,@ADP::EVALUATED-CODE)))))

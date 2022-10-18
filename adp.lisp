@@ -103,9 +103,9 @@
 	  do (check-type row list "a list")
 	     (loop for elem in row
 		   do (assert (eq (car elem) :cell) () "Each cell of a table must be a list starting with :cell. Found: ~s" elem)))
-    `(adppvt:emplace-adp-element :table (list ,(loop for row in rows
-						     collect `(list ,(loop for elem in row
-									   collect (cons 'list elem))))))))
+    `(adppvt:emplace-adp-element :table ,@(loop for row in rows
+						collect (cons 'list (loop for elem in row
+									  collect (cons 'list elem)))))))
 
 
 (adv-defmacro itemize (&rest items)
@@ -117,7 +117,13 @@
 			      (check-items (cdr item))
 			      (error "Each item of itemize must be a list starting with :item ot :itemize. Found: ~s" item)))))
       (check-items items))
-    `(adppvt:emplace-adp-element :itemize ,@items)))
+    (labels ((process-itemize-items (item-list)
+	       (loop for item in item-list
+		     if (eq (car item) :item)
+		       collect (cons 'list item)
+		     else
+		       collect (list* 'list :itemize (process-itemize-items (cdr item))))))
+      `(adppvt:emplace-adp-element :itemize ,@(process-itemize-items items)))))
 
 
 (adv-defmacro image (alt-text path)
@@ -188,7 +194,7 @@
 	   (when (listp tags)
 	     (assert (every #'symbolp tags) (tags) "Thare is a non-symbol in ~s" tags))
 	   `((loop for ,tag in ',tags
-		   do (apply #'adppvt:add-code-tag ,tag (funcall #'adppvt:process-code-tag ,tag ',code))))))))
+		   do (apply #'adppvt:add-code-tag ,tag ',code)))))))
 
 
 (adv-defmacro code-block (tags &body code)
@@ -202,20 +208,14 @@
 						       collect (adppvt:process-code-tag '#:dummy-tag ,expr))))))
 
 
-(adv-defmacro code-example (tags &body code)
+(adv-defmacro code-example (&body code)
   (when adppvt:*add-documentation*
     (let ((evaluated-code (loop for expr in code
 				collect (with-gensyms (output result)
 					  `(let* ((,output (make-array 10 :adjustable t :fill-pointer 0 :element-type 'character))
 						  (,result (multiple-value-list (with-output-to-string (*standard-output* ,output)
-										  ,(adppvt:remove-code-tag-exprs (if (and (symbolp expr)
-															  (member expr tags))
-														     (adppvt:get-code-tag expr)
-														     expr))))))
-					     (list ',(if (and (symbolp expr)
-							      (member expr tags))
-							 (adppvt:process-code-tag expr (adppvt:get-code-tag expr))
-							 (adppvt:process-code-tag '#:dummy-tag expr))
+										  ,(adppvt:remove-code-tag-exprs expr)))))
+					     (list ',(adppvt:process-code-tag '#:dummy-tag expr)
 						   ,output
 						   ,result))))))
       `(adppvt:emplace-adp-element :code-example (list ,@evaluated-code)))))
