@@ -50,4 +50,7 @@
 (text "Header tags also work! For example: " (header-ref adp-header))
 
 
+(text "Lastly, we can make text " (italic "italic") " and " (bold "bold") ". Also, we can make inline code: "
+      (code-inline '(+ 3 4)))
+
 (write-in-file #P"README")

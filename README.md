@@ -86,3 +86,5 @@ Let's define the parameter `*EXAMPLE-PARAMETER*` and the type `WEIRD-TYPE`. Look
 
 Header tags also work! For example: ***Add Documentation, Please***
 
+Lastly, we can make text _italic_ and **bold**. Also, we can make inline code: `(+ 3 4)`
+

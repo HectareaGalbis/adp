@@ -46,7 +46,7 @@
 
 (adppvt:def-code-inline-writer (stream code)
   (let ((*print-pretty* nil))
-    (format stream "`~s`" code)))
+    (format stream "`~a`" code)))
 
 (adppvt:def-web-link-writer (stream name link)
   (format stream "[~a](~a)" name link))
