@@ -132,17 +132,17 @@
 
 (adv-defmacro bold (&rest args)
   (when adppvt:*add-documentation*
-    `(create-bold-text ,@args)))
+    `(adppvt:create-bold-text ,@args)))
 
 
 (adv-defmacro italic (&rest args)
   (when adppvt:*add-documentation*
-    `(create-italic-text ,@args)))
+    `(adppvt:create-italic-text ,@args)))
 
 
 (adv-defmacro code-inline (code)
   (when adppvt:*add-documentation*
-    `(create-code-inline-text ,code)))
+    `(adppvt:create-code-inline-text ,code)))
 
 
 (adv-defmacro web-link (name link)
@@ -157,22 +157,22 @@
 
 (adv-defmacro header-ref (label)
   (when adppvt:*add-documentation*
-    `(create-header-ref-text ,label)))
+    `(adppvt:create-header-ref-text ,label)))
 
 
 (adv-defmacro symbol-ref (label)
   (when adppvt:*add-documentation*
-    `(create-symbol-ref-text ,label)))
+    `(adppvt:create-symbol-ref-text ,label)))
 
 
 (adv-defmacro function-ref (label)
   (when adppvt:*add-documentation*
-    `(create-function-ref-text ,label)))
+    `(adppvt:create-function-ref-text ,label)))
 
 
 (adv-defmacro type-ref (label)
   (when adppvt:*add-documentation*
-    `(create-type-ref-text ,label)))
+    `(adppvt:create-type-ref-text ,label)))
 
 
 ;; (adv-defmacro code-focus (tags &rest code)
@@ -182,14 +182,13 @@
 (adv-defmacro code-tag (tags &body code)
   (with-gensyms (tag)
     `(progn
-       ,@(loop for expr in code
-	       collect (adppvt:remove-own-code-focus-exprs expr))
+       ,@(adppvt:remove-own-code-hide-exprs code)
        ,@(when adppvt:*add-documentation*
 	   (assert (or (symbolp tags) (listp tags)) (tags) "~s is not a symbol nor a list" tags)
 	   (when (listp tags)
 	     (assert (every #'symbolp tags) (tags) "Thare is a non-symbol in ~s" tags))
 	   `((loop for ,tag in ',tags
-		   do (funcall #'process-code-tag ,tag ',code)))))))
+		   do (apply #'adppvt:add-code-tag ,tag (funcall #'adppvt:process-code-tag ,tag ',code))))))))
 
 
 (adv-defmacro code-block (tags &body code)
@@ -198,9 +197,9 @@
       `(adppvt:emplace-adp-element :code-block (loop for ,expr in ',code
 						     if (and (symbolp ,expr)
 							     (member ,expr ',tags))
-						       append (process-code-tag ,expr (get-code-tag ,expr))
+						       append (adppvt:process-code-tag ,expr (coerce (adppvt:get-code-tag ,expr) 'list))
 						     else
-						       collect (process-code-tag '#:dummy-tag ,expr))))))
+						       collect (adppvt:process-code-tag '#:dummy-tag ,expr))))))
 
 
 (adv-defmacro code-example (tags &body code)

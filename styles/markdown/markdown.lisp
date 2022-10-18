@@ -67,13 +67,32 @@
   (declare (ignore root-path file-path))
   (format stream "`~a`" tag))
 
+(defun prin1-with-hide-string (stream code str)
+  (let ((normal-pprint-dispatch *print-pprint-dispatch*)
+	(custom-pprint-dispatch (copy-pprint-dispatch nil)))
+    (labels ((custom-hide-print (stream sym)
+	       (if (adppvt:hide-symbolp sym)
+		   (princ str stream)
+		   (let ((*print-pprint-dispatch* normal-pprint-dispatch))
+		     (prin1 sym stream)))))
+      (set-pprint-dispatch 'symbol #'custom-hide-print 0 custom-pprint-dispatch)
+      (let ((*print-pprint-dispatch* custom-pprint-dispatch))
+	(prin1 code stream)))))
+
 (adppvt:def-code-block-writer (stream code-list)
-  (format stream "```~%~{~s~%~^~%~}~%```~%~%" code-list))
+    (format stream "```")
+  (loop for code in code-list
+	do (terpri stream)
+	   (prin1-with-hide-string stream code "...")
+	   (terpri stream))
+  (format stream "```~%~%"))
 
 (adppvt:def-code-example-writer (stream code-list)
-  (format stream "```~%")
+  (format stream "```")
   (loop for (code output result) in code-list
-	do (format stream "~s~%Output:~%~a~%Result:~%~{~s~%~}~%" code output result))
+	do (terpri stream)
+	   (prin1-with-hide-string stream code "...")
+	   (format stream "~a~%~{~s~%~}~%" output result))
   (format stream "```~%~%"))
 
 

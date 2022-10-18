@@ -208,13 +208,15 @@
       (and (consp code)
 	   (plistp (cdr code)))))
 
+(intern "CODE-HIDE" :adp) ; Advance intern
+(intern "CODE-TAG" :adp)  ; Advance intern
 
 (declaim (ftype (function (t) t) remove-code-tag-exprs))
 (defun remove-code-tag-exprs (code)
   (labels ((remove-code-tag-exprs-aux (code)
 	     (if (plistp code)
 		 (cond
-		   ((member (car code) '(code-tag code-hide))
+		   ((member (car code) '(adp::code-tag adp::code-hide))
 		    (mapcan #'remove-code-tag-exprs-aux (cddr code)))
 		   (t
 		    (list (mapcan #'remove-code-tag-exprs-aux code))))
@@ -226,9 +228,9 @@
   (labels ((remove-own-code-hide-exprs-aux (code)
 	     (if (plistp code)
 		 (cond
-		   ((eq (car code) 'code-hide)
+		   ((eq (car code) 'adp::code-hide)
 		    (mapcan #'remove-own-code-hide-exprs-aux (cddr code)))
-		   ((eq (car code) 'code-tag)
+		   ((eq (car code) 'adp::code-tag)
 		    (list code))
 		   (t
 		    (list (mapcan #'remove-own-code-hide-exprs-aux code))))
@@ -239,8 +241,8 @@
 (defun process-code-tag (tag code)
   (labels ((process-aux (tag code)
 	     (if (plistp code)
-		 (if (member (car code) '(code-hide code-tag))
-		     (if (and (eq (car code) 'code-hide)
+		 (if (member (car code) '(adp::code-hide adp::code-tag))
+		     (if (and (eq (car code) 'adp::code-hide)
 			      (or (null (cadr code))
 				  (member tag (cadr code))))
 			 (list *hide-symbol*)
@@ -259,12 +261,12 @@
 (defparameter *bold-symbol* '#:bold)
 (defparameter *italic-symbol* '#:italic)
 (defparameter *code-inline-symbol* '#:code-inline)
-(defparameter *header-ref-symbol* '#:bold)
-(defparameter *symbol-ref-symbol* '#:bold)
-(defparameter *function-ref-symbol* '#:bold)
-(defparameter *type-ref-symbol* '#:bold)
+(defparameter *header-ref-symbol* '#:header)
+(defparameter *symbol-ref-symbol* '#:symbol)
+(defparameter *function-ref-symbol* '#:function)
+(defparameter *type-ref-symbol* '#:type)
 
-(declaim (ftype (function (&rest t) (cons keyword list)) create-bold-text create-italic-text
+(declaim (ftype (function (&rest t) (cons symbol list)) create-bold-text create-italic-text
 		create-code-inline-text))
 (defun create-bold-text (&rest args)
   (cons *bold-symbol* args))
@@ -275,7 +277,7 @@
 (defun create-code-inline-text (&rest args)
   (cons *code-inline-symbol* args))
 
-(declaim (ftype (function (symbol) (cons keyword list)) create-header-ref-text create-symbol-ref-text
+(declaim (ftype (function (symbol) (cons symbol list)) create-header-ref-text create-symbol-ref-text
 		create-function-ref-text create-type-ref-text))
 (defun create-header-ref-text (label)
   (list *header-ref-symbol* label))

@@ -99,14 +99,16 @@
 
 ```Lisp
 (DEFMACRO ADP:BOLD (&REST ADP::ARGS)
-  (WHEN ADP-PRIVATE:*ADD-DOCUMENTATION* `(ADP::CREATE-BOLD-TEXT ,@ADP::ARGS)))
+  (WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
+    `(ADP-PRIVATE:CREATE-BOLD-TEXT ,@ADP::ARGS)))
 ```
 
 #### ***Macro*** ADP:ITALIC
 
 ```Lisp
 (DEFMACRO ADP:ITALIC (&REST ADP::ARGS)
-  (WHEN ADP-PRIVATE:*ADD-DOCUMENTATION* `(ADP::CREATE-ITALIC-TEXT ,@ADP::ARGS)))
+  (WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
+    `(ADP-PRIVATE:CREATE-ITALIC-TEXT ,@ADP::ARGS)))
 ```
 
 #### ***Macro*** ADP:CODE-INLINE
@@ -114,7 +116,7 @@
 ```Lisp
 (DEFMACRO ADP:CODE-INLINE (ADP::CODE)
   (WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
-    `(ADP::CREATE-CODE-INLINE-TEXT ,ADP::CODE)))
+    `(ADP-PRIVATE:CREATE-CODE-INLINE-TEXT ,ADP::CODE)))
 ```
 
 #### ***Macro*** ADP:WEB-LINK
@@ -135,7 +137,7 @@
 ```Lisp
 (DEFMACRO ADP:HEADER-REF (ADP::LABEL)
   (WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
-    `(ADP::CREATE-HEADER-REF-TEXT ,ADP::LABEL)))
+    `(ADP-PRIVATE:CREATE-HEADER-REF-TEXT ,ADP::LABEL)))
 ```
 
 #### ***Macro*** ADP:SYMBOL-REF
@@ -143,7 +145,7 @@
 ```Lisp
 (DEFMACRO ADP:SYMBOL-REF (ADP::LABEL)
   (WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
-    `(ADP::CREATE-SYMBOL-REF-TEXT ,ADP::LABEL)))
+    `(ADP-PRIVATE:CREATE-SYMBOL-REF-TEXT ,ADP::LABEL)))
 ```
 
 #### ***Macro*** ADP:FUNCTION-REF
@@ -151,7 +153,7 @@
 ```Lisp
 (DEFMACRO ADP:FUNCTION-REF (ADP::LABEL)
   (WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
-    `(ADP::CREATE-FUNCTION-REF-TEXT ,ADP::LABEL)))
+    `(ADP-PRIVATE:CREATE-FUNCTION-REF-TEXT ,ADP::LABEL)))
 ```
 
 #### ***Macro*** ADP:TYPE-REF
@@ -159,7 +161,7 @@
 ```Lisp
 (DEFMACRO ADP:TYPE-REF (ADP::LABEL)
   (WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
-    `(ADP::CREATE-TYPE-REF-TEXT ,ADP::LABEL)))
+    `(ADP-PRIVATE:CREATE-TYPE-REF-TEXT ,ADP::LABEL)))
 ```
 
 #### ***Macro*** ADP::CODE-TAG
@@ -168,8 +170,7 @@
 (DEFMACRO ADP::CODE-TAG (ADP::TAGS &BODY ADP::CODE)
   (ALEXANDRIA:WITH-GENSYMS (ADP::TAG)
     `(PROGN
-      ,@(LOOP ADP::FOR ADP::EXPR ADP::IN ADP::CODE
-              ADP::COLLECT (ADP-PRIVATE:REMOVE-OWN-CODE-FOCUS-EXPRS ADP::EXPR))
+      ,@(ADP-PRIVATE:REMOVE-OWN-CODE-HIDE-EXPRS ADP::CODE)
       ,@(WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
           (ASSERT (OR (SYMBOLP ADP::TAGS) (LISTP ADP::TAGS)) (ADP::TAGS)
                   "~s is not a symbol nor a list" ADP::TAGS)
@@ -177,7 +178,9 @@
             (ASSERT (EVERY #'SYMBOLP ADP::TAGS) (ADP::TAGS)
                     "Thare is a non-symbol in ~s" ADP::TAGS))
           `((LOOP ADP::FOR ,ADP::TAG ADP::IN ',ADP::TAGS
-                  DO (APPLY #'ADP::ADD-CODE-TAG ,ADP::TAG ',ADP::CODE)))))))
+                  DO (APPLY #'ADP-PRIVATE:ADD-CODE-TAG ,ADP::TAG
+                            (FUNCALL #'ADP-PRIVATE:PROCESS-CODE-TAG ,ADP::TAG
+                                     ',ADP::CODE))))))))
 ```
 
 #### ***Macro*** ADP:CODE-BLOCK
@@ -191,11 +194,13 @@
                                               IF (AND (SYMBOLP ,ADP::EXPR)
                                                       (MEMBER ,ADP::EXPR
                                                               ',ADP::TAGS))
-                                              APPEND (ADP::PROCESS-CODE-TAG
+                                              APPEND (ADP-PRIVATE:PROCESS-CODE-TAG
                                                       ,ADP::EXPR
-                                                      (ADP::GET-CODE-TAG
-                                                       ,ADP::EXPR)) ADP::ELSE
-                                              ADP::COLLECT (ADP::PROCESS-CODE-TAG
+                                                      (COERCE
+                                                       (ADP-PRIVATE:GET-CODE-TAG
+                                                        ,ADP::EXPR)
+                                                       'LIST)) ADP::ELSE
+                                              ADP::COLLECT (ADP-PRIVATE:PROCESS-CODE-TAG
                                                             '#:DUMMY-TAG
                                                             ,ADP::EXPR))))))
 ```
