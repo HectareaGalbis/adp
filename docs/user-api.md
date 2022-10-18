@@ -140,7 +140,7 @@
 ```Lisp
 (DEFMACRO ADP:HEADER-REF (ADP::LABEL)
   (WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
-    `(ADP-PRIVATE:CREATE-HEADER-REF-TEXT ,ADP::LABEL)))
+    `(ADP-PRIVATE:CREATE-HEADER-REF-TEXT ',ADP::LABEL)))
 ```
 
 #### ***Macro*** ADP:SYMBOL-REF
@@ -148,7 +148,7 @@
 ```Lisp
 (DEFMACRO ADP:SYMBOL-REF (ADP::LABEL)
   (WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
-    `(ADP-PRIVATE:CREATE-SYMBOL-REF-TEXT ,ADP::LABEL)))
+    `(ADP-PRIVATE:CREATE-SYMBOL-REF-TEXT ',ADP::LABEL)))
 ```
 
 #### ***Macro*** ADP:FUNCTION-REF
@@ -156,7 +156,7 @@
 ```Lisp
 (DEFMACRO ADP:FUNCTION-REF (ADP::LABEL)
   (WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
-    `(ADP-PRIVATE:CREATE-FUNCTION-REF-TEXT ,ADP::LABEL)))
+    `(ADP-PRIVATE:CREATE-FUNCTION-REF-TEXT ',ADP::LABEL)))
 ```
 
 #### ***Macro*** ADP:TYPE-REF
@@ -164,7 +164,7 @@
 ```Lisp
 (DEFMACRO ADP:TYPE-REF (ADP::LABEL)
   (WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
-    `(ADP-PRIVATE:CREATE-TYPE-REF-TEXT ,ADP::LABEL)))
+    `(ADP-PRIVATE:CREATE-TYPE-REF-TEXT ',ADP::LABEL)))
 ```
 
 #### ***Macro*** ADP::CODE-TAG
@@ -484,19 +484,22 @@
             (ADP-PRIVATE:EMPTY-ADP-ELEMENTS)
             (LOOP ADP::FOR (,ADP::HEADER-TAG
                             . ,ADP::HEADER-STR) ADP::ACROSS ADP-PRIVATE:*HEADER-TAGS*
-                  ADP::FOR ,ADP::SYMBOL-TAG ADP::ACROSS ADP-PRIVATE:*SYMBOL-TAGS*
-                  ADP::FOR ,ADP::FUNCTION-TAG ADP::ACROSS ADP-PRIVATE:*FUNCTION-TAGS*
-                  ADP::FOR ,ADP::TYPE-TAG ADP::ACROSS ADP-PRIVATE:*TYPE-TAGS*
                   DO (ADP-PRIVATE:ADD-HEADER-TAG-PATH ,ADP::HEADER-TAG
                                                       ,ADP::HEADER-STR
-                                                      ,ADP::LET-FILE-PATH) (ADP-PRIVATE:ADD-SYMBOL-TAG-PATH
-                                                                            ,ADP::SYMBOL-TAG
-                                                                            ,ADP::LET-FILE-PATH) (ADP-PRIVATE:ADD-FUNCTION-TAG-PATH
-                                                                                                  ,ADP::FUNCTION-TAG
-                                                                                                  ,ADP::LET-FILE-PATH) (ADP-PRIVATE:ADD-TYPE-TAG-PATH
-                                                                                                                        ,ADP::TYPE-TAG
-                                                                                                                        ,ADP::LET-FILE-PATH)
-                  ADP::FINALLY (ADP-PRIVATE:EMPTY-HEADER-TAGS) (ADP-PRIVATE:EMPTY-SYMBOL-TAGS) (ADP-PRIVATE:EMPTY-FUNCTION-TAGS) (ADP-PRIVATE:EMPTY-TYPE-TAGS))))))))
+                                                      ,ADP::LET-FILE-PATH)
+                  ADP::FINALLY (ADP-PRIVATE:EMPTY-HEADER-TAGS))
+            (LOOP ADP::FOR ,ADP::SYMBOL-TAG ADP::ACROSS ADP-PRIVATE:*SYMBOL-TAGS*
+                  DO (ADP-PRIVATE:ADD-SYMBOL-TAG-PATH ,ADP::SYMBOL-TAG
+                                                      ,ADP::LET-FILE-PATH)
+                  ADP::FINALLY (ADP-PRIVATE:EMPTY-SYMBOL-TAGS))
+            (LOOP ADP::FOR ,ADP::FUNCTION-TAG ADP::ACROSS ADP-PRIVATE:*FUNCTION-TAGS*
+                  DO (ADP-PRIVATE:ADD-FUNCTION-TAG-PATH ,ADP::FUNCTION-TAG
+                                                        ,ADP::LET-FILE-PATH)
+                  ADP::FINALLY (ADP-PRIVATE:EMPTY-FUNCTION-TAGS))
+            (LOOP ADP::FOR ,ADP::TYPE-TAG ADP::ACROSS ADP-PRIVATE:*TYPE-TAGS*
+                  DO (ADP-PRIVATE:ADD-TYPE-TAG-PATH ,ADP::TYPE-TAG
+                                                    ,ADP::LET-FILE-PATH)
+                  ADP::FINALLY (ADP-PRIVATE:EMPTY-TYPE-TAGS))))))))
 ```
 
 #### ***Function*** ADP:LOAD-DOCUMENTATION-SYSTEM

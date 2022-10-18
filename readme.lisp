@@ -2,7 +2,7 @@
 (in-package :adp)
 
 
-(header "Add Documentation, Please")
+(header "Add Documentation, Please" adp-header)
 
 (text (italic "Add Documentation, Please") " is a library for literate programming and semi-automatic API generation.")
 
@@ -36,5 +36,18 @@
 (table ((:cell "Header1") (:cell "Header 2") (:cell "Header 3"))
        ((:cell 3) (:cell 4) (:cell 5))
        ((:cell "Hola " (+ 3 4)) (:cell "Adios") (:cell "Casa")))
+
+(text "We can also write function reference. Above we had defined the function " (function-ref prueba) ".")
+
+(text "Let's define the parameter " (symbol-ref *example-parameter*) " and the type " (type-ref weird-type) ". Look how we can make reference before the definitions have been evaluated.")
+
+(code-example
+  (defparameter *example-parameter* 3)
+  (deftype weird-type ()
+    '(cons string integer)))
+
+
+(text "Header tags also work! For example: " (header-ref adp-header))
+
 
 (write-in-file #P"README")

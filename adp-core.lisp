@@ -92,7 +92,8 @@
 
 (declaim (ftype (function (symbol) t) push-symbol-tag))
 (defun push-symbol-tag (tag)
-  (vector-push-extend tag *symbol-tags*))
+  (vector-push-extend tag *symbol-tags*)
+  (print *symbol-tags*))
 
 (declaim (ftype (function (symbol) t) push-function-tag))
 (defun push-function-tag (tag)
@@ -613,7 +614,7 @@
 		       (header-rel-path (cdr header-str-path)))
 		  (funcall *header-ref-proc* stream header-tag header-str root-path header-rel-path)))
 	       ((symbol-ref-textp arg)
-		(assert (get-header-tag-path (cadr arg)) ((cadr arg)) "~s is not a symbol tag." (cadr arg))
+		(assert (get-symbol-tag-path (cadr arg)) ((cadr arg)) "~s is not a symbol tag." (cadr arg))
 		(let* ((symbol-tag (cadr arg))
 		       (symbol-path (get-symbol-tag-path symbol-tag)))
 		  (funcall *symbol-ref-proc* stream symbol-tag root-path symbol-path)))

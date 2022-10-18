@@ -158,22 +158,22 @@
 
 (adv-defmacro header-ref (label)
   (when adppvt:*add-documentation*
-    `(adppvt:create-header-ref-text ,label)))
+    `(adppvt:create-header-ref-text ',label)))
 
 
 (adv-defmacro symbol-ref (label)
   (when adppvt:*add-documentation*
-    `(adppvt:create-symbol-ref-text ,label)))
+    `(adppvt:create-symbol-ref-text ',label)))
 
 
 (adv-defmacro function-ref (label)
   (when adppvt:*add-documentation*
-    `(adppvt:create-function-ref-text ,label)))
+    `(adppvt:create-function-ref-text ',label)))
 
 
 (adv-defmacro type-ref (label)
   (when adppvt:*add-documentation*
-    `(adppvt:create-type-ref-text ,label)))
+    `(adppvt:create-type-ref-text ',label)))
 
 
 ;; (adv-defmacro code-focus (tags &rest code)
@@ -378,17 +378,17 @@
 	     (adppvt:emplace-adp-file ,let-file-path (copy-array adppvt:*file-adp-elements*))
 	     (adppvt:empty-adp-elements)
 	     (loop for (,header-tag . ,header-str) across adppvt:*header-tags*
-		   for ,symbol-tag across adppvt:*symbol-tags*
-		   for ,function-tag across adppvt:*function-tags*
-		   for ,type-tag across adppvt:*type-tags*
 		   do (adppvt:add-header-tag-path ,header-tag ,header-str ,let-file-path)
-		      (adppvt:add-symbol-tag-path ,symbol-tag ,let-file-path)
-		      (adppvt:add-function-tag-path ,function-tag ,let-file-path)
-		      (adppvt:add-type-tag-path ,type-tag ,let-file-path)
-		   finally (adppvt:empty-header-tags)
-			   (adppvt:empty-symbol-tags)
-			   (adppvt:empty-function-tags)
-			   (adppvt:empty-type-tags))))))))
+		   finally (adppvt:empty-header-tags))
+	     (loop for ,symbol-tag across adppvt:*symbol-tags*
+		   do (adppvt:add-symbol-tag-path ,symbol-tag ,let-file-path)
+		   finally (adppvt:empty-symbol-tags))
+	     (loop for ,function-tag across adppvt:*function-tags*
+		   do (adppvt:add-function-tag-path ,function-tag ,let-file-path)
+		   finally (adppvt:empty-function-tags))
+	     (loop for ,type-tag across adppvt:*type-tags*
+		   do (adppvt:add-type-tag-path ,type-tag ,let-file-path)
+		   finally (adppvt:empty-type-tags))))))))
 
 
 (adv-defun load-documentation-system (system style root-path &rest style-args)

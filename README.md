@@ -54,3 +54,35 @@ ADP::ADIOS
 | Hola 7 | Adios | Casa |
 
 
+We can also write function reference. Above we had defined the function `PRUEBA`.
+
+Let's define the parameter `*EXAMPLE-PARAMETER*` and the type `WEIRD-TYPE`. Look how we can make reference before the definitions have been evaluated.
+
+#### ***Parameter*** ADP::*EXAMPLE-PARAMETER*
+
+```Lisp
+(DEFPARAMETER ADP::*EXAMPLE-PARAMETER* 3)
+```
+
+#### ***Type*** ADP::WEIRD-TYPE
+
+```Lisp
+(DEFTYPE ADP::WEIRD-TYPE () '(CONS STRING INTEGER))
+```
+
+```
+(ADP:DEFPARAMETER
+  ADP::*EXAMPLE-PARAMETER*
+  3)
+
+#(*EXAMPLE-PARAMETER*) 10
+
+(ADP:DEFTYPE
+  ADP::WEIRD-TYPE
+  NIL
+  '(CONS STRING INTEGER))
+11
+```
+
+Header tags also work! For example: ***Add Documentation, Please***
+
