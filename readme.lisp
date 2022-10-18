@@ -42,6 +42,7 @@
 (text "Let's define the parameter " (symbol-ref *example-parameter*) " and the type " (type-ref weird-type) ". Look how we can make reference before the definitions have been evaluated.")
 
 (code-example
+  'adppvt::*add-documentation*
   (defparameter *example-parameter* 3)
   (deftype weird-type ()
     '(cons string integer)))
@@ -50,7 +51,7 @@
 (text "Header tags also work! For example: " (header-ref adp-header))
 
 
-(text "Lastly, we can make text " (italic "italic") " and " (bold "bold") ". Also, we can make inline code: "
+(text "Lastly, we can make text " (italic "italic") ", " (bold "bold") " and " (bold-italic "bold-italic") ". Also, we can make inline code: "
       (code-inline '(+ 3 4)))
 
 (write-in-file #P"README")

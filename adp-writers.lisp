@@ -44,6 +44,7 @@
 (def-customizable-writer def-image-writer *image-proc*)
 (def-customizable-writer def-bold-writer *bold-proc*)
 (def-customizable-writer def-italic-writer *italic-proc*)
+(def-customizable-writer def-bold-italic-writer *bold-italic-proc*)
 (def-customizable-writer def-code-inline-writer *code-inline-proc*)
 (def-customizable-writer def-web-link-writer *web-link-proc*)
 (def-customizable-writer def-header-ref-writer *header-ref-proc*)

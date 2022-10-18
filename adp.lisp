@@ -5,6 +5,8 @@
 
 (cl:defmacro adv-header (str &optional label)
   (when adppvt:*add-documentation*
+    (check-type str string "a string")
+    (check-type label (or null symbol) "a symbol")
     `(progn
        ,@(when label
 	   `((adppvt:push-header-tag ',label ,str)))
@@ -13,6 +15,8 @@
 
 (cl:defmacro adv-subheader (str &optional label)
   (when adppvt:*add-documentation*
+    (check-type str string "a string")
+    (check-type label (or null symbol) "a symbol")
     `(progn
        ,@(when label
 	   `((adppvt:push-header-tag ',label ,str)))
@@ -36,6 +40,7 @@
 
 (cl:defmacro adv-write-in-file (file-path)
   (when adppvt:*add-documentation*
+    (check-type file-path pathname "a pathname")
     (assert (pathname-directory file-path) (file-path) "The ~s pathname has not a directory part." file-path)
     (assert (pathname-name file-path) (file-path) "The ~s pathname has not a name part." file-path)
     (with-gensyms (let-file-path header-tag header-str symbol-tag function-tag type-tag)
@@ -70,6 +75,8 @@
 
 (adv-defmacro header (str &optional label)
   (when adppvt:*add-documentation*
+    (check-type str string "a string")
+    (check-type label (or null symbol) "a symbol")
     `(progn
        ,@(when label
 	   `((adppvt:push-header-tag ',label ,str)))
@@ -78,6 +85,8 @@
 
 (adv-defmacro subheader (str &optional label)
   (when adppvt:*add-documentation*
+    (check-type str string "a string")
+    (check-type label (or null symbol) "a symbol")
     `(progn
        ,@(when label
 	   `((adppvt:push-header-tag ',label ,str)))
@@ -86,6 +95,8 @@
 
 (adv-defmacro subsubheader (str &optional label)
   (when adppvt:*add-documentation*
+    (check-type str string "a string")
+    (check-type label (or null symbol) "a symbol")
     `(progn
        ,@(when label
 	   `((adppvt:push-header-tag ',label ,str)))
@@ -128,12 +139,9 @@
 
 (adv-defmacro image (alt-text path)
   (when adppvt:*add-documentation*
-    (with-gensyms (let-alt-text let-path)
-      `(let ((,let-alt-text ,alt-text)
-	     (,let-path ,path))
-	 (declare (type string ,let-alt-text)
-		  (type pathname ,let-path))
-	 (adppvt:emplace-adp-element :image ,let-alt-text ,let-path)))))
+    (check-type alt-text string "a string")
+    (check-type path pathname "a pathname")
+    `(adppvt:emplace-adp-element :image ,alt-text ,path)))
 
 
 (adv-defmacro bold (&rest args)
@@ -146,38 +154,45 @@
     `(adppvt:create-italic-text ,@args)))
 
 
-(adv-defmacro code-inline (code)
+(adv-defmacro bold-italic (&rest args)
   (when adppvt:*add-documentation*
-    `(adppvt:create-code-inline-text ,code)))
+    `(adppvt:create-bold-italic-text ,@args)))
+
+
+(adv-defmacro code-inline (&rest code)
+  (when adppvt:*add-documentation*
+    `(adppvt:create-code-inline-text ,@code)))
 
 
 (adv-defmacro web-link (name link)
   (when adppvt:*add-documentation*
+    (check-type name string "a string")
+    (check-type link string "a string")
     `(adppvt:create-web-link-text ,name ,link)))
 
 
 (adv-defmacro header-ref (label)
   (when adppvt:*add-documentation*
+    (check-type label symbol "a symbol")
     `(adppvt:create-header-ref-text ',label)))
 
 
 (adv-defmacro symbol-ref (label)
   (when adppvt:*add-documentation*
+    (check-type label symbol "a symbol")
     `(adppvt:create-symbol-ref-text ',label)))
 
 
 (adv-defmacro function-ref (label)
   (when adppvt:*add-documentation*
+    (check-type label symbol "a symbol")
     `(adppvt:create-function-ref-text ',label)))
 
 
 (adv-defmacro type-ref (label)
   (when adppvt:*add-documentation*
+    (check-type label symbol "a symbol")
     `(adppvt:create-type-ref-text ',label)))
-
-
-;; (adv-defmacro code-focus (tags &rest code)
-;;   `(progn ,@code))
 
 
 (adv-defmacro code-tag (tags &body code)
@@ -185,15 +200,18 @@
     `(progn
        ,@(adppvt:remove-own-code-hide-exprs code)
        ,@(when adppvt:*add-documentation*
-	   (assert (or (symbolp tags) (listp tags)) (tags) "~s is not a symbol nor a list" tags)
-	   (when (listp tags)
-	     (assert (every #'symbolp tags) (tags) "Thare is a non-symbol in ~s" tags))
+	   (check-type tags list "a list")
+	   (loop for tag in tags
+		 do (check-type tag symbol "a symbol"))
 	   `((loop for ,tag in ',tags
 		   do (apply #'adppvt:add-code-tag ,tag ',code)))))))
 
 
 (adv-defmacro code-block (tags &body code)
   (when adppvt:*add-documentation*
+    (check-type tags list "a list")
+    (loop for tag in tags
+	  do (check-type tag symbol "a symbol"))
     (with-gensyms (expr)
       `(adppvt:emplace-adp-element :code-block (loop for ,expr in ',code
 						     if (and (symbolp ,expr)
@@ -367,6 +385,7 @@
 
 (adv-defmacro write-in-file (file-path)
   (when adppvt:*add-documentation*
+    (check-type file-path pathname "a pathname")
     (assert (pathname-name file-path) (file-path) "The ~s pathname has not a name part." file-path)
     (with-gensyms (let-file-path header-tag header-str symbol-tag function-tag type-tag)
       (once-only (file-path)
@@ -391,9 +410,12 @@
 		   finally (adppvt:empty-type-tags))))))))
 
 
+(declaim (ftype (function (t symbol pathname &rest t) t) load-documentation-system))
 (adv-defun load-documentation-system (system style root-path &rest style-args)
+  (assert (asdf:find-system system) (system) "The system ~s was not found." system)
   (adppvt:remove-current-procs)
   (let ((style-system (intern (concatenate 'string "ADP/" (symbol-name style)) :keyword)))
+    (assert (asdf:find-system style-system) (style-system) "The style ~s was not found." style-system)
     (asdf:load-system style-system :force t))
   (adppvt:check-current-procs)
   (adppvt:check-style-parameters style-args)

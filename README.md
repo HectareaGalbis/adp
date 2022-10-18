@@ -71,6 +71,9 @@ Let's define the parameter `*EXAMPLE-PARAMETER*` and the type `WEIRD-TYPE`. Look
 ```
 
 ```
+'ADP-PRIVATE:*ADD-DOCUMENTATION*
+ADP-PRIVATE:*ADD-DOCUMENTATION*
+
 (ADP:DEFPARAMETER
   ADP::*EXAMPLE-PARAMETER*
   3)
@@ -86,5 +89,5 @@ Let's define the parameter `*EXAMPLE-PARAMETER*` and the type `WEIRD-TYPE`. Look
 
 Header tags also work! For example: ***Add Documentation, Please***
 
-Lastly, we can make text _italic_ and **bold**. Also, we can make inline code: `(+ 3 4)`
+Lastly, we can make text _italic_, **bold** and ***bold-italic***. Also, we can make inline code: `(+ 3 4)`
 

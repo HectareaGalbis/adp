@@ -257,10 +257,11 @@
 
 ;; ----- text variations -----
 
-(declaim (type symbol *bold-symbol* *italic-symbol* *code-inline-symbol* *header-ref-symbol*
-	       *symbol-ref-symbol* *function-ref-symbol* *type-ref-symbol*))
+(declaim (type symbol *bold-symbol* *italic-symbol* *bold-italic-symbol* *code-inline-symbol*
+	       *header-ref-symbol* *symbol-ref-symbol* *function-ref-symbol* *type-ref-symbol*))
 (defparameter *bold-symbol* '#:bold)
 (defparameter *italic-symbol* '#:italic)
+(defparameter *bold-italic-symbol* '#:bolditalic)
 (defparameter *code-inline-symbol* '#:code-inline)
 (defparameter *web-link-symbol* '#:web-link)
 (defparameter *header-ref-symbol* '#:header)
@@ -275,6 +276,9 @@
 
 (defun create-italic-text (&rest args)
   (cons *italic-symbol* args))
+
+(defun create-bold-italic-text (&rest args)
+  (cons *bold-italic-symbol* args))
 
 (defun create-code-inline-text (&rest args)
   (cons *code-inline-symbol* args))
@@ -306,6 +310,10 @@
 (defun italic-textp (arg)
   (and (listp arg)
        (eq (car arg) *italic-symbol*)))
+
+(defun bold-italic-textp (arg)
+  (and (listp arg)
+       (eq (car arg) *bold-italic-symbol*)))
 
 (defun code-inline-textp (arg)
   (and (listp arg)
@@ -405,11 +413,10 @@
 (declaim (type (or null (function (stream string pathname pathname) t)) *image-proc*))
 (defvar *image-proc* nil)
 
-(declaim (type (or null (function (stream string) t)) *bold-proc*))
+(declaim (type (or null (function (stream string) t)) *bold-proc* *italic-proc* *bold-italic-proc*))
 (defvar *bold-proc* nil)
-
-(declaim (type (or null (function (stream string) t)) *italic-proc*))
 (defvar *italic-proc* nil)
+(defvar *bold-italic-proc* nil)
 
 (declaim (type (or null (function (stream t) t)) *code-inline-proc*))
 (defvar *code-inline-proc* nil)
@@ -420,20 +427,16 @@
 (declaim (type (or null (function (stream symbol string pathname pathname) t)) *header-ref-proc*))
 (defvar *header-ref-proc* nil)
 
-(declaim (type (or null (function (stream symbol pathname pathname) t)) *symbol-ref-proc*))
+(declaim (type (or null (function (stream symbol pathname pathname) t)) *symbol-ref-proc* *function-ref-proc*
+	       *type-ref-proc*))
 (defvar *symbol-ref-proc* nil)
-
-(declaim (type (or null (function (stream symbol pathname pathname) t)) *function-ref-proc*))
 (defvar *function-ref-proc* nil)
-
-(declaim (type (or null (function (stream symbol pathname pathname) t)) *type-ref-proc*))
 (defvar *type-ref-proc* nil)
 
-(declaim (type (or null (function (stream list) t)) *code-block-proc*))
+(declaim (type (or null (function (stream list) t)) *code-block-proc* *code-example-proc*))
 (defvar *code-block-proc* nil)
-
-(declaim (type (or null (function (stream list) t)) *code-example-proc*))
 (defvar *code-example-proc* nil)
+
 
 (declaim (type (or null (function (stream t) t)) *defclass-proc* *defconstant-proc* *defgeneric-proc*
 	       *define-compiler-macro-proc* *define-condition-proc* *define-method-combination-proc*
@@ -481,6 +484,7 @@
 	*image-proc* nil
 	*bold-proc* nil
 	*italic-proc* nil
+	*bold-italic-proc* nil
 	*code-inline-proc* nil
 	*web-link-proc* nil
 	*header-ref-proc* nil
@@ -533,6 +537,8 @@
     (error "The function bold is not defined in the current style."))
   (unless *italic-proc*
     (error "The function italic is not defined in the current style."))
+  (unless *bold-italic-proc*
+    (error "The function bold-italic is not defined in the current style."))
   (unless *code-inline-proc*
     (error "The function code-inline is not defined in the current style."))
   (unless *web-link-proc*
@@ -589,6 +595,23 @@
     (error "The function get-file-extension is not defined in the current style.")))
 
 
+(declaim (ftype (function (&rest t) string) simple-slice-format))
+(defun simple-slice-format (&rest args)
+  (with-output-to-string (stream)
+    (loop for arg in args
+	  do (when (or (bold-textp arg)
+		       (italic-textp arg)
+		       (bold-italic-textp arg)
+		       (code-inline-textp arg)
+		       (web-link-textp arg)
+		       (header-ref-textp arg)
+		       (symbol-ref-textp arg)
+		       (function-ref-textp arg)
+		       (type-ref-textp arg))
+	       (error "Non-toplevel functions cannot be nested."))
+	     (princ arg stream))))
+
+
 (declaim (ftype (function (pathname &rest t) string) slice-format))
 (defun slice-format (root-path &rest args)
   (with-output-to-string (stream)
@@ -596,13 +619,16 @@
 	  do (cond
 	       ((bold-textp arg)
 		(let ((bold-args (cdr arg)))
-		  (funcall *bold-proc* stream (apply #'slice-format root-path bold-args))))
+		  (funcall *bold-proc* stream (apply #'simple-slice-format bold-args))))
 	       ((italic-textp arg)
 		(let ((italic-args (cdr arg)))
-		  (funcall *italic-proc* stream (apply #'slice-format root-path italic-args))))
+		  (funcall *italic-proc* stream (apply #'simple-slice-format italic-args))))
+	       ((bold-italic-textp arg)
+		(let ((bold-italic-args (cdr arg)))
+		  (funcall *bold-italic-proc* stream (apply #'simple-slice-format bold-italic-args))))
 	       ((code-inline-textp arg)
 		(let ((code-inline-args (cdr arg)))
-		  (funcall *code-inline-proc* stream (apply #'slice-format root-path code-inline-args))))
+		  (funcall *code-inline-proc* stream (apply #'simple-slice-format code-inline-args))))
 	       ((web-link-textp arg)
 		(destructuring-bind (name link) (cdr arg)
 		  (funcall *web-link-proc* stream name link)))

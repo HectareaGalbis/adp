@@ -5,9 +5,9 @@
   (:shadow #:defclass #:defconstant #:defgeneric #:define-compiler-macro #:define-condition
 	   #:define-method-combination #:define-modify-macro #:define-setf-expander #:define-symbol-macro
 	   #:defmacro #:defmethod #:defpackage #:defparameter #:defsetf #:defstruct #:deftype #:defun #:defvar)
-  (:export #:header #:subheader #:subsubheader #:text #:table #:itemize #:image #:bold #:italic #:code-inline
-	   #:web-link #:header-ref #:symbol-ref #:function-ref #:type-ref #:code-block #:code-example
-	   #:defclass #:defconstant #:defgeneric #:define-compiler-macro #:define-condition
+  (:export #:header #:subheader #:subsubheader #:text #:table #:itemize #:image #:bold #:italic #:bold-italic
+	   #:code-inline #:web-link #:header-ref #:symbol-ref #:function-ref #:type-ref #:code-block
+	   #:code-example #:defclass #:defconstant #:defgeneric #:define-compiler-macro #:define-condition
 	   #:define-method-combination #:define-modify-macro #:define-setf-expander #:define-symbol-macro
 	   #:defmacro #:defmethod #:defpackage #:defparameter #:defsetf #:defstruct #:deftype #:defun #:defvar
 	   #:write-in-file #:load-documentation-system))
@@ -23,15 +23,15 @@
 	   #:emplace-adp-element #:emplace-adp-file #:empty-adp-elements #:check-style-parameters
 	   #:set-parameter-value #:write-system-files #:add-code-tag #:get-code-tag #:process-code-tag
 	   #:remove-code-tag-exprs #:remove-own-code-hide-exprs #:remove-current-data #:remove-current-procs
-	   #:check-current-procs #:hide-symbolp #:create-bold-text #:create-italic-text #:create-code-inline-text
-	   #:create-web-link-text #:create-header-ref-text #:create-symbol-ref-text #:create-function-ref-text
-	   #:create-type-ref-text
+	   #:check-current-procs #:hide-symbolp #:create-bold-text #:create-italic-text #:create-bold-italic-text
+	   #:create-code-inline-text #:create-web-link-text #:create-header-ref-text #:create-symbol-ref-text
+	   #:create-function-ref-text #:create-type-ref-text
 
 	   #:def-header-writer #:def-subheader-writer #:def-subsubheader-writer #:def-text-writer
 	   #:def-table-writer #:def-itemize-writer #:def-image-writer #:def-bold-writer #:def-italic-writer
-	   #:def-code-inline-writer #:def-web-link-writer #:def-header-ref-writer #:def-symbol-ref-writer
-	   #:def-function-ref-writer #:def-type-ref-writer #:def-code-block-writer #:def-code-example-writer
-	   #:def-defclass-writer #:def-defconstant-writer #:def-defgeneric-writer
+	   #:def-bold-italic-writer #:def-code-inline-writer #:def-web-link-writer #:def-header-ref-writer
+	   #:def-symbol-ref-writer #:def-function-ref-writer #:def-type-ref-writer #:def-code-block-writer
+	   #:def-code-example-writer #:def-defclass-writer #:def-defconstant-writer #:def-defgeneric-writer
 	   #:def-define-compiler-macro-writer #:def-define-condition-writer
 	   #:def-define-method-combination-writer #:def-define-modify-macro-writer
 	   #:def-define-setf-expander-writer #:def-define-symbol-macro-writer #:def-defmacro-writer

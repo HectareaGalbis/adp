@@ -1060,4 +1060,4 @@
 (def-with-components defvar name initial-value documentation)
 
 
-(adp:write-in-file "docs/style-maker-help")
+(adp:write-in-file #P"docs/style-maker-help")

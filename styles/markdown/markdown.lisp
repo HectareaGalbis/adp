@@ -44,6 +44,9 @@
 (adppvt:def-italic-writer (stream text)
   (format stream "_~a_" text))
 
+(adppvt:def-bold-italic-writer (stream text)
+  (format stream "***~a***" text))
+
 (adppvt:def-code-inline-writer (stream code)
   (let ((*print-pretty* nil))
     (format stream "`~a`" code)))
