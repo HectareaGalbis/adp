@@ -40,8 +40,8 @@ The ADP project only depends on Alexandria. However, each style can have other d
 
 ## Documentation
 
-* The ADP guide: [holita](#Introduction)
+* The ADP guide: TODO
 * The Style-Maker guide: TODO
-* The ADP api: `docs/user-api.md`
-* The Style-Maker api: `docs/style-maker-api.md`
+* The ADP api: [file-path](docs/user-api.md)
+* The Style-Maker api: [file-path](docs/style-maker-api.md)
 
