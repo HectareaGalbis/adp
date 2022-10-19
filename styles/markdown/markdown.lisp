@@ -56,7 +56,7 @@
 
 (adppvt:def-file-ref-writer (stream root-path file-path)
     (declare (ignore root-path))
-  (format stream "[file-path](~a.md)" file-path))
+  (format stream "[~a](~a.md)" file-path file-path))
 
 (adppvt:def-header-ref-writer (stream tag header-text root-path file-path)
   (declare (ignore tag root-path file-path))
