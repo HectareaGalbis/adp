@@ -44,7 +44,7 @@
 (code-example
   'adppvt::*add-documentation*
   (defparameter *example-parameter* 3)
-  (deftype weird-type ()
+  (deftype weird-type (code-hide () ())
     '(cons string integer)))
 
 

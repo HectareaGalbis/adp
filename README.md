@@ -44,6 +44,7 @@ Iteración 4
 Iteración 5
 Iteración 6
 Iteración 7
+
 ADP::HOLA
 ADP::ADIOS
 ```
@@ -72,17 +73,20 @@ Let's define the parameter `*EXAMPLE-PARAMETER*` and the type `WEIRD-TYPE`. Look
 
 ```
 'ADP-PRIVATE:*ADD-DOCUMENTATION*
+
 ADP-PRIVATE:*ADD-DOCUMENTATION*
 
 (ADP:DEFPARAMETER
   ADP::*EXAMPLE-PARAMETER*
   3)
+
 10
 
 (ADP:DEFTYPE
   ADP::WEIRD-TYPE
-  NIL
+  #:HIDE
   '(CONS STRING INTEGER))
+
 11
 ```
 
