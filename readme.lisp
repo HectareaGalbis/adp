@@ -23,6 +23,7 @@
 
 (code-block ()
   (adp:defun foo ()
+    "A function that does nothing"
     (values)))
 
 (text "That's all! And the same occurs with every Common Lisp macro that defines something, like " (function-ref defpackage) " or " (function-ref define-method-combination) ".")
@@ -43,7 +44,7 @@
 
 (itemize (:item "The ADP guide: " "TODO")
 	 (:item "The Style-Maker guide: " "TODO")
-	 (:item "The ADP api: " "TODO")
-	 (:item "The Style-Maker api: " "TODO"))
+	 (:item "The ADP api: " (file-ref #P"docs/user-api"))
+	 (:item "The Style-Maker api: " (file-ref #P"docs/style-maker-api")))
 
 (write-in-file #P"README")

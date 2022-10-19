@@ -20,6 +20,7 @@ ADP redefines the macro `DEFUN`. To generate the documentation for this function
 (ADP:DEFUN
   ADP::FOO
   NIL
+  "A function that does nothing"
   (VALUES))
 ```
 
@@ -33,14 +34,14 @@ Finally, you can also choose between several styles. Each style creates differen
 
 For now, you need to install this project downloading the source. But soon it will be available on Quicklisp.
 
-## Dependencies
+## [Dependencies](#hola)
 
 The ADP project only depends on Alexandria. However, each style can have other dependencies.
 
 ## Documentation
 
-* The ADP guide: TODO
+* The ADP guide: [holita](https://github.com/Hectarea1996/adp/blob/dev/README.md#hola)
 * The Style-Maker guide: TODO
-* The ADP api: TODO
-* The Style-Maker api: TODO
+* The ADP api: `docs/user-api.md`
+* The Style-Maker api: `docs/style-maker-api.md`
 
