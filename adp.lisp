@@ -319,8 +319,7 @@
 (adv-defmacro define-setf-expander (&body define-setf-expander-body)
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:push-function-tag (list 'cl:setf (car ',define-setf-expander-body)))
-	   (adppvt:emplace-adp-element :define-setf-expander '(cl:define-setf-expander ,@define-setf-expander-body))))
+	 `((adppvt:emplace-adp-element :define-setf-expander '(cl:define-setf-expander ,@define-setf-expander-body))))
      (cl:define-setf-expander ,@define-setf-expander-body)))
 
 
@@ -365,8 +364,7 @@
 (adv-defmacro defsetf (&body defsetf-body)
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:push-function-tag (list 'cl:setf (car ',defsetf-body)))
-	   (adppvt:emplace-adp-element :defsetf '(cl:defsetf ,@defsetf-body))))
+	 `((adppvt:emplace-adp-element :defsetf '(cl:defsetf ,@defsetf-body))))
      (cl:defsetf ,@defsetf-body)))
 
 
@@ -389,7 +387,8 @@
 (adv-defmacro defun (&body defun-body)
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:push-function-tag (car ',defun-body))
+	 `((when (symbolp (car ',defun-body))
+	     (adppvt:push-function-tag (car ',defun-body)))
 	   (adppvt:emplace-adp-element :defun '(cl:defun ,@defun-body))))
      (cl:defun ,@defun-body)))
 
@@ -435,8 +434,8 @@
 	   (values))))))
 
 
-(declaim (ftype (function (t symbol pathname &rest t) t) load-documentation-system))
-(adv-defun load-documentation-system (system style root-path &rest style-args)
+(declaim (ftype (function (t symbol &rest t) t) load-documentation-system))
+(adv-defun load-documentation-system (system style &rest style-args)
   (assert (asdf:find-system system) (system) "The system ~s was not found." system)
   (adppvt:remove-current-procs)
   (let ((style-system (intern (concatenate 'string "ADP/" (symbol-name style)) :keyword)))
@@ -449,9 +448,10 @@
     (asdf:load-system system :force t))
   (loop for (name value) in style-args by #'cddr
 	do (adppvt:set-parameter-value name value))
-  (let ((fixed-root-path (make-pathname :host (pathname-host root-path)
-					:device (pathname-device root-path)
-					:directory (cons :absolute (cdr (pathname-directory root-path))))))
+  (let* ((root-path (asdf:system-source-directory system))
+	 (fixed-root-path (make-pathname :host (pathname-host root-path)
+					 :device (pathname-device root-path)
+					 :directory (pathname-directory root-path))))
     (adppvt:write-system-files fixed-root-path)))
 
 
