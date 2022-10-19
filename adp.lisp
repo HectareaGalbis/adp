@@ -10,7 +10,8 @@
     `(progn
        ,@(when label
 	   `((adppvt:push-header-tag ',label ,str)))
-       (adppvt:emplace-adp-element :header ,str ',label))))
+       (adppvt:emplace-adp-element :header ,str ',label)
+       (values))))
 
 
 (cl:defmacro adv-subheader (str &optional label)
@@ -20,22 +21,23 @@
     `(progn
        ,@(when label
 	   `((adppvt:push-header-tag ',label ,str)))
-       (adppvt:emplace-adp-element :subheader ,str ',label))))
+       (adppvt:emplace-adp-element :subheader ,str ',label)
+       (values))))
 
 
 (cl:defmacro adv-defmacro (&body defmacro-body)
   `(progn
-     (cl:defmacro ,@defmacro-body)
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-function-tag (car ',defmacro-body))
-	   (adppvt:emplace-adp-element :defmacro '(cl:defmacro ,@defmacro-body))))))
+	   (adppvt:emplace-adp-element :defmacro '(cl:defmacro ,@defmacro-body))))
+     (cl:defmacro ,@defmacro-body)))
 
 (cl:defmacro adv-defun (&body defun-body)
   `(progn
-     (cl:defun ,@defun-body)
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-function-tag (car ',defun-body))
-	   (adppvt:emplace-adp-element :defun '(cl:defun ,@defun-body))))))
+	   (adppvt:emplace-adp-element :defun '(cl:defun ,@defun-body))))
+     (cl:defun ,@defun-body)))
 
 
 (cl:defmacro adv-write-in-file (file-path)
@@ -61,7 +63,8 @@
 		   finally (adppvt:empty-function-tags))
 	     (loop for ,type-tag across adppvt:*type-tags*
 		   do (adppvt:add-type-tag-path ,type-tag ,let-file-path)
-		   finally (adppvt:empty-type-tags))))))))
+		   finally (adppvt:empty-type-tags)))
+	   (values))))))
 
 
 ;; ----- ADP interface -----
@@ -80,7 +83,8 @@
     `(progn
        ,@(when label
 	   `((adppvt:push-header-tag ',label ,str)))
-       (adppvt:emplace-adp-element :header ,str ',label))))
+       (adppvt:emplace-adp-element :header ,str ',label)
+       (values))))
 
 
 (adv-defmacro subheader (str &optional label)
@@ -90,7 +94,8 @@
     `(progn
        ,@(when label
 	   `((adppvt:push-header-tag ',label ,str)))
-       (adppvt:emplace-adp-element :subheader ,str ',label))))
+       (adppvt:emplace-adp-element :subheader ,str ',label)
+       (values))))
 
 
 (adv-defmacro subsubheader (str &optional label)
@@ -100,12 +105,15 @@
     `(progn
        ,@(when label
 	   `((adppvt:push-header-tag ',label ,str)))
-       (adppvt:emplace-adp-element :subsubheader ,str ',label))))
+       (adppvt:emplace-adp-element :subsubheader ,str ',label)
+       (values))))
 
 
 (adv-defmacro text (&rest objects)
   (when adppvt:*add-documentation*
-    `(adppvt:emplace-adp-element :text ,@objects)))
+    `(progn
+       (adppvt:emplace-adp-element :text ,@objects)
+       (values))))
 
 
 (adv-defmacro table (&rest rows)
@@ -114,9 +122,11 @@
 	  do (check-type row list "a list")
 	     (loop for elem in row
 		   do (assert (eq (car elem) :cell) () "Each cell of a table must be a list starting with :cell. Found: ~s" elem)))
-    `(adppvt:emplace-adp-element :table ,@(loop for row in rows
-						collect (cons 'list (loop for elem in row
-									  collect (cons 'list elem)))))))
+    `(progn
+       (adppvt:emplace-adp-element :table ,@(loop for row in rows
+						  collect (cons 'list (loop for elem in row
+									    collect (cons 'list elem)))))
+       (values))))
 
 
 (adv-defmacro itemize (&rest items)
@@ -134,14 +144,18 @@
 		       collect (cons 'list item)
 		     else
 		       collect (list* 'list :itemize (process-itemize-items (cdr item))))))
-      `(adppvt:emplace-adp-element :itemize ,@(process-itemize-items items)))))
+      `(progn
+	 (adppvt:emplace-adp-element :itemize ,@(process-itemize-items items))
+	 (values)))))
 
 
 (adv-defmacro image (alt-text path)
   (when adppvt:*add-documentation*
     (check-type alt-text string "a string")
     (check-type path pathname "a pathname")
-    `(adppvt:emplace-adp-element :image ,alt-text ,path)))
+    `(progn
+       (adppvt:emplace-adp-element :image ,alt-text ,path)
+       (values))))
 
 
 (adv-defmacro bold (&rest args)
@@ -204,13 +218,13 @@
 (adv-defmacro code-tag (tags &body code)
   (with-gensyms (tag)
     `(progn
-       ,@(adppvt:remove-own-code-hide-exprs code)
        ,@(when adppvt:*add-documentation*
 	   (check-type tags list "a list")
 	   (loop for tag in tags
 		 do (check-type tag symbol "a symbol"))
 	   `((loop for ,tag in ',tags
-		   do (apply #'adppvt:add-code-tag ,tag ',code)))))))
+		   do (apply #'adppvt:add-code-tag ,tag ',code))))
+       ,@(adppvt:remove-own-code-hide-exprs code))))
 
 
 (adv-defmacro code-block (tags &body code)
@@ -219,12 +233,14 @@
     (loop for tag in tags
 	  do (check-type tag symbol "a symbol"))
     (with-gensyms (expr)
-      `(adppvt:emplace-adp-element :code-block (loop for ,expr in ',code
+      `(progn
+	 (adppvt:emplace-adp-element :code-block (loop for ,expr in ',code
 						     if (and (symbolp ,expr)
 							     (member ,expr ',tags))
 						       append (adppvt:process-code-tag ,expr (coerce (adppvt:get-code-tag ,expr) 'list))
 						     else
-						       collect (adppvt:process-code-tag '#:dummy-tag ,expr))))))
+						       collect (adppvt:process-code-tag '#:dummy-tag ,expr)))
+	 (values)))))
 
 
 (adv-defmacro code-example (&body code)
@@ -237,7 +253,9 @@
 					     (list ',(adppvt:process-code-tag '#:dummy-tag expr)
 						   ,output
 						   ,result))))))
-      `(adppvt:emplace-adp-element :code-example (list ,@evaluated-code)))))
+      `(progn
+	 (adppvt:emplace-adp-element :code-example (list ,@evaluated-code))
+	 (values)))))
 
 
 ;; ----- API functions -----
@@ -246,142 +264,142 @@
 
 (adv-defmacro defclass (&body defclass-body)
   `(progn
-     (cl:defclass ,@defclass-body)
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-type-tag (car ',defclass-body))
-	   (adppvt:emplace-adp-element :defclass '(cl:defclass ,@defclass-body))))))
+	   (adppvt:emplace-adp-element :defclass '(cl:defclass ,@defclass-body))))
+     (cl:defclass ,@defclass-body)))
 
 
 (adv-defmacro defconstant (&body defconstant-body)
   `(progn
-     (cl:defconstant ,@defconstant-body)
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-symbol-tag (car ',defconstant-body))
-	   (adppvt:emplace-adp-element :defconstant '(cl:defconstant ,@defconstant-body))))))
+	   (adppvt:emplace-adp-element :defconstant '(cl:defconstant ,@defconstant-body))))
+     (cl:defconstant ,@defconstant-body)))
 
 
 (adv-defmacro defgeneric (&body defgeneric-body)
   `(progn
-     (cl:defgeneric ,@defgeneric-body)
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-function-tag (car ',defgeneric-body))
-	   (adppvt:emplace-adp-element :defgeneric '(cl:defgeneric ,@defgeneric-body))))))
+	   (adppvt:emplace-adp-element :defgeneric '(cl:defgeneric ,@defgeneric-body))))
+     (cl:defgeneric ,@defgeneric-body)))
 
 
 (adv-defmacro define-compiler-macro (&body define-compiler-macro-body)
   `(progn
-     (cl:define-compiler-macro ,@define-compiler-macro-body)
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:emplace-adp-element :define-compiler-macro '(cl:define-compiler-macro ,@define-compiler-macro-body))))))
+	 `((adppvt:emplace-adp-element :define-compiler-macro '(cl:define-compiler-macro ,@define-compiler-macro-body))))
+     (cl:define-compiler-macro ,@define-compiler-macro-body)))
 
 
 (adv-defmacro define-condition (&body define-condition-body)
   `(progn
-     (cl:define-condition ,@define-condition-body)
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-type-tag (car ',define-condition-body))
-	   (adppvt:emplace-adp-element :define-condition '(cl:define-condition ,@define-condition-body))))))
+	   (adppvt:emplace-adp-element :define-condition '(cl:define-condition ,@define-condition-body))))
+     (cl:define-condition ,@define-condition-body)))
 
 
 (adv-defmacro define-method-combination (&body define-method-combination-body)
   `(progn
-     (cl:define-method-combination ,@define-method-combination-body)
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:emplace-adp-element :define-method-combination '(cl:define-method-combination ,@define-method-combination-body))))))
+	 `((adppvt:emplace-adp-element :define-method-combination '(cl:define-method-combination ,@define-method-combination-body))))
+     (cl:define-method-combination ,@define-method-combination-body)))
 
 
 (adv-defmacro define-modify-macro (&body define-modify-macro-body)
   `(progn
-     (cl:define-modify-macro ,@define-modify-macro-body)
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-function-tag (car ',define-modify-macro-body))
-	   (adppvt:emplace-adp-element :define-modify-macro '(cl:define-modify-macro ,@define-modify-macro-body))))))
+	   (adppvt:emplace-adp-element :define-modify-macro '(cl:define-modify-macro ,@define-modify-macro-body))))
+     (cl:define-modify-macro ,@define-modify-macro-body)))
 
 
 (adv-defmacro define-setf-expander (&body define-setf-expander-body)
   `(progn
-     (cl:define-setf-expander ,@define-setf-expander-body)
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-function-tag (list 'cl:setf (car ',define-setf-expander-body)))
-	   (adppvt:emplace-adp-element :define-setf-expander '(cl:define-setf-expander ,@define-setf-expander-body))))))
+	   (adppvt:emplace-adp-element :define-setf-expander '(cl:define-setf-expander ,@define-setf-expander-body))))
+     (cl:define-setf-expander ,@define-setf-expander-body)))
 
 
 (adv-defmacro define-symbol-macro (&body define-symbol-macro-body)
   `(progn
-     (cl:define-symbol-macro ,@define-symbol-macro-body)
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-symbol-tag (car ',define-symbol-macro-body))
-	   (adppvt:emplace-adp-element :define-symbol-macro '(cl:define-symbol-macro ,@define-symbol-macro-body))))))
+	   (adppvt:emplace-adp-element :define-symbol-macro '(cl:define-symbol-macro ,@define-symbol-macro-body))))
+     (cl:define-symbol-macro ,@define-symbol-macro-body)))
 
 
 (adv-defmacro defmacro (&body defmacro-body)
   `(progn
-     (cl:defmacro ,@defmacro-body)
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-function-tag (car ',defmacro-body))
-	   (adppvt:emplace-adp-element :defmacro '(cl:defmacro ,@defmacro-body))))))
+	   (adppvt:emplace-adp-element :defmacro '(cl:defmacro ,@defmacro-body))))
+     (cl:defmacro ,@defmacro-body)))
 
 
 (adv-defmacro defmethod (&body defmethod-body)
   `(progn
-     (cl:defmethod ,@defmethod-body)
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:emplace-adp-element :defmethod '(cl:defmethod ,@defmethod-body))))))
+	 `((adppvt:emplace-adp-element :defmethod '(cl:defmethod ,@defmethod-body))))
+     (cl:defmethod ,@defmethod-body)))
 
 
 (adv-defmacro defpackage (&body defpackage-body)
   `(progn
-     (cl:defpackage ,@defpackage-body)
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:emplace-adp-element :defpackage '(cl:defpackage ,@defpackage-body))))))
+	 `((adppvt:emplace-adp-element :defpackage '(cl:defpackage ,@defpackage-body))))
+     (cl:defpackage ,@defpackage-body)))
 
 
 (adv-defmacro defparameter (&body defparameter-body)
   `(progn
-     (cl:defparameter ,@defparameter-body)
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-symbol-tag (car ',defparameter-body))
-	   (adppvt:emplace-adp-element :defparameter '(cl:defparameter ,@defparameter-body))))))
+	   (adppvt:emplace-adp-element :defparameter '(cl:defparameter ,@defparameter-body))))
+     (cl:defparameter ,@defparameter-body)))
 
 
 (adv-defmacro defsetf (&body defsetf-body)
   `(progn
-     (cl:defsetf ,@defsetf-body)
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-function-tag (list 'cl:setf (car ',defsetf-body)))
-	   (adppvt:emplace-adp-element :defsetf '(cl:defsetf ,@defsetf-body))))))
+	   (adppvt:emplace-adp-element :defsetf '(cl:defsetf ,@defsetf-body))))
+     (cl:defsetf ,@defsetf-body)))
 
 
 (adv-defmacro defstruct (&body defstruct-body)
   `(progn
-     (cl:defstruct ,@defstruct-body)
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-type-tag (car ',defstruct-body))
-	   (adppvt:emplace-adp-element :defstruct '(cl:defstruct ,@defstruct-body))))))
+	   (adppvt:emplace-adp-element :defstruct '(cl:defstruct ,@defstruct-body))))
+     (cl:defstruct ,@defstruct-body)))
 
 
 (adv-defmacro deftype (&body deftype-body)
   `(progn
-     (cl:deftype ,@deftype-body)
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-type-tag (car ',deftype-body))
-	   (adppvt:emplace-adp-element :deftype '(cl:deftype ,@deftype-body))))))
+	   (adppvt:emplace-adp-element :deftype '(cl:deftype ,@deftype-body))))
+     (cl:deftype ,@deftype-body)))
 
 
 (adv-defmacro defun (&body defun-body)
   `(progn
-     (cl:defun ,@defun-body)
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-function-tag (car ',defun-body))
-	   (adppvt:emplace-adp-element :defun '(cl:defun ,@defun-body))))))
+	   (adppvt:emplace-adp-element :defun '(cl:defun ,@defun-body))))
+     (cl:defun ,@defun-body)))
 
 
 (adv-defmacro defvar (&body defvar-body)
   `(progn
-     (cl:defvar ,@defvar-body)
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-symbol-tag (car ',defvar-body))
-	   (adppvt:emplace-adp-element :defvar '(cl:defvar ,@defvar-body))))))
+	   (adppvt:emplace-adp-element :defvar '(cl:defvar ,@defvar-body))))
+     (cl:defvar ,@defvar-body)))
 
 
 ;; ----- Writer functions -----
@@ -413,7 +431,8 @@
 		   finally (adppvt:empty-function-tags))
 	     (loop for ,type-tag across adppvt:*type-tags*
 		   do (adppvt:add-type-tag-path ,type-tag ,let-file-path)
-		   finally (adppvt:empty-type-tags))))))))
+		   finally (adppvt:empty-type-tags)))
+	   (values))))))
 
 
 (declaim (ftype (function (t symbol pathname &rest t) t) load-documentation-system))

@@ -4,7 +4,7 @@
   :author "Héctor Galbis Sanchis"
   :description "Add Documentation, Please. A documentation generator."
   :license "The Unlicense"
-  :depends-on (:uiop :alexandria)
+  :depends-on (:alexandria)
   :components ((:file "package")
 	       (:file "adp-core")
 	       (:file "adp")

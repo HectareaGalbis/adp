@@ -12,7 +12,8 @@
     `(PROGN
       ,@(WHEN ADP::LABEL
           `((ADP-PRIVATE:PUSH-HEADER-TAG ',ADP::LABEL ,ADP::STR)))
-      (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :HEADER ,ADP::STR ',ADP::LABEL))))
+      (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :HEADER ,ADP::STR ',ADP::LABEL)
+      (VALUES))))
 ```
 
 #### ***Macro*** ADP:SUBHEADER
@@ -25,7 +26,8 @@
     `(PROGN
       ,@(WHEN ADP::LABEL
           `((ADP-PRIVATE:PUSH-HEADER-TAG ',ADP::LABEL ,ADP::STR)))
-      (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :SUBHEADER ,ADP::STR ',ADP::LABEL))))
+      (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :SUBHEADER ,ADP::STR ',ADP::LABEL)
+      (VALUES))))
 ```
 
 #### ***Macro*** ADP:SUBSUBHEADER
@@ -38,7 +40,8 @@
     `(PROGN
       ,@(WHEN ADP::LABEL
           `((ADP-PRIVATE:PUSH-HEADER-TAG ',ADP::LABEL ,ADP::STR)))
-      (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :SUBSUBHEADER ,ADP::STR ',ADP::LABEL))))
+      (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :SUBSUBHEADER ,ADP::STR ',ADP::LABEL)
+      (VALUES))))
 ```
 
 #### ***Macro*** ADP:TEXT
@@ -46,7 +49,7 @@
 ```Lisp
 (DEFMACRO ADP:TEXT (&REST ADP::OBJECTS)
   (WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
-    `(ADP-PRIVATE:EMPLACE-ADP-ELEMENT :TEXT ,@ADP::OBJECTS)))
+    `(PROGN (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :TEXT ,@ADP::OBJECTS) (VALUES))))
 ```
 
 #### ***Macro*** ADP:TABLE
@@ -61,13 +64,15 @@
                                                     NIL
                                                     "Each cell of a table must be a list starting with :cell. Found: ~s"
                                                     ADP::ELEM)))
-    `(ADP-PRIVATE:EMPLACE-ADP-ELEMENT :TABLE
-                                      ,@(LOOP ADP::FOR ADP::ROW ADP::IN ADP::ROWS
-                                              ADP::COLLECT (CONS 'LIST
-                                                                 (LOOP ADP::FOR ADP::ELEM ADP::IN ADP::ROW
-                                                                       ADP::COLLECT (CONS
-                                                                                     'LIST
-                                                                                     ADP::ELEM)))))))
+    `(PROGN
+      (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :TABLE
+                                       ,@(LOOP ADP::FOR ADP::ROW ADP::IN ADP::ROWS
+                                               ADP::COLLECT (CONS 'LIST
+                                                                  (LOOP ADP::FOR ADP::ELEM ADP::IN ADP::ROW
+                                                                        ADP::COLLECT (CONS
+                                                                                      'LIST
+                                                                                      ADP::ELEM)))))
+      (VALUES))))
 ```
 
 #### ***Macro*** ADP:ITEMIZE
@@ -91,9 +96,11 @@
                      ADP::COLLECT (LIST* 'LIST :ITEMIZE
                                          (ADP::PROCESS-ITEMIZE-ITEMS
                                           (CDR ADP::ITEM))))))
-      `(ADP-PRIVATE:EMPLACE-ADP-ELEMENT :ITEMIZE
-                                        ,@(ADP::PROCESS-ITEMIZE-ITEMS
-                                           ADP::ITEMS)))))
+      `(PROGN
+        (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :ITEMIZE
+                                         ,@(ADP::PROCESS-ITEMIZE-ITEMS
+                                            ADP::ITEMS))
+        (VALUES)))))
 ```
 
 #### ***Macro*** ADP:IMAGE
@@ -103,7 +110,9 @@
   (WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
     (CHECK-TYPE ADP::ALT-TEXT STRING "a string")
     (CHECK-TYPE ADP::PATH PATHNAME "a pathname")
-    `(ADP-PRIVATE:EMPLACE-ADP-ELEMENT :IMAGE ,ADP::ALT-TEXT ,ADP::PATH)))
+    `(PROGN
+      (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :IMAGE ,ADP::ALT-TEXT ,ADP::PATH)
+      (VALUES))))
 ```
 
 #### ***Macro*** ADP:BOLD
@@ -199,14 +208,14 @@
 (DEFMACRO ADP::CODE-TAG (ADP::TAGS &BODY ADP::CODE)
   (ALEXANDRIA:WITH-GENSYMS (ADP::TAG)
     `(PROGN
-      ,@(ADP-PRIVATE:REMOVE-OWN-CODE-HIDE-EXPRS ADP::CODE)
       ,@(WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
           (CHECK-TYPE ADP::TAGS LIST "a list")
           (LOOP ADP::FOR ADP::TAG ADP::IN ADP::TAGS
                 DO (CHECK-TYPE ADP::TAG SYMBOL "a symbol"))
           `((LOOP ADP::FOR ,ADP::TAG ADP::IN ',ADP::TAGS
                   DO (APPLY #'ADP-PRIVATE:ADD-CODE-TAG ,ADP::TAG
-                            ',ADP::CODE)))))))
+                            ',ADP::CODE))))
+      ,@(ADP-PRIVATE:REMOVE-OWN-CODE-HIDE-EXPRS ADP::CODE))))
 ```
 
 #### ***Macro*** ADP:CODE-BLOCK
@@ -218,20 +227,22 @@
     (LOOP ADP::FOR ADP::TAG ADP::IN ADP::TAGS
           DO (CHECK-TYPE ADP::TAG SYMBOL "a symbol"))
     (ALEXANDRIA:WITH-GENSYMS (ADP::EXPR)
-      `(ADP-PRIVATE:EMPLACE-ADP-ELEMENT :CODE-BLOCK
-                                        (LOOP ADP::FOR ,ADP::EXPR ADP::IN ',ADP::CODE
-                                              IF (AND (SYMBOLP ,ADP::EXPR)
-                                                      (MEMBER ,ADP::EXPR
-                                                              ',ADP::TAGS))
-                                              APPEND (ADP-PRIVATE:PROCESS-CODE-TAG
-                                                      ,ADP::EXPR
-                                                      (COERCE
-                                                       (ADP-PRIVATE:GET-CODE-TAG
-                                                        ,ADP::EXPR)
-                                                       'LIST)) ADP::ELSE
-                                              ADP::COLLECT (ADP-PRIVATE:PROCESS-CODE-TAG
-                                                            '#:DUMMY-TAG
-                                                            ,ADP::EXPR))))))
+      `(PROGN
+        (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :CODE-BLOCK
+                                         (LOOP ADP::FOR ,ADP::EXPR ADP::IN ',ADP::CODE
+                                               IF (AND (SYMBOLP ,ADP::EXPR)
+                                                       (MEMBER ,ADP::EXPR
+                                                               ',ADP::TAGS))
+                                               APPEND (ADP-PRIVATE:PROCESS-CODE-TAG
+                                                       ,ADP::EXPR
+                                                       (COERCE
+                                                        (ADP-PRIVATE:GET-CODE-TAG
+                                                         ,ADP::EXPR)
+                                                        'LIST)) ADP::ELSE
+                                               ADP::COLLECT (ADP-PRIVATE:PROCESS-CODE-TAG
+                                                             '#:DUMMY-TAG
+                                                             ,ADP::EXPR)))
+        (VALUES)))))
 ```
 
 #### ***Macro*** ADP:CODE-EXAMPLE
@@ -256,8 +267,10 @@
                                     ',(ADP-PRIVATE:PROCESS-CODE-TAG
                                        '#:DUMMY-TAG ADP::EXPR)
                                     ,ADP::OUTPUT ,ADP::RESULT))))))
-      `(ADP-PRIVATE:EMPLACE-ADP-ELEMENT :CODE-EXAMPLE
-                                        (LIST ,@ADP::EVALUATED-CODE)))))
+      `(PROGN
+        (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :CODE-EXAMPLE
+                                         (LIST ,@ADP::EVALUATED-CODE))
+        (VALUES)))))
 ```
 
 ## API documentation functions
@@ -267,11 +280,11 @@
 ```Lisp
 (DEFMACRO ADP:DEFCLASS (&BODY ADP::DEFCLASS-BODY)
   `(PROGN
-    (DEFCLASS ,@ADP::DEFCLASS-BODY)
     ,@(WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
         `((ADP-PRIVATE:PUSH-TYPE-TAG (CAR ',ADP::DEFCLASS-BODY))
           (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :DEFCLASS
-                                           '(DEFCLASS ,@ADP::DEFCLASS-BODY))))))
+                                           '(DEFCLASS ,@ADP::DEFCLASS-BODY))))
+    (DEFCLASS ,@ADP::DEFCLASS-BODY)))
 ```
 
 #### ***Macro*** ADP:DEFCONSTANT
@@ -279,12 +292,12 @@
 ```Lisp
 (DEFMACRO ADP:DEFCONSTANT (&BODY ADP::DEFCONSTANT-BODY)
   `(PROGN
-    (DEFCONSTANT ,@ADP::DEFCONSTANT-BODY)
     ,@(WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
         `((ADP-PRIVATE:PUSH-SYMBOL-TAG (CAR ',ADP::DEFCONSTANT-BODY))
           (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :DEFCONSTANT
                                            '(DEFCONSTANT
-                                                ,@ADP::DEFCONSTANT-BODY))))))
+                                                ,@ADP::DEFCONSTANT-BODY))))
+    (DEFCONSTANT ,@ADP::DEFCONSTANT-BODY)))
 ```
 
 #### ***Macro*** ADP:DEFGENERIC
@@ -292,11 +305,11 @@
 ```Lisp
 (DEFMACRO ADP:DEFGENERIC (&BODY ADP::DEFGENERIC-BODY)
   `(PROGN
-    (DEFGENERIC ,@ADP::DEFGENERIC-BODY)
     ,@(WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
         `((ADP-PRIVATE:PUSH-FUNCTION-TAG (CAR ',ADP::DEFGENERIC-BODY))
           (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :DEFGENERIC
-                                           '(DEFGENERIC ,@ADP::DEFGENERIC-BODY))))))
+                                           '(DEFGENERIC ,@ADP::DEFGENERIC-BODY))))
+    (DEFGENERIC ,@ADP::DEFGENERIC-BODY)))
 ```
 
 #### ***Macro*** ADP:DEFINE-COMPILER-MACRO
@@ -304,10 +317,10 @@
 ```Lisp
 (DEFMACRO ADP:DEFINE-COMPILER-MACRO (&BODY ADP::DEFINE-COMPILER-MACRO-BODY)
   `(PROGN
-    (DEFINE-COMPILER-MACRO ,@ADP::DEFINE-COMPILER-MACRO-BODY)
     ,@(WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
         `((ADP-PRIVATE:EMPLACE-ADP-ELEMENT :DEFINE-COMPILER-MACRO
-                                           '(DEFINE-COMPILER-MACRO ,@ADP::DEFINE-COMPILER-MACRO-BODY))))))
+                                           '(DEFINE-COMPILER-MACRO ,@ADP::DEFINE-COMPILER-MACRO-BODY))))
+    (DEFINE-COMPILER-MACRO ,@ADP::DEFINE-COMPILER-MACRO-BODY)))
 ```
 
 #### ***Macro*** ADP:DEFINE-CONDITION
@@ -315,11 +328,11 @@
 ```Lisp
 (DEFMACRO ADP:DEFINE-CONDITION (&BODY ADP::DEFINE-CONDITION-BODY)
   `(PROGN
-    (DEFINE-CONDITION ,@ADP::DEFINE-CONDITION-BODY)
     ,@(WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
         `((ADP-PRIVATE:PUSH-TYPE-TAG (CAR ',ADP::DEFINE-CONDITION-BODY))
           (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :DEFINE-CONDITION
-                                           '(DEFINE-CONDITION ,@ADP::DEFINE-CONDITION-BODY))))))
+                                           '(DEFINE-CONDITION ,@ADP::DEFINE-CONDITION-BODY))))
+    (DEFINE-CONDITION ,@ADP::DEFINE-CONDITION-BODY)))
 ```
 
 #### ***Macro*** ADP:DEFINE-METHOD-COMBINATION
@@ -328,10 +341,10 @@
 (DEFMACRO ADP:DEFINE-METHOD-COMBINATION
           (&BODY ADP::DEFINE-METHOD-COMBINATION-BODY)
   `(PROGN
-    (DEFINE-METHOD-COMBINATION ,@ADP::DEFINE-METHOD-COMBINATION-BODY)
     ,@(WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
         `((ADP-PRIVATE:EMPLACE-ADP-ELEMENT :DEFINE-METHOD-COMBINATION
-                                           '(DEFINE-METHOD-COMBINATION ,@ADP::DEFINE-METHOD-COMBINATION-BODY))))))
+                                           '(DEFINE-METHOD-COMBINATION ,@ADP::DEFINE-METHOD-COMBINATION-BODY))))
+    (DEFINE-METHOD-COMBINATION ,@ADP::DEFINE-METHOD-COMBINATION-BODY)))
 ```
 
 #### ***Macro*** ADP:DEFINE-MODIFY-MACRO
@@ -339,11 +352,11 @@
 ```Lisp
 (DEFMACRO ADP:DEFINE-MODIFY-MACRO (&BODY ADP::DEFINE-MODIFY-MACRO-BODY)
   `(PROGN
-    (DEFINE-MODIFY-MACRO ,@ADP::DEFINE-MODIFY-MACRO-BODY)
     ,@(WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
         `((ADP-PRIVATE:PUSH-FUNCTION-TAG (CAR ',ADP::DEFINE-MODIFY-MACRO-BODY))
           (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :DEFINE-MODIFY-MACRO
-                                           '(DEFINE-MODIFY-MACRO ,@ADP::DEFINE-MODIFY-MACRO-BODY))))))
+                                           '(DEFINE-MODIFY-MACRO ,@ADP::DEFINE-MODIFY-MACRO-BODY))))
+    (DEFINE-MODIFY-MACRO ,@ADP::DEFINE-MODIFY-MACRO-BODY)))
 ```
 
 #### ***Macro*** ADP:DEFINE-SETF-EXPANDER
@@ -351,12 +364,12 @@
 ```Lisp
 (DEFMACRO ADP:DEFINE-SETF-EXPANDER (&BODY ADP::DEFINE-SETF-EXPANDER-BODY)
   `(PROGN
-    (DEFINE-SETF-EXPANDER ,@ADP::DEFINE-SETF-EXPANDER-BODY)
     ,@(WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
         `((ADP-PRIVATE:PUSH-FUNCTION-TAG
            (LIST 'SETF (CAR ',ADP::DEFINE-SETF-EXPANDER-BODY)))
           (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :DEFINE-SETF-EXPANDER
-                                           '(DEFINE-SETF-EXPANDER ,@ADP::DEFINE-SETF-EXPANDER-BODY))))))
+                                           '(DEFINE-SETF-EXPANDER ,@ADP::DEFINE-SETF-EXPANDER-BODY))))
+    (DEFINE-SETF-EXPANDER ,@ADP::DEFINE-SETF-EXPANDER-BODY)))
 ```
 
 #### ***Macro*** ADP:DEFINE-SYMBOL-MACRO
@@ -364,12 +377,12 @@
 ```Lisp
 (DEFMACRO ADP:DEFINE-SYMBOL-MACRO (&BODY ADP::DEFINE-SYMBOL-MACRO-BODY)
   `(PROGN
-    (DEFINE-SYMBOL-MACRO ,@ADP::DEFINE-SYMBOL-MACRO-BODY)
     ,@(WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
         `((ADP-PRIVATE:PUSH-SYMBOL-TAG (CAR ',ADP::DEFINE-SYMBOL-MACRO-BODY))
           (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :DEFINE-SYMBOL-MACRO
                                            '(DEFINE-SYMBOL-MACRO
-                                             ,@ADP::DEFINE-SYMBOL-MACRO-BODY))))))
+                                             ,@ADP::DEFINE-SYMBOL-MACRO-BODY))))
+    (DEFINE-SYMBOL-MACRO ,@ADP::DEFINE-SYMBOL-MACRO-BODY)))
 ```
 
 #### ***Macro*** ADP:DEFMACRO
@@ -377,11 +390,11 @@
 ```Lisp
 (DEFMACRO ADP:DEFMACRO (&BODY ADP::DEFMACRO-BODY)
   `(PROGN
-    (DEFMACRO ,@ADP::DEFMACRO-BODY)
     ,@(WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
         `((ADP-PRIVATE:PUSH-FUNCTION-TAG (CAR ',ADP::DEFMACRO-BODY))
           (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :DEFMACRO
-                                           '(DEFMACRO ,@ADP::DEFMACRO-BODY))))))
+                                           '(DEFMACRO ,@ADP::DEFMACRO-BODY))))
+    (DEFMACRO ,@ADP::DEFMACRO-BODY)))
 ```
 
 #### ***Macro*** ADP:DEFMETHOD
@@ -389,10 +402,10 @@
 ```Lisp
 (DEFMACRO ADP:DEFMETHOD (&BODY ADP::DEFMETHOD-BODY)
   `(PROGN
-    (DEFMETHOD ,@ADP::DEFMETHOD-BODY)
     ,@(WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
         `((ADP-PRIVATE:EMPLACE-ADP-ELEMENT :DEFMETHOD
-                                           '(DEFMETHOD ,@ADP::DEFMETHOD-BODY))))))
+                                           '(DEFMETHOD ,@ADP::DEFMETHOD-BODY))))
+    (DEFMETHOD ,@ADP::DEFMETHOD-BODY)))
 ```
 
 #### ***Macro*** ADP:DEFPACKAGE
@@ -400,11 +413,11 @@
 ```Lisp
 (DEFMACRO ADP:DEFPACKAGE (&BODY ADP::DEFPACKAGE-BODY)
   `(PROGN
-    (DEFPACKAGE ,@ADP::DEFPACKAGE-BODY)
     ,@(WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
         `((ADP-PRIVATE:EMPLACE-ADP-ELEMENT :DEFPACKAGE
                                            '(DEFPACKAGE
-                                                ,@ADP::DEFPACKAGE-BODY))))))
+                                                ,@ADP::DEFPACKAGE-BODY))))
+    (DEFPACKAGE ,@ADP::DEFPACKAGE-BODY)))
 ```
 
 #### ***Macro*** ADP:DEFPARAMETER
@@ -412,12 +425,12 @@
 ```Lisp
 (DEFMACRO ADP:DEFPARAMETER (&BODY ADP::DEFPARAMETER-BODY)
   `(PROGN
-    (DEFPARAMETER ,@ADP::DEFPARAMETER-BODY)
     ,@(WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
         `((ADP-PRIVATE:PUSH-SYMBOL-TAG (CAR ',ADP::DEFPARAMETER-BODY))
           (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :DEFPARAMETER
                                            '(DEFPARAMETER
-                                                ,@ADP::DEFPARAMETER-BODY))))))
+                                                ,@ADP::DEFPARAMETER-BODY))))
+    (DEFPARAMETER ,@ADP::DEFPARAMETER-BODY)))
 ```
 
 #### ***Macro*** ADP:DEFSETF
@@ -425,12 +438,12 @@
 ```Lisp
 (DEFMACRO ADP:DEFSETF (&BODY ADP::DEFSETF-BODY)
   `(PROGN
-    (DEFSETF ,@ADP::DEFSETF-BODY)
     ,@(WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
         `((ADP-PRIVATE:PUSH-FUNCTION-TAG
            (LIST 'SETF (CAR ',ADP::DEFSETF-BODY)))
           (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :DEFSETF
-                                           '(DEFSETF ,@ADP::DEFSETF-BODY))))))
+                                           '(DEFSETF ,@ADP::DEFSETF-BODY))))
+    (DEFSETF ,@ADP::DEFSETF-BODY)))
 ```
 
 #### ***Macro*** ADP:DEFSTRUCT
@@ -438,12 +451,12 @@
 ```Lisp
 (DEFMACRO ADP:DEFSTRUCT (&BODY ADP::DEFSTRUCT-BODY)
   `(PROGN
-    (DEFSTRUCT ,@ADP::DEFSTRUCT-BODY)
     ,@(WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
         `((ADP-PRIVATE:PUSH-TYPE-TAG (CAR ',ADP::DEFSTRUCT-BODY))
           (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :DEFSTRUCT
                                            '(DEFSTRUCT
-                                                ,@ADP::DEFSTRUCT-BODY))))))
+                                                ,@ADP::DEFSTRUCT-BODY))))
+    (DEFSTRUCT ,@ADP::DEFSTRUCT-BODY)))
 ```
 
 #### ***Macro*** ADP:DEFTYPE
@@ -451,11 +464,11 @@
 ```Lisp
 (DEFMACRO ADP:DEFTYPE (&BODY ADP::DEFTYPE-BODY)
   `(PROGN
-    (DEFTYPE ,@ADP::DEFTYPE-BODY)
     ,@(WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
         `((ADP-PRIVATE:PUSH-TYPE-TAG (CAR ',ADP::DEFTYPE-BODY))
           (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :DEFTYPE
-                                           '(DEFTYPE ,@ADP::DEFTYPE-BODY))))))
+                                           '(DEFTYPE ,@ADP::DEFTYPE-BODY))))
+    (DEFTYPE ,@ADP::DEFTYPE-BODY)))
 ```
 
 #### ***Macro*** ADP:DEFUN
@@ -463,11 +476,10 @@
 ```Lisp
 (DEFMACRO ADP:DEFUN (&BODY ADP::DEFUN-BODY)
   `(PROGN
-    (DEFUN ,@ADP::DEFUN-BODY)
     ,@(WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
         `((ADP-PRIVATE:PUSH-FUNCTION-TAG (CAR ',ADP::DEFUN-BODY))
-          (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :DEFUN
-                                           '(DEFUN ,@ADP::DEFUN-BODY))))))
+          (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :DEFUN '(DEFUN ,@ADP::DEFUN-BODY))))
+    (DEFUN ,@ADP::DEFUN-BODY)))
 ```
 
 #### ***Macro*** ADP:DEFVAR
@@ -475,11 +487,11 @@
 ```Lisp
 (DEFMACRO ADP:DEFVAR (&BODY ADP::DEFVAR-BODY)
   `(PROGN
-    (DEFVAR ,@ADP::DEFVAR-BODY)
     ,@(WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
         `((ADP-PRIVATE:PUSH-SYMBOL-TAG (CAR ',ADP::DEFVAR-BODY))
           (ADP-PRIVATE:EMPLACE-ADP-ELEMENT :DEFVAR
-                                           '(DEFVAR ,@ADP::DEFVAR-BODY))))))
+                                           '(DEFVAR ,@ADP::DEFVAR-BODY))))
+    (DEFVAR ,@ADP::DEFVAR-BODY)))
 ```
 
 ## Documentation writer function
@@ -525,7 +537,8 @@
             (LOOP ADP::FOR ,ADP::TYPE-TAG ADP::ACROSS ADP-PRIVATE:*TYPE-TAGS*
                   DO (ADP-PRIVATE:ADD-TYPE-TAG-PATH ,ADP::TYPE-TAG
                                                     ,ADP::LET-FILE-PATH)
-                  ADP::FINALLY (ADP-PRIVATE:EMPTY-TYPE-TAGS))))))))
+                  ADP::FINALLY (ADP-PRIVATE:EMPTY-TYPE-TAGS)))
+          (VALUES))))))
 ```
 
 #### ***Function*** ADP:LOAD-DOCUMENTATION-SYSTEM
