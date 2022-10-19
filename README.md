@@ -34,13 +34,13 @@ Finally, you can also choose between several styles. Each style creates differen
 
 For now, you need to install this project downloading the source. But soon it will be available on Quicklisp.
 
-## [Dependencies](#hola)
+## Dependencies
 
 The ADP project only depends on Alexandria. However, each style can have other dependencies.
 
 ## Documentation
 
-* The ADP guide: [holita](https://github.com/Hectarea1996/adp/blob/dev/README.md#hola)
+* The ADP guide: [holita](#Dependecies)
 * The Style-Maker guide: TODO
 * The ADP api: `docs/user-api.md`
 * The Style-Maker api: `docs/style-maker-api.md`
