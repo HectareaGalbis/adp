@@ -67,7 +67,7 @@ Let's define the parameter `*EXAMPLE-PARAMETER*` and the type `WEIRD-TYPE`. Look
 #### ***Type*** ADP::WEIRD-TYPE
 
 ```Lisp
-([DEFTYPE](http://www.lispworks.com/documentation/lw71/CLHS/Body/m_deftp.htm) ADP::WEIRD-TYPE () '(CONS STRING INTEGER))
+(DEFTYPE ADP::WEIRD-TYPE () '(CONS STRING INTEGER))
 ```
 
 ```

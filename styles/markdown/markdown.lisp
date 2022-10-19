@@ -99,7 +99,7 @@
   (loop for (code output result) in code-list
 	do (terpri stream)
 	   (prin1-with-hide-string stream code "...")
-	   (format stream "~%~a~{~s~^~%~}~%" output result))
+	   (format stream "~%~a~%~{~s~^~%~}~%" output result))
   (format stream "```~%~%"))
 
 

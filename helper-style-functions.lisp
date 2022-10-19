@@ -4,6 +4,7 @@
 
 (adp:header "Style-maker helper functions/macros" style-helper-header)
 
+
 ;; ----- helper-helper-functions -----
 
 (defun documentationp (expr)
