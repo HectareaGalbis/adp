@@ -48,20 +48,20 @@
 	`(progn
 	   (let ((,let-file-path (make-pathname :directory (cons :relative (cdr (pathname-directory ,file-path)))
 						:name (pathname-name ,file-path))))
-	     (adppvt:emplace-adp-file ,let-file-path (copy-array adppvt:*file-adp-elements*))
-	     (adppvt:empty-adp-elements)
+	     (adppvt:push-adp-file ,let-file-path)
+	     (adppvt:push-file-tag ,let-file-path)
 	     (loop for (,header-tag . ,header-str) across adppvt:*header-tags*
-		   for ,symbol-tag across adppvt:*symbol-tags*
-		   for ,function-tag across adppvt:*function-tags*
-		   for ,type-tag across adppvt:*type-tags*
 		   do (adppvt:add-header-tag-path ,header-tag ,header-str ,let-file-path)
-		      (adppvt:add-symbol-tag-path ,symbol-tag ,let-file-path)
-		      (adppvt:add-function-tag-path ,function-tag ,let-file-path)
-		      (adppvt:add-type-tag-path ,type-tag ,let-file-path)
-		   finally (adppvt:empty-header-tags)
-			   (adppvt:empty-symbol-tags)
-			   (adppvt:empty-function-tags)
-			   (adppvt:empty-type-tags))))))))
+		   finally (adppvt:empty-header-tags))
+	     (loop for ,symbol-tag across adppvt:*symbol-tags*
+		   do (adppvt:add-symbol-tag-path ,symbol-tag ,let-file-path)
+		   finally (adppvt:empty-symbol-tags))
+	     (loop for ,function-tag across adppvt:*function-tags*
+		   do (adppvt:add-function-tag-path ,function-tag ,let-file-path)
+		   finally (adppvt:empty-function-tags))
+	     (loop for ,type-tag across adppvt:*type-tags*
+		   do (adppvt:add-type-tag-path ,type-tag ,let-file-path)
+		   finally (adppvt:empty-type-tags))))))))
 
 
 ;; ----- ADP interface -----
@@ -169,6 +169,12 @@
     (check-type name string "a string")
     (check-type link string "a string")
     `(adppvt:create-web-link-text ,name ,link)))
+
+
+(adv-defmacro file-ref (path)
+  (when adppvt:*add-documentation*
+    (check-type path pathname "a pathname")
+    `(adppvt:create-file-ref-text ,path)))
 
 
 (adv-defmacro header-ref (label)
@@ -394,8 +400,8 @@
 							       (cons :relative (cdr (pathname-directory ,file-path)))
 							       nil)
 						:name (pathname-name ,file-path))))
-	     (adppvt:emplace-adp-file ,let-file-path (copy-array adppvt:*file-adp-elements*))
-	     (adppvt:empty-adp-elements)
+	     (adppvt:push-adp-file ,let-file-path)
+	     (adppvt:push-file-tag ,let-file-path)
 	     (loop for (,header-tag . ,header-str) across adppvt:*header-tags*
 		   do (adppvt:add-header-tag-path ,header-tag ,header-str ,let-file-path)
 		   finally (adppvt:empty-header-tags))

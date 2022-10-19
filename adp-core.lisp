@@ -44,39 +44,27 @@
 
 ;; ----- adp files -----
 
-(deftype adp-file ()
-  '(cons pathname (vector adp-element)))
+(declaim (type hash-table *project-adp-files*))
+(defvar *project-adp-files* (make-hash-table :test 'equal))
 
-(declaim (ftype (function (pathname (vector adp-element)) adp-file) create-adp-file))
-(defun create-adp-file (path elements)
-  (cons path elements))
-
-(declaim (ftype (function (adp-file) pathname) adp-file-path))
-(defun adp-file-path (adp-file)
-  (car adp-file))
-
-(declaim (ftype (function (adp-file) (vector adp-element)) adp-file-elements))
-(defun adp-file-elements (adp-file)
-  (cdr adp-file))
-
-
-(declaim (type (vector adp-file) *project-adp-files*))
-(defvar *project-adp-files* (make-array 10 :adjustable t :fill-pointer 0))
-
-(declaim (ftype (function (adp-file) t) push-adp-file))
-(defun push-adp-file (adp-file)
-  (vector-push-extend adp-file *project-adp-files*))
-
-(declaim (ftype (function (pathname (vector adp-element)) t) emplace-adp-file))
-(defun emplace-adp-file (path elements)
-  (vector-push-extend (create-adp-file path elements) *project-adp-files*))
+(declaim (ftype (function (pathname) t) push-adp-file))
+(defun push-adp-file (path)
+  (when (not (gethash path *project-adp-files*))
+    (setf (gethash path *project-adp-files*) (make-array 100 :adjustable t :fill-pointer 0)))
+  (let ((file-contents (gethash path *project-adp-files*)))
+    (loop for elem across *file-adp-elements*
+	  do (vector-push-extend elem file-contents)))
+  (empty-adp-elements))
 
 (declaim (ftype (function () t) empty-adp-files))
 (defun empty-adp-files ()
-  (setf (fill-pointer *project-adp-files*) 0))
+  (setf *project-adp-files* (make-hash-table :test 'equal)))
 
 
 ;; ----- adp ref tags -----
+
+(declaim (type (vector pathname) *file-tags*))
+(defvar *file-tags* (make-array 10 :adjustable t :fill-pointer 0 :element-type 'pathname))
 
 (declaim (type (vector (cons symbol string)) *header-tags*))
 (defvar *header-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
@@ -86,42 +74,62 @@
 (defvar *function-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
 (defvar *type-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
 
-(declaim (ftype (function (symbol string) t) push-header-tag))
-(defun push-header-tag (tag str)
-  (vector-push-extend (cons tag str) *header-tags*))
+(declaim (ftype (function (pathname) boolean) file-tagp))
+(defun file-tagp (tag)
+  (loop for file-tag across *file-tags*
+	  thereis (equal tag file-tag)))
 
-(declaim (ftype (function (symbol) t) push-symbol-tag))
-(defun push-symbol-tag (tag)
-  (vector-push-extend tag *symbol-tags*)
-  (print *symbol-tags*))
-
-(declaim (ftype (function (symbol) t) push-function-tag))
-(defun push-function-tag (tag)
-  (vector-push-extend tag *function-tags*))
-
-(declaim (ftype (function (symbol) t) push-type-tag))
-(defun push-type-tag (tag)
-  (vector-push-extend tag *type-tags*))
-
-(declaim (ftype (function (symbol) boolean) header-tagp))
+(declaim (ftype (function (symbol) boolean) header-tagp symbol-tagp function-tagp type-tagp))
 (defun header-tagp (tag)
   (loop for header-tag across *header-tags*
 	  thereis (eq tag header-tag)))
 
-(declaim (ftype (function (symbol) boolean) symbol-tagp))
 (defun symbol-tagp (tag)
   (loop for symbol-tag across *symbol-tags*
 	  thereis (eq tag symbol-tag)))
 
-(declaim (ftype (function (symbol) boolean) function-tagp))
 (defun function-tagp (tag)
   (loop for function-tag across *function-tags*
 	  thereis (eq tag function-tag)))
 
-(declaim (ftype (function (symbol) boolean) type-tagp))
 (defun type-tagp (tag)
   (loop for type-tag across *type-tags*
 	  thereis (eq tag type-tag)))
+
+
+(declaim (ftype (function (pathname) t) push-file-tag))
+(defun push-file-tag (path)
+  (when (file-tagp path)
+    (return-from push-file-tag))
+  (vector-push-extend path *file-tags*))
+
+(declaim (ftype (function (symbol string) t) push-header-tag))
+(defun push-header-tag (tag str)
+  (when (header-tagp tag)
+    (warn "The header tag ~s is already used." tag))
+  (vector-push-extend (cons tag str) *header-tags*))
+
+(declaim (ftype (function (symbol) t) push-symbol-tag push-function-tag push-type-tag))
+(defun push-symbol-tag (tag)
+  (when (symbol-tagp tag)
+    (warn "The symbol tag ~s is already used." tag))
+  (vector-push-extend tag *symbol-tags*))
+
+(defun push-function-tag (tag)
+  (when (function-tagp tag)
+    (warn "The function tag ~s is already used." tag))
+  (vector-push-extend tag *function-tags*))
+
+(defun push-type-tag (tag)
+  (when (type-tagp tag)
+    (warn "The type tag ~s is already used." tag))
+  (vector-push-extend tag *type-tags*))
+
+
+(declaim (ftype (function () t) empty-file-tags empty-header-tags empty-symbol-tags empty-function-tags
+		empty-type-tags))
+(defun empty-file-tags ()
+  (setf (fill-pointer *file-tags*) 0))
 
 (defun empty-header-tags ()
   (setf (fill-pointer *header-tags*) 0))
@@ -146,34 +154,48 @@
 (defun add-header-tag-path (tag str path)
   (setf (gethash tag *header-tags-table*) (cons str path)))
 
-(declaim (ftype (function (symbol pathname) t) add-symbol-tag-path))
+
+(declaim (ftype (function (symbol pathname) t) add-symbol-tag-path add-function-tag-path add-type-tag-path))
 (defun add-symbol-tag-path (tag path)
   (setf (gethash tag *symbol-tags-table*) path))
 
-(declaim (ftype (function (symbol pathname) t) add-function-tag-path))
 (defun add-function-tag-path (tag path)
   (setf (gethash tag *function-tags-table*) path))
 
-(declaim (ftype (function (symbol pathname) t) add-type-tag-path))
 (defun add-type-tag-path (tag path)
   (setf (gethash tag *type-tags-table*) path))
+
 
 (declaim (ftype (function (symbol) (or (cons string pathname) null)) get-header-tag-path))
 (defun get-header-tag-path (tag)
   (values (gethash tag *header-tags-table*)))
 
-(declaim (ftype (function (symbol) (or pathname null)) get-symbol-tag-path))
+
+(declaim (ftype (function (symbol) (or pathname null)) get-symbol-tag-path get-function-tag-path
+		get-type-tag-path))
 (defun get-symbol-tag-path (tag)
   (values (gethash tag *symbol-tags-table*)))
 
-(declaim (ftype (function (symbol) (or pathname null)) get-function-tag-path))
 (defun get-function-tag-path (tag)
   (values (gethash tag *function-tags-table*)))
 
-(declaim (ftype (function (symbol) (or pathname null)) get-type-tag-path))
 (defun get-type-tag-path (tag)
   (values (gethash tag *type-tags-table*)))
 
+
+(declaim (ftype (function () t) empty-header-tags-table empty-symbol-tags-table empty-function-tags-table
+		empty-type-tags-table))
+(defun empty-header-tags-table ()
+  (setf *header-tags-table* (make-hash-table)))
+
+(defun empty-symbol-tags-table ()
+  (setf *symbol-tags-table* (make-hash-table)))
+
+(defun empty-function-tags-table ()
+  (setf *function-tags-table* (make-hash-table)))
+
+(defun empty-type-tags-table ()
+  (setf *type-tags-table* (make-hash-table)))
 
 ;; ----- adp code tags -----
 
@@ -195,6 +217,9 @@
 (defun get-code-tag (tag)
   (values (gethash tag *code-tags*)))
 
+(declaim (ftype (function () t) empty-code-tags))
+(defun empty-code-tags ()
+  (setf *code-tags* (make-hash-table)))
 
 (declaim (type symbol *hide-symbol*))
 (defparameter *hide-symbol* '#:hide)
@@ -264,6 +289,7 @@
 (defparameter *bold-italic-symbol* '#:bolditalic)
 (defparameter *code-inline-symbol* '#:code-inline)
 (defparameter *web-link-symbol* '#:web-link)
+(defparameter *file-ref-symbol* '#:file)
 (defparameter *header-ref-symbol* '#:header)
 (defparameter *symbol-ref-symbol* '#:symbol)
 (defparameter *function-ref-symbol* '#:function)
@@ -287,6 +313,10 @@
 (defun create-web-link-text (text link)
   (list *web-link-symbol* text link))
 
+(declaim (ftype (function (pathname) (cons pathname list)) create-file-ref))
+(defun create-file-ref-text (path)
+  (list *file-ref-symbol* path))
+
 (declaim (ftype (function (symbol) (cons symbol list)) create-header-ref-text create-symbol-ref-text
 		create-function-ref-text create-type-ref-text))
 (defun create-header-ref-text (label)
@@ -301,8 +331,8 @@
 (defun create-type-ref-text (label)
   (list *type-ref-symbol* label))
 
-(declaim (ftype (function (t) boolean) bold-textp italic-textp code-inline-textp web-link-textp header-ref-textp
-		symbol-ref-textp function-ref-textp type-ref-textp))
+(declaim (ftype (function (t) boolean) bold-textp italic-textp code-inline-textp web-link-textp file-ref-textp
+		header-ref-textp symbol-ref-textp function-ref-textp type-ref-textp))
 (defun bold-textp (arg)
   (and (listp arg)
        (eq (car arg) *bold-symbol*)))
@@ -322,6 +352,10 @@
 (defun web-link-textp (arg)
   (and (listp arg)
        (eq (car arg) *web-link-symbol*)))
+
+(defun file-ref-textp (arg)
+  (and (listp arg)
+       (eq (car arg) *file-ref-symbol*)))
 
 (defun header-ref-textp (arg)
   (and (listp arg)
@@ -345,25 +379,34 @@
 (declaim (type list *style-parameters*))
 (defvar *style-parameters* nil)
 
+(declaim (ftype (function (symbol keyword boolean) t) add-style-parameter))
 (defun add-style-parameter (name key-name required)
   (push (list name key-name required) *style-parameters*))
 
+(declaim (ftype (function () t) empty-style-parameter))
+(defun empty-style-parameters ()
+  (setf *style-parameters* nil))
+
+(declaim (ftype (function (keyword) boolean) style-parameterp style-parameter-requiredp))
 (defun style-parameterp (key-name)
   (member key-name *style-parameters* :key #'cadr))
 
 (defun style-parameter-requiredp (key-name)
   (cadar (member key-name *style-parameters* :key #'cadr)))
 
+(declaim (ftype (function () list) style-required-parameters))
 (defun style-required-parameters ()
   (loop for (name key-name requiredp) in *style-parameters*
 	if requiredp
 	  collect key-name))
 
+(declaim (ftype (function (keyword t) t) set-parameter-value))
 (defun set-parameter-value (key-name value)
   (loop for (name key requiredp) in *style-parameters*
 	until (eq key key-name)
 	finally (setf (symbol-value name) value)))
 
+(declaim (ftype (function (list) t) check-style-parameters))
 (defun check-style-parameters (style-params)
   (let ((required-parameters (style-required-parameters))
 	(style-parameter-key-names (loop for key-name in style-params by #'cddr
@@ -380,18 +423,19 @@
 
 (declaim (ftype (function () t) remove-current-data))
 (defun remove-current-data ()
-  (setf (fill-pointer *file-adp-elements*) 0
-	(fill-pointer *project-adp-files*) 0
-	(fill-pointer *header-tags*) 0
-	(fill-pointer *symbol-tags*) 0
-	(fill-pointer *function-tags*) 0
-	(fill-pointer *type-tags*) 0
-	*header-tags-table* (make-hash-table)
-	*symbol-tags-table* (make-hash-table)
-	*function-tags-table* (make-hash-table)
-	*type-tags-table* (make-hash-table)
-	*code-tags* (make-hash-table)
-	*style-parameters* nil))
+  (empty-adp-elements)
+  (empty-adp-files)
+  (empty-file-tags)
+  (empty-header-tags)
+  (empty-symbol-tags)
+  (empty-function-tags)
+  (empty-type-tags)
+  (empty-header-tags-table)
+  (empty-symbol-tags-table)
+  (empty-function-tags-table)
+  (empty-type-tags-table)
+  (empty-code-tags)
+  (empty-style-parameters))
 
 
 ;; ----- writing functions -----
@@ -423,6 +467,9 @@
 
 (declaim (type (or null (function (stream string string) t)) *web-link-proc*))
 (defvar *web-link-proc* nil)
+
+(declaim (type (or null (function (stream pathname pathname))) *file-ref-proc*))
+(defvar *file-ref-proc* nil)
 
 (declaim (type (or null (function (stream symbol string pathname pathname) t)) *header-ref-proc*))
 (defvar *header-ref-proc* nil)
@@ -487,6 +534,7 @@
 	*bold-italic-proc* nil
 	*code-inline-proc* nil
 	*web-link-proc* nil
+	*file-ref-proc* nil
 	*header-ref-proc* nil
 	*symbol-ref-proc* nil
 	*function-ref-proc* nil
@@ -543,6 +591,8 @@
     (error "The function code-inline is not defined in the current style."))
   (unless *web-link-proc*
     (error "The function web-link is not defined in the current style."))
+  (unless *file-ref-proc*
+    (error "The function file-ref is not defined in the current style."))
   (unless *header-ref-proc*
     (error "The function header-ref is not defined in the current style."))
   (unless *symbol-ref-proc*
@@ -604,6 +654,7 @@
 		       (bold-italic-textp arg)
 		       (code-inline-textp arg)
 		       (web-link-textp arg)
+		       (file-ref-textp arg)
 		       (header-ref-textp arg)
 		       (symbol-ref-textp arg)
 		       (function-ref-textp arg)
@@ -632,6 +683,10 @@
 	       ((web-link-textp arg)
 		(destructuring-bind (name link) (cdr arg)
 		  (funcall *web-link-proc* stream name link)))
+	       ((file-ref-textp arg)
+		(assert (file-tagp (cadr arg)) ((cadr arg)) "~s is not a file tag." (cadr arg))
+		(let* ((file-path (cadr arg)))
+		  (funcall *file-ref-proc* stream root-path file-path)))
 	       ((header-ref-textp arg)
 		(assert (get-header-tag-path (cadr arg)) ((cadr arg)) "~s is not a header tag." (cadr arg)) 
 		(let* ((header-tag (cadr arg))
@@ -720,7 +775,5 @@
 (defun write-system-files (root-path)
   (when *system-files-proc*
     (funcall *system-files-proc* root-path))
-  (loop for file-content across *project-adp-files*
-	do (let ((rel-path (adp-file-path file-content))
-		 (file-elements (adp-file-elements file-content)))
-	     (write-file root-path rel-path file-elements))))
+  (loop for rel-path being the hash-key in *project-adp-files* using (hash-value file-elements)
+	do (write-file root-path rel-path file-elements)))

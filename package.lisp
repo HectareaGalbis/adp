@@ -6,7 +6,7 @@
 	   #:define-method-combination #:define-modify-macro #:define-setf-expander #:define-symbol-macro
 	   #:defmacro #:defmethod #:defpackage #:defparameter #:defsetf #:defstruct #:deftype #:defun #:defvar)
   (:export #:header #:subheader #:subsubheader #:text #:table #:itemize #:image #:bold #:italic #:bold-italic
-	   #:code-inline #:web-link #:header-ref #:symbol-ref #:function-ref #:type-ref #:code-block
+	   #:code-inline #:web-link #:file-ref #:header-ref #:symbol-ref #:function-ref #:type-ref #:code-block
 	   #:code-example #:defclass #:defconstant #:defgeneric #:define-compiler-macro #:define-condition
 	   #:define-method-combination #:define-modify-macro #:define-setf-expander #:define-symbol-macro
 	   #:defmacro #:defmethod #:defpackage #:defparameter #:defsetf #:defstruct #:deftype #:defun #:defvar
@@ -17,22 +17,22 @@
   (:use #:cl #:alexandria)
   (:nicknames #:adppvt)
   (:export #:*add-documentation* #:current-style #:*file-adp-elements* #:*header-tags* #:*symbol-tags*
-	   #:*function-tags* #:*type-tags* #:push-header-tag #:push-symbol-tag #:push-function-tag
-	   #:push-type-tag #:add-header-tag-path #:add-symbol-tag-path #:add-function-tag-path
-	   #:add-type-tag-path #:empty-header-tags #:empty-symbol-tags #:empty-function-tags #:empty-type-tags
-	   #:emplace-adp-element #:emplace-adp-file #:empty-adp-elements #:check-style-parameters
-	   #:set-parameter-value #:write-system-files #:add-code-tag #:get-code-tag #:process-code-tag
-	   #:remove-code-tag-exprs #:remove-own-code-hide-exprs #:remove-current-data #:remove-current-procs
-	   #:check-current-procs #:hide-symbolp #:create-bold-text #:create-italic-text #:create-bold-italic-text
-	   #:create-code-inline-text #:create-web-link-text #:create-header-ref-text #:create-symbol-ref-text
-	   #:create-function-ref-text #:create-type-ref-text
+	   #:*function-tags* #:*type-tags* #:push-file-tag #:push-header-tag #:push-symbol-tag
+	   #:push-function-tag #:push-type-tag #:add-header-tag-path #:add-symbol-tag-path
+	   #:add-function-tag-path #:add-type-tag-path #:empty-header-tags #:empty-symbol-tags
+	   #:empty-function-tags #:empty-type-tags #:emplace-adp-element #:push-adp-file #:empty-adp-elements
+	   #:check-style-parameters #:set-parameter-value #:write-system-files #:add-code-tag #:get-code-tag
+	   #:process-code-tag #:remove-code-tag-exprs #:remove-own-code-hide-exprs #:remove-current-data
+	   #:remove-current-procs #:check-current-procs #:hide-symbolp #:create-bold-text #:create-italic-text
+	   #:create-bold-italic-text #:create-code-inline-text #:create-web-link-text #:create-file-ref-text
+	   #:create-header-ref-text #:create-symbol-ref-text #:create-function-ref-text #:create-type-ref-text
 
 	   #:def-header-writer #:def-subheader-writer #:def-subsubheader-writer #:def-text-writer
 	   #:def-table-writer #:def-itemize-writer #:def-image-writer #:def-bold-writer #:def-italic-writer
-	   #:def-bold-italic-writer #:def-code-inline-writer #:def-web-link-writer #:def-header-ref-writer
-	   #:def-symbol-ref-writer #:def-function-ref-writer #:def-type-ref-writer #:def-code-block-writer
-	   #:def-code-example-writer #:def-defclass-writer #:def-defconstant-writer #:def-defgeneric-writer
-	   #:def-define-compiler-macro-writer #:def-define-condition-writer
+	   #:def-bold-italic-writer #:def-code-inline-writer #:def-web-link-writer #:def-file-ref-writer
+	   #:def-header-ref-writer #:def-symbol-ref-writer #:def-function-ref-writer #:def-type-ref-writer
+	   #:def-code-block-writer #:def-code-example-writer #:def-defclass-writer #:def-defconstant-writer
+	   #:def-defgeneric-writer #:def-define-compiler-macro-writer #:def-define-condition-writer
 	   #:def-define-method-combination-writer #:def-define-modify-macro-writer
 	   #:def-define-setf-expander-writer #:def-define-symbol-macro-writer #:def-defmacro-writer
 	   #:def-defmethod-writer #:def-defpackage-writer #:def-defparameter-writer #:def-defsetf-writer

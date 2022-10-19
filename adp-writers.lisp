@@ -47,6 +47,7 @@
 (def-customizable-writer def-bold-italic-writer *bold-italic-proc*)
 (def-customizable-writer def-code-inline-writer *code-inline-proc*)
 (def-customizable-writer def-web-link-writer *web-link-proc*)
+(def-customizable-writer def-file-ref-writer *file-ref-proc*)
 (def-customizable-writer def-header-ref-writer *header-ref-proc*)
 (def-customizable-writer def-symbol-ref-writer *symbol-ref-proc*)
 (def-customizable-writer def-function-ref-writer *function-ref-proc*)

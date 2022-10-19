@@ -148,6 +148,15 @@
     `(ADP-PRIVATE:CREATE-WEB-LINK-TEXT ,ADP::NAME ,ADP::LINK)))
 ```
 
+#### ***Macro*** ADP:FILE-REF
+
+```Lisp
+(DEFMACRO ADP:FILE-REF (ADP::PATH)
+  (WHEN ADP-PRIVATE:*ADD-DOCUMENTATION*
+    (CHECK-TYPE ADP::PATH PATHNAME "a pathname")
+    `(ADP-PRIVATE:CREATE-FILE-REF-TEXT ,ADP::PATH)))
+```
+
 #### ***Macro*** ADP:HEADER-REF
 
 ```Lisp
@@ -497,10 +506,8 @@
                                             ,ADP::FILE-PATH)))
                                     NIL)
                                 :NAME (PATHNAME-NAME ,ADP::FILE-PATH))))
-            (ADP-PRIVATE:EMPLACE-ADP-FILE ,ADP::LET-FILE-PATH
-                                          (ALEXANDRIA:COPY-ARRAY
-                                           ADP-PRIVATE:*FILE-ADP-ELEMENTS*))
-            (ADP-PRIVATE:EMPTY-ADP-ELEMENTS)
+            (ADP-PRIVATE:PUSH-ADP-FILE ,ADP::LET-FILE-PATH)
+            (ADP-PRIVATE:PUSH-FILE-TAG ,ADP::LET-FILE-PATH)
             (LOOP ADP::FOR (,ADP::HEADER-TAG
                             . ,ADP::HEADER-STR) ADP::ACROSS ADP-PRIVATE:*HEADER-TAGS*
                   DO (ADP-PRIVATE:ADD-HEADER-TAG-PATH ,ADP::HEADER-TAG

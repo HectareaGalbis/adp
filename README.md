@@ -67,7 +67,7 @@ Let's define the parameter `*EXAMPLE-PARAMETER*` and the type `WEIRD-TYPE`. Look
 #### ***Type*** ADP::WEIRD-TYPE
 
 ```Lisp
-(DEFTYPE ADP::WEIRD-TYPE () '(CONS STRING INTEGER))
+([DEFTYPE](http://www.lispworks.com/documentation/lw71/CLHS/Body/m_deftp.htm) ADP::WEIRD-TYPE () '(CONS STRING INTEGER))
 ```
 
 ```
@@ -77,8 +77,7 @@ ADP-PRIVATE:*ADD-DOCUMENTATION*
 (ADP:DEFPARAMETER
   ADP::*EXAMPLE-PARAMETER*
   3)
-
-#(*EXAMPLE-PARAMETER*) 10
+10
 
 (ADP:DEFTYPE
   ADP::WEIRD-TYPE
@@ -90,4 +89,6 @@ ADP-PRIVATE:*ADD-DOCUMENTATION*
 Header tags also work! For example: ***Add Documentation, Please***
 
 Lastly, we can make text _italic_, **bold** and ***bold-italic***. Also, we can make inline code: `(+ 3 4)`
+
+It looks like we can now make file references: `README`
 

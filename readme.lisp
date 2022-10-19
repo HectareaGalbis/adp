@@ -54,4 +54,6 @@
 (text "Lastly, we can make text " (italic "italic") ", " (bold "bold") " and " (bold-italic "bold-italic") ". Also, we can make inline code: "
       (code-inline '(+ 3 4)))
 
+(text "It looks like we can now make file references: " (file-ref #P"README"))
+
 (write-in-file #P"README")

@@ -54,6 +54,10 @@
 (adppvt:def-web-link-writer (stream name link)
   (format stream "[~a](~a)" name link))
 
+(adppvt:def-file-ref-writer (stream root-path file-path)
+    (declare (ignore root-path))
+  (format stream "`~a`" file-path))
+
 (adppvt:def-header-ref-writer (stream tag header-text root-path file-path)
   (declare (ignore tag root-path file-path))
   (format stream "***~a***" header-text))
