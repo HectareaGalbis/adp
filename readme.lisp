@@ -2,7 +2,7 @@
 (in-package :adp)
 
 
-(header "Add Documentation, Please")
+(header "Add Documentation, Please" adp-header)
 
 (text "Welcome to ADP!")
 
@@ -46,5 +46,7 @@
 	 (:item "The Style-Maker guide: " "TODO")
 	 (:item "The ADP api: " (file-ref #P"docs/user-api"))
 	 (:item "The Style-Maker api: " (file-ref #P"docs/style-maker-api")))
+
+(text "Go top: " (header-ref adp-header))
 
 (write-in-file #P"README")

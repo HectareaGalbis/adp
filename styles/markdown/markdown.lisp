@@ -58,9 +58,24 @@
     (declare (ignore root-path))
   (format stream "[~a](~a.md)" file-path file-path))
 
+
+(defun convert-to-github-header-anchor (str)
+  (let ((down-str (string-downcase str))
+	(simple-str (make-array 100 :adjustable t :fill-pointer 0 :element-type 'character)))
+    (loop for down-char across down-str
+	  do (when (or (alphanumericp down-char)
+		       (char= down-char #\space)
+		       (char= down-char #\-))
+	       (vector-push-extend down-char simple-str)))
+    (loop for i from 0 below (fill-pointer simple-str)
+	  do (when (char= (aref simple-str i) #\space)
+	       (setf (aref simple-str i) #\-)))
+    (values simple-str)))
+
+
 (adppvt:def-header-ref-writer (stream tag header-text root-path file-path)
-  (declare (ignore tag root-path file-path))
-  (format stream "***~a***" header-text))
+  (declare (ignore tag root-path))
+  (format stream "[~a](~a.md#~a)" header-text file-path (convert-to-github-header-anchor header-text)))
 
 (adppvt:def-symbol-ref-writer (stream tag root-path file-path)
   (declare (ignore root-path file-path))

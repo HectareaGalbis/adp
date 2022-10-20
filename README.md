@@ -45,3 +45,5 @@ The ADP project only depends on Alexandria. However, each style can have other d
 * The ADP api: [docs/user-api](docs/user-api.md)
 * The Style-Maker api: [docs/style-maker-api](docs/style-maker-api.md)
 
+Go top: [Add Documentation, Please](README.md#add-documentation-please)
+
