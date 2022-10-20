@@ -197,7 +197,7 @@
   (declare (ignore tag))
   (adppvt:with-defmacro-components ((name lambda-list documentation) source)
     (format stream "Macro: ~a~%~%" name)
-    (format stream "```Lisp~%(defmacro ~s ~s)~%```" name lambda-list)
+    (format stream "```Lisp~%(defmacro ~s ~s)~%```~%~%" name lambda-list)
     (when documentation
       (format stream "~a~%~%" documentation))))
 

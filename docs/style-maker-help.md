@@ -112,7 +112,9 @@ Macro: WITH-DEFCLASS-COMPONENTS
 (defmacro ADP-PRIVATE:WITH-DEFCLASS-COMPONENTS (((&REST #:COMPONENT-REST-ARGS0)
                                                  #:FUNCTION-BODY-ARG1)
                                                 &BODY #:BODY-ARG2))
-```### Defconstant components
+```
+
+### Defconstant components
 
 Function: DEFCONSTANT-NAME
 
@@ -139,7 +141,9 @@ Macro: WITH-DEFCONSTANT-COMPONENTS
                                                      #:COMPONENT-REST-ARGS0)
                                                     #:FUNCTION-BODY-ARG1)
                                                    &BODY #:BODY-ARG2))
-```### Defgeneric components
+```
+
+### Defgeneric components
 
 Function: DEFGENERIC-FUNCTION-NAME
 
@@ -208,7 +212,9 @@ Macro: WITH-DEFGENERIC-COMPONENTS
                                                     #:COMPONENT-REST-ARGS0)
                                                    #:FUNCTION-BODY-ARG1)
                                                   &BODY #:BODY-ARG2))
-```### Define-compiler-macro components
+```
+
+### Define-compiler-macro components
 
 Function: DEFINE-COMPILER-MACRO-NAME
 
@@ -247,7 +253,9 @@ Macro: WITH-DEFINE-COMPILER-MACRO-COMPONENTS
                                                                #:COMPONENT-REST-ARGS0)
                                                               #:FUNCTION-BODY-ARG1)
                                                              &BODY #:BODY-ARG2))
-```### Define-condition components
+```
+
+### Define-condition components
 
 Function: DEFINE-CONDITION-NAME
 
@@ -352,7 +360,9 @@ Macro: WITH-DEFINE-CONDITION-COMPONENTS
                                                           #:COMPONENT-REST-ARGS0)
                                                          #:FUNCTION-BODY-ARG1)
                                                         &BODY #:BODY-ARG2))
-```### Define-method-combination components
+```
+
+### Define-method-combination components
 
 Function: DEFINE-METHOD-COMBINATION-NAME
 
@@ -470,7 +480,9 @@ Macro: WITH-DEFINE-METHOD-COMBINATION-COMPONENTS
                                                                   #:FUNCTION-BODY-ARG1)
                                                                  &BODY
                                                                  #:BODY-ARG2))
-```### Define-modify-macro components
+```
+
+### Define-modify-macro components
 
 Function: DEFINE-MODIFY-MACRO-NAME
 
@@ -503,7 +515,9 @@ Macro: WITH-DEFINE-MODIFY-MACRO-COMPONENTS
                                                              #:COMPONENT-REST-ARGS0)
                                                             #:FUNCTION-BODY-ARG1)
                                                            &BODY #:BODY-ARG2))
-```### Define-setf-expander components
+```
+
+### Define-setf-expander components
 
 Function: DEFINE-SETF-EXPANDER-ACCESS-FN
 
@@ -542,7 +556,9 @@ Macro: WITH-DEFINE-SETF-EXPANDER-COMPONENTS
                                                               #:COMPONENT-REST-ARGS0)
                                                              #:FUNCTION-BODY-ARG1)
                                                             &BODY #:BODY-ARG2))
-```### Define-symbol-macro components
+```
+
+### Define-symbol-macro components
 
 Function: DEFINE-SYMBOL-MACRO-SYMBOL
 
@@ -563,7 +579,9 @@ Macro: WITH-DEFINE-SYMBOL-MACRO-COMPONENTS
                                                              #:COMPONENT-REST-ARGS0)
                                                             #:FUNCTION-BODY-ARG1)
                                                            &BODY #:BODY-ARG2))
-```### Defmacro components
+```
+
+### Defmacro components
 
 Function: DEFMACRO-NAME
 
@@ -601,7 +619,9 @@ Macro: WITH-DEFMACRO-COMPONENTS
 (defmacro ADP-PRIVATE:WITH-DEFMACRO-COMPONENTS (((&REST #:COMPONENT-REST-ARGS0)
                                                  #:FUNCTION-BODY-ARG1)
                                                 &BODY #:BODY-ARG2))
-```### defmethod components
+```
+
+### defmethod components
 
 Function: DEFMETHOD-FUNCTION-NAME
 
@@ -646,7 +666,9 @@ Macro: WITH-DEFMETHOD-COMPONENTS
                                                    #:COMPONENT-REST-ARGS0)
                                                   #:FUNCTION-BODY-ARG1)
                                                  &BODY #:BODY-ARG2))
-```### Defpackage components
+```
+
+### Defpackage components
 
 Function: DEFPACKAGE-OPTIONS
 
@@ -733,7 +755,9 @@ Macro: WITH-DEFPACKAGE-COMPONENTS
                                                     #:COMPONENT-REST-ARGS0)
                                                    #:FUNCTION-BODY-ARG1)
                                                   &BODY #:BODY-ARG2))
-```### Defparameter components
+```
+
+### Defparameter components
 
 Function: DEFPARAMETER-NAME
 
@@ -760,7 +784,9 @@ Macro: WITH-DEFPARAMETER-COMPONENTS
                                                       #:COMPONENT-REST-ARGS0)
                                                      #:FUNCTION-BODY-ARG1)
                                                     &BODY #:BODY-ARG2))
-```### Defsetf components
+```
+
+### Defsetf components
 
 Function: DEFSETF-ACCESS-FN
 
@@ -786,7 +812,9 @@ Macro: WITH-DEFSETF-COMPONENTS
 (defmacro ADP-PRIVATE:WITH-DEFSETF-COMPONENTS (((&REST #:COMPONENT-REST-ARGS0)
                                                 #:FUNCTION-BODY-ARG1)
                                                &BODY #:BODY-ARG2))
-```### Defstruct components
+```
+
+### Defstruct components
 
 Function: DEFSTRUCT-NAME-AND-OPTIONS
 
@@ -981,7 +1009,9 @@ Macro: WITH-DEFSTRUCT-COMPONENTS
                                                    #:COMPONENT-REST-ARGS0)
                                                   #:FUNCTION-BODY-ARG1)
                                                  &BODY #:BODY-ARG2))
-```### Deftype components
+```
+
+### Deftype components
 
 Function: DEFTYPE-NAME
 
@@ -1019,7 +1049,9 @@ Macro: WITH-DEFTYPE-COMPONENTS
 (defmacro ADP-PRIVATE:WITH-DEFTYPE-COMPONENTS (((&REST #:COMPONENT-REST-ARGS0)
                                                 #:FUNCTION-BODY-ARG1)
                                                &BODY #:BODY-ARG2))
-```### Defun components
+```
+
+### Defun components
 
 Function: DEFUN-FUNCTION-NAME
 
@@ -1057,7 +1089,9 @@ Macro: WITH-DEFUN-COMPONENTS
 (defmacro ADP-PRIVATE:WITH-DEFUN-COMPONENTS (((&REST #:COMPONENT-REST-ARGS0)
                                               #:FUNCTION-BODY-ARG1)
                                              &BODY #:BODY-ARG2))
-```### Defvar components
+```
+
+### Defvar components
 
 Function: DEFVAR-NAME
 
@@ -1084,3 +1118,4 @@ Macro: WITH-DEFVAR-COMPONENTS
                                                #:FUNCTION-BODY-ARG1)
                                               &BODY #:BODY-ARG2))
 ```
+
