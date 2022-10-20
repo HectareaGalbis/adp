@@ -35,3 +35,12 @@
   :components ((:module "styles/markdown"
 		:components ((:file "package")
 			     (:file "markdown")))))
+
+(asdf:defsystem #:adp/html
+  :author ""
+  :description "HTML style for adp"
+  :license "The Unlicense"
+  :depends-on (:alexandria :adp)
+  :components ((:module "styles/html"
+		:components ((:file "package")
+			     (:file "html")))))
