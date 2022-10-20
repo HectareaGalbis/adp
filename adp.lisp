@@ -29,14 +29,14 @@
   `(progn
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-function-tag (car ',defmacro-body))
-	   (adppvt:emplace-adp-element :defmacro '(cl:defmacro ,@defmacro-body))))
+	   (adppvt:emplace-adp-element :defmacro '(cl:defmacro ,@defmacro-body) (car ',defmacro-body))))
      (cl:defmacro ,@defmacro-body)))
 
 (cl:defmacro adv-defun (&body defun-body)
   `(progn
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-function-tag (car ',defun-body))
-	   (adppvt:emplace-adp-element :defun '(cl:defun ,@defun-body))))
+	   (adppvt:emplace-adp-element :defun '(cl:defun ,@defun-body) (car ',defun-body))))
      (cl:defun ,@defun-body)))
 
 
@@ -266,7 +266,7 @@
   `(progn
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-type-tag (car ',defclass-body))
-	   (adppvt:emplace-adp-element :defclass '(cl:defclass ,@defclass-body))))
+	   (adppvt:emplace-adp-element :defclass '(cl:defclass ,@defclass-body) (car ',defclass-body))))
      (cl:defclass ,@defclass-body)))
 
 
@@ -274,7 +274,7 @@
   `(progn
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-symbol-tag (car ',defconstant-body))
-	   (adppvt:emplace-adp-element :defconstant '(cl:defconstant ,@defconstant-body))))
+	   (adppvt:emplace-adp-element :defconstant '(cl:defconstant ,@defconstant-body) (car ',defconstant-body))))
      (cl:defconstant ,@defconstant-body)))
 
 
@@ -282,7 +282,7 @@
   `(progn
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-function-tag (car ',defgeneric-body))
-	   (adppvt:emplace-adp-element :defgeneric '(cl:defgeneric ,@defgeneric-body))))
+	   (adppvt:emplace-adp-element :defgeneric '(cl:defgeneric ,@defgeneric-body) (car ',defgeneric-body))))
      (cl:defgeneric ,@defgeneric-body)))
 
 
@@ -297,7 +297,7 @@
   `(progn
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-type-tag (car ',define-condition-body))
-	   (adppvt:emplace-adp-element :define-condition '(cl:define-condition ,@define-condition-body))))
+	   (adppvt:emplace-adp-element :define-condition '(cl:define-condition ,@define-condition-body) (car ',define-condition-body))))
      (cl:define-condition ,@define-condition-body)))
 
 
@@ -312,7 +312,7 @@
   `(progn
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-function-tag (car ',define-modify-macro-body))
-	   (adppvt:emplace-adp-element :define-modify-macro '(cl:define-modify-macro ,@define-modify-macro-body))))
+	   (adppvt:emplace-adp-element :define-modify-macro '(cl:define-modify-macro ,@define-modify-macro-body) (car ',define-modify-macro-body))))
      (cl:define-modify-macro ,@define-modify-macro-body)))
 
 
@@ -327,7 +327,7 @@
   `(progn
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-symbol-tag (car ',define-symbol-macro-body))
-	   (adppvt:emplace-adp-element :define-symbol-macro '(cl:define-symbol-macro ,@define-symbol-macro-body))))
+	   (adppvt:emplace-adp-element :define-symbol-macro '(cl:define-symbol-macro ,@define-symbol-macro-body) (car ',define-symbol-macro-body))))
      (cl:define-symbol-macro ,@define-symbol-macro-body)))
 
 
@@ -335,7 +335,7 @@
   `(progn
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-function-tag (car ',defmacro-body))
-	   (adppvt:emplace-adp-element :defmacro '(cl:defmacro ,@defmacro-body))))
+	   (adppvt:emplace-adp-element :defmacro '(cl:defmacro ,@defmacro-body) (car ',defmacro-body))))
      (cl:defmacro ,@defmacro-body)))
 
 
@@ -357,7 +357,7 @@
   `(progn
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-symbol-tag (car ',defparameter-body))
-	   (adppvt:emplace-adp-element :defparameter '(cl:defparameter ,@defparameter-body))))
+	   (adppvt:emplace-adp-element :defparameter '(cl:defparameter ,@defparameter-body) (car ',defparameter-body))))
      (cl:defparameter ,@defparameter-body)))
 
 
@@ -372,7 +372,7 @@
   `(progn
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-type-tag (car ',defstruct-body))
-	   (adppvt:emplace-adp-element :defstruct '(cl:defstruct ,@defstruct-body))))
+	   (adppvt:emplace-adp-element :defstruct '(cl:defstruct ,@defstruct-body) (car ',defstruct-body))))
      (cl:defstruct ,@defstruct-body)))
 
 
@@ -380,7 +380,7 @@
   `(progn
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-type-tag (car ',deftype-body))
-	   (adppvt:emplace-adp-element :deftype '(cl:deftype ,@deftype-body))))
+	   (adppvt:emplace-adp-element :deftype '(cl:deftype ,@deftype-body) (car ',deftype-body))))
      (cl:deftype ,@deftype-body)))
 
 
@@ -389,7 +389,9 @@
      ,@(when adppvt:*add-documentation*
 	 `((when (symbolp (car ',defun-body))
 	     (adppvt:push-function-tag (car ',defun-body)))
-	   (adppvt:emplace-adp-element :defun '(cl:defun ,@defun-body))))
+	   (adppvt:emplace-adp-element :defun '(cl:defun ,@defun-body) (if (symbolp (car ',defun-body))
+									   (car ',defun-body)
+									   nil))))
      (cl:defun ,@defun-body)))
 
 
@@ -397,7 +399,7 @@
   `(progn
      ,@(when adppvt:*add-documentation*
 	 `((adppvt:push-symbol-tag (car ',defvar-body))
-	   (adppvt:emplace-adp-element :defvar '(cl:defvar ,@defvar-body))))
+	   (adppvt:emplace-adp-element :defvar '(cl:defvar ,@defvar-body) (car ',defvar-body))))
      (cl:defvar ,@defvar-body)))
 
 

@@ -486,10 +486,11 @@
 
 
 (declaim (type (or null (function (stream t) t)) *defclass-proc* *defconstant-proc* *defgeneric-proc*
-	       *define-compiler-macro-proc* *define-condition-proc* *define-method-combination-proc*
-	       *define-modify-macro-proc* *define-setf-expander-proc* *define-symbol-macro-proc*
-	       *defmacro-proc* *defmethod-proc* *defpackage-proc* *defparameter-proc* *defsetf-proc*
-	       *defstruct-proc* *deftype-proc* *defun-proc* *defvar-proc*))
+	       *define-condition-proc* *define-modify-macro-proc* *define-symbol-macro-proc* *defmacro-proc*
+	       *defparameter-proc* *defstruct-proc* *deftype-proc* *defun-proc* *defvar-proc*))
+(declaim (type (or null (function (stream t symbol) t)) *define-compiler-macro-proc*
+	       *define-method-combination-proc* *define-setf-expander-proc* *defmethod-proc* *defpackage-proc*
+	       *defsetf-proc*))
 (defvar *defclass-proc* nil)
 (defvar *defconstant-proc* nil)
 (defvar *defgeneric-proc* nil)

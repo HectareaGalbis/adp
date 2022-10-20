@@ -77,6 +77,10 @@
   (declare (ignore tag root-path))
   (format stream "[~a](~a.md#~a)" header-text file-path (convert-to-github-header-anchor header-text)))
 
+(defun symbol-macro-p (sym &optional env)
+  (let ((*macroexpand-hook* (constantly nil)))
+    (nth-value 1 (macroexpand-1 sym env))))
+
 (adppvt:def-symbol-ref-writer (stream tag root-path file-path)
   (declare (ignore root-path file-path))
   (format stream "`~a`" tag))
@@ -120,36 +124,145 @@
 
 ;; ----- api functions -----
 
-(defmacro def-general-writer (definition title name documentation)
-  (let ((writer-name (find-symbol (concatenate 'string "DEF-" (symbol-name definition) "-WRITER") :adppvt))
-	(with-components-name (find-symbol (concatenate 'string "WITH-" (symbol-name definition) "-COMPONENTS") :adppvt)))
-    (with-gensyms (stream source)
-      `(,writer-name (,stream ,source)
-		     (,with-components-name ((,name ,@(when documentation `(,documentation))) ,source)
-		       (format ,stream "#### ***~a*** ~s~%~%" ,title ,name)
-		       ,@(when documentation
-			   `((when ,documentation
-			       (format ,stream "~a~%~%" ,documentation))))
-		       (format ,stream "```Lisp~%~s~%```~%~%" ,source))))))
+(adppvt:def-defclass-writer (stream source tag)
+  (declare (ignore tag))
+  (adppvt:with-defclass-components ((class-name superclass-names slot-specifiers documentation default-initargs metaclass) source)
+    (format stream "Type: ~a~%~%" class-name)
+    (format stream "```Lisp~%(defclass ~s ~s~%  ~s~@[~%  (:default-initargs~{ ~s~})~]~[~%  (:metaclass ~s)~])~%```~%~%"
+	    class-name superclass-names slot-specifiers default-initargs metaclass documentation)
+    (when documentation
+      (format stream "~a~%~%" documentation))))
 
-(def-general-writer defclass "Class" class-name documentation)
-(def-general-writer defconstant "Constant" name documentation)
-(def-general-writer defgeneric "Generic function" function-name documentation)
-(def-general-writer define-compiler-macro "Compiler macro" name documentation)
-(def-general-writer define-condition "Condition" name documentation)
-(def-general-writer define-method-combination "Method combination" name documentation)
-(def-general-writer define-modify-macro "Modify macro" name documentation)
-(def-general-writer define-setf-expander "Setf expander" access-fn documentation)
-(def-general-writer define-symbol-macro "Symbol macro" symbol nil)
-(def-general-writer defmacro "Macro" name documentation)
-(def-general-writer defmethod "Method" function-name documentation)
-(def-general-writer defpackage "Package" defined-package-name documentation)
-(def-general-writer defparameter "Parameter" name documentation)
-(def-general-writer defsetf "Setf" access-fn documentation)
-(def-general-writer defstruct "Structure" structure-name documentation)
-(def-general-writer deftype "Type" name documentation)
-(def-general-writer defun "Function" function-name documentation)
-(def-general-writer defvar "Var" name documentation)
+(adppvt:def-defconstant-writer (stream source tag)
+  (declare (ignore tag))
+  (adppvt:with-defconstant-components ((name initial-value documentation) source)
+    (format stream "Variable: ~a~%~%" name)
+    (format stream "```Lisp~%(defconstant ~s ~s)~%```~%~%" name initial-value)
+    (when documentation
+      (format stream "~a~%~%" documentation))))
+
+(adppvt:def-defgeneric-writer (stream source tag)
+  (declare (ignore tag))
+  (adppvt:with-defgeneric-components ((function-name gf-lambda-list documentation) source)
+    (format stream "Generic function: ~a~%~%" function-name)
+    (format stream "```Lisp~%(defgeneric ~s ~s)~%```~%~%" function-name gf-lambda-list)
+    (when documentation
+      (format stream "~a~%~%" documentation))))
+
+(adppvt:def-define-compiler-macro-writer (stream source)
+  (adppvt:with-define-compiler-macro-components ((name documentation) source)
+    (format stream "Compiler macro: ~a~%~%" name)
+    (format stream "```Lisp~%(define-compiler-macro ~s)~%```~%~%" name)
+    (when documentation
+      (format stream "~a~%~%" documentation))))
+
+(adppvt:def-define-condition-writer (stream source tag)
+  (declare (ignore tag))
+  (adppvt:with-define-condition-components ((name parent-types slot-specs default-initargs report-name documentation) source)
+    (format stream "Condition: ~a~%~%" name)
+    (format stream "```Lisp~%(defcondition ~s ~s~%  ~s~@[~%  (:default-initargs~{ ~s~})~]~@[~%  (:report ~s)~])~%```~%~%"
+	    name parent-types slot-specs default-initargs report-name)
+    (when documentation
+      (format stream "~a~%~%" documentation))))
+
+(adppvt:def-define-method-combination-writer (stream source)
+  (adppvt:with-define-method-combination-components ((name documentation) source)
+    (format stream "Method combination: ~a~%~%" name)
+    (format stream "```Lisp~%(define-method-combination ~s)~%```~%~%" name)
+    (when documentation
+      (format stream "~a~%~%" documentation))))
+
+(adppvt:def-define-modify-macro-writer (stream source tag)
+  (declare (ignore tag))
+  (adppvt:with-define-modify-macro-components ((name lambda-list function documentation) source)
+    (format stream "Macro: ~a~%~%" name)
+    (format stream "```Lisp~%(define-modify-macro ~s ~s ~s)~%```~%~%" name lambda-list function)
+    (when documentation
+      (format stream "~a~%~%" documentation))))
+
+(adppvt:def-define-setf-expander-writer (stream source)
+  (adppvt:with-define-setf-expander-components ((access-fn lambda-list documentation) source)
+    (format stream "Setf expander: ~a~%~%" access-fn)
+    (format stream "```Lisp~%(define-setf-expander ~s ~s)~%```~%~%" access-fn lambda-list)
+    (when documentation
+      (format stream "~a~%~%" documentation))))
+
+(adppvt:def-define-symbol-macro-writer (stream source tag)
+  (declare (ignore tag))
+  (adppvt:with-define-symbol-macro-components ((symbol expansion) source)
+    (format stream "Symbol macro: ~a~%~%" symbol)
+    (format stream "```Lisp~%(define-symbol-macro ~s ~s)~%```~%~%" symbol expansion)))
+
+(adppvt:def-defmacro-writer (stream source tag)
+  (declare (ignore tag))
+  (adppvt:with-defmacro-components ((name lambda-list documentation) source)
+    (format stream "Macro: ~a~%~%" name)
+    (format stream "```Lisp~%(defmacro ~s ~s)~%```" name lambda-list)
+    (when documentation
+      (format stream "~a~%~%" documentation))))
+
+(adppvt:def-defmethod-writer (stream source)
+  (adppvt:with-defmethod-components ((function-name method-qualifiers specialized-lambda-list documentation) source)
+    (format stream "Method: ~a~%~%" function-name)
+    (format stream "```Lisp~%(defmethod ~s~{ ~s~} ~s)~%```~%~%" function-name method-qualifiers specialized-lambda-list)
+    (when documentation
+      (format stream "~a~%~%" documentation))))
+
+(adppvt:def-defpackage-writer (stream source)
+  (adppvt:with-defpackage-components ((defined-package-name nicknames use-package-names documentation) source)
+    (format stream "Package: ~a~%~%" defined-package-name)
+    (format stream "```Lisp~%(defpackage ~s~@[~%  (:nicknames~{ ~s~})~]~@[~%  (:use~{ ~s~})~])~%```~%~%"
+	    defined-package-name nicknames use-package-names)
+    (when documentation
+      (format stream "~a~%~%" documentation))))
+
+(adppvt:def-defparameter-writer (stream source tag)
+  (declare (ignore tag))
+  (adppvt:with-defparameter-components ((name initial-value documentation) source)
+    (format stream "Variable: ~a~%~%" name)
+    (format stream "```Lisp~%(defparameter ~s ~s)~%```~%~%"
+	    name initial-value)
+    (when documentation
+      (format stream "~a~%~%" documentation))))
+
+(adppvt:def-defsetf-writer (stream source)
+  (adppvt:with-defsetf-components ((access-fn update-fn documentation) source)
+    (format stream "Defsetf: ~a~%~%" access-fn)
+    (format stream "```Lisp~%(defsetf ~s ~s)" access-fn update-fn)
+    (when documentation
+      (format stream "~a~%~%" documentation))))
+
+(adppvt:def-defstruct-writer (stream source tag)
+  (declare (ignore tag))
+  (adppvt:with-defstruct-components ((structure-name name-and-options slot-descriptions documentation) source)
+    (format stream "Struct: ~a~%~%" structure-name)
+    (format stream "```Lisp~%(defstruct ~s~%  ~s)~%```~%~%" name-and-options slot-descriptions)
+    (when documentation
+      (format stream "~a~%~%" documentation))))
+
+(adppvt:def-deftype-writer (stream source tag)
+  (declare (ignore tag))
+  (adppvt:with-deftype-components ((name lambda-list documentation) source)
+    (format stream "Type: ~a~%~%" name)
+    (format stream "```Lisp~%(deftype ~s ~s)~%```~%~%" name lambda-list)
+    (when documentation
+      (format stream "~a~%~%" documentation))))
+
+(adppvt:def-defun-writer (stream source tag)
+  (declare (ignore tag))
+  (adppvt:with-defun-components ((function-name lambda-list documentation) source)
+    (format stream "Function: ~a~%~%" function-name)
+    (format stream "```Lisp~%(defun ~s ~s)~%```~%~%" function-name lambda-list)
+    (when documentation
+      (format stream "~a~%~%" documentation))))
+
+(adppvt:def-defvar-writer (stream source tag)
+  (declare (ignore tag))
+  (adppvt:with-defvar-components ((name initial-value documentation) source)
+    (format stream "Variable: ~a~%~%" name)
+    (format stream "```Lisp~%(defvar ~s~@[ ~s~])~%```~%~%" name initial-value)
+    (when documentation
+      (format stream "~a~%~%" documentation))))
 
 
 ;; ----- file functions -----

@@ -3,8 +3,9 @@
 (in-package :adp/html)
 
 
+
 (adppvt:def-header-writer (stream text tag)
-  )
+  (format stream "<h1>~a</h1>~%~%" text))
 
 (adppvt:def-subheader-writer (stream text tag)
   )
@@ -25,7 +26,7 @@
   )
 
 (adppvt:def-bold-writer (stream text)
-  )
+  (format stream "<strong>~a</strong>"))
 
 (adppvt:def-italic-writer (stream text)
   )
@@ -42,10 +43,16 @@
 (adppvt:def-file-ref-writer (stream root-path file-path)
   )
 
-
-
 (adppvt:def-header-ref-writer (stream tag header-text root-path file-path)
   )
+
+
+
+
+
+
+
+
 
 (adppvt:def-symbol-ref-writer (stream tag root-path file-path)
   )
@@ -76,6 +83,10 @@
 
 
 ;; ----- api functions -----
+
+(adppvt:def-defclass-writer (stream source)
+  )
+
 
 (defmacro def-general-writer (definition title name documentation)
   (let ((writer-name (find-symbol (concatenate 'string "DEF-" (symbol-name definition) "-WRITER") :adppvt))

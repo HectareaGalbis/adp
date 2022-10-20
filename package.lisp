@@ -92,7 +92,7 @@
 	   #:deftype-lambda-list #:deftype-declarations #:deftype-documentation #:deftype-forms
 	   #:defun-function-name #:defun-lambda-list #:defun-declarations #:defun-documentation #:defun-forms
 	   #:defvar-name #:defvar-initial-value #:defvar-documentation #:with-defclass-components
-	   #:with-defconstant-components #:with-function-name-components
+	   #:with-defconstant-components #:with-defgeneric-components
 	   #:with-define-compiler-macro-components #:with-define-condition-components
 	   #:with-define-method-combination-components #:with-define-modify-macro-components
 	   #:with-define-setf-expander-components #:with-define-symbol-macro-components
