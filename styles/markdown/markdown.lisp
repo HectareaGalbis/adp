@@ -86,8 +86,15 @@
   (format stream "`~a`" tag))
 
 (adppvt:def-function-ref-writer (stream tag root-path file-path)
-  (declare (ignore root-path file-path))
-  (format stream "`~a`" tag))
+  (declare (ignore root-path))
+  (let* ((function-header (cond
+			    ((macro-function tag)
+			     (format nil "Macro: ~a" tag))
+			    ((subtypep tag 'generic-function)
+			     (format nil "Generic function: ~a" tag))
+			    (t (format nil "Function: ~a" tag))))
+	 (function-anchor (convert-to-github-header-anchor function-header)))
+    (format stream "[~a](~a.md#~a)" tag file-path function-anchor)))
 
 (adppvt:def-type-ref-writer (stream tag root-path file-path)
   (declare (ignore root-path file-path))
