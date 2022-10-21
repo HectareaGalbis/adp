@@ -286,3 +286,12 @@
   ...)
 ```
 
+## Additional functions
+
+#### Macro: CL-REF
+
+```Lisp
+(defmacro CL-REF (SYM)
+  ...)
+```
+

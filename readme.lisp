@@ -19,7 +19,7 @@
     "A function that does nothing."
     (values)))
 
-(text "ADP redefines the macro " (function-ref defun) ". To generate the documentation for this function you just need to tell Common Lisp that the macro " (code-inline "defun") " used is the one from the package " (code-inline "adp") ":")
+(text "ADP redefines the macro " (function-ref defun) ". To generate the documentation for this function you just need to tell Common Lisp that the macro " (cl-ref defun) " used is the one from the package " (code-inline "adp") ":")
 
 (code-block ()
   (adp:defun foo ()
@@ -46,16 +46,6 @@
 	 (:item "The Style-Maker guide: " "TODO")
 	 (:item "The ADP api: " (file-ref #P"docs/user-api"))
 	 (:item "The Style-Maker api: " (file-ref #P"docs/style-maker-api")))
-
-(text "Go top: " (header-ref adp-header))
-
-
-(code-example
-  (defun prueba-str (&optional (str "Prueba"))
-    (print str)))
-
-
-(text (symbol-ref adppvt:*custom-pprint-dispatch*))
 
 (write-in-file #P"README")
 

@@ -457,4 +457,11 @@
     (adppvt:write-system-files fixed-root-path)))
 
 
+;; ----- Additional functions -----
+
+(adv-subheader "Additional functions")
+
+(adv-defmacro cl-ref (sym)
+  `(web-link ,(symbol-name sym) ,(hyperspec:lookup sym)))
+
 (adv-write-in-file #P"docs/user-api")

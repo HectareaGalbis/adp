@@ -4,7 +4,7 @@
   :author "Héctor Galbis Sanchis"
   :description "Add Documentation, Please. A documentation generator."
   :license "The Unlicense"
-  :depends-on (:alexandria)
+  :depends-on (:alexandria :hyperspec)
   :components ((:file "package")
 	       (:file "adp-core")
 	       (:file "adp")
@@ -31,7 +31,7 @@
   :author "Héctor Galbis Sanchis"
   :description "Markdown style for adp"
   :license "The Unlicense"
-  :depends-on (:alexandria :adp)
+  :depends-on (:adp)
   :components ((:module "styles/markdown"
 		:components ((:file "package")
 			     (:file "markdown")))))
@@ -40,7 +40,7 @@
   :author ""
   :description "HTML style for adp"
   :license "The Unlicense"
-  :depends-on (:alexandria :adp)
+  :depends-on (:adp)
   :components ((:module "styles/html"
 		:components ((:file "package")
 			     (:file "html")))))

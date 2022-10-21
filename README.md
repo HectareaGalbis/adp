@@ -14,7 +14,7 @@ Generating the API documentation is also easy. Suppose that you have the followi
 (DEFUN FOO () "A function that does nothing." (VALUES))
 ```
 
-ADP redefines the macro [DEFUN](docs/user-api.md#macro-defun). To generate the documentation for this function you just need to tell Common Lisp that the macro `defun` used is the one from the package `adp`:
+ADP redefines the macro [DEFUN](docs/user-api.md#macro-defun). To generate the documentation for this function you just need to tell Common Lisp that the macro [DEFUN](http://www.lispworks.com/reference/HyperSpec/Body/m_defun.htm) used is the one from the package `adp`:
 
 ```
 (ADP:DEFUN FOO () "A function that does nothing" (VALUES))
@@ -40,20 +40,4 @@ The ADP project only depends on Alexandria. However, each style can have other d
 * The Style-Maker guide: TODO
 * The ADP api: [docs/user-api](docs/user-api.md)
 * The Style-Maker api: [docs/style-maker-api](docs/style-maker-api.md)
-
-Go top: [Add Documentation, Please](README.md#add-documentation-please)
-
-#### Function: PRUEBA-STR
-
-```Lisp
-(defun PRUEBA-STR (&OPTIONAL (STR "Prueba"))
-  ...)
-```
-
-```
-(ADP:DEFUN PRUEBA-STR (&OPTIONAL (STR "Prueba")) (PRINT STR))
-PRUEBA-STR
-```
-
-[\*CUSTOM-PPRINT-DISPATCH\*](docs/style-maker-help.md#variable-custom-pprint-dispatch)
 
