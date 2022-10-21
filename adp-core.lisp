@@ -44,21 +44,43 @@
 
 ;; ----- adp files -----
 
-(declaim (type hash-table *project-adp-files*))
-(defvar *project-adp-files* (make-hash-table :test 'equal))
+(deftype adp-file ()
+  '(cons pathname vector))
+
+(declaim (ftype (function (pathname vector) adp-file) create-adp-file))
+(defun create-adp-file (path contents)
+  (cons path contents))
+
+(declaim (ftype (function (adp-file) pathname) adp-file-path))
+(defun adp-file-path (file)
+  (car file))
+
+(declaim (ftype (function (adp-file) vector) ado-file-contents))
+(defun adp-file-contents (file)
+  (cdr file))
+
+(declaim (type (vector adp-file) *project-adp-files*))
+(defvar *project-adp-files* (make-array 10 :adjustable t :fill-pointer 0))
+
+(declaim (ftype (function (pathname) boolean) adp-file-presentp))
+(defun get-project-adp-file-contents (path)
+  (loop for file across *project-adp-files*
+	  thereis (and (equal path (adp-file-path file))
+		       (adp-file-contents file))))
 
 (declaim (ftype (function (pathname) t) push-adp-file))
 (defun push-adp-file (path)
-  (when (not (gethash path *project-adp-files*))
-    (setf (gethash path *project-adp-files*) (make-array 100 :adjustable t :fill-pointer 0)))
-  (let ((file-contents (gethash path *project-adp-files*)))
+  (let ((file-contents (get-project-adp-file-contents path)))
+    (when (not file-contents)
+      (setf file-contents (make-array 100 :adjustable t :fill-pointer 0))
+      (vector-push-extend (create-adp-file path file-contents) *project-adp-files*))
     (loop for elem across *file-adp-elements*
 	  do (vector-push-extend elem file-contents)))
   (empty-adp-elements))
 
 (declaim (ftype (function () t) empty-adp-files))
 (defun empty-adp-files ()
-  (setf *project-adp-files* (make-hash-table :test 'equal)))
+  (setf (fill-pointer *project-adp-files*) 0))
 
 
 ;; ----- adp ref tags -----
@@ -776,5 +798,7 @@
 (defun write-system-files (root-path)
   (when *system-files-proc*
     (funcall *system-files-proc* root-path))
-  (loop for rel-path being the hash-key in *project-adp-files* using (hash-value file-elements)
+  (loop for file across *project-adp-files*
+	for rel-path = (adp-file-path file)
+	for file-elements = (adp-file-contents file)
 	do (write-file root-path rel-path file-elements)))
