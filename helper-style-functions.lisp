@@ -10,8 +10,10 @@
 (adp:subheader "Miscellanea")
 
 
+(defparameter *normal-pprint-dispatch* *print-pprint-dispatch*)
 (adp:defparameter *custom-pprint-dispatch* (copy-pprint-dispatch)
-  "An extension of *print-pprint-dispatch*. The define functions (like defun) from adp will be printed as if they were from cl.")
+  "An extension of *print-pprint-dispatch*. The define functions (like defun) from adp will be printed as if they were from cl. The string will be printed with escape character even if *print-escape* is false.")
+
 (set-pprint-dispatch '(cons (member adp:defclass)) (pprint-dispatch '(defclass)) 0 *custom-pprint-dispatch*)
 (set-pprint-dispatch '(cons (member adp:defconstant)) (pprint-dispatch '(defconstant)) 0 *custom-pprint-dispatch*)
 (set-pprint-dispatch '(cons (member adp:defgeneric)) (pprint-dispatch '(defgeneric)) 0 *custom-pprint-dispatch*)
@@ -30,6 +32,11 @@
 (set-pprint-dispatch '(cons (member adp:deftype)) (pprint-dispatch '(deftype)) 0 *custom-pprint-dispatch*)
 (set-pprint-dispatch '(cons (member adp:defun)) (pprint-dispatch '(defun)) 0 *custom-pprint-dispatch*)
 (set-pprint-dispatch '(cons (member adp:defvar)) (pprint-dispatch '(defvar)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch 'atom (lambda (stream object)
+			     (let ((*print-escape* (or *print-escape* (not (symbolp object))))
+				   (*print-pprint-dispatch* *normal-pprint-dispatch*))
+			       (write object :stream stream)))
+		     0 *custom-pprint-dispatch*)
 
 
 (declaim (ftype (function (t &optional stream (or string null)) t) custom-prin1))

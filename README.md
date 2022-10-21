@@ -43,21 +43,10 @@ The ADP project only depends on Alexandria. However, each style can have other d
 
 Go top: [Add Documentation, Please](README.md#add-documentation-please)
 
-```
-(LOOP ADP::FOR ADP::I ADP::FROM 0 ADP::BELOW 10
-      DO (PRINT ADP::I)
-      ADP::FINALLY (RETURN "Hola mundo"))
-0 
-1 
-2 
-3 
-4 
-5 
-6 
-7 
-8 
-9 
-"Hola mundo"
+#### Function: PRUEBA-STR
+
+```Lisp
+(defun ADP::PRUEBA-STR (&OPTIONAL (STR "Prueba")))
 ```
 
 [\*CUSTOM-PPRINT-DISPATCH\*](docs/style-maker-help.md#variable-custom-pprint-dispatch)

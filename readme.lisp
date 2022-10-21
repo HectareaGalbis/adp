@@ -50,10 +50,9 @@
 (text "Go top: " (header-ref adp-header))
 
 
-(code-example
-  (loop for i from 0 below 10
-	do (print i)
-	finally (return "Hola mundo")))
+(defun prueba-str (&optional (str "Prueba"))
+  (print str))
+
 
 (text (symbol-ref adppvt:*custom-pprint-dispatch*))
 
