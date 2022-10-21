@@ -1,4 +1,4 @@
-# Style-maker helper functions/macros
+# Style-maker helper functions
 
 ## Miscellanea
 

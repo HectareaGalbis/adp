@@ -22,7 +22,10 @@
 	       (:file "adp")
 	       (:file "adp-writers")
 	       (:file "helper-style-functions")
-	       (:file "readme")))
+	       (:file "readme")
+	       (:module "guides"
+		:components ((:file "user-guide")
+			     (:file "style-maker-guide")))))
 
 
 ;; ----- ADP styles -----

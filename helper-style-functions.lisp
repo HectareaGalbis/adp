@@ -2,7 +2,7 @@
 
 (in-package :adppvt)
 
-(adp:header "Style-maker helper functions/macros" style-helper-header)
+(adp:header "Style-maker helper functions" style-maker-helper-header)
 
 
 ;; ----- Miscellanea functions -----

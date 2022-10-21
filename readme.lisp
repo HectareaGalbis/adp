@@ -42,10 +42,11 @@
 
 (subheader "Documentation")
 
-(itemize (:item "The ADP guide: " "TODO")
-	 (:item "The Style-Maker guide: " "TODO")
-	 (:item "The ADP api: " (file-ref #P"docs/user-api"))
-	 (:item "The Style-Maker api: " (file-ref #P"docs/style-maker-api")))
+(itemize (:item "The ADP guide: " (header-ref user-guide-header))
+	 (:item "The ADP api: " (header-ref user-api-header))
+	 (:item "The Style-Maker guide: " (header-ref style-maker-guide-header))
+	 (:item "The Style-Maker api: " (header-ref adppvt:style-maker-api-header))
+	 (:item "Style-maker helper functions: " (header-ref adppvt:style-maker-helper-header)))
 
 (write-in-file #P"README")
 

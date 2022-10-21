@@ -2,7 +2,7 @@
 (in-package :adppvt)
 
 
-(adp:header "Style-maker interface" style-header)
+(adp:header "Style-maker interface" style-maker-api-header)
 
 
 ;; ----- style parameters -----

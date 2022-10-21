@@ -38,7 +38,7 @@
 	   #:def-defmethod-writer #:def-defpackage-writer #:def-defparameter-writer #:def-defsetf-writer
 	   #:def-defstruct-writer #:def-deftype-writer #:def-defun-writer #:def-defvar-writer
 	   #:def-get-file-extension-writer #:def-file-header-writer #:def-file-foot-writer
-	   #:def-system-files-writer
+	   #:def-system-files-writer #:style-maker-api-header #:style-maker-helper-header
 
 	   #:defclass-class-name #:defclass-superclass-names #:defclass-slot-specifiers #:defclass-slot-names
 	   #:defclass-slot-options #:defclass-reader-function-names #:defclass-writer-function-names

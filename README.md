@@ -36,8 +36,9 @@ The ADP project only depends on Alexandria. However, each style can have other d
 
 ## Documentation
 
-* The ADP guide: TODO
-* The Style-Maker guide: TODO
-* The ADP api: [docs/user-api](docs/user-api.md)
-* The Style-Maker api: [docs/style-maker-api](docs/style-maker-api.md)
+* The ADP guide: [The ADP User Guide](docs/user-guide.md#the-adp-user-guide)
+* The ADP api: [ADP User Interface](docs/user-api.md#adp-user-interface)
+* The Style-Maker guide: [The Style-maker Guide](docs/style-maker-guide.md#the-style-maker-guide)
+* The Style-Maker api: [Style-maker interface](docs/style-maker-api.md#style-maker-interface)
+* Style-maker helper functions: [Style-maker helper functions](docs/style-maker-help.md#style-maker-helper-functions)
 

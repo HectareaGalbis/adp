@@ -69,7 +69,7 @@
 
 ;; ----- ADP interface -----
 
-(adv-header "ADP User Interface" interface-header)
+(adv-header "ADP User Interface" user-api-header)
 
 
 ;; ----- Guide functions -----
