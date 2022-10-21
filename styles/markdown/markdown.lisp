@@ -73,6 +73,15 @@
     (values simple-str)))
 
 
+(defun symbol-github-name (sym)
+  (let* ((sym-name (symbol-name sym))
+	 (length-name (length sym-name)))
+    (if (and (char= (aref sym-name 0) #\*)
+	     (char= (aref sym-name (1- length-name)) #\*))
+	(format nil "\*~a\*" (subseq sym-name 1 (1- length-name)))
+	(format nil "~a" sym))))
+
+
 (adppvt:def-header-ref-writer (stream tag header-text root-path file-path)
   (declare (ignore tag root-path))
   (format stream "[~a](~a.md#~a)" header-text file-path (convert-to-github-header-anchor header-text)))
@@ -85,10 +94,10 @@
   (declare (ignore root-path))
   (let* ((symbol-header (cond
 			  ((symbol-macro-p tag)
-			   (format nil "Symbol macro: ~a" tag))
+			   (format nil "Symbol macro: ~a" (symbol-github-name tag)))
 			  ((constantp tag)
-			   (format nil "Constant: ~a" tag))
-			  (t (format nil "Variable: ~a" tag))))
+			   (format nil "Constant: ~a" (symbol-github-name tag)))
+			  (t (format nil "Variable: ~a" (symbol-github-name tag)))))
 	 (symbol-anchor (convert-to-github-header-anchor symbol-header)))
     (format stream "[~a](~a.md#~a)" tag file-path symbol-anchor)))
 
@@ -147,7 +156,7 @@
 (adppvt:def-defconstant-writer (stream source tag)
   (declare (ignore tag))
   (adppvt:with-defconstant-components ((name initial-value documentation) source)
-    (format stream "#### Constant: ~a~%~%" name)
+    (format stream "#### Constant: ~a~%~%" (symbol-github-name name))
     (format stream "```Lisp~%(defconstant ~s ~s)~%```~%~%" name initial-value)
     (when documentation
       (format stream "~a~%~%" documentation))))
@@ -201,7 +210,7 @@
 (adppvt:def-define-symbol-macro-writer (stream source tag)
   (declare (ignore tag))
   (adppvt:with-define-symbol-macro-components ((symbol expansion) source)
-    (format stream "#### Symbol macro: ~a~%~%" symbol)
+    (format stream "#### Symbol macro: ~a~%~%" (symbol-github-name symbol))
     (format stream "```Lisp~%(define-symbol-macro ~s ~s)~%```~%~%" symbol expansion)))
 
 (adppvt:def-defmacro-writer (stream source tag)
@@ -230,7 +239,7 @@
 (adppvt:def-defparameter-writer (stream source tag)
   (declare (ignore tag))
   (adppvt:with-defparameter-components ((name initial-value documentation) source)
-    (format stream "#### Variable: ~a~%~%" name)
+    (format stream "#### Variable: ~a~%~%" (symbol-github-name name))
     (format stream "```Lisp~%(defparameter ~s ~s)~%```~%~%"
 	    name initial-value)
     (when documentation
@@ -270,7 +279,7 @@
 (adppvt:def-defvar-writer (stream source tag)
   (declare (ignore tag))
   (adppvt:with-defvar-components ((name initial-value documentation) source)
-    (format stream "#### Variable: ~a~%~%" name)
+    (format stream "#### Variable: ~a~%~%" (symbol-github-name name))
     (format stream "```Lisp~%(defvar ~s~@[ ~s~])~%```~%~%" name initial-value)
     (when documentation
       (format stream "~a~%~%" documentation))))
