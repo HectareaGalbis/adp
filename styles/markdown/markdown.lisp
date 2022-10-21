@@ -282,7 +282,7 @@
   (adppvt:with-defun-components ((function-name lambda-list documentation) source)
     (format stream "#### Function: ~a~%~%" function-name)
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
-      (format stream "```Lisp~%(defun ~s ~a)~%```~%~%" function-name lambda-list))
+      (format stream "```Lisp~%(defun ~s ~a~%  ...)~%```~%~%" function-name lambda-list))
     (when documentation
       (format stream "~a~%~%" documentation))))
 

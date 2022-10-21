@@ -46,7 +46,8 @@ Go top: [Add Documentation, Please](README.md#add-documentation-please)
 #### Function: PRUEBA-STR
 
 ```Lisp
-(defun ADP::PRUEBA-STR (&OPTIONAL (STR "Prueba")))
+(defun ADP::PRUEBA-STR (&OPTIONAL (STR "Prueba"))
+  ...)
 ```
 
 [\*CUSTOM-PPRINT-DISPATCH\*](docs/style-maker-help.md#variable-custom-pprint-dispatch)
