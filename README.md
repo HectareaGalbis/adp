@@ -60,5 +60,5 @@ Go top: [Add Documentation, Please](README.md#add-documentation-please)
 "Hola mundo"
 ```
 
-[*CUSTOM-PPRINT-DISPATCH*](docs/style-maker-help.md#variable-custom-pprint-dispatch)
+[\*CUSTOM-PPRINT-DISPATCH\*](docs/style-maker-help.md#variable-custom-pprint-dispatch)
 
