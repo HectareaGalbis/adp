@@ -462,6 +462,6 @@
 (adv-subheader "Additional functions")
 
 (adv-defmacro cl-ref (sym)
-  `(web-link ,(symbol-name sym) ,(hyperspec:lookup sym)))
+  `(web-link ,(prin1-to-string sym) ,(hyperspec:lookup sym)))
 
 (adv-write-in-file #P"docs/user-api")
