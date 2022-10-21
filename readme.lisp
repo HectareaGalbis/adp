@@ -19,7 +19,7 @@
     "A function that does nothing."
     (values)))
 
-(text "ADP redefines the macro " (function-ref defun) ". To generate the documentation for this function you just need to tell Common Lisp that the macro " (cl-ref defun) " used is the one from the package " (code-inline "adp") ":")
+(text "ADP redefines the macro " (cl-ref defun) ". To generate the documentation for this function you just need to tell Common Lisp that the macro " (function-ref defun) " used is the one from the package " (code-inline "adp") ":")
 
 (code-block ()
   (adp:defun foo ()
