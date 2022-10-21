@@ -55,6 +55,7 @@
 	do (print i)
 	finally (return "Hola mundo")))
 
+(text (symbol-ref adppvt:*custom-pprint-dispatch*))
 
 (write-in-file #P"README")
 
