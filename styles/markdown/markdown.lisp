@@ -138,7 +138,8 @@
   (loop for (code output result) (t string list) in code-list
 	do (terpri stream)
 	   (adppvt:custom-prin1 code stream "...")
-	   (format stream "~a~{~%~s~}~%" output result))
+	   (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
+	     (format stream "~a~{~%~s~}~%" output result)))
   (format stream "```~%~%"))
 
 
