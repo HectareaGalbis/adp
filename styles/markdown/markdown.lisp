@@ -82,8 +82,15 @@
     (nth-value 1 (macroexpand-1 sym env))))
 
 (adppvt:def-symbol-ref-writer (stream tag root-path file-path)
-  (declare (ignore root-path file-path))
-  (format stream "`~a`" tag))
+  (declare (ignore root-path))
+  (let* ((symbol-header (cond
+			  ((symbol-macro-p tag)
+			   (format nil "Symbol macro: ~a" tag))
+			  ((constantp tag)
+			   (format nil "Constant: ~a" tag))
+			  (t (format nil "Variable: ~a" tag))))
+	 (symbol-anchor (convert-to-github-header-anchor symbol-header)))
+    (format stream "[~a](~a.md#~a)" tag file-path symbol-anchor)))
 
 (adppvt:def-function-ref-writer (stream tag root-path file-path)
   (declare (ignore root-path))
@@ -97,26 +104,23 @@
     (format stream "[~a](~a.md#~a)" tag file-path function-anchor)))
 
 (adppvt:def-type-ref-writer (stream tag root-path file-path)
-  (declare (ignore root-path file-path))
-  (format stream "`~a`" tag))
-
-(defun prin1-with-hide-string (stream code str)
-  (let ((normal-pprint-dispatch *print-pprint-dispatch*)
-	(custom-pprint-dispatch (copy-pprint-dispatch nil)))
-    (labels ((custom-hide-print (stream sym)
-	       (if (adppvt:hide-symbolp sym)
-		   (princ str stream)
-		   (let ((*print-pprint-dispatch* normal-pprint-dispatch))
-		     (prin1 sym stream)))))
-      (set-pprint-dispatch 'symbol #'custom-hide-print 0 custom-pprint-dispatch)
-      (let ((*print-pprint-dispatch* custom-pprint-dispatch))
-	(prin1 code stream)))))
+  (declare (ignore root-path))
+  (let* ((type-header (cond
+			((subtypep tag 'condition)
+			 (format nil "Condition: ~a" tag))
+			((subtypep tag 'structure-class)
+			 (format nil "Struct: ~a" tag))
+			((subtypep tag 'class)
+			 (format nil "Class: ~a" tag))
+			(t (format nil "Type: ~a" tag))))
+	 (type-anchor (convert-to-github-header-anchor type-header)))
+    (format stream "[~a](~a.md#~a)" tag file-path type-anchor)))
 
 (adppvt:def-code-block-writer (stream code-list)
     (format stream "```")
   (loop for code in code-list
 	do (terpri stream)
-	   (prin1-with-hide-string stream code "...")
+	   (adppvt:custom-prin1 code stream "...")
 	   (terpri stream))
   (format stream "```~%~%"))
 
@@ -124,7 +128,7 @@
   (format stream "```")
   (loop for (code output result) (t string list) in code-list
 	do (terpri stream)
-	   (prin1-with-hide-string stream code "...")
+	   (adppvt:custom-prin1 code stream "...")
 	   (format stream "~a~{~%~s~}~%" output result))
   (format stream "```~%~%"))
 
@@ -134,7 +138,7 @@
 (adppvt:def-defclass-writer (stream source tag)
   (declare (ignore tag))
   (adppvt:with-defclass-components ((class-name superclass-names slot-specifiers documentation default-initargs metaclass) source)
-    (format stream "#### Type: ~a~%~%" class-name)
+    (format stream "#### Class: ~a~%~%" class-name)
     (format stream "```Lisp~%(defclass ~s ~s~%  ~s~@[~%  (:default-initargs~{ ~s~})~]~[~%  (:metaclass ~s)~])~%```~%~%"
 	    class-name superclass-names slot-specifiers default-initargs metaclass documentation)
     (when documentation
@@ -143,7 +147,7 @@
 (adppvt:def-defconstant-writer (stream source tag)
   (declare (ignore tag))
   (adppvt:with-defconstant-components ((name initial-value documentation) source)
-    (format stream "#### Variable: ~a~%~%" name)
+    (format stream "#### Constant: ~a~%~%" name)
     (format stream "```Lisp~%(defconstant ~s ~s)~%```~%~%" name initial-value)
     (when documentation
       (format stream "~a~%~%" documentation))))

@@ -1,5 +1,24 @@
 # Style-maker helper functions/macros
 
+## Miscellanea
+
+#### Variable: *CUSTOM-PPRINT-DISPATCH*
+
+```Lisp
+(defparameter ADP-PRIVATE:*CUSTOM-PPRINT-DISPATCH* (COPY-PPRINT-DISPATCH))
+```
+
+An extension of *print-pprint-dispatch*. The define functions (like defun) from adp will be printed as if they were from cl.
+
+#### Function: CUSTOM-PRIN1
+
+```Lisp
+(defun ADP-PRIVATE:CUSTOM-PRIN1 (ADP-PRIVATE::CODE &OPTIONAL STREAM
+                                 (ADP-PRIVATE::HIDE-STR NIL)))
+```
+
+It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol which verifies hide-symbolp is found, then hide-str is princ-ed instead.
+
 ## API function components
 
 ### Defclass components

@@ -5,7 +5,51 @@
 (adp:header "Style-maker helper functions/macros" style-helper-header)
 
 
-;; ----- helper-helper-functions -----
+;; ----- Miscellanea functions -----
+
+(adp:subheader "Miscellanea")
+
+
+(adp:defparameter *custom-pprint-dispatch* (copy-pprint-dispatch)
+  "An extension of *print-pprint-dispatch*. The define functions (like defun) from adp will be printed as if they were from cl.")
+(set-pprint-dispatch '(cons (member adp:defclass)) (pprint-dispatch '(defclass)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:defconstant)) (pprint-dispatch '(defconstant)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:defgeneric)) (pprint-dispatch '(defgeneric)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:define-compiler-macro)) (pprint-dispatch '(define-compiler-macro)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:define-condition)) (pprint-dispatch '(define-condition)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:define-method-combination)) (pprint-dispatch '(define-method-combination)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:define-modify-macro)) (pprint-dispatch '(define-modify-macro)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:define-setf-expander)) (pprint-dispatch '(define-setf-expander)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:define-symbol-macro)) (pprint-dispatch '(define-symbol-macro)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:defmacro)) (pprint-dispatch '(defmacro)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:defmethod)) (pprint-dispatch '(defmethod)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:defpackage)) (pprint-dispatch '(defpackage)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:defparameter)) (pprint-dispatch '(defparameter)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:defsetf)) (pprint-dispatch '(defsetf)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:defstruct)) (pprint-dispatch '(defstruct)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:deftype)) (pprint-dispatch '(deftype)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:defun)) (pprint-dispatch '(defun)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:defvar)) (pprint-dispatch '(defvar)) 0 *custom-pprint-dispatch*)
+
+
+(declaim (ftype (function (t &optional stream (or string null)) t) custom-prin1))
+(adp:defun custom-prin1 (code &optional stream (hide-str nil))
+  "It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol which verifies hide-symbolp is found, then hide-str is princ-ed instead."
+  (let ((custom-pprint-dispatch (copy-pprint-dispatch *custom-pprint-dispatch*)))
+    (labels ((custom-hide-print (stream sym)
+	       (if (adppvt:hide-symbolp sym)
+		   (princ hide-str stream)
+		   (let ((*print-pprint-dispatch* *custom-pprint-dispatch*))
+		     (prin1 sym stream)))))
+      (when hide-str
+	(set-pprint-dispatch 'symbol #'custom-hide-print 0 custom-pprint-dispatch))
+      (let ((*print-pprint-dispatch* custom-pprint-dispatch))
+	(prin1 code stream)))))
+
+
+;; ----- Components functions -----
+
+(adp:subheader "API function components" api-components-subheader)
 
 (defun documentationp (expr)
   (stringp expr))
@@ -34,8 +78,6 @@
 	    (let ,,let-bindings-var
 	      ,@,body-arg)))))))
 
-
-(adp:subheader "API function components" api-components-subheader)
 
 ;; ----- defclass components -----
 

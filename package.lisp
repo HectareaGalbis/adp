@@ -98,4 +98,5 @@
 	   #:with-define-setf-expander-components #:with-define-symbol-macro-components
 	   #:with-defmacro-components #:with-defmethod-components #:with-defpackage-components
 	   #:with-defparameter-components #:with-defsetf-components #:with-defstruct-components
-	   #:with-deftype-components #:with-defun-components #:with-defvar-components))
+	   #:with-deftype-components #:with-defun-components #:with-defvar-components #:custom-prin1
+	   #:*custom-pprint-dispatch*))
