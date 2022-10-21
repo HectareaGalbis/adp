@@ -50,5 +50,10 @@ Go top: [Add Documentation, Please](README.md#add-documentation-please)
   ...)
 ```
 
+```
+(ADP:DEFUN ADP::PRUEBA-STR (&OPTIONAL (ADP::STR "Prueba")) (PRINT ADP::STR))
+ADP::PRUEBA-STR
+```
+
 [\*CUSTOM-PPRINT-DISPATCH\*](docs/style-maker-help.md#variable-custom-pprint-dispatch)
 

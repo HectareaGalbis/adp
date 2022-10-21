@@ -50,8 +50,9 @@
 (text "Go top: " (header-ref adp-header))
 
 
-(defun prueba-str (&optional (str "Prueba"))
-  (print str))
+(code-example
+  (defun prueba-str (&optional (str "Prueba"))
+    (print str)))
 
 
 (text (symbol-ref adppvt:*custom-pprint-dispatch*))
