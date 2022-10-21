@@ -78,7 +78,7 @@
 	 (length-name (length sym-name)))
     (if (and (char= (aref sym-name 0) #\*)
 	     (char= (aref sym-name (1- length-name)) #\*))
-	(format nil "\*~a\*" (subseq sym-name 1 (1- length-name)))
+	(format nil "\\*~a\\*" (subseq sym-name 1 (1- length-name)))
 	(format nil "~a" sym))))
 
 

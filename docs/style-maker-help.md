@@ -2,7 +2,7 @@
 
 ## Miscellanea
 
-#### Variable: *CUSTOM-PPRINT-DISPATCH*
+#### Variable: \*CUSTOM-PPRINT-DISPATCH\*
 
 ```Lisp
 (defparameter ADP-PRIVATE:*CUSTOM-PPRINT-DISPATCH* (COPY-PPRINT-DISPATCH))
