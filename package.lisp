@@ -27,13 +27,13 @@
 	   #:create-bold-italic-text #:create-code-inline-text #:create-web-link-text #:create-file-ref-text
 	   #:create-header-ref-text #:create-symbol-ref-text #:create-function-ref-text #:create-type-ref-text
 
-	   #:def-header-writer #:def-subheader-writer #:def-subsubheader-writer #:def-text-writer
-	   #:def-table-writer #:def-itemize-writer #:def-image-writer #:def-bold-writer #:def-italic-writer
-	   #:def-bold-italic-writer #:def-code-inline-writer #:def-web-link-writer #:def-file-ref-writer
-	   #:def-header-ref-writer #:def-symbol-ref-writer #:def-function-ref-writer #:def-type-ref-writer
-	   #:def-code-block-writer #:def-code-example-writer #:def-defclass-writer #:def-defconstant-writer
-	   #:def-defgeneric-writer #:def-define-compiler-macro-writer #:def-define-condition-writer
-	   #:def-define-method-combination-writer #:def-define-modify-macro-writer
+	   #:def-style-parameter #:def-header-writer #:def-subheader-writer #:def-subsubheader-writer
+	   #:def-text-writer #:def-table-writer #:def-itemize-writer #:def-image-writer #:def-bold-writer
+	   #:def-italic-writer #:def-bold-italic-writer #:def-code-inline-writer #:def-web-link-writer
+	   #:def-file-ref-writer #:def-header-ref-writer #:def-symbol-ref-writer #:def-function-ref-writer
+	   #:def-type-ref-writer #:def-code-block-writer #:def-code-example-writer #:def-defclass-writer
+	   #:def-defconstant-writer #:def-defgeneric-writer #:def-define-compiler-macro-writer
+	   #:def-define-condition-writer #:def-define-method-combination-writer #:def-define-modify-macro-writer
 	   #:def-define-setf-expander-writer #:def-define-symbol-macro-writer #:def-defmacro-writer
 	   #:def-defmethod-writer #:def-defpackage-writer #:def-defparameter-writer #:def-defsetf-writer
 	   #:def-defstruct-writer #:def-deftype-writer #:def-defun-writer #:def-defvar-writer

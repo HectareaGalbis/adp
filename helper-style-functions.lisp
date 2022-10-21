@@ -12,7 +12,7 @@
 
 (defparameter *normal-pprint-dispatch* *print-pprint-dispatch*)
 (adp:defparameter *custom-pprint-dispatch* (copy-pprint-dispatch)
-  "An extension of *print-pprint-dispatch*. The define functions (like defun) from adp will be printed as if they were from cl. The string will be printed with escape character even if *print-escape* is false.")
+  "An extension of *print-pprint-dispatch*. The define functions (like defun) from adp will be printed with pretty indentation as if they were from cl. Internal symbols will be printed without the package extension even if *print-escape* is true.")
 
 (set-pprint-dispatch '(cons (member adp:defclass)) (pprint-dispatch '(defclass)) 0 *custom-pprint-dispatch*)
 (set-pprint-dispatch '(cons (member adp:defconstant)) (pprint-dispatch '(defconstant)) 0 *custom-pprint-dispatch*)
@@ -32,10 +32,14 @@
 (set-pprint-dispatch '(cons (member adp:deftype)) (pprint-dispatch '(deftype)) 0 *custom-pprint-dispatch*)
 (set-pprint-dispatch '(cons (member adp:defun)) (pprint-dispatch '(defun)) 0 *custom-pprint-dispatch*)
 (set-pprint-dispatch '(cons (member adp:defvar)) (pprint-dispatch '(defvar)) 0 *custom-pprint-dispatch*)
-(set-pprint-dispatch 'atom (lambda (stream object)
-			     (let ((*print-escape* (or *print-escape* (not (symbolp object))))
-				   (*print-pprint-dispatch* *normal-pprint-dispatch*))
-			       (write object :stream stream)))
+(set-pprint-dispatch 'symbol (lambda (stream sym)
+			       (let* ((sym-package (symbol-package sym))
+				      (internalp (and sym-package
+						      (eq (nth-value 1 (find-symbol (symbol-name sym) sym-package))
+							  :internal)))
+				      (*print-escape* (not internalp))
+				      (*print-pprint-dispatch* *normal-pprint-dispatch*))
+				 (write sym :stream stream)))
 		     0 *custom-pprint-dispatch*)
 
 

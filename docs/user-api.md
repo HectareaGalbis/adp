@@ -124,7 +124,7 @@
 #### Macro: CODE-TAG
 
 ```Lisp
-(defmacro ADP::CODE-TAG (TAGS &BODY CODE)
+(defmacro CODE-TAG (TAGS &BODY CODE)
   ...)
 ```
 

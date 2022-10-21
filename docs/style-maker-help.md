@@ -8,7 +8,7 @@
 (defparameter ADP-PRIVATE:*CUSTOM-PPRINT-DISPATCH* (COPY-PPRINT-DISPATCH))
 ```
 
-An extension of *print-pprint-dispatch*. The define functions (like defun) from adp will be printed as if they were from cl. The string will be printed with escape character even if *print-escape* is false.
+An extension of *print-pprint-dispatch*. The define functions (like defun) from adp will be printed with pretty indentation as if they were from cl. Symbols that are not external will be printed without the package extension even if *print-escape* is true.
 
 #### Function: CUSTOM-PRIN1
 
@@ -145,9 +145,9 @@ It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol w
 #### Macro: WITH-DEFCLASS-COMPONENTS
 
 ```Lisp
-(defmacro ADP-PRIVATE:WITH-DEFCLASS-COMPONENTS (((&REST COMPONENT-REST-ARGS0)
-                                                 FUNCTION-BODY-ARG1)
-                                                &BODY BODY-ARG2)
+(defmacro ADP-PRIVATE:WITH-DEFCLASS-COMPONENTS (((&REST #:COMPONENT-REST-ARGS0)
+                                                 #:FUNCTION-BODY-ARG1)
+                                                &BODY #:BODY-ARG2)
   ...)
 ```
 
@@ -178,9 +178,9 @@ It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol w
 
 ```Lisp
 (defmacro ADP-PRIVATE:WITH-DEFCONSTANT-COMPONENTS (((&REST
-                                                     COMPONENT-REST-ARGS0)
-                                                    FUNCTION-BODY-ARG1)
-                                                   &BODY BODY-ARG2)
+                                                     #:COMPONENT-REST-ARGS0)
+                                                    #:FUNCTION-BODY-ARG1)
+                                                   &BODY #:BODY-ARG2)
   ...)
 ```
 
@@ -259,9 +259,10 @@ It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol w
 #### Macro: WITH-DEFGENERIC-COMPONENTS
 
 ```Lisp
-(defmacro ADP-PRIVATE:WITH-DEFGENERIC-COMPONENTS (((&REST COMPONENT-REST-ARGS0)
-                                                   FUNCTION-BODY-ARG1)
-                                                  &BODY BODY-ARG2)
+(defmacro ADP-PRIVATE:WITH-DEFGENERIC-COMPONENTS (((&REST
+                                                    #:COMPONENT-REST-ARGS0)
+                                                   #:FUNCTION-BODY-ARG1)
+                                                  &BODY #:BODY-ARG2)
   ...)
 ```
 
@@ -306,9 +307,9 @@ It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol w
 
 ```Lisp
 (defmacro ADP-PRIVATE:WITH-DEFINE-COMPILER-MACRO-COMPONENTS (((&REST
-                                                               COMPONENT-REST-ARGS0)
-                                                              FUNCTION-BODY-ARG1)
-                                                             &BODY BODY-ARG2)
+                                                               #:COMPONENT-REST-ARGS0)
+                                                              #:FUNCTION-BODY-ARG1)
+                                                             &BODY #:BODY-ARG2)
   ...)
 ```
 
@@ -430,9 +431,9 @@ It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol w
 
 ```Lisp
 (defmacro ADP-PRIVATE:WITH-DEFINE-CONDITION-COMPONENTS (((&REST
-                                                          COMPONENT-REST-ARGS0)
-                                                         FUNCTION-BODY-ARG1)
-                                                        &BODY BODY-ARG2)
+                                                          #:COMPONENT-REST-ARGS0)
+                                                         #:FUNCTION-BODY-ARG1)
+                                                        &BODY #:BODY-ARG2)
   ...)
 ```
 
@@ -568,10 +569,10 @@ It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol w
 
 ```Lisp
 (defmacro ADP-PRIVATE:WITH-DEFINE-METHOD-COMBINATION-COMPONENTS (((&REST
-                                                                   COMPONENT-REST-ARGS0)
-                                                                  FUNCTION-BODY-ARG1)
+                                                                   #:COMPONENT-REST-ARGS0)
+                                                                  #:FUNCTION-BODY-ARG1)
                                                                  &BODY
-                                                                 BODY-ARG2)
+                                                                 #:BODY-ARG2)
   ...)
 ```
 
@@ -609,9 +610,9 @@ It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol w
 
 ```Lisp
 (defmacro ADP-PRIVATE:WITH-DEFINE-MODIFY-MACRO-COMPONENTS (((&REST
-                                                             COMPONENT-REST-ARGS0)
-                                                            FUNCTION-BODY-ARG1)
-                                                           &BODY BODY-ARG2)
+                                                             #:COMPONENT-REST-ARGS0)
+                                                            #:FUNCTION-BODY-ARG1)
+                                                           &BODY #:BODY-ARG2)
   ...)
 ```
 
@@ -656,9 +657,9 @@ It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol w
 
 ```Lisp
 (defmacro ADP-PRIVATE:WITH-DEFINE-SETF-EXPANDER-COMPONENTS (((&REST
-                                                              COMPONENT-REST-ARGS0)
-                                                             FUNCTION-BODY-ARG1)
-                                                            &BODY BODY-ARG2)
+                                                              #:COMPONENT-REST-ARGS0)
+                                                             #:FUNCTION-BODY-ARG1)
+                                                            &BODY #:BODY-ARG2)
   ...)
 ```
 
@@ -682,9 +683,9 @@ It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol w
 
 ```Lisp
 (defmacro ADP-PRIVATE:WITH-DEFINE-SYMBOL-MACRO-COMPONENTS (((&REST
-                                                             COMPONENT-REST-ARGS0)
-                                                            FUNCTION-BODY-ARG1)
-                                                           &BODY BODY-ARG2)
+                                                             #:COMPONENT-REST-ARGS0)
+                                                            #:FUNCTION-BODY-ARG1)
+                                                           &BODY #:BODY-ARG2)
   ...)
 ```
 
@@ -728,9 +729,9 @@ It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol w
 #### Macro: WITH-DEFMACRO-COMPONENTS
 
 ```Lisp
-(defmacro ADP-PRIVATE:WITH-DEFMACRO-COMPONENTS (((&REST COMPONENT-REST-ARGS0)
-                                                 FUNCTION-BODY-ARG1)
-                                                &BODY BODY-ARG2)
+(defmacro ADP-PRIVATE:WITH-DEFMACRO-COMPONENTS (((&REST #:COMPONENT-REST-ARGS0)
+                                                 #:FUNCTION-BODY-ARG1)
+                                                &BODY #:BODY-ARG2)
   ...)
 ```
 
@@ -781,9 +782,10 @@ It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol w
 #### Macro: WITH-DEFMETHOD-COMPONENTS
 
 ```Lisp
-(defmacro ADP-PRIVATE:WITH-DEFMETHOD-COMPONENTS (((&REST COMPONENT-REST-ARGS0)
-                                                  FUNCTION-BODY-ARG1)
-                                                 &BODY BODY-ARG2)
+(defmacro ADP-PRIVATE:WITH-DEFMETHOD-COMPONENTS (((&REST
+                                                   #:COMPONENT-REST-ARGS0)
+                                                  #:FUNCTION-BODY-ARG1)
+                                                 &BODY #:BODY-ARG2)
   ...)
 ```
 
@@ -813,7 +815,7 @@ It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol w
 #### Function: DEFPACKAGE-DOCUMENTATION
 
 ```Lisp
-(defun ADP-PRIVATE::DEFPACKAGE-DOCUMENTATION (DEFPACKAGE-SOURCE)
+(defun DEFPACKAGE-DOCUMENTATION (DEFPACKAGE-SOURCE)
   ...)
 ```
 
@@ -883,9 +885,10 @@ It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol w
 #### Macro: WITH-DEFPACKAGE-COMPONENTS
 
 ```Lisp
-(defmacro ADP-PRIVATE:WITH-DEFPACKAGE-COMPONENTS (((&REST COMPONENT-REST-ARGS0)
-                                                   FUNCTION-BODY-ARG1)
-                                                  &BODY BODY-ARG2)
+(defmacro ADP-PRIVATE:WITH-DEFPACKAGE-COMPONENTS (((&REST
+                                                    #:COMPONENT-REST-ARGS0)
+                                                   #:FUNCTION-BODY-ARG1)
+                                                  &BODY #:BODY-ARG2)
   ...)
 ```
 
@@ -916,9 +919,9 @@ It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol w
 
 ```Lisp
 (defmacro ADP-PRIVATE:WITH-DEFPARAMETER-COMPONENTS (((&REST
-                                                      COMPONENT-REST-ARGS0)
-                                                     FUNCTION-BODY-ARG1)
-                                                    &BODY BODY-ARG2)
+                                                      #:COMPONENT-REST-ARGS0)
+                                                     #:FUNCTION-BODY-ARG1)
+                                                    &BODY #:BODY-ARG2)
   ...)
 ```
 
@@ -948,9 +951,9 @@ It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol w
 #### Macro: WITH-DEFSETF-COMPONENTS
 
 ```Lisp
-(defmacro ADP-PRIVATE:WITH-DEFSETF-COMPONENTS (((&REST COMPONENT-REST-ARGS0)
-                                                FUNCTION-BODY-ARG1)
-                                               &BODY BODY-ARG2)
+(defmacro ADP-PRIVATE:WITH-DEFSETF-COMPONENTS (((&REST #:COMPONENT-REST-ARGS0)
+                                                #:FUNCTION-BODY-ARG1)
+                                               &BODY #:BODY-ARG2)
   ...)
 ```
 
@@ -966,7 +969,7 @@ It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol w
 #### Function: DEFSTRUCT-STRUCTURE-NAME
 
 ```Lisp
-(defun ADP-PRIVATE::DEFSTRUCT-STRUCTURE-NAME (DEFSTRUCT-SOURCE)
+(defun DEFSTRUCT-STRUCTURE-NAME (DEFSTRUCT-SOURCE)
   ...)
 ```
 
@@ -1176,9 +1179,10 @@ It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol w
 #### Macro: WITH-DEFSTRUCT-COMPONENTS
 
 ```Lisp
-(defmacro ADP-PRIVATE:WITH-DEFSTRUCT-COMPONENTS (((&REST COMPONENT-REST-ARGS0)
-                                                  FUNCTION-BODY-ARG1)
-                                                 &BODY BODY-ARG2)
+(defmacro ADP-PRIVATE:WITH-DEFSTRUCT-COMPONENTS (((&REST
+                                                   #:COMPONENT-REST-ARGS0)
+                                                  #:FUNCTION-BODY-ARG1)
+                                                 &BODY #:BODY-ARG2)
   ...)
 ```
 
@@ -1222,9 +1226,9 @@ It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol w
 #### Macro: WITH-DEFTYPE-COMPONENTS
 
 ```Lisp
-(defmacro ADP-PRIVATE:WITH-DEFTYPE-COMPONENTS (((&REST COMPONENT-REST-ARGS0)
-                                                FUNCTION-BODY-ARG1)
-                                               &BODY BODY-ARG2)
+(defmacro ADP-PRIVATE:WITH-DEFTYPE-COMPONENTS (((&REST #:COMPONENT-REST-ARGS0)
+                                                #:FUNCTION-BODY-ARG1)
+                                               &BODY #:BODY-ARG2)
   ...)
 ```
 
@@ -1268,9 +1272,9 @@ It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol w
 #### Macro: WITH-DEFUN-COMPONENTS
 
 ```Lisp
-(defmacro ADP-PRIVATE:WITH-DEFUN-COMPONENTS (((&REST COMPONENT-REST-ARGS0)
-                                              FUNCTION-BODY-ARG1)
-                                             &BODY BODY-ARG2)
+(defmacro ADP-PRIVATE:WITH-DEFUN-COMPONENTS (((&REST #:COMPONENT-REST-ARGS0)
+                                              #:FUNCTION-BODY-ARG1)
+                                             &BODY #:BODY-ARG2)
   ...)
 ```
 
@@ -1300,9 +1304,9 @@ It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol w
 #### Macro: WITH-DEFVAR-COMPONENTS
 
 ```Lisp
-(defmacro ADP-PRIVATE:WITH-DEFVAR-COMPONENTS (((&REST COMPONENT-REST-ARGS0)
-                                               FUNCTION-BODY-ARG1)
-                                              &BODY BODY-ARG2)
+(defmacro ADP-PRIVATE:WITH-DEFVAR-COMPONENTS (((&REST #:COMPONENT-REST-ARGS0)
+                                               #:FUNCTION-BODY-ARG1)
+                                              &BODY #:BODY-ARG2)
   ...)
 ```
 

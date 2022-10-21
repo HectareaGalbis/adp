@@ -149,7 +149,7 @@
   (adppvt:with-defclass-components ((class-name superclass-names slot-specifiers documentation default-initargs metaclass) source)
     (format stream "#### Class: ~a~%~%" class-name)
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
-      (format stream "```Lisp~%(defclass ~s ~a~%  ~a~@[~%  (:default-initargs~{ ~a~})~]~[~%  (:metaclass ~a)~])~%```~%~%"
+      (format stream "```Lisp~%(defclass ~s ~s~%  ~s~@[~%  (:default-initargs~{ ~s~})~]~[~%  (:metaclass ~s)~])~%```~%~%"
 	      class-name superclass-names slot-specifiers default-initargs metaclass documentation))
     (when documentation
       (format stream "~a~%~%" documentation))))
@@ -158,7 +158,8 @@
   (declare (ignore tag))
   (adppvt:with-defconstant-components ((name initial-value documentation) source)
     (format stream "#### Constant: ~a~%~%" (symbol-github-name name))
-    (format stream "```Lisp~%(defconstant ~s ~s)~%```~%~%" name initial-value)
+    (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
+      (format stream "```Lisp~%(defconstant ~s ~s)~%```~%~%" name initial-value))
     (when documentation
       (format stream "~a~%~%" documentation))))
 
@@ -167,14 +168,15 @@
   (adppvt:with-defgeneric-components ((function-name gf-lambda-list documentation) source)
     (format stream "#### Generic function: ~a~%~%" function-name)
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
-      (format stream "```Lisp~%(defgeneric ~s ~a~%  ...)~%```~%~%" function-name gf-lambda-list))
+      (format stream "```Lisp~%(defgeneric ~s ~s~%  ...)~%```~%~%" function-name gf-lambda-list))
     (when documentation
       (format stream "~a~%~%" documentation))))
 
 (adppvt:def-define-compiler-macro-writer (stream source)
   (adppvt:with-define-compiler-macro-components ((name documentation) source)
     (format stream "#### Compiler macro: ~a~%~%" name)
-    (format stream "```Lisp~%(define-compiler-macro ~s~%  ...)~%```~%~%" name)
+    (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
+      (format stream "```Lisp~%(define-compiler-macro ~s~%  ...)~%```~%~%" name))
     (when documentation
       (format stream "~a~%~%" documentation))))
 
@@ -183,7 +185,7 @@
   (adppvt:with-define-condition-components ((name parent-types slot-specs default-initargs report-name documentation) source)
     (format stream "#### Condition: ~a~%~%" name)
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
-      (format stream "```Lisp~%(defcondition ~s ~s~%  ~a~@[~%  (:default-initargs~{ ~a~})~]~@[~%  (:report ~a)~])~%```~%~%"
+      (format stream "```Lisp~%(defcondition ~s ~s~%  ~s~@[~%  (:default-initargs~{ ~s~})~]~@[~%  (:report ~s)~])~%```~%~%"
 	      name parent-types slot-specs default-initargs report-name))
     (when documentation
       (format stream "~a~%~%" documentation))))
@@ -191,7 +193,8 @@
 (adppvt:def-define-method-combination-writer (stream source)
   (adppvt:with-define-method-combination-components ((name documentation) source)
     (format stream "#### Method combination: ~a~%~%" name)
-    (format stream "```Lisp~%(define-method-combination ~s~%  ...)~%```~%~%" name)
+    (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
+      (format stream "```Lisp~%(define-method-combination ~s~%  ...)~%```~%~%" name))
     (when documentation
       (format stream "~a~%~%" documentation))))
 
@@ -200,7 +203,7 @@
   (adppvt:with-define-modify-macro-components ((name lambda-list function documentation) source)
     (format stream "#### Macro: ~a~%~%" name)
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
-      (format stream "```Lisp~%(define-modify-macro ~s ~a ~s)~%```~%~%" name lambda-list function))
+      (format stream "```Lisp~%(define-modify-macro ~s ~s ~s)~%```~%~%" name lambda-list function))
     (when documentation
       (format stream "~a~%~%" documentation))))
 
@@ -208,7 +211,7 @@
   (adppvt:with-define-setf-expander-components ((access-fn lambda-list documentation) source)
     (format stream "#### Setf expander: ~a~%~%" access-fn)
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
-      (format stream "```Lisp~%(define-setf-expander ~s ~a~%  ...)~%```~%~%" access-fn lambda-list))
+      (format stream "```Lisp~%(define-setf-expander ~s ~s~%  ...)~%```~%~%" access-fn lambda-list))
     (when documentation
       (format stream "~a~%~%" documentation))))
 
@@ -216,14 +219,15 @@
   (declare (ignore tag))
   (adppvt:with-define-symbol-macro-components ((symbol expansion) source)
     (format stream "#### Symbol macro: ~a~%~%" (symbol-github-name symbol))
-    (format stream "```Lisp~%(define-symbol-macro ~s ~s)~%```~%~%" symbol expansion)))
+    (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
+      (format stream "```Lisp~%(define-symbol-macro ~s ~s)~%```~%~%" symbol expansion))))
 
 (adppvt:def-defmacro-writer (stream source tag)
   (declare (ignore tag))
   (adppvt:with-defmacro-components ((name lambda-list documentation) source)
     (format stream "#### Macro: ~a~%~%" name)
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
-      (format stream "```Lisp~%(defmacro ~s ~a~%  ...)~%```~%~%" name lambda-list))
+      (format stream "```Lisp~%(defmacro ~s ~s~%  ...)~%```~%~%" name lambda-list))
     (when documentation
       (format stream "~a~%~%" documentation))))
 
@@ -231,7 +235,7 @@
   (adppvt:with-defmethod-components ((function-name method-qualifiers specialized-lambda-list documentation) source)
     (format stream "#### Method: ~a~%~%" function-name)
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
-      (format stream "```Lisp~%(defmethod ~s~{ ~s~} ~a~%  ...)~%```~%~%" function-name method-qualifiers specialized-lambda-list))
+      (format stream "```Lisp~%(defmethod ~s~{ ~s~} ~s~%  ...)~%```~%~%" function-name method-qualifiers specialized-lambda-list))
     (when documentation
       (format stream "~a~%~%" documentation))))
 
@@ -239,7 +243,7 @@
   (adppvt:with-defpackage-components ((defined-package-name nicknames use-package-names documentation) source)
     (format stream "#### Package: ~a~%~%" defined-package-name)
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
-      (format stream "```Lisp~%(defpackage ~a~@[~%  (:nicknames~{ ~a~})~]~@[~%  (:use~{ ~a~})~]~%  ...)~%```~%~%"
+      (format stream "```Lisp~%(defpackage ~s~@[~%  (:nicknames~{ ~s~})~]~@[~%  (:use~{ ~s~})~]~%  ...)~%```~%~%"
 	      defined-package-name nicknames use-package-names))
     (when documentation
       (format stream "~a~%~%" documentation))))
@@ -248,15 +252,17 @@
   (declare (ignore tag))
   (adppvt:with-defparameter-components ((name initial-value documentation) source)
     (format stream "#### Variable: ~a~%~%" (symbol-github-name name))
-    (format stream "```Lisp~%(defparameter ~s ~s)~%```~%~%"
-	    name initial-value)
+    (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
+      (format stream "```Lisp~%(defparameter ~s ~s)~%```~%~%"
+	      name initial-value))
     (when documentation
       (format stream "~a~%~%" documentation))))
 
 (adppvt:def-defsetf-writer (stream source)
   (adppvt:with-defsetf-components ((access-fn update-fn documentation) source)
     (format stream "#### Defsetf: ~a~%~%" access-fn)
-    (format stream "```Lisp~%(defsetf ~s ~s)" access-fn update-fn)
+    (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
+      (format stream "```Lisp~%(defsetf ~s ~s)" access-fn update-fn))
     (when documentation
       (format stream "~a~%~%" documentation))))
 
@@ -265,7 +271,7 @@
   (adppvt:with-defstruct-components ((structure-name name-and-options slot-descriptions documentation) source)
     (format stream "#### Struct: ~a~%~%" structure-name)
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
-      (format stream "```Lisp~%(defstruct ~s~%  ~a)~%```~%~%" name-and-options slot-descriptions))
+      (format stream "```Lisp~%(defstruct ~s~%  ~s)~%```~%~%" name-and-options slot-descriptions))
     (when documentation
       (format stream "~a~%~%" documentation))))
 
@@ -273,7 +279,8 @@
   (declare (ignore tag))
   (adppvt:with-deftype-components ((name lambda-list documentation) source)
     (format stream "#### Type: ~a~%~%" name)
-    (format stream "```Lisp~%(deftype ~s ~s)~%```~%~%" name lambda-list)
+    (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
+      (format stream "```Lisp~%(deftype ~s ~s)~%```~%~%" name lambda-list))
     (when documentation
       (format stream "~a~%~%" documentation))))
 
@@ -282,7 +289,7 @@
   (adppvt:with-defun-components ((function-name lambda-list documentation) source)
     (format stream "#### Function: ~a~%~%" function-name)
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
-      (format stream "```Lisp~%(defun ~s ~a~%  ...)~%```~%~%" function-name lambda-list))
+      (format stream "```Lisp~%(defun ~s ~s~%  ...)~%```~%~%" function-name lambda-list))
     (when documentation
       (format stream "~a~%~%" documentation))))
 
@@ -290,7 +297,8 @@
   (declare (ignore tag))
   (adppvt:with-defvar-components ((name initial-value documentation) source)
     (format stream "#### Variable: ~a~%~%" (symbol-github-name name))
-    (format stream "```Lisp~%(defvar ~s~@[ ~s~])~%```~%~%" name initial-value)
+    (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
+      (format stream "```Lisp~%(defvar ~s~@[ ~s~])~%```~%~%" name initial-value))
     (when documentation
       (format stream "~a~%~%" documentation))))
 
