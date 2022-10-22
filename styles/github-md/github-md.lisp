@@ -100,7 +100,7 @@
 			   (format nil "Constant: ~a" (symbol-github-name tag)))
 			  (t (format nil "Variable: ~a" (symbol-github-name tag)))))
 	 (symbol-anchor (convert-to-github-header-anchor symbol-header)))
-    (format stream "[~s](/~a.md#~a)" (symbol-github-name tag) file-path symbol-anchor)))
+    (format stream "[~s](/~a.md#~a)" tag file-path symbol-anchor)))
 
 (adppvt:def-function-ref-writer (stream tag root-path file-path)
   (declare (ignore root-path))

@@ -335,18 +335,36 @@ A reference to an ADP macro: [ADP:HEADER](/docs/user-api.md#macro-header)
 
 Note again that [ADP:FUNCTION-REF](/docs/user-api.md#macro-function-ref) only can be used inside [ADP:TEXT](/docs/user-api.md#macro-text), [ADP:TABLE](/docs/user-api.md#macro-table) or [ADP:ITEMIZE](/docs/user-api.md#macro-itemize). The same goes to [ADP:SYMBOL-REF](/docs/user-api.md#macro-symbol-ref) and [ADP:TYPE-REF](/docs/user-api.md#macro-type-ref).
 
-A cool thing about cross references is that you can make a reference to something that is not currently defined but will be. For example, a variable is defined at the end of this file but we can make a reference now. I'm writing the next expression:
+A cool thing about cross references is that you can make a reference to something that is not currently defined but will be. For example, a variable will be defined at the end of this file but we can make a reference now. I'm writing the next expression:
 
 ```
 (ADP:TEXT "In the future, we will define the symbol "
           (ADP:SYMBOL-REF A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE) ".")
 ```
 
-In the future, we will define the symbol ["A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE"](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file).
+In the future, we will define the symbol [ADP::A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file).
+
+Finally, an example using a type-tag:
+
+```
+(ADP:TEXT "Using a type tag: " (ADP:TYPE-REF ALSO-A-TYPE?))
+```
+
+Using a type tag: [ADP::ALSO-A-TYPE?](/docs/user-guide.md#condition-also-a-type)
+
+### Code-tags
 
 #### Variable: A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE
 
 ```Lisp
 (defparameter A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE T)
 ```
+
+#### Type: ALSO-A-TYPE?
+
+```Lisp
+(deftype ALSO-A-TYPE? NIL)
+```
+
+Go back to [Function-tags, symbol-tags and type-tags](/docs/user-guide.md#function-tags-symbol-tags-and-type-tags)
 

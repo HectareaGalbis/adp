@@ -272,7 +272,7 @@
 (text "Note that the macro is used inside a " (function-ref text) " form. Same as with " (function-ref bold) " or " (function-ref italic) " " (function-ref header-ref) " only can be used inside " (function-ref text) ", " (function-ref table) " and " (function-ref itemize) ".")
 
 
-(subsubheader "Function-tags, symbol-tags and type-tags")
+(subsubheader "Function-tags, symbol-tags and type-tags" function-tags-subsubheader)
 
 (text "These tags are symbols associated with a function, a variable or a type. More specifically, the macros used to define things like " (function-ref defun) ", " (function-ref defparameter) " or " (function-ref defstruct) " can create automatically a function-tag, a symbol-tag or a type-tag respectively. The tag created is the symbol of the name of the function, variable or type defined respectively. ADP defines three types of tags because the same symbol can refer to a function, a variable and a type simultaneously. The next list shows what type of tags are defined by which macros:")
 
@@ -304,7 +304,7 @@
 
 (text "Note again that " (function-ref function-ref) " only can be used inside " (function-ref text) ", " (function-ref table) " or " (function-ref itemize) ". The same goes to " (function-ref symbol-ref) " and " (function-ref type-ref) ".")
 
-(text "A cool thing about cross references is that you can make a reference to something that is not currently defined but will be. For example, a variable is defined at the end of this file but we can make a reference now. I'm writing the next expression:")
+(text "A cool thing about cross references is that you can make a reference to something that is not currently defined but will be. For example, a variable will be defined at the end of this file but we can make a reference now. I'm writing the next expression:")
 
 (code-block (symbol-ref-example)
   symbol-ref-example)
@@ -312,7 +312,15 @@
 (code-tag (symbol-ref-example)
   (text "In the future, we will define the symbol " (symbol-ref a-parameter-defined-at-the-end-of-the-file) "."))
 
+(text "Finally, an example using a type-tag:")
 
+(code-block (type-ref-example)
+  type-ref-example)
+
+(code-tag (type-ref-example)
+  (text "Using a type tag: " (type-ref also-a-type?)))
+
+(subsubheader "Code-tags")
 
 
 
@@ -320,5 +328,10 @@
 
 
 (defparameter a-parameter-defined-at-the-end-of-the-file t)
+
+(deftype also-a-type? ()
+  nil)
+
+(text "Go back to " (header-ref function-tags-subsubheader))
 
 (write-in-file #P"docs/user-guide")
