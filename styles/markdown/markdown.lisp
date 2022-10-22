@@ -84,7 +84,7 @@
 
 (adppvt:def-header-ref-writer (stream tag header-text root-path file-path)
   (declare (ignore tag root-path))
-  (format stream "[~a](~a.md#~a)" header-text file-path (convert-to-github-header-anchor header-text)))
+  (format stream "[~a](/~a.md#~a)" header-text file-path (convert-to-github-header-anchor header-text)))
 
 (defun symbol-macro-p (sym &optional env)
   (let ((*macroexpand-hook* (constantly nil)))

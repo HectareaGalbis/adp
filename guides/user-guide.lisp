@@ -45,7 +45,7 @@
     "Multiply a by the sum of b and c."
     (* a (+ b c))))
 
-(text "That's all! Actually, note that if you load your project as always after changing some defuns, you will see that nothing happens. Your system is loaded normally and nothing changes. This is because the documentation generation is disabled by default. So, even you add ADP code you original code remains the same.")
+(text "That's all! Actually, note that if you load your project as always after changing some defuns, you will see that nothing happens. Your system is loaded normally and nothing changes. This is because the documentation generation is disabled by default. So, even you add ADP code your original code remains the same.")
 
 (text "Same as with " (function-ref defun) ", every macro that defines something is redefined to print documentation. You can see every macro here: " (header-ref api-subheader))
 

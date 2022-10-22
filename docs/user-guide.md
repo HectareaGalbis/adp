@@ -42,9 +42,9 @@ If you want to generate documentation of this definition you only need to use th
 (ADP:DEFUN FOO (A B C) "Multiply a by the sum of b and c." (* A (+ B C)))
 ```
 
-That's all! Actually, note that if you load your project as always after changing some defuns, you will see that nothing happens. Your system is loaded normally and nothing changes. This is because the documentation generation is disabled by default. So, even you add ADP code you original code remains the same.
+That's all! Actually, note that if you load your project as always after changing some defuns, you will see that nothing happens. Your system is loaded normally and nothing changes. This is because the documentation generation is disabled by default. So, even you add ADP code your original code remains the same.
 
-Same as with [ADP:DEFUN](docs/user-api.md#macro-defun), every macro that defines something is redefined to print documentation. You can see every macro here: [API documentation functions](docs/user-api.md#api-documentation-functions)
+Same as with [ADP:DEFUN](docs/user-api.md#macro-defun), every macro that defines something is redefined to print documentation. You can see every macro here: [API documentation functions](/docs/user-api.md#api-documentation-functions)
 
 ## Functions to generate guides.
 
@@ -62,7 +62,7 @@ You can add headers in your documentation. In other words, they work as titles o
 (ADP:SUBSUBHEADER "A subsection of my guide.")
 ```
 
-As I said, I'm using headers in this guide. This is a header: [The ADP User Guide](docs/user-guide.md#the-adp-user-guide). This is a subheader: [Setting up ADP](docs/user-guide.md#setting-up-adp). And this is a subsubheader: [Headers](docs/user-guide.md#headers). Note that I can make a reference to a header. I can achieve this with header-tags. We will see this later in [Tags and references](docs/user-guide.md#tags-and-references).
+As I said, I'm using headers in this guide. This is a header: [The ADP User Guide](/docs/user-guide.md#the-adp-user-guide). This is a subheader: [Setting up ADP](/docs/user-guide.md#setting-up-adp). And this is a subsubheader: [Headers](/docs/user-guide.md#headers). Note that I can make a reference to a header. I can achieve this with header-tags. We will see this later in [Tags and references](/docs/user-guide.md#tags-and-references).
 
 ### Text
 
