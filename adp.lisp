@@ -258,7 +258,7 @@ tags in code-hide is empty, the that piece of code will be hidden for every tag 
 	   (loop for tag in tags
 		 do (check-type tag symbol "a symbol"))
 	   `((loop for ,tag in ',tags
-		   do (apply #'adppvt:add-code-tag ,tag ',code))))
+		   do (apply #'adppvt:add-code-tag ,tag (adppvt:process-code-tag ,tag ',code)))))
        ,@(adppvt:remove-own-code-hide-exprs code))))
 
 
@@ -274,7 +274,7 @@ the code assigned to that tag is prin1-ed instead of the symbol."
 	 (adppvt:emplace-adp-element :code-block (loop for ,expr in ',code
 						     if (and (symbolp ,expr)
 							     (member ,expr ',tags))
-						       append (adppvt:process-code-tag ,expr (coerce (adppvt:get-code-tag ,expr) 'list))
+						       append (adppvt:create-code-block-tag ,expr)
 						     else
 						       collect (adppvt:process-code-tag '#:dummy-tag ,expr)))
 	 (values)))))

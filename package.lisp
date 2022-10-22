@@ -6,11 +6,11 @@
 	   #:define-method-combination #:define-modify-macro #:define-setf-expander #:define-symbol-macro
 	   #:defmacro #:defmethod #:defpackage #:defparameter #:defsetf #:defstruct #:deftype #:defun #:defvar)
   (:export #:header #:subheader #:subsubheader #:text #:table #:itemize #:image #:bold #:italic #:bold-italic
-	   #:code-inline #:web-link #:file-ref #:header-ref #:symbol-ref #:function-ref #:type-ref #:code-block
-	   #:code-example #:defclass #:defconstant #:defgeneric #:define-compiler-macro #:define-condition
-	   #:define-method-combination #:define-modify-macro #:define-setf-expander #:define-symbol-macro
-	   #:defmacro #:defmethod #:defpackage #:defparameter #:defsetf #:defstruct #:deftype #:defun #:defvar
-	   #:write-in-file #:load-documentation-system #:cl-ref))
+	   #:code-inline #:web-link #:file-ref #:header-ref #:symbol-ref #:function-ref #:type-ref #:code-tag
+	   #:code-block #:code-example #:defclass #:defconstant #:defgeneric #:define-compiler-macro
+	   #:define-condition #:define-method-combination #:define-modify-macro #:define-setf-expander
+	   #:define-symbol-macro #:defmacro #:defmethod #:defpackage #:defparameter #:defsetf #:defstruct
+	   #:deftype #:defun #:defvar #:write-in-file #:load-documentation-system #:cl-ref))
 
 
 (defpackage #:adp-private
@@ -26,6 +26,7 @@
 	   #:remove-current-procs #:check-current-procs #:hide-symbolp #:create-bold-text #:create-italic-text
 	   #:create-bold-italic-text #:create-code-inline-text #:create-web-link-text #:create-file-ref-text
 	   #:create-header-ref-text #:create-symbol-ref-text #:create-function-ref-text #:create-type-ref-text
+	   #:create-code-block-tag
 
 	   #:def-style-parameter #:def-header-writer #:def-subheader-writer #:def-subsubheader-writer
 	   #:def-text-writer #:def-table-writer #:def-itemize-writer #:def-image-writer #:def-bold-writer

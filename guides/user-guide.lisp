@@ -83,7 +83,8 @@
 
 (text "You can add tables using the macro " (function-ref table) ". The best way to see how to use it is an example. Imagine we want to show some data stored in some variables.")
 
-(code-block ()
+
+(code-tag (info-table)
   (cl:defparameter peter-info '(34 "Peter Garcia" 1435))
   (cl:defparameter maria-info '(27 "Maria Martinez" 1765))
   (cl:defparameter laura-info '(53 "Laura Beneyto" 1543))
@@ -97,34 +98,30 @@
   (cl:defun get-salary (info)
     (third info)))
 
-(cl:defparameter peter-info '(34 "Peter Garcia" 1435))
-  (cl:defparameter maria-info '(27 "Maria Martinez" 1765))
-  (cl:defparameter laura-info '(53 "Laura Beneyto" 1543))
-
-  (cl:defun get-age (info)
-    (first info))
-
-  (cl:defun get-name (info)
-    (second info))
-
-  (cl:defun get-salary (info)
-    (third info))
+(code-block (info-table)
+  info-table)
 
 (text "Now we can create a table like this:")
 
-(code-block ()
+(code-block (table-example)
+  table-example)
+
+(text "And you will see this:")
+
+(code-tag (table-example)
   (table ((:cell "Age") (:cell "Name") (:cell "Salary"))
 	 ((:cell (get-age peter-info)) (:cell (get-name peter-info)) (:cell (get-salary peter-info) "€"))
 	 ((:cell (get-age maria-info)) (:cell (get-name maria-info)) (:cell (get-salary maria-info) "€"))
 	 ((:cell (get-age laura-info)) (:cell (get-name laura-info)) (:cell (get-salary laura-info) "€"))))
 
-(text "And you will see this:")
+(text "Note that in the " (italic "Salary") " column we used multiple values in each cell. Each cell can accept multiple values and they are treated as if they are in the " (function-ref text) " macro. In other words, each element in a cell is " (cl-ref princ) "-ed and the results are concatenated.")
 
-(table ((:cell "Age") (:cell "Name") (:cell "Salary"))
-       ((:cell (get-age peter-info)) (:cell (get-name peter-info)) (:cell (get-salary peter-info) "€"))
-       ((:cell (get-age maria-info)) (:cell (get-name maria-info)) (:cell (get-salary maria-info) "€"))
-       ((:cell (get-age laura-info)) (:cell (get-name laura-info)) (:cell (get-salary laura-info) "€")))
 
+(subsubheader "Lists")
+
+(text "You can add lists with " (function-ref itemize) ". For example:")
+
+(code-block ())
 
 (subsubheader "Tags and references" tags-subsubheader)
 

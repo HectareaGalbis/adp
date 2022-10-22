@@ -235,7 +235,7 @@
 (defun code-tagp (tag)
   (values (gethash tag *code-tags*)))
 
-(declaim (ftype (function (symbol) vector) get-code-tag))
+(declaim (ftype (function (symbol) (or vector null)) get-code-tag))
 (defun get-code-tag (tag)
   (values (gethash tag *code-tags*)))
 
@@ -394,6 +394,20 @@
 (defun type-ref-textp (arg)
   (and (listp arg)
        (eq (car arg) *type-ref-symbol*)))
+
+
+;; ----- tag variation -----
+
+(declaim (type symbol *code-block-tag-symbol*))
+(defparameter *code-block-tag-symbol* '#:tag)
+
+(declaim (ftype (function (symbol) t) create-code-block-tag))
+(defun create-code-block-tag (tag)
+  (list *code-block-tag-symbol* tag))
+
+(defun code-block-tagp (arg)
+  (and (listp arg)
+       (eq (car arg) *code-block-tag-symbol*)))
 
 
 ;; ----- style parameters -----
@@ -756,7 +770,15 @@
 			   (funcall *itemize-proc* stream (write-itemize item-list)))))
 	     (:image (destructuring-bind (alt-text image-path) (adp-element-contents element)
 		       (funcall *image-proc* stream alt-text root-path image-path)))
-	     (:code-block (apply *code-block-proc* stream (adp-element-contents element)))
+	     (:code-block (let* ((contents (adp-element-contents element))
+				 (processed-contents (mapcar (lambda (code)
+							       (if (code-block-tagp code)
+								   (let ((associated-code (coerce (get-code-tag (cadr code)) 'list)))
+								     (assert associated-code () "~s is not a code-tag." associated-code)
+								     associated-code)
+								   code))
+							     contents)))
+			    (apply *code-block-proc* stream processed-contents)))
 	     (:code-example (apply *code-example-proc* stream (adp-element-contents element)))
 	     (:defclass (apply *defclass-proc* stream (adp-element-contents element)))
 	     (:defconstant (apply *defconstant-proc* stream (adp-element-contents element)))

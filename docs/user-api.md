@@ -170,7 +170,7 @@ defined with adp:defclass, adp:define-condition, adp:defstruct or adp:deftype.
 #### Macro: CODE-TAG
 
 ```Lisp
-(defmacro CODE-TAG (TAGS &BODY CODE)
+(defmacro ADP:CODE-TAG (TAGS &BODY CODE)
   ...)
 ```
 

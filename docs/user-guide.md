@@ -118,5 +118,13 @@ And you will see this:
 | 53 | Laura Beneyto | 1543€ |
 
 
+Note that in the _Salary_ column we used multiple values in each cell. Each cell can accept multiple values and they are treated as if they are in the [ADP:TEXT](/docs/user-api.md#macro-text) macro. In other words, each element in a cell is [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)-ed and the results are concatenated.
+
+### Lists
+
+You can add lists with [ADP:ITEMIZE](/docs/user-api.md#macro-itemize). For example:
+
+``````
+
 ### Tags and references
 
