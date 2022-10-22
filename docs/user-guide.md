@@ -13,8 +13,7 @@ After installing ADP, you must add it as a dependency in your project, like you 
   ...
   :DEPENDS-ON
   (:UIOP :ALEXANDRIA)
-  :COMPONENTS
-  (...))
+  ...)
 ```
 
 You only need to add `:adp` to the `depends on` list.
@@ -24,7 +23,6 @@ You only need to add `:adp` to the `depends on` list.
   ...
   :DEPENDS-ON
   (:UIOP :ALEXANDRIA :ADP)
-  :COMPONENTS
-  (...))
+  ...)
 ```
 

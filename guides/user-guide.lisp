@@ -17,7 +17,7 @@
   (asdf:defsystem :my-system
     (code-hide ())
     :depends-on (:uiop :alexandria)
-    :components ((code-hide ()))))
+    (code-hide ())))
 
 (text "You only need to add " (code-inline ":adp") " to the " (code-inline "depends on") " list.")
 
@@ -25,7 +25,7 @@
   (asdf:defsystem :my-system
     (code-hide ())
     :depends-on (:uiop :alexandria :adp)
-    :components ((code-hide ()))))
+    (code-hide ())))
 
 
 (write-in-file #P"docs/user-guide")
