@@ -26,3 +26,58 @@ You only need to add `:adp` to the `depends on` list.
   ...)
 ```
 
+Your system is now ready to use ADP.
+
+## Functions to generate the API
+
+I'm sure your code defines a lot of things like functions, macros and symbols. In order to do that you have had to use define macros like [DEFUN](http://www.lispworks.com/reference/HyperSpec/Body/m_defun.htm), [DEFMACRO](http://www.lispworks.com/reference/HyperSpec/Body/m_defmac.htm) or [DEFPARAMETER](http://www.lispworks.com/reference/HyperSpec/Body/m_defpar.htm). Print some documentation of this definitions is very easy with ADP. For example, consider this function definition:
+
+```
+(DEFUN FOO (A B C) "Multiply a by the sum of b and c." (* A (+ B C)))
+```
+
+If you want to generate documentation of this definition you only need to use the macro [ADP:DEFUN](docs/user-api.md#macro-defun) instead of [DEFUN](http://www.lispworks.com/reference/HyperSpec/Body/m_defun.htm).
+
+```
+(ADP:DEFUN FOO (A B C) "Multiply a by the sum of b and c." (* A (+ B C)))
+```
+
+That's all! Actually, note that if you load your project as always after changing some defuns, you will see that nothing happens. Your system is loaded normally and nothing changes. This is because the documentation generation is disabled by default. So, even you add ADP code you original code remains the same.
+
+Same as with [ADP:DEFUN](docs/user-api.md#macro-defun), every macro that defines something is redefined to print documentation. You can see every macro here: [API documentation functions](docs/user-api.md#api-documentation-functions)
+
+## Functions to generate guides.
+
+The other group of functions are intended to generate guides and tutorials (like this one). But you can use them wherever you want and however you want. Even you can use them together with the API functions above.
+
+### Headers
+
+You can add headers in your documentation. In other words, they work as titles or subtitles. You can this way organize your guide with different sections (like I do in this guide). The macros that add headers are [ADP:HEADER](docs/user-api.md#macro-header), [ADP:SUBHEADER](docs/user-api.md#macro-subheader) and [ADP:SUBSUBHEADER](docs/user-api.md#macro-subsubheader). They need a string as the first argument.
+
+```
+(ADP:HEADER "The title of my guide.")
+
+(ADP:SUBHEADER "A section of my guide.")
+
+(ADP:SUBSUBHEADER "A subsection of my guide.")
+```
+
+As I said, I'm using headers in this guide. This is a header: [The ADP User Guide](docs/user-guide.md#the-adp-user-guide). This is a subheader: [Setting up ADP](docs/user-guide.md#setting-up-adp). And this is a subsubheader: [Headers](docs/user-guide.md#headers). Note that I can make a reference to a header. I can achieve this with header-tags. We will see this later in [Tags and references](docs/user-guide.md#tags-and-references).
+
+### Text
+
+When you want to add text you must use the macro [ADP:TEXT](docs/user-api.md#macro-text). It receives a variable number of arguments. Each argument is evaluated at run-time and its result is [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)-ed. Then, all the content that has been [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)-ed is concatenated into a single string and finally it is printed in the documentation file. For example:
+
+```
+(ADP:TEXT "This is the text macro. The result of 3+4 is " (+ 3 4)
+          ". As we will see later you can stylize the text with "
+          (ADP:BOLD "bold words") ", " (ADP:ITALIC "italic words") ", or "
+          (ADP:BOLD-ITALIC "bold-italic words") " and more styles.")
+```
+
+If I use that right now:
+
+This is the text macro. The result of 3+4 is 7. As we will see later you can stylize the text with **bold words**, _italic words_, or ***bold-italic words*** and more styles.
+
+### Tags and references
+
