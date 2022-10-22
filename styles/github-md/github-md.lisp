@@ -1,5 +1,5 @@
 
-(in-package :adp/markdown)
+(in-package :adp/github-md)
 
 
 ;; ----- guide functions -----

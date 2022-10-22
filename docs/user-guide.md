@@ -62,7 +62,7 @@ You can add headers in your documentation. In other words, they work as titles o
 (ADP:SUBSUBHEADER "A subsection of my guide.")
 ```
 
-As I said, I'm using headers in this guide. This is a header: [The ADP User Guide](/docs/user-guide.md#the-adp-user-guide). This is a subheader: [Setting up ADP](/docs/user-guide.md#setting-up-adp). And this is a subsubheader: [Headers](/docs/user-guide.md#headers). Note that I can make a reference to a header. I can achieve this with header-tags. We will see this later in [Tags and references](/docs/user-guide.md#tags-and-references).
+As I said, I'm using headers in this guide. This is a header: [The ADP User Guide](/docs/user-guide.md#the-adp-user-guide). This is a subheader: [Setting up ADP](/docs/user-guide.md#setting-up-adp). And this is a subsubheader: [Headers](/docs/user-guide.md#headers). Note that I can make a reference to a header. I can achieve this with header-tags. We will see this later in [Cross references](/docs/user-guide.md#cross-references).
 
 ### Text
 
@@ -147,6 +147,30 @@ You will see this:
 
 Note that each item inside [ADP:ITEMIZE](/docs/user-api.md#macro-itemize) is a list starting with `ITEM` or `ITEMIZE`. When you use `ITEM` every object will be [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)-ed and then concatenated. In other words, it works the same as [ADP:TEXT](/docs/user-api.md#macro-text) or [ADP:TABLE](/docs/user-api.md#macro-table). On the other hand, when using `ITEMIZE` you are indicating that you want a sublist of items.
 
+### Text enrichment
+
+Inside a [ADP:TEXT](/docs/user-api.md#macro-text) form, a `CELL` from a [ADP:TABLE](/docs/user-api.md#macro-table) form and a `ITEM` form a [ADP:ITEMIZE](/docs/user-api.md#macro-itemize) form, we can enrich the text with the macros [ADP:BOLD](/docs/user-api.md#macro-bold), [ADP:ITALIC](/docs/user-api.md#macro-italic), [ADP:BOLD-ITALIC](/docs/user-api.md#macro-bold-italic) and [ADP:WEB-LINK](/docs/user-api.md#macro-web-link). For example:
+
+```
+(ADP:TEXT "As " (ADP:BOLD "Andrew") " said: "
+          (ADP:ITALIC "You only need " (+ 1 2 3)) " "
+          (ADP:WEB-LINK "coins" "https://en.wikipedia.org/wiki/Coin") " "
+          (ADP:ITALIC "to enter in") " "
+          (ADP:BOLD-ITALIC "The Giant Red Tree."))
+```
+
+You will see this:
+
+As **Andrew** said: _You only need 6_ [coins](https://en.wikipedia.org/wiki/Coin) _to enter in_ ***The Giant Red Tree.***
+
+Note that spaces are placed out of enrichment functions (after `italic` and `web-link` calls). Also, you cannot nest calls of [ADP:BOLD](/docs/user-api.md#macro-bold), [ADP:ITALIC](/docs/user-api.md#macro-italic), [ADP:BOLD-ITALIC](/docs/user-api.md#macro-bold-italic) and [ADP:WEB-LINK](/docs/user-api.md#macro-web-link). For example, if you try this:
+
+```
+(ADP:TEXT (ADP:BOLD (ADP:ITALIC "This should be bold-italic.")))
+```
+
+an error will be raised.
+
 ### Images
 
 You can add images with the macro [ADP:IMAGE](/docs/user-api.md#macro-image). For example, an image is located at `guides/images/`. If I evaluate the next expression:
@@ -211,29 +235,49 @@ And you will see:
 "world"
 ```
 
-### Text enrichment
+Both with [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block) and with [ADP:CODE-EXAMPLE](/docs/user-api.md#macro-code-example) you can write multiple expressions.
 
-Inside a [ADP:TEXT](/docs/user-api.md#macro-text) form, a `CELL` from a [ADP:TABLE](/docs/user-api.md#macro-table) form and a `ITEM` form a [ADP:ITEMIZE](/docs/user-api.md#macro-itemize) form, we can enrich the text with the macros [ADP:BOLD](/docs/user-api.md#macro-bold), [ADP:ITALIC](/docs/user-api.md#macro-italic), [ADP:BOLD-ITALIC](/docs/user-api.md#macro-bold-italic) and [ADP:WEB-LINK](/docs/user-api.md#macro-web-link). For example:
+## Generating the documentation
 
-```
-(ADP:TEXT "As " (ADP:BOLD "Andrew") " said: "
-          (ADP:ITALIC "You only need " (+ 1 2 3)) " "
-          (ADP:WEB-LINK "coins" "https://en.wikipedia.org/wiki/Coin") " "
-          (ADP:ITALIC "to enter in") " "
-          (ADP:BOLD-ITALIC "The Giant Red Tree."))
-```
+There are still some useful macros that I didn't explain yet. However, I think it is now a good time to learn how to actually generate the documentation. You may have multiple files where the macros expalined above are used. But, where the documentation will be printed in? Which files will be generated?
 
-You will see this:
-
-As **Andrew** said: _You only need 6_ [coins](https://en.wikipedia.org/wiki/Coin) _to enter in_ ***The Giant Red Tree.***
-
-Note that spaces are placed out of enrichment functions (after `italic` and `web-link` calls). Also, you cannot nest calls of [ADP:BOLD](/docs/user-api.md#macro-bold), [ADP:ITALIC](/docs/user-api.md#macro-italic), [ADP:BOLD-ITALIC](/docs/user-api.md#macro-bold-italic) and [ADP:WEB-LINK](/docs/user-api.md#macro-web-link). For example, if you try this:
+First, we need to understand how ADP works. When you load a project and a file contains calls to some of the above macros, ADP will store information from these macros (functions or symbols defined, tables, lists, text, etc). At every moment we can decide to associate the information gathered so far with a file using the macro [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file). A good way to use ADP is calling [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file) at the end of every file of code from your project. Doing that will create as many documentation files as code files your project has. Let's see an example. Imagine we have following code in a file (it doesn't matter where it is located or even its name.)
 
 ```
-(ADP:TEXT (ADP:BOLD (ADP:ITALIC "This should be bold-italic.")))
+(ADP:HEADER "My API")
+
+(ADP:DEFUN FOO () "This function does a lot of things" ...)
+
+(ADP:DEFUN BAR () "This function also does a lot of things")
+
+(ADP:DEFPARAMETER *GLOBAL-PARAM* ... "This paramter is awesome")
 ```
 
-an error will be raised.
+Now, we want to create a file where to print this information in. In order to do that, we must use [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file).
 
-### Tags and references
+```
+(ADP:HEADER "My API")
+
+(ADP:DEFUN FOO () "This function does a lot of things" ...)
+
+(ADP:DEFUN BAR () "This function also does a lot of things")
+
+(ADP:DEFPARAMETER *GLOBAL-PARAM* ... "This paramter is awesome")
+
+(ADP:WRITE-IN-FILE #P"docs/my-api")
+```
+
+This macro receives only the pathname to the file where to print in the documentation. The pathname must be relative to the system's root directory. Also note that I didn't use any extension in the pathname. That's because ADP let you choose between different styles to generate the documentation and each style will create their own files. After using [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file) the header, the two functions and the parameter are associated with the file that will be located at `docs/my-api`. If the pathname was already used in another call to [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file), the new content will be appended to the information already gathered.
+
+When all your documentation is associated with a file, it is time to generate the files and print the documentation. The function that must be used now is [ADP:LOAD-DOCUMENTATION-SYSTEM](/docs/user-api.md#function-load-documentation-system). As the name suggests, you are going to load your system. In fact, it will load you system with the documentation generation enabled so, while forms are evaluated the documentation is gathered and also is associated with the pertinent files. When the system is completely loaded, the file generation and documentation printing begins. For example, if your system is named `MY-SYSTEM`, then you can eval this expression in the REPL:
+
+```
+(ADP:LOAD-DOCUMENTATION-SYSTEM :MY-SYSTEM :MARKDOWN)
+```
+
+The second argument is the desired style. In this case the used style is `MARKDOWN`. This style generates `md` files to be used in the GitHub platform.
+
+And that's all, the documentation is ready to be read.
+
+### Cross references
 

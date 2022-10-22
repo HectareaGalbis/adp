@@ -139,6 +139,26 @@
 (text "Note that each item inside " (function-ref itemize) " is a list starting with " (code-inline :item) " or " (code-inline :itemize) ". When you use " (code-inline :item) " every object will be " (cl-ref princ) "-ed and then concatenated. In other words, it works the same as " (function-ref text) " or " (function-ref table) ". On the other hand, when using " (code-inline :itemize) " you are indicating that you want a sublist of items.")
 
 
+(subsubheader "Text enrichment")
+
+(text "Inside a " (function-ref text) " form, a " (code-inline :cell) " from a " (function-ref table) " form and a " (code-inline :item) " form a " (function-ref itemize) " form, we can enrich the text with the macros " (function-ref bold) ", " (function-ref italic) ", " (function-ref bold-italic) " and " (function-ref web-link) ". For example:")
+
+(code-block (rich-text-example)
+  rich-text-example)
+
+(text "You will see this:")
+
+(code-tag (rich-text-example)
+  (text "As " (bold "Andrew") " said: " (italic "You only need " (+ 1 2 3)) " " (web-link "coins" "https://en.wikipedia.org/wiki/Coin") " " (italic "to enter in") " " (bold-italic "The Giant Red Tree.")))
+
+(text "Note that spaces are placed out of enrichment functions (after " (code-inline "italic") " and " (code-inline "web-link") " calls). Also, you cannot nest calls of " (function-ref bold) ", " (function-ref italic) ", " (function-ref bold-italic) " and " (function-ref web-link) ". For example, if you try this:")
+
+(code-block ()
+  (text (bold (italic "This should be bold-italic."))))
+
+(text "an error will be raised.")
+
+
 (subsubheader "Images")
 
 (text "You can add images with the macro " (function-ref image) ". For example, an image is located at " (code-inline "guides/images/") ". If I evaluate the next expression:")
@@ -184,27 +204,48 @@
 	  do (print i)
 	  finally (return (values "Hello" "world")))))
 
-(subsubheader "Text enrichment")
+(text "Both with " (function-ref code-block) " and with " (function-ref code-example) " you can write multiple expressions.")
 
-(text "Inside a " (function-ref text) " form, a " (code-inline :cell) " from a " (function-ref table) " form and a " (code-inline :item) " form a " (function-ref itemize) " form, we can enrich the text with the macros " (function-ref bold) ", " (function-ref italic) ", " (function-ref bold-italic) " and " (function-ref web-link) ". For example:")
 
-(code-block (rich-text-example)
-  rich-text-example)
+(subheader "Generating the documentation")
 
-(text "You will see this:")
+(text "There are still some useful macros that I didn't explain yet. However, I think it is now a good time to learn how to actually generate the documentation. You may have multiple files where the macros expalined above are used. But, where the documentation will be printed in? Which files will be generated?")
 
-(code-tag (rich-text-example)
-  (text "As " (bold "Andrew") " said: " (italic "You only need " (+ 1 2 3)) " " (web-link "coins" "https://en.wikipedia.org/wiki/Coin") " " (italic "to enter in") " " (bold-italic "The Giant Red Tree.")))
-
-(text "Note that spaces are placed out of enrichment functions (after " (code-inline "italic") " and " (code-inline "web-link") " calls). Also, you cannot nest calls of " (function-ref bold) ", " (function-ref italic) ", " (function-ref bold-italic) " and " (function-ref web-link) ". For example, if you try this:")
+(text "First, we need to understand how ADP works. When you load a project and a file contains calls to some of the above macros, ADP will store information from these macros (functions or symbols defined, tables, lists, text, etc). At every moment we can decide to associate the information gathered so far with a file using the macro " (function-ref write-in-file) ". A good way to use ADP is calling " (function-ref write-in-file) " at the end of every file of code from your project. Doing that will create as many documentation files as code files your project has. Let's see an example. Imagine we have following code in a file (it doesn't matter where it is located or even its name.)")
 
 (code-block ()
-  (text (bold (italic "This should be bold-italic."))))
+  (header "My API")
+  (defun foo ()
+    "This function does a lot of things"
+    (code-hide ()))
+  (defun bar ()
+    "This function also does a lot of things")
+  (defparameter *global-param* (code-hide ()) "This paramter is awesome"))
 
-(text "an error will be raised.")
+(text "Now, we want to create a file where to print this information in. In order to do that, we must use " (function-ref write-in-file) ".")
 
+(code-block ()
+  (header "My API")
+  (defun foo ()
+    "This function does a lot of things"
+    (code-hide ()))
+  (defun bar ()
+    "This function also does a lot of things")
+  (defparameter *global-param* (code-hide ()) "This paramter is awesome")
+  (write-in-file #P"docs/my-api"))
 
-(subsubheader "Tags and references" tags-subsubheader)
+(text "This macro receives only the pathname to the file where to print in the documentation. The pathname must be relative to the system's root directory. Also note that I didn't use any extension in the pathname. That's because ADP let you choose between different styles to generate the documentation and each style will create their own files. After using " (function-ref write-in-file) " the header, the two functions and the parameter are associated with the file that will be located at " (code-inline "docs/my-api") ". If the pathname was already used in another call to " (function-ref write-in-file) ", the new content will be appended to the information already gathered.")
+
+(text "When all your documentation is associated with a file, it is time to generate the files and print the documentation. The function that must be used now is " (function-ref load-documentation-system) ". As the name suggests, you are going to load your system. In fact, it will load you system with the documentation generation enabled so, while forms are evaluated the documentation is gathered and also is associated with the pertinent files. When the system is completely loaded, the file generation and documentation printing begins. For example, if your system is named " (code-inline :my-system) ", then you can eval this expression in the REPL:")
+
+(code-block ()
+  (load-documentation-system :my-system :markdown))
+
+(text "The second argument is the desired style. In this case the used style is " (code-inline :markdown) ". This style generates " (code-inline "md") " files to be used in the GitHub platform.")
+
+(text "And that's all, the documentation is ready to be read.")
+
+(subsubheader "Cross references" tags-subsubheader)
 
 
 

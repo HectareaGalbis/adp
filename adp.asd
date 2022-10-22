@@ -30,14 +30,14 @@
 
 ;; ----- ADP styles -----
 
-(asdf:defsystem #:adp/markdown
+(asdf:defsystem #:adp/github-md
   :author "Héctor Galbis Sanchis"
   :description "Markdown style for adp"
   :license "The Unlicense"
   :depends-on (:adp)
-  :components ((:module "styles/markdown"
+  :components ((:module "styles/github-md"
 		:components ((:file "package")
-			     (:file "markdown")))))
+			     (:file "github-md")))))
 
 (asdf:defsystem #:adp/html
   :author ""
