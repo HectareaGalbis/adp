@@ -373,14 +373,14 @@ And you write in your tutorial that the function `sum-list` can be used the way 
   (SUM-LIST '(1 2 3)))
 ```
 
-But now you decide to use vectors rather than lists. You didn't use code-tags so you must change your code in two different places. Let's create now a code-tag using the macro [ADP:CODE-TAG](/docs/user-api.md#macro-code-tag).
+But now you decide to use vectors rather than lists. You didn't use code-tags so you must change your code in two different places. Let's create now a code-tag using the macro [ADP:CODE-TAG](/docs/user-api.md#macro-code-tag). Unfortunately, the macro [ADP:CODE-TAG](/docs/user-api.md#macro-code-tag) cannot be printed inside code-block. So, I will use `code-lag` instead:
 
 ```
 (ADP:DEFUN SUM-LIST (INT-LIST)
   (LOOP FOR NUM IN INT-LIST
         SUM NUM))
 
-(SUM-LIST '(1 2 3))
+(CODE-LAG (SUM-LIST-EXAMPLE) (SUM-LIST '(1 2 3)))
 ```
 
 A code-tag named `sum-list-example` is created and you can now use it in the tutorial:
