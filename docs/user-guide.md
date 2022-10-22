@@ -416,6 +416,10 @@ You will see this:
 
 ```
 (ADP:DEFTYPE ALSO-A-TYPE? () NIL)
+
+(SOME-CODE-IN (THE-MIDDLE))
+
+(ADP:DEFPARAMETER A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE T)
 ```
 
 ### Hiding your code

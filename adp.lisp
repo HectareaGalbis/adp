@@ -274,11 +274,11 @@ the code assigned to that tag is prin1-ed instead of the symbol."
     (with-gensyms (expr)
       `(progn
 	 (adppvt:emplace-adp-element :code-block (loop for ,expr in ',code
-						     if (and (symbolp ,expr)
-							     (member ,expr ',tags))
-						       append (adppvt:create-code-block-tag ,expr)
-						     else
-						       collect (adppvt:process-code-tag '#:dummy-tag ,expr)))
+						       if (and (symbolp ,expr)
+							       (member ,expr ',tags))
+							 collect (adppvt:create-code-block-tag ,expr)
+						       else
+							 collect (adppvt:process-code-tag '#:dummy-tag ,expr)))
 	 (values)))))
 
 
