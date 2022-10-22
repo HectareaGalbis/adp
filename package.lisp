@@ -10,7 +10,7 @@
 	   #:code-example #:defclass #:defconstant #:defgeneric #:define-compiler-macro #:define-condition
 	   #:define-method-combination #:define-modify-macro #:define-setf-expander #:define-symbol-macro
 	   #:defmacro #:defmethod #:defpackage #:defparameter #:defsetf #:defstruct #:deftype #:defun #:defvar
-	   #:write-in-file #:load-documentation-system))
+	   #:write-in-file #:load-documentation-system #:cl-ref))
 
 
 (defpackage #:adp-private

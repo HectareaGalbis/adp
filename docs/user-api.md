@@ -394,7 +394,7 @@ arguments to let the user customize briefly how documentation is printed.
 #### Macro: CL-REF
 
 ```Lisp
-(defmacro CL-REF (SYM)
+(defmacro ADP:CL-REF (SYM)
   ...)
 ```
 
