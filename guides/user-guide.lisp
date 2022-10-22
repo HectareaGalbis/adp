@@ -151,7 +151,24 @@
 (code-tag (image-example)
   (image "Lisp logo" #P"guides/images/Lisp_logo.svg"))
 
-(text "The first argument is the alternative text of the image. If for some reason the image cannot be loaded in some web page, the alternative text is used instead. The second argument is the path of the image, relative to the system's root directory.")
+(text "The first argument is the alternative text of the image. If for some reason the image cannot be loaded in some web page, the alternative text is used instead. The second argument is the pathname of the image, relative to the system's root directory.")
+
+
+(subsubheader "Code blocks")
+
+(text "A good Lisp tutorial must include Lisp code examples. ADP defines two macros to print code blocks: " (function-ref code-block) " and " (function-ref code-example) ". The main difference is that the former does not evaluate the code to be printed. So, for example:")
+
+(code-block ()
+  (code-block ()
+    (this is not (valid code))
+    (but it (is (ok)))))
+
+(text "And you will see:")
+
+(code-block ()
+  (this is not (valid code))
+  (but it (is (ok))))
+
 
 (subsubheader "Text enrichment")
 
@@ -165,17 +182,17 @@
 (code-tag (rich-text-example)
   (text "As " (bold "Andrew") " said: " (italic "You only need " (+ 1 2 3)) " " (web-link "coins" "https://en.wikipedia.org/wiki/Coin") " " (italic "to enter in") " " (bold-italic "The Giant Red Tree.")))
 
-(text "Note that spaces are placed out of enrichment functions. Also, you cannot nest calls of " (function-ref bold) ", " (function-ref italic) ", " (function-ref bold-italic) " and " (function-ref web-link) ". For example, if you try this:")
+(text "Note that spaces are placed out of enrichment functions (after " (code-inline "italic") " and " (code-inline "web-link") " calls). Also, you cannot nest calls of " (function-ref bold) ", " (function-ref italic) ", " (function-ref bold-italic) " and " (function-ref web-link) ". For example, if you try this:")
 
 (code-block ()
   (text (bold (italic "This should be bold-italic."))))
 
 (text "an error will be raised.")
 
-(text "")
-
 
 (subsubheader "Tags and references" tags-subsubheader)
+
+
 
 
 (write-in-file #P"docs/user-guide")

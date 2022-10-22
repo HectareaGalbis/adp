@@ -159,7 +159,25 @@ I get this:
 
 ![Lisp logo](/guides/images/Lisp_logo.svg)
 
-The first argument is the alternative text of the image. If for some reason the image cannot be loaded in some web page, the alternative text is used instead. The second argument is the path of the image, relative to the system's root directory.
+The first argument is the alternative text of the image. If for some reason the image cannot be loaded in some web page, the alternative text is used instead. The second argument is the pathname of the image, relative to the system's root directory.
+
+### Code blocks
+
+A good Lisp tutorial must include Lisp code examples. ADP defines two macros to print code blocks: [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block) and [ADP:CODE-EXAMPLE](/docs/user-api.md#macro-code-example). The main difference is that the former does not evaluate the code to be printed. So, for example:
+
+```
+(ADP:CODE-BLOCK NIL
+  (THIS IS NOT (VALID CODE))
+  (BUT IT (IS (OK))))
+```
+
+And you will see:
+
+```
+(THIS IS NOT (VALID CODE))
+
+(BUT IT (IS (OK)))
+```
 
 ### Text enrichment
 
@@ -177,15 +195,13 @@ You will see this:
 
 As **Andrew** said: _You only need 6_ [coins](https://en.wikipedia.org/wiki/Coin) _to enter in_ ***The Giant Red Tree.***
 
-Note that spaces are placed out of enrichment functions. Also, you cannot nest calls of [ADP:BOLD](/docs/user-api.md#macro-bold), [ADP:ITALIC](/docs/user-api.md#macro-italic), [ADP:BOLD-ITALIC](/docs/user-api.md#macro-bold-italic) and [ADP:WEB-LINK](/docs/user-api.md#macro-web-link). For example, if you try this:
+Note that spaces are placed out of enrichment functions (after `italic` and `web-link` calls). Also, you cannot nest calls of [ADP:BOLD](/docs/user-api.md#macro-bold), [ADP:ITALIC](/docs/user-api.md#macro-italic), [ADP:BOLD-ITALIC](/docs/user-api.md#macro-bold-italic) and [ADP:WEB-LINK](/docs/user-api.md#macro-web-link). For example, if you try this:
 
 ```
 (ADP:TEXT (ADP:BOLD (ADP:ITALIC "This should be bold-italic.")))
 ```
 
 an error will be raised.
-
-
 
 ### Tags and references
 
