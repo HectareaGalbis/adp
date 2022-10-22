@@ -358,8 +358,13 @@
 
 (text "Let's see a live example. Do you remember the symbol " (symbol-ref a-parameter-defined-at-the-end-of-the-file) " and the type " (type-ref also-a-type?) ". In the source file I have written this:")
 
-(code-block (code-tag-example)
-  code-tag-example)
+(code-block ()
+  (code-lag (end-parameter-code)
+    (defparameter a-parameter-defined-at-the-end-of-the-file t))
+
+  (code-lag (end-type-code)
+    (deftype also-a-type? ()
+      nil)))
 
 (text "So, if right now I write this:")
 
@@ -380,13 +385,12 @@
 
 
 
-(code-tag (code-tag-example)
-  (code-tag (end-parameter-code)
-    (defparameter a-parameter-defined-at-the-end-of-the-file t))
+(code-tag (end-parameter-code)
+  (defparameter a-parameter-defined-at-the-end-of-the-file t))
 
-  (code-tag (end-type-code)
-    (deftype also-a-type? ()
-      nil)))
+(code-tag (end-type-code)
+  (deftype also-a-type? ()
+    nil))
 
 (text "Go back to " (header-ref function-tags-subsubheader))
 

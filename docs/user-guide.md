@@ -397,9 +397,10 @@ First we indicate in the list after `code-block` that we will use the code tag n
 Let's see a live example. Do you remember the symbol [A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file) and the type [ALSO-A-TYPE?](/docs/user-guide.md#condition-also-a-type). In the source file I have written this:
 
 ```
-(ADP:DEFPARAMETER A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE T)
+(CODE-LAG (END-PARAMETER-CODE)
+ (ADP:DEFPARAMETER A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE T))
 
-(ADP:DEFTYPE ALSO-A-TYPE? () NIL)
+(CODE-LAG (END-TYPE-CODE) (ADP:DEFTYPE ALSO-A-TYPE? () NIL))
 ```
 
 So, if right now I write this:
