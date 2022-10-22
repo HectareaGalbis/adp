@@ -99,7 +99,7 @@
 			   (format nil "Constant: ~a" (symbol-github-name tag)))
 			  (t (format nil "Variable: ~a" (symbol-github-name tag)))))
 	 (symbol-anchor (convert-to-github-header-anchor symbol-header)))
-    (format stream "[~s](~a.md#~a)" (symbol-github-name tag) file-path symbol-anchor)))
+    (format stream "[~s](/~a.md#~a)" (symbol-github-name tag) file-path symbol-anchor)))
 
 (adppvt:def-function-ref-writer (stream tag root-path file-path)
   (declare (ignore root-path))
@@ -110,7 +110,7 @@
 			     (format nil "Generic function: ~a" tag))
 			    (t (format nil "Function: ~a" tag))))
 	 (function-anchor (convert-to-github-header-anchor function-header)))
-    (format stream "[~s](~a.md#~a)" tag file-path function-anchor)))
+    (format stream "[~s](/~a.md#~a)" tag file-path function-anchor)))
 
 (adppvt:def-type-ref-writer (stream tag root-path file-path)
   (declare (ignore root-path))
@@ -123,7 +123,7 @@
 			 (format nil "Class: ~a" tag))
 			(t (format nil "Type: ~a" tag))))
 	 (type-anchor (convert-to-github-header-anchor type-header)))
-    (format stream "[~s](~a.md#~a)" tag file-path type-anchor)))
+    (format stream "[~s](/~a.md#~a)" tag file-path type-anchor)))
 
 (adppvt:def-code-block-writer (stream code-list)
     (format stream "```")
