@@ -338,13 +338,13 @@
   (code-block ()
     (sum-list '(1 2 3))))
 
-(text "But now you decide to use vectors rather than lists. You didn't use code-tags so you must change your code in two different places. Let's create now a code-tag using the macro " (function-ref code-tag) ".")
+(text "But now you decide to use vectors rather than lists. You didn't use code-tags so you must change your code in two different places. Let's create now a code-tag using the macro " (function-ref code-tag) ". Unfortunately, the macro " (function-ref code-tag) " cannot be printed inside code-block. So, I will use " (code-inline "code-lag") " instead:")
 
 (code-block ()
   (defun sum-list (int-list)
     (loop for num in int-list
 	  sum num))
-  (code-tag (sum-list-example)
+  (code-lag (sum-list-example)
     (sum-list '(1 2 3))))
 
 (text "A code-tag named " (code-inline "sum-list-example") " is created and you can now use it in the tutorial:")
