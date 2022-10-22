@@ -241,7 +241,7 @@ Both with [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block) and with [ADP:COD
 
 There are still some useful macros that I didn't explain yet. However, I think it is now a good time to learn how to actually generate the documentation. You may have multiple files where the macros expalined above are used. But, where the documentation will be printed in? Which files will be generated?
 
-First, we need to understand how ADP works. When you load a project and a file contains calls to some of the above macros, ADP will store information from these macros (functions or symbols defined, tables, lists, text, etc). At every moment we can decide to associate the information gathered so far with a file using the macro [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file). A good way to use ADP is calling [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file) at the end of every file of code from your project. Doing that will create as many documentation files as code files your project has. Let's see an example. Imagine we have following code in a file (it doesn't matter where it is located or even its name.)
+First, we need to understand how ADP works. When you load a project and a file contains calls to some of the above macros, ADP will store information from these macros (functions or symbols defined, tables, lists, text, etc). At every moment we can decide to associate the information gathered so far with a file using the macro [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file). A good way to use ADP is calling [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file) at the end of every file of code from your project. Doing that will create as many documentation files as code files your project has. Let's see an example. Imagine we have the following code in a file (it doesn't matter where it is located or even its name.)
 
 ```
 (ADP:HEADER "My API")
@@ -250,7 +250,7 @@ First, we need to understand how ADP works. When you load a project and a file c
 
 (ADP:DEFUN BAR () "This function also does a lot of things")
 
-(ADP:DEFPARAMETER *GLOBAL-PARAM* ... "This paramter is awesome")
+(ADP:DEFPARAMETER *GLOBAL-PARAM* ... "This parameter is awesome")
 ```
 
 Now, we want to create a file where to print this information in. In order to do that, we must use [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file).
@@ -267,7 +267,7 @@ Now, we want to create a file where to print this information in. In order to do
 (ADP:WRITE-IN-FILE #P"docs/my-api")
 ```
 
-This macro receives only the pathname to the file where to print in the documentation. The pathname must be relative to the system's root directory. Also note that I didn't use any extension in the pathname. That's because ADP let you choose between different styles to generate the documentation and each style will create their own files. After using [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file) the header, the two functions and the parameter are associated with the file that will be located at `docs/my-api`. If the pathname was already used in another call to [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file), the new content will be appended to the information already gathered.
+This macro receives only the pathname to the file where to print in the documentation. The pathname must be relative to the system's root directory. Also note that I didn't use any extension in the pathname. That's because ADP let you choose between different styles to generate the documentation and each style will create their own files. After using [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file), the header, the two functions and the parameter are associated with the file that will be located at `docs/my-api`. If the pathname was already used in another call to [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file), the new content will be appended to the information already gathered.
 
 When all your documentation is associated with a file, it is time to generate the files and print the documentation. The function that must be used now is [ADP:LOAD-DOCUMENTATION-SYSTEM](/docs/user-api.md#function-load-documentation-system). As the name suggests, you are going to load your system. In fact, it will load you system with the documentation generation enabled so, while forms are evaluated the documentation is gathered and also is associated with the pertinent files. When the system is completely loaded, the file generation and documentation printing begins. For example, if your system is named `MY-SYSTEM`, then you can eval this expression in the REPL:
 
@@ -280,4 +280,24 @@ The second argument is the desired style. In this case the used style is `GITHUB
 And that's all! The documentation is ready to be read.
 
 ## Cross references
+
+ADP supports cross references with tags. A tag is a just a symbol with some information associated. There are five types of tags: header-tags, function-tags, symbol-tags, type-tags and code-tags.
+
+### Header-tags
+
+A header-tag is a symbol with a header associated to it. We have already seen how to add a header to the documentation. But I didn't say that the macros [ADP:HEADER](/docs/user-api.md#macro-header), [ADP:SUBHEADER](/docs/user-api.md#macro-subheader) and [ADP:SUBSUBHEADER](/docs/user-api.md#macro-subsubheader) receives a second optional argument. As you can imagine, this second argument must be a symbol that will be converted to a header tag. For example, the first header of this file is created with this expression:
+
+```
+(ADP:HEADER "The ADP User Guide" USER-GUIDE-HEADER)
+```
+
+Now the symbol `user-guide-header` is a header-tag. We can make a reference to that header with the macro [ADP:HEADER-REF](/docs/user-api.md#macro-header-ref). For example, if I write this:
+
+```
+(ADP:TEXT "Go to the top: " (ADP:HEADER-REF USER-GUIDE-HEADER))
+```
+
+Then you will see this:
+
+Go to the top: [The ADP User Guide](/docs/user-guide.md#the-adp-user-guide)
 

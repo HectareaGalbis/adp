@@ -2,7 +2,8 @@
 (in-package :adp)
 
 
-(header "The ADP User Guide" user-guide-header)
+(code-tag (code-user-guide-header)
+  (header "The ADP User Guide" user-guide-header))
 
 (text "Welcome to the ADP User Guide! Here you will learn how to add documentation to your projects using ADP. ADP can be divided in two groups of functions. The API functions and Guide function. However, despite that distinction all the functions can be mixed to generate your documentation.")
 
@@ -211,7 +212,7 @@
 
 (text "There are still some useful macros that I didn't explain yet. However, I think it is now a good time to learn how to actually generate the documentation. You may have multiple files where the macros expalined above are used. But, where the documentation will be printed in? Which files will be generated?")
 
-(text "First, we need to understand how ADP works. When you load a project and a file contains calls to some of the above macros, ADP will store information from these macros (functions or symbols defined, tables, lists, text, etc). At every moment we can decide to associate the information gathered so far with a file using the macro " (function-ref write-in-file) ". A good way to use ADP is calling " (function-ref write-in-file) " at the end of every file of code from your project. Doing that will create as many documentation files as code files your project has. Let's see an example. Imagine we have following code in a file (it doesn't matter where it is located or even its name.)")
+(text "First, we need to understand how ADP works. When you load a project and a file contains calls to some of the above macros, ADP will store information from these macros (functions or symbols defined, tables, lists, text, etc). At every moment we can decide to associate the information gathered so far with a file using the macro " (function-ref write-in-file) ". A good way to use ADP is calling " (function-ref write-in-file) " at the end of every file of code from your project. Doing that will create as many documentation files as code files your project has. Let's see an example. Imagine we have the following code in a file (it doesn't matter where it is located or even its name.)")
 
 (code-block ()
   (header "My API")
@@ -220,7 +221,7 @@
     (code-hide ()))
   (defun bar ()
     "This function also does a lot of things")
-  (defparameter *global-param* (code-hide ()) "This paramter is awesome"))
+  (defparameter *global-param* (code-hide ()) "This parameter is awesome"))
 
 (text "Now, we want to create a file where to print this information in. In order to do that, we must use " (function-ref write-in-file) ".")
 
@@ -234,7 +235,7 @@
   (defparameter *global-param* (code-hide ()) "This paramter is awesome")
   (write-in-file #P"docs/my-api"))
 
-(text "This macro receives only the pathname to the file where to print in the documentation. The pathname must be relative to the system's root directory. Also note that I didn't use any extension in the pathname. That's because ADP let you choose between different styles to generate the documentation and each style will create their own files. After using " (function-ref write-in-file) " the header, the two functions and the parameter are associated with the file that will be located at " (code-inline "docs/my-api") ". If the pathname was already used in another call to " (function-ref write-in-file) ", the new content will be appended to the information already gathered.")
+(text "This macro receives only the pathname to the file where to print in the documentation. The pathname must be relative to the system's root directory. Also note that I didn't use any extension in the pathname. That's because ADP let you choose between different styles to generate the documentation and each style will create their own files. After using " (function-ref write-in-file) ", the header, the two functions and the parameter are associated with the file that will be located at " (code-inline "docs/my-api") ". If the pathname was already used in another call to " (function-ref write-in-file) ", the new content will be appended to the information already gathered.")
 
 (text "When all your documentation is associated with a file, it is time to generate the files and print the documentation. The function that must be used now is " (function-ref load-documentation-system) ". As the name suggests, you are going to load your system. In fact, it will load you system with the documentation generation enabled so, while forms are evaluated the documentation is gathered and also is associated with the pertinent files. When the system is completely loaded, the file generation and documentation printing begins. For example, if your system is named " (code-inline :my-system) ", then you can eval this expression in the REPL:")
 
@@ -245,9 +246,28 @@
 
 (text "And that's all! The documentation is ready to be read.")
 
+
 (subheader "Cross references" tags-subheader)
 
+(text "ADP supports cross references with tags. A tag is a just a symbol with some information associated. There are five types of tags: header-tags, function-tags, symbol-tags, type-tags and code-tags.")
 
+
+(subsubheader "Header-tags")
+
+(text "A header-tag is a symbol with a header associated to it. We have already seen how to add a header to the documentation. But I didn't say that the macros " (function-ref header) ", " (function-ref subheader) " and " (function-ref subsubheader) " receives a second optional argument. As you can imagine, this second argument must be a symbol that will be converted to a header tag. For example, the first header of this file is created with this expression:")
+
+(code-block (code-user-guide-header)
+  code-user-guide-header)
+
+(text "Now the symbol " (code-inline "user-guide-header") " is a header-tag. We can make a reference to that header with the macro " (function-ref header-ref) ". For example, if I write this:")
+
+(code-block (header-ref-example)
+  header-ref-example)
+
+(text "Then you will see this:")
+
+(code-tag (header-ref-example)
+  (text "Go to the top: " (header-ref user-guide-header)))
 
 
 
