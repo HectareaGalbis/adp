@@ -72,7 +72,7 @@
 (text "When you want to add text you must use the macro " (function-ref text) ". It receives a variable number of arguments. Each argument is evaluated at run-time and its result is " (cl-ref princ) "-ed. Then, all the content that has been " (cl-ref princ) "-ed is concatenated into a single string and finally it is printed in the documentation file. For example:")
 
 (code-block ()
-  (text "This is the text macro. The result of 3+4 is " (+ 3 4) ". As we will see later you can stylize the text with " (bold "bold words") ", " (italic "italic words") ", or " (bold-italic "bold-italic words") " and more styles."))
+  (text "This is the text macro. The result of 3+4 is " (+ 3 4) ". As we will see later you can enrich the text with " (bold "bold words") ", " (italic "italic words") ", " (bold-italic "bold-italic words") " and more."))
 
 (text "If I use that right now:")
 
@@ -135,6 +135,31 @@
 	   (:item "Fruits:")
 	   (:itemize (:item 0.5 "Kg of apples")
 		     (:item 6 " oranges"))))
+
+(text "Note that each item inside " (function-ref itemize) " is a list starting with " (code-inline :item) " or " (code-inline :itemize) ". When you use " (code-inline :item) " every object will be " (cl-ref princ) "-ed and then concatenated. In other words, it works the same as " (function-ref text) " or " (function-ref table) ". On the other hand, when using " (code-inline :itemize) " you are indicating that you want a sublist of items.")
+
+
+(subsubheader "Text enrichment")
+
+(text "Inside a " (function-ref text) " form, a " (code-inline :cell) " from a " (function-ref table) " form and a " (code-inline :item) " form a " (function-ref itemize) " form, we can enrich the text with the macros " (function-ref bold) ", " (function-ref italic) ", " (function-ref bold-italic) " and " (function-ref web-link) ". For example:")
+
+(code-block (rich-text-example)
+  rich-text-example)
+
+(text "You will see this:")
+
+(code-tag (rich-text-example)
+  (text "As " (bold "Andrew") " said: " (italic "You only need " (+ 1 2 3)) (web-link "coins" "https://en.wikipedia.org/wiki/Coin") (italic "  to enter in ") (bold-italic "The Giant Red Tree.")))
+
+(text "It is good to know that you cannot nest calls of " (function-ref bold) ", " (function-ref italic) ", " (function-ref bold-italic) " and " (function-ref web-link) ". For example, if you try this:")
+
+(code-block ()
+  (text (bold (italic "This should be bold-italic."))))
+
+(text "an error will be raised.")
+
+(text "")
+
 
 (subsubheader "Tags and references" tags-subsubheader)
 

@@ -70,9 +70,9 @@ When you want to add text you must use the macro [ADP:TEXT](/docs/user-api.md#ma
 
 ```
 (ADP:TEXT "This is the text macro. The result of 3+4 is " (+ 3 4)
-          ". As we will see later you can stylize the text with "
-          (ADP:BOLD "bold words") ", " (ADP:ITALIC "italic words") ", or "
-          (ADP:BOLD-ITALIC "bold-italic words") " and more styles.")
+          ". As we will see later you can enrich the text with "
+          (ADP:BOLD "bold words") ", " (ADP:ITALIC "italic words") ", "
+          (ADP:BOLD-ITALIC "bold-italic words") " and more.")
 ```
 
 If I use that right now:
@@ -144,6 +144,33 @@ You will see this:
 * Fruits:
   * 0.5Kg of apples
   * 6 oranges
+
+Note that each item inside [ADP:ITEMIZE](/docs/user-api.md#macro-itemize) is a list starting with `ITEM` or `ITEMIZE`. When you use `ITEM` every object will be [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)-ed and then concatenated. In other words, it works the same as [ADP:TEXT](/docs/user-api.md#macro-text) or [ADP:TABLE](/docs/user-api.md#macro-table). On the other hand, when using `ITEMIZE` you are indicating that you want a sublist of items.
+
+### Text enrichment
+
+Inside a [ADP:TEXT](/docs/user-api.md#macro-text) form, a `CELL` from a [ADP:TABLE](/docs/user-api.md#macro-table) form and a `ITEM` form a [ADP:ITEMIZE](/docs/user-api.md#macro-itemize) form, we can enrich the text with the macros [ADP:BOLD](/docs/user-api.md#macro-bold), [ADP:ITALIC](/docs/user-api.md#macro-italic), [ADP:BOLD-ITALIC](/docs/user-api.md#macro-bold-italic) and [ADP:WEB-LINK](/docs/user-api.md#macro-web-link). For example:
+
+```
+(ADP:TEXT "As " (ADP:BOLD "Andrew") " said: "
+          (ADP:ITALIC "You only need " (+ 1 2 3))
+          (ADP:WEB-LINK "coins" "https://en.wikipedia.org/wiki/Coin")
+          (ADP:ITALIC "  to enter in ") (ADP:BOLD-ITALIC "The Giant Red Tree."))
+```
+
+You will see this:
+
+As **Andrew** said: _You only need 6_[coins](https://en.wikipedia.org/wiki/Coin)_  to enter in _***The Giant Red Tree.***
+
+It is good to know that you cannot nest calls of [ADP:BOLD](/docs/user-api.md#macro-bold), [ADP:ITALIC](/docs/user-api.md#macro-italic), [ADP:BOLD-ITALIC](/docs/user-api.md#macro-bold-italic) and [ADP:WEB-LINK](/docs/user-api.md#macro-web-link). For example, if you try this:
+
+```
+(ADP:TEXT (ADP:BOLD (ADP:ITALIC "This should be bold-italic.")))
+```
+
+an error will be raised.
+
+
 
 ### Tags and references
 
