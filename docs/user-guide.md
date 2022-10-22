@@ -403,7 +403,7 @@ Let's see a live example. Do you remember the symbol [A-PARAMETER-DEFINED-AT-THE
 (CODE-LAG (END-TYPE-CODE) (ADP:DEFTYPE ALSO-A-TYPE? () NIL))
 ```
 
-So, if right now I write this:
+So, if I write this:
 
 ```
 (ADP:CODE-BLOCK (END-PARAMETER-CODE END-TYPE-CODE)

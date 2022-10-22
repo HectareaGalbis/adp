@@ -366,7 +366,7 @@
     (deftype also-a-type? ()
       nil)))
 
-(text "So, if right now I write this:")
+(text "So, if I write this:")
 
 (code-block (code-block-with-tag-example)
   code-block-with-tag-example)
