@@ -147,6 +147,20 @@ You will see this:
 
 Note that each item inside [ADP:ITEMIZE](/docs/user-api.md#macro-itemize) is a list starting with `ITEM` or `ITEMIZE`. When you use `ITEM` every object will be [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)-ed and then concatenated. In other words, it works the same as [ADP:TEXT](/docs/user-api.md#macro-text) or [ADP:TABLE](/docs/user-api.md#macro-table). On the other hand, when using `ITEMIZE` you are indicating that you want a sublist of items.
 
+### Images
+
+You can add images with the macro [ADP:IMAGE](/docs/user-api.md#macro-image). For example, an image is located at `guides/images/`. If I evaluate the next expression:
+
+```
+(ADP:IMAGE "Lisp logo" #P"guides/images/Lisp_logo.svg")
+```
+
+I get this:
+
+![Lisp logo](/home/hectarea/quicklisp/local-projects/adp/Lisp_logo.svg)
+
+The first argument is the alternative text of the image. If for some reason the image cannot be loaded in some web page, the alternative text is used instead. The second argument is the path of the image, relative to the system's root directory.
+
 ### Text enrichment
 
 Inside a [ADP:TEXT](/docs/user-api.md#macro-text) form, a `CELL` from a [ADP:TABLE](/docs/user-api.md#macro-table) form and a `ITEM` form a [ADP:ITEMIZE](/docs/user-api.md#macro-itemize) form, we can enrich the text with the macros [ADP:BOLD](/docs/user-api.md#macro-bold), [ADP:ITALIC](/docs/user-api.md#macro-italic), [ADP:BOLD-ITALIC](/docs/user-api.md#macro-bold-italic) and [ADP:WEB-LINK](/docs/user-api.md#macro-web-link). For example:
@@ -163,7 +177,7 @@ You will see this:
 
 As **Andrew** said: _You only need 6_ [coins](https://en.wikipedia.org/wiki/Coin) _to enter in_ ***The Giant Red Tree.***
 
-It is good to know that you cannot nest calls of [ADP:BOLD](/docs/user-api.md#macro-bold), [ADP:ITALIC](/docs/user-api.md#macro-italic), [ADP:BOLD-ITALIC](/docs/user-api.md#macro-bold-italic) and [ADP:WEB-LINK](/docs/user-api.md#macro-web-link). For example, if you try this:
+Note that spaces are placed out of enrichment functions. Also, you cannot nest calls of [ADP:BOLD](/docs/user-api.md#macro-bold), [ADP:ITALIC](/docs/user-api.md#macro-italic), [ADP:BOLD-ITALIC](/docs/user-api.md#macro-bold-italic) and [ADP:WEB-LINK](/docs/user-api.md#macro-web-link). For example, if you try this:
 
 ```
 (ADP:TEXT (ADP:BOLD (ADP:ITALIC "This should be bold-italic.")))

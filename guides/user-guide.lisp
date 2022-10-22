@@ -139,6 +139,20 @@
 (text "Note that each item inside " (function-ref itemize) " is a list starting with " (code-inline :item) " or " (code-inline :itemize) ". When you use " (code-inline :item) " every object will be " (cl-ref princ) "-ed and then concatenated. In other words, it works the same as " (function-ref text) " or " (function-ref table) ". On the other hand, when using " (code-inline :itemize) " you are indicating that you want a sublist of items.")
 
 
+(subsubheader "Images")
+
+(text "You can add images with the macro " (function-ref image) ". For example, an image is located at " (code-inline "guides/images/") ". If I evaluate the next expression:")
+
+(code-block (image-example)
+  image-example)
+
+(text "I get this:")
+
+(code-tag (image-example)
+  (image "Lisp logo" #P"guides/images/Lisp_logo.svg"))
+
+(text "The first argument is the alternative text of the image. If for some reason the image cannot be loaded in some web page, the alternative text is used instead. The second argument is the path of the image, relative to the system's root directory.")
+
 (subsubheader "Text enrichment")
 
 (text "Inside a " (function-ref text) " form, a " (code-inline :cell) " from a " (function-ref table) " form and a " (code-inline :item) " form a " (function-ref itemize) " form, we can enrich the text with the macros " (function-ref bold) ", " (function-ref italic) ", " (function-ref bold-italic) " and " (function-ref web-link) ". For example:")
@@ -151,7 +165,7 @@
 (code-tag (rich-text-example)
   (text "As " (bold "Andrew") " said: " (italic "You only need " (+ 1 2 3)) " " (web-link "coins" "https://en.wikipedia.org/wiki/Coin") " " (italic "to enter in") " " (bold-italic "The Giant Red Tree.")))
 
-(text "It is good to know that you cannot nest calls of " (function-ref bold) ", " (function-ref italic) ", " (function-ref bold-italic) " and " (function-ref web-link) ". For example, if you try this:")
+(text "Note that spaces are placed out of enrichment functions. Also, you cannot nest calls of " (function-ref bold) ", " (function-ref italic) ", " (function-ref bold-italic) " and " (function-ref web-link) ". For example, if you try this:")
 
 (code-block ()
   (text (bold (italic "This should be bold-italic."))))
