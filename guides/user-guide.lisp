@@ -356,16 +356,37 @@
 
 (text "First we indicate in the list after " (code-inline "code-block") " that we will use the code tag named " (code-inline "sum-list-example") ". Then, we use it. Now, each time you change the call to " (code-inline "sum-list") " in your test code the tutorial will be automatically changed. You can specify as many tags as you want in both " (function-ref code-tag) " and " (function-ref code-block) " macros.")
 
+(text "Let's see a live example. Do you remember the symbol " (symbol-ref a-parameter-defined-at-the-end-of-the-file) " and the type " (type-ref also-a-type?) ". In the source file I have written this:")
+
+(code-block (code-tag-example)
+  code-tag-example)
+
+(text "So, if right now I write this:")
+
+(code-block (code-block-with-tag-example)
+  code-block-with-tag-example)
+
+(text "You will see this:")
+
+(code-tag (code-block-with-tag-example)
+  (code-block (end-parameter-code end-type-code)
+    end-type-code
+    (some-code-in (the-middle))
+    end-parameter-code))
+
 
 (subsubheader "Hiding your code")
 
 
 
 
-(defparameter a-parameter-defined-at-the-end-of-the-file t)
+(code-tag (code-tag-example)
+  (code-tag (end-parameter-code)
+    (defparameter a-parameter-defined-at-the-end-of-the-file t))
 
-(deftype also-a-type? ()
-  nil)
+  (code-tag (end-type-code)
+    (deftype also-a-type? ()
+      nil)))
 
 (text "Go back to " (header-ref function-tags-subsubheader))
 

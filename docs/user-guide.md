@@ -394,6 +394,29 @@ A code-tag named `sum-list-example` is created and you can now use it in the tut
 
 First we indicate in the list after `code-block` that we will use the code tag named `sum-list-example`. Then, we use it. Now, each time you change the call to `sum-list` in your test code the tutorial will be automatically changed. You can specify as many tags as you want in both [ADP:CODE-TAG](/docs/user-api.md#macro-code-tag) and [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block) macros.
 
+Let's see a live example. Do you remember the symbol [A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file) and the type [ALSO-A-TYPE?](/docs/user-guide.md#condition-also-a-type). In the source file I have written this:
+
+```
+(ADP:DEFPARAMETER A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE T)
+
+(ADP:DEFTYPE ALSO-A-TYPE? () NIL)
+```
+
+So, if right now I write this:
+
+```
+(ADP:CODE-BLOCK (END-PARAMETER-CODE END-TYPE-CODE)
+  END-TYPE-CODE
+  (SOME-CODE-IN (THE-MIDDLE))
+  END-PARAMETER-CODE)
+```
+
+You will see this:
+
+```
+(ADP:DEFTYPE ALSO-A-TYPE? () NIL)
+```
+
 ### Hiding your code
 
 #### Variable: A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE
