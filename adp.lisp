@@ -263,7 +263,7 @@ tags in code-hide is empty, the that piece of code will be hidden for every tag 
        ,@(adppvt:remove-own-code-hide-exprs code))))
 
 
-(adv-defmacro code-block (tags &body code)
+(adv-defmacro code-block ((&rest tags) &body code)
   "Add a block of code. Each element of code will be prin1-ed but not evaluated. If a symbol is used and that symbol appears as a tag in tags, then 
 the code assigned to that tag is prin1-ed instead of the symbol."
   (when adppvt:*add-documentation*

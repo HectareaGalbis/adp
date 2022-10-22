@@ -184,7 +184,7 @@ tags in code-hide is empty, the that piece of code will be hidden for every tag 
 #### Macro: CODE-BLOCK
 
 ```Lisp
-(defmacro ADP:CODE-BLOCK (TAGS &BODY CODE)
+(defmacro ADP:CODE-BLOCK ((&REST TAGS) &BODY CODE)
   ...)
 ```
 
