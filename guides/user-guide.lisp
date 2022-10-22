@@ -84,9 +84,9 @@
 (text "You can add tables using the macro " (function-ref table) ". The best way to see how to use it is an example. Imagine we want to show some data stored in some variables.")
 
 (code-example
-  (cl:defvar peter-info '(34 "Peter Garcia" 1435))
-  (cl:defvar maria-info '(27 "Maria Martinez" 1765))
-  (cl:defvar laura-info '(53 "Laura Beneyto" 1543))
+  (cl:defparameter peter-info '(34 "Peter Garcia" 1435))
+  (cl:defparameter maria-info '(27 "Maria Martinez" 1765))
+  (cl:defparameter laura-info '(53 "Laura Beneyto" 1543))
 
   (cl:defun get-age (info)
     (first info))
@@ -108,9 +108,9 @@
 (text "And you will see this:")
 
 (table ((:cell "Age") (:cell "Name") (:cell "Salary"))
-       ((:cell (get-age peter-info)) (:cell (get-name peter-info)) (:cell (get-salary peter-info)))
-       ((:cell (get-age maria-info)) (:cell (get-name maria-info)) (:cell (get-salary maria-info)))
-       ((:cell (get-age laura-info)) (:cell (get-name laura-info)) (:cell (get-salary laura-info))))
+       ((:cell (get-age peter-info)) (:cell (get-name peter-info)) (:cell (get-salary peter-info) "€"))
+       ((:cell (get-age maria-info)) (:cell (get-name maria-info)) (:cell (get-salary maria-info) "€"))
+       ((:cell (get-age laura-info)) (:cell (get-name laura-info)) (:cell (get-salary laura-info) "€")))
 
 
 (subsubheader "Tags and references" tags-subsubheader)
