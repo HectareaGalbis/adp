@@ -121,7 +121,20 @@
 
 (text "You can add lists with " (function-ref itemize) ". For example:")
 
+(code-block (list-example)
+  list-example)
 
+(text "You will see this:")
+
+(code-tag (list-example)
+  (itemize (:item "Vegetables:")
+	   (:itemize (:item 3 " peppers:")
+		     (:itemize (:item 1 " green pepper")
+			       (:item (- 3 1) " red pepper"))
+		     (:item 0.25 "Kg of carrots"))
+	   (:item "Fruits:")
+	   (:itemize (:item 0.5 "Kg of apples")
+		     (:item 6 " oranges"))))
 
 (subsubheader "Tags and references" tags-subsubheader)
 

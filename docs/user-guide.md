@@ -124,5 +124,26 @@ Note that in the _Salary_ column we used multiple values in each cell. Each cell
 
 You can add lists with [ADP:ITEMIZE](/docs/user-api.md#macro-itemize). For example:
 
+```
+(ADP:ITEMIZE (:ITEM "Vegetables:")
+             (:ITEMIZE (:ITEM 3 " peppers:")
+              (:ITEMIZE (:ITEM 1 " green pepper")
+               (:ITEM (- 3 1) " red pepper"))
+              (:ITEM 0.25 "Kg of carrots"))
+             (:ITEM "Fruits:")
+             (:ITEMIZE (:ITEM 0.5 "Kg of apples") (:ITEM 6 " oranges")))
+```
+
+You will see this:
+
+* Vegetables:
+  * 3 peppers:
+    * 1 green pepper
+    * 2 red pepper
+  * 0.25Kg of carrots
+* Fruits:
+  * 0.5Kg of apples
+  * 6 oranges
+
 ### Tags and references
 
