@@ -157,7 +157,7 @@ You can add images with the macro [ADP:IMAGE](/docs/user-api.md#macro-image). Fo
 
 I get this:
 
-![Lisp logo](/home/hectarea/quicklisp/local-projects/adp/Lisp_logo.svg)
+![Lisp logo](/guides/images/Lisp_logo.svg)
 
 The first argument is the alternative text of the image. If for some reason the image cannot be loaded in some web page, the alternative text is used instead. The second argument is the path of the image, relative to the system's root directory.
 

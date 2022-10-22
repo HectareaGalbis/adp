@@ -36,7 +36,7 @@
     (itemize-aux items 0)))
 
 (adppvt:def-image-writer (stream alt-text root-path rel-image-path)
-  (format stream "![~a](~a)~%~%" alt-text (merge-pathnames root-path rel-image-path)))
+  (format stream "![~a](/~a)~%~%" alt-text rel-image-path))
 
 (adppvt:def-bold-writer (stream text)
   (format stream "**~a**" text))
