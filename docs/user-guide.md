@@ -285,7 +285,7 @@ ADP supports cross references with tags. A tag is a just a symbol with some info
 
 ### Header-tags
 
-A header-tag is a symbol with a header associated to it. We have already seen how to add a header to the documentation. But I didn't say that the macros [ADP:HEADER](/docs/user-api.md#macro-header), [ADP:SUBHEADER](/docs/user-api.md#macro-subheader) and [ADP:SUBSUBHEADER](/docs/user-api.md#macro-subsubheader) receives a second optional argument. As you can imagine, this second argument must be a symbol that will be converted to a header tag. For example, the first header of this file is created with this expression:
+A header-tag is a symbol with a header associated. We have already seen how to add a header to the documentation. But I didn't say that the macros [ADP:HEADER](/docs/user-api.md#macro-header), [ADP:SUBHEADER](/docs/user-api.md#macro-subheader) and [ADP:SUBSUBHEADER](/docs/user-api.md#macro-subsubheader) receives a second optional argument. As you can imagine, this second argument must be a symbol that will be converted to a header tag. For example, the first header of this file is created with this expression:
 
 ```
 (ADP:HEADER "The ADP User Guide" USER-GUIDE-HEADER)
@@ -300,4 +300,53 @@ Now the symbol `user-guide-header` is a header-tag. We can make a reference to t
 Then you will see this:
 
 Go to the top: [The ADP User Guide](/docs/user-guide.md#the-adp-user-guide)
+
+Note that the macro is used inside a [ADP:TEXT](/docs/user-api.md#macro-text) form. Same as with [ADP:BOLD](/docs/user-api.md#macro-bold) or [ADP:ITALIC](/docs/user-api.md#macro-italic) [ADP:HEADER-REF](/docs/user-api.md#macro-header-ref) only can be used inside [ADP:TEXT](/docs/user-api.md#macro-text), [ADP:TABLE](/docs/user-api.md#macro-table) and [ADP:ITEMIZE](/docs/user-api.md#macro-itemize).
+
+### Function-tags, symbol-tags and type-tags
+
+These tags are symbols associated with a function, a variable or a type. More specifically, the macros used to define things like [ADP:DEFUN](/docs/user-api.md#macro-defun), [ADP:DEFPARAMETER](/docs/user-api.md#macro-defparameter) or [ADP:DEFSTRUCT](/docs/user-api.md#macro-defstruct) can create automatically a function-tag, a symbol-tag or a type-tag respectively. The tag created is the symbol of the name of the function, variable or type defined respectively. ADP defines three types of tags because the same symbol can refer to a function, a variable and a type simultaneously. The next list shows what type of tags are defined by which macros:
+
+* Function-tags:
+  * [ADP:DEFGENERIC](/docs/user-api.md#macro-defgeneric)
+  * [ADP:DEFINE-MODIFY-MACRO](/docs/user-api.md#macro-define-modify-macro)
+  * [ADP:DEFMACRO](/docs/user-api.md#macro-defmacro)
+  * [ADP:DEFUN](/docs/user-api.md#macro-defun)
+* Symbol-tags:
+  * [ADP:DEFCONSTANT](/docs/user-api.md#macro-defconstant)
+  * [ADP:DEFINE-SYMBOL-MACRO](/docs/user-api.md#macro-define-symbol-macro)
+  * [ADP:DEFPARAMETER](/docs/user-api.md#macro-defparameter)
+  * [ADP:DEFVAR](/docs/user-api.md#macro-defvar)
+* Type-tags:
+  * [ADP:DEFCLASS](/docs/user-api.md#macro-defclass)
+  * [ADP:DEFINE-CONDITION](/docs/user-api.md#macro-define-condition)
+  * [ADP:DEFSTRUCT](/docs/user-api.md#macro-defstruct)
+  * [ADP:DEFTYPE](/docs/user-api.md#macro-deftype)
+
+Same as with header-tags, we can make reference to functions, variables and types with [ADP:FUNCTION-REF](/docs/user-api.md#macro-function-ref), [ADP:SYMBOL-REF](/docs/user-api.md#macro-symbol-ref) and [ADP:TYPE-REF](/docs/user-api.md#macro-type-ref). For example, to make a reference to an ADP macro:
+
+```
+(ADP:TEXT "A reference to an ADP macro: " (ADP:FUNCTION-REF ADP:HEADER))
+```
+
+You will see this:
+
+A reference to an ADP macro: [ADP:HEADER](/docs/user-api.md#macro-header)
+
+Note again that [ADP:FUNCTION-REF](/docs/user-api.md#macro-function-ref) only can be used inside [ADP:TEXT](/docs/user-api.md#macro-text), [ADP:TABLE](/docs/user-api.md#macro-table) or [ADP:ITEMIZE](/docs/user-api.md#macro-itemize). The same goes to [ADP:SYMBOL-REF](/docs/user-api.md#macro-symbol-ref) and [ADP:TYPE-REF](/docs/user-api.md#macro-type-ref).
+
+A cool thing about cross references is that you can make a reference to something that is not currently defined but will be. For example, a variable is defined at the end of this file but we can make a reference now. I'm writing the next expression:
+
+```
+(ADP:TEXT "In the future, we will define the symbol "
+          (ADP:SYMBOL-REF A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE) ".")
+```
+
+In the future, we will define the symbol ["A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE"](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file).
+
+#### Variable: A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE
+
+```Lisp
+(defparameter A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE T)
+```
 

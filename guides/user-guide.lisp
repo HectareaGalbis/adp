@@ -254,7 +254,7 @@
 
 (subsubheader "Header-tags")
 
-(text "A header-tag is a symbol with a header associated to it. We have already seen how to add a header to the documentation. But I didn't say that the macros " (function-ref header) ", " (function-ref subheader) " and " (function-ref subsubheader) " receives a second optional argument. As you can imagine, this second argument must be a symbol that will be converted to a header tag. For example, the first header of this file is created with this expression:")
+(text "A header-tag is a symbol with a header associated. We have already seen how to add a header to the documentation. But I didn't say that the macros " (function-ref header) ", " (function-ref subheader) " and " (function-ref subsubheader) " receives a second optional argument. As you can imagine, this second argument must be a symbol that will be converted to a header tag. For example, the first header of this file is created with this expression:")
 
 (code-block (code-user-guide-header)
   code-user-guide-header)
@@ -269,6 +269,56 @@
 (code-tag (header-ref-example)
   (text "Go to the top: " (header-ref user-guide-header)))
 
+(text "Note that the macro is used inside a " (function-ref text) " form. Same as with " (function-ref bold) " or " (function-ref italic) " " (function-ref header-ref) " only can be used inside " (function-ref text) ", " (function-ref table) " and " (function-ref itemize) ".")
 
+
+(subsubheader "Function-tags, symbol-tags and type-tags")
+
+(text "These tags are symbols associated with a function, a variable or a type. More specifically, the macros used to define things like " (function-ref defun) ", " (function-ref defparameter) " or " (function-ref defstruct) " can create automatically a function-tag, a symbol-tag or a type-tag respectively. The tag created is the symbol of the name of the function, variable or type defined respectively. ADP defines three types of tags because the same symbol can refer to a function, a variable and a type simultaneously. The next list shows what type of tags are defined by which macros:")
+
+(itemize (:item "Function-tags:")
+	 (:itemize (:item (function-ref defgeneric))
+		   (:item (function-ref define-modify-macro))
+		   (:item (function-ref defmacro))
+		   (:item (function-ref defun)))
+	 (:item "Symbol-tags:")
+	 (:itemize (:item (function-ref defconstant))
+		   (:item (function-ref define-symbol-macro))
+		   (:item (function-ref defparameter))
+		   (:item (function-ref defvar)))
+	 (:item "Type-tags:")
+	 (:itemize (:item (function-ref defclass))
+		   (:item (function-ref define-condition))
+		   (:item (function-ref defstruct))
+		   (:item (function-ref deftype))))
+
+(text "Same as with header-tags, we can make reference to functions, variables and types with " (function-ref function-ref) ", " (function-ref symbol-ref) " and " (function-ref type-ref) ". For example, to make a reference to an ADP macro:")
+
+(code-block (function-tag-example)
+  function-tag-example)
+
+(text "You will see this:")
+
+(code-tag (function-tag-example)
+  (text "A reference to an ADP macro: " (function-ref header)))
+
+(text "Note again that " (function-ref function-ref) " only can be used inside " (function-ref text) ", " (function-ref table) " or " (function-ref itemize) ". The same goes to " (function-ref symbol-ref) " and " (function-ref type-ref) ".")
+
+(text "A cool thing about cross references is that you can make a reference to something that is not currently defined but will be. For example, a variable is defined at the end of this file but we can make a reference now. I'm writing the next expression:")
+
+(code-block (symbol-ref-example)
+  symbol-ref-example)
+
+(code-tag (symbol-ref-example)
+  (text "In the future, we will define the symbol " (symbol-ref a-parameter-defined-at-the-end-of-the-file) "."))
+
+
+
+
+
+
+
+
+(defparameter a-parameter-defined-at-the-end-of-the-file t)
 
 (write-in-file #P"docs/user-guide")
