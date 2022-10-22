@@ -85,22 +85,16 @@ You can add tables using the macro [ADP:TABLE](/docs/user-api.md#macro-table). T
 
 ```
 (DEFPARAMETER PETER-INFO '(34 "Peter Garcia" 1435))
-PETER-INFO
 
 (DEFPARAMETER MARIA-INFO '(27 "Maria Martinez" 1765))
-MARIA-INFO
 
 (DEFPARAMETER LAURA-INFO '(53 "Laura Beneyto" 1543))
-LAURA-INFO
 
 (DEFUN GET-AGE (INFO) (FIRST INFO))
-GET-AGE
 
 (DEFUN GET-NAME (INFO) (SECOND INFO))
-GET-NAME
 
 (DEFUN GET-SALARY (INFO) (THIRD INFO))
-GET-SALARY
 ```
 
 Now we can create a table like this:

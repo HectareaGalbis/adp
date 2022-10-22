@@ -83,7 +83,7 @@
 
 (text "You can add tables using the macro " (function-ref table) ". The best way to see how to use it is an example. Imagine we want to show some data stored in some variables.")
 
-(code-example
+(code-block ()
   (cl:defparameter peter-info '(34 "Peter Garcia" 1435))
   (cl:defparameter maria-info '(27 "Maria Martinez" 1765))
   (cl:defparameter laura-info '(53 "Laura Beneyto" 1543))
@@ -96,6 +96,19 @@
 
   (cl:defun get-salary (info)
     (third info)))
+
+(cl:defparameter peter-info '(34 "Peter Garcia" 1435))
+  (cl:defparameter maria-info '(27 "Maria Martinez" 1765))
+  (cl:defparameter laura-info '(53 "Laura Beneyto" 1543))
+
+  (cl:defun get-age (info)
+    (first info))
+
+  (cl:defun get-name (info)
+    (second info))
+
+  (cl:defun get-salary (info)
+    (third info))
 
 (text "Now we can create a table like this:")
 
