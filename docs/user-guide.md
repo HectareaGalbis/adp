@@ -179,6 +179,37 @@ And you will see:
 (BUT IT (IS (OK)))
 ```
 
+Note that `NIL` is printed after `code-block`. This is because we can pass some symbols to [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block) in order to change a bit how it works. But, we will see that in later sections.
+
+On the other hand, [ADP:CODE-EXAMPLE](/docs/user-api.md#macro-code-example) do evaluate the code. And what is more, it prints the standard output as well as the returned values. For example:
+
+```
+(ADP:CODE-EXAMPLE
+  (LOOP FOR I FROM 0 BELOW 10
+        DO (PRINT I)
+        FINALLY (RETURN (VALUES "Hello" "world"))))
+```
+
+And you will see:
+
+```
+(LOOP FOR I FROM 0 BELOW 10
+      DO (PRINT I)
+      FINALLY (RETURN (VALUES "Hello" "world")))
+0 
+1 
+2 
+3 
+4 
+5 
+6 
+7 
+8 
+9 
+"Hello"
+"world"
+```
+
 ### Text enrichment
 
 Inside a [ADP:TEXT](/docs/user-api.md#macro-text) form, a `CELL` from a [ADP:TABLE](/docs/user-api.md#macro-table) form and a `ITEM` form a [ADP:ITEMIZE](/docs/user-api.md#macro-itemize) form, we can enrich the text with the macros [ADP:BOLD](/docs/user-api.md#macro-bold), [ADP:ITALIC](/docs/user-api.md#macro-italic), [ADP:BOLD-ITALIC](/docs/user-api.md#macro-bold-italic) and [ADP:WEB-LINK](/docs/user-api.md#macro-web-link). For example:

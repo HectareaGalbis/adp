@@ -169,6 +169,20 @@
   (this is not (valid code))
   (but it (is (ok))))
 
+(text "Note that " (code-inline 'nil) " is printed after " (code-inline "code-block") ". This is because we can pass some symbols to " (function-ref code-block) " in order to change a bit how it works. But, we will see that in later sections.")
+
+(text "On the other hand, " (function-ref code-example) " do evaluate the code. And what is more, it prints the standard output as well as the returned values. For example:")
+
+(code-block (code-example-example)
+  code-example-example)
+
+(text "And you will see:")
+
+(code-tag (code-example-example)
+  (code-example
+    (loop for i from 0 below 10
+	  do (print i)
+	  finally (return (values "Hello" "world")))))
 
 (subsubheader "Text enrichment")
 
