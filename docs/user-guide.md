@@ -77,7 +77,52 @@ When you want to add text you must use the macro [ADP:TEXT](/docs/user-api.md#ma
 
 If I use that right now:
 
-This is the text macro. The result of 3+4 is 7. As we will see later you can stylize the text with **bold words**, _italic words_, or ***bold-italic words*** and more styles.
+This is the text macro. The result of 3+4 is 7. As we will see later you can stylize the text with **bold words**, _italic words_, or ***bold-italic words*** among other styles.
+
+### Tables
+
+You can add tables using the macro [ADP:TABLE](/docs/user-api.md#macro-table). The best way to see how to use it is an example. Imagine we want to show some data stored in some variables.
+
+```
+(DEFVAR PETER-INFO '(34 "Peter Garcia" 1435))
+PETER-INFO
+
+(DEFVAR MARIA-INFO '(27 "Maria Martinez" 1765))
+MARIA-INFO
+
+(DEFVAR LAURA-INFO '(53 "Laura Beneyto" 1543))
+LAURA-INFO
+
+(DEFUN GET-AGE (INFO) (FIRST INFO))
+GET-AGE
+
+(DEFUN GET-NAME (INFO) (SECOND INFO))
+GET-NAME
+
+(DEFUN GET-SALARY (INFO) (THIRD INFO))
+GET-SALARY
+```
+
+Now we can create a table like this:
+
+```
+(ADP:TABLE ((:CELL "Age") (:CELL "Name") (:CELL "Salary"))
+           ((:CELL (GET-AGE PETER-INFO)) (:CELL (GET-NAME PETER-INFO))
+            (:CELL (GET-SALARY PETER-INFO) "€"))
+           ((:CELL (GET-AGE MARIA-INFO)) (:CELL (GET-NAME MARIA-INFO))
+            (:CELL (GET-SALARY MARIA-INFO) "€"))
+           ((:CELL (GET-AGE LAURA-INFO)) (:CELL (GET-NAME LAURA-INFO))
+            (:CELL (GET-SALARY LAURA-INFO) "€")))
+```
+
+And you will see this:
+
+| Age | Name | Salary |
+| --- | --- | --- |
+| 34 | Peter Garcia | 1435 |
+| 27 | Maria Martinez | 1765 |
+| 53 | Laura Beneyto | 1543 |
+
 
 ### Tags and references
 

@@ -76,9 +76,41 @@
 
 (text "If I use that right now:")
 
-(text "This is the text macro. The result of 3+4 is " (+ 3 4) ". As we will see later you can stylize the text with " (bold "bold words") ", " (italic "italic words") ", or " (bold-italic "bold-italic words") " and more styles.")
+(text "This is the text macro. The result of 3+4 is " (+ 3 4) ". As we will see later you can stylize the text with " (bold "bold words") ", " (italic "italic words") ", or " (bold-italic "bold-italic words") " among other styles.")
 
 
+(subsubheader "Tables")
+
+(text "You can add tables using the macro " (function-ref table) ". The best way to see how to use it is an example. Imagine we want to show some data stored in some variables.")
+
+(code-example
+  (cl:defvar peter-info '(34 "Peter Garcia" 1435))
+  (cl:defvar maria-info '(27 "Maria Martinez" 1765))
+  (cl:defvar laura-info '(53 "Laura Beneyto" 1543))
+
+  (cl:defun get-age (info)
+    (first info))
+
+  (cl:defun get-name (info)
+    (second info))
+
+  (cl:defun get-salary (info)
+    (third info)))
+
+(text "Now we can create a table like this:")
+
+(code-block ()
+  (table ((:cell "Age") (:cell "Name") (:cell "Salary"))
+	 ((:cell (get-age peter-info)) (:cell (get-name peter-info)) (:cell (get-salary peter-info) "€"))
+	 ((:cell (get-age maria-info)) (:cell (get-name maria-info)) (:cell (get-salary maria-info) "€"))
+	 ((:cell (get-age laura-info)) (:cell (get-name laura-info)) (:cell (get-salary laura-info) "€"))))
+
+(text "And you will see this:")
+
+(table ((:cell "Age") (:cell "Name") (:cell "Salary"))
+       ((:cell (get-age peter-info)) (:cell (get-name peter-info)) (:cell (get-salary peter-info)))
+       ((:cell (get-age maria-info)) (:cell (get-name maria-info)) (:cell (get-salary maria-info)))
+       ((:cell (get-age laura-info)) (:cell (get-name laura-info)) (:cell (get-salary laura-info))))
 
 
 (subsubheader "Tags and references" tags-subsubheader)
