@@ -64,7 +64,7 @@
   (subheader "A section of my guide.")
   (subsubheader "A subsection of my guide."))
 
-(text "As I said, I'm using headers in this guide. This is a header: " (header-ref user-guide-header) ". This is a subheader: " (header-ref setting-up-subheader) ". And this is a subsubheader: " (header-ref headers-subsubheader) ". Note that I can make a reference to a header. I can achieve this with header-tags. We will see this later in " (header-ref tags-subsubheader) ".")
+(text "As I said, I'm using headers in this guide. This is a header: " (header-ref user-guide-header) ". This is a subheader: " (header-ref setting-up-subheader) ". And this is a subsubheader: " (header-ref headers-subsubheader) ". Note that I can make a reference to a header. I can achieve this with header-tags. We will see this later in " (header-ref tags-subheader) ".")
 
 
 (subsubheader "Text")
@@ -239,13 +239,14 @@
 (text "When all your documentation is associated with a file, it is time to generate the files and print the documentation. The function that must be used now is " (function-ref load-documentation-system) ". As the name suggests, you are going to load your system. In fact, it will load you system with the documentation generation enabled so, while forms are evaluated the documentation is gathered and also is associated with the pertinent files. When the system is completely loaded, the file generation and documentation printing begins. For example, if your system is named " (code-inline :my-system) ", then you can eval this expression in the REPL:")
 
 (code-block ()
-  (load-documentation-system :my-system :markdown))
+  (load-documentation-system :my-system :github-md))
 
-(text "The second argument is the desired style. In this case the used style is " (code-inline :markdown) ". This style generates " (code-inline "md") " files to be used in the GitHub platform.")
+(text "The second argument is the desired style. In this case the used style is " (code-inline :github-md) ". This style generates " (code-inline "md") " files to be used in the GitHub platform.")
 
-(text "And that's all, the documentation is ready to be read.")
+(text "And that's all! The documentation is ready to be read.")
 
-(subsubheader "Cross references" tags-subsubheader)
+(subheader "Cross references" tags-subheader)
+
 
 
 

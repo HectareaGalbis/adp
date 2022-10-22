@@ -272,12 +272,12 @@ This macro receives only the pathname to the file where to print in the document
 When all your documentation is associated with a file, it is time to generate the files and print the documentation. The function that must be used now is [ADP:LOAD-DOCUMENTATION-SYSTEM](/docs/user-api.md#function-load-documentation-system). As the name suggests, you are going to load your system. In fact, it will load you system with the documentation generation enabled so, while forms are evaluated the documentation is gathered and also is associated with the pertinent files. When the system is completely loaded, the file generation and documentation printing begins. For example, if your system is named `MY-SYSTEM`, then you can eval this expression in the REPL:
 
 ```
-(ADP:LOAD-DOCUMENTATION-SYSTEM :MY-SYSTEM :MARKDOWN)
+(ADP:LOAD-DOCUMENTATION-SYSTEM :MY-SYSTEM :GITHUB-MD)
 ```
 
-The second argument is the desired style. In this case the used style is `MARKDOWN`. This style generates `md` files to be used in the GitHub platform.
+The second argument is the desired style. In this case the used style is `GITHUB-MD`. This style generates `md` files to be used in the GitHub platform.
 
-And that's all, the documentation is ready to be read.
+And that's all! The documentation is ready to be read.
 
-### Cross references
+## Cross references
 
