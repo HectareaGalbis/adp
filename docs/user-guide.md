@@ -154,13 +154,14 @@ Inside a [ADP:TEXT](/docs/user-api.md#macro-text) form, a `CELL` from a [ADP:TAB
 ```
 (ADP:TEXT "As " (ADP:BOLD "Andrew") " said: "
           (ADP:ITALIC "You only need " (+ 1 2 3))
-          (ADP:WEB-LINK "coins" "https://en.wikipedia.org/wiki/Coin")
-          (ADP:ITALIC "  to enter in ") (ADP:BOLD-ITALIC "The Giant Red Tree."))
+          (ADP:WEB-LINK "coins" "https://en.wikipedia.org/wiki/Coin") " "
+          (ADP:ITALIC "to enter in") " "
+          (ADP:BOLD-ITALIC "The Giant Red Tree."))
 ```
 
 You will see this:
 
-As **Andrew** said: _You only need 6_[coins](https://en.wikipedia.org/wiki/Coin)_  to enter in _***The Giant Red Tree.***
+As **Andrew** said: _You only need 6_[coins](https://en.wikipedia.org/wiki/Coin) _to enter in_ ***The Giant Red Tree.***
 
 It is good to know that you cannot nest calls of [ADP:BOLD](/docs/user-api.md#macro-bold), [ADP:ITALIC](/docs/user-api.md#macro-italic), [ADP:BOLD-ITALIC](/docs/user-api.md#macro-bold-italic) and [ADP:WEB-LINK](/docs/user-api.md#macro-web-link). For example, if you try this:
 

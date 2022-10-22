@@ -149,7 +149,7 @@
 (text "You will see this:")
 
 (code-tag (rich-text-example)
-  (text "As " (bold "Andrew") " said: " (italic "You only need " (+ 1 2 3)) (web-link "coins" "https://en.wikipedia.org/wiki/Coin") (italic "  to enter in ") (bold-italic "The Giant Red Tree.")))
+  (text "As " (bold "Andrew") " said: " (italic "You only need " (+ 1 2 3)) (web-link "coins" "https://en.wikipedia.org/wiki/Coin") " " (italic "to enter in") " " (bold-italic "The Giant Red Tree.")))
 
 (text "It is good to know that you cannot nest calls of " (function-ref bold) ", " (function-ref italic) ", " (function-ref bold-italic) " and " (function-ref web-link) ". For example, if you try this:")
 
