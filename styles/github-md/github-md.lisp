@@ -99,7 +99,8 @@
 			  ((constantp tag)
 			   (format nil "Constant: ~a" (symbol-github-name tag)))
 			  (t (format nil "Variable: ~a" (symbol-github-name tag)))))
-	 (symbol-anchor (convert-to-github-header-anchor symbol-header)))
+	 (symbol-anchor (convert-to-github-header-anchor symbol-header))
+	 (*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
     (format stream "[~s](/~a.md#~a)" tag file-path symbol-anchor)))
 
 (adppvt:def-function-ref-writer (stream tag root-path file-path)
@@ -110,7 +111,8 @@
 			    ((subtypep tag 'generic-function)
 			     (format nil "Generic function: ~a" tag))
 			    (t (format nil "Function: ~a" tag))))
-	 (function-anchor (convert-to-github-header-anchor function-header)))
+	 (function-anchor (convert-to-github-header-anchor function-header))
+	 (*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
     (format stream "[~s](/~a.md#~a)" tag file-path function-anchor)))
 
 (adppvt:def-type-ref-writer (stream tag root-path file-path)
@@ -123,7 +125,8 @@
 			((subtypep tag 'class)
 			 (format nil "Class: ~a" tag))
 			(t (format nil "Type: ~a" tag))))
-	 (type-anchor (convert-to-github-header-anchor type-header)))
+	 (type-anchor (convert-to-github-header-anchor type-header))
+	 (*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
     (format stream "[~s](/~a.md#~a)" tag file-path type-anchor)))
 
 (adppvt:def-code-block-writer (stream code-list)

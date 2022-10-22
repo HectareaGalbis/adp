@@ -342,7 +342,7 @@ A cool thing about cross references is that you can make a reference to somethin
           (ADP:SYMBOL-REF A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE) ".")
 ```
 
-In the future, we will define the symbol [ADP::A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file).
+In the future, we will define the symbol [A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file).
 
 Finally, an example using a type-tag:
 
@@ -350,7 +350,7 @@ Finally, an example using a type-tag:
 (ADP:TEXT "Using a type tag: " (ADP:TYPE-REF ALSO-A-TYPE?))
 ```
 
-Using a type tag: [ADP::ALSO-A-TYPE?](/docs/user-guide.md#condition-also-a-type)
+Using a type tag: [ALSO-A-TYPE?](/docs/user-guide.md#condition-also-a-type)
 
 ### Code-tags
 
