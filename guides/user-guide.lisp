@@ -320,9 +320,44 @@
 (code-tag (type-ref-example)
   (text "Using a type tag: " (type-ref also-a-type?)))
 
+
 (subsubheader "Code-tags")
 
+(text "Code-tags work differently to those we have just seen above. Code-tags are used inside the " (function-ref code-block) " macro. Imagine that you are making a tutorial. You are explaining how some piece of code works and you test that code in a different file to make sure your tutorial is well done. But one day, you decide to change your code. Now the tutorial needs to be changed too. To avoid writing your code twice you can use code-tags. Suppose that your code looks like this:")
 
+(code-block ()
+  (defun sum-list (int-list)
+    (loop for num in int-list
+	  sum num))
+  (sum-list '(1 2 3)))
+
+(text "And you write in your tutorial that the function " (code-inline "sum-list") " can be used the way you tested before:")
+
+(code-block ()
+  (text "The sum-list function can be used like this:")
+  (code-block ()
+    (sum-list '(1 2 3))))
+
+(text "But now you decide to use vectors rather than lists. You didn't use code-tags so you must change your code in two different places. Let's create now a code-tag using the macro " (function-ref code-tag) ".")
+
+(code-block ()
+  (defun sum-list (int-list)
+    (loop for num in int-list
+	  sum num))
+  (code-tag (sum-list-example)
+    (sum-list '(1 2 3))))
+
+(text "A code-tag named " (code-inline "sum-list-example") " is created and you can now use it in the tutorial:")
+
+(code-block ()
+  (text "The sum-list function can be used like this:")
+  (code-block (sum-list-example)
+    sum-list-example))
+
+(text "First we indicate in the list after " (code-inline "code-block") " that we will use the code tag named " (code-inline "sum-list-example") ". Then, we use it. Now, each time you change the call to " (code-inline "sum-list") " in your test code the tutorial will be automatically changed. You can specify as many tags as you want in both " (function-ref code-tag) " and " (function-ref code-block) " macros.")
+
+
+(subsubheader "Hiding your code")
 
 
 

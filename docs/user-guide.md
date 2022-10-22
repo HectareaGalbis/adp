@@ -354,6 +354,48 @@ Using a type tag: [ALSO-A-TYPE?](/docs/user-guide.md#condition-also-a-type)
 
 ### Code-tags
 
+Code-tags work differently to those we have just seen above. Code-tags are used inside the [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block) macro. Imagine that you are making a tutorial. You are explaining how some piece of code works and you test that code in a different file to make sure your tutorial is well done. But one day, you decide to change your code. Now the tutorial needs to be changed too. To avoid writing your code twice you can use code-tags. Suppose that your code looks like this:
+
+```
+(ADP:DEFUN SUM-LIST (INT-LIST)
+  (LOOP FOR NUM IN INT-LIST
+        SUM NUM))
+
+(SUM-LIST '(1 2 3))
+```
+
+And you write in your tutorial that the function `sum-list` can be used the way you tested before:
+
+```
+(ADP:TEXT "The sum-list function can be used like this:")
+
+(ADP:CODE-BLOCK NIL
+  (SUM-LIST '(1 2 3)))
+```
+
+But now you decide to use vectors rather than lists. You didn't use code-tags so you must change your code in two different places. Let's create now a code-tag using the macro [ADP:CODE-TAG](/docs/user-api.md#macro-code-tag).
+
+```
+(ADP:DEFUN SUM-LIST (INT-LIST)
+  (LOOP FOR NUM IN INT-LIST
+        SUM NUM))
+
+(SUM-LIST '(1 2 3))
+```
+
+A code-tag named `sum-list-example` is created and you can now use it in the tutorial:
+
+```
+(ADP:TEXT "The sum-list function can be used like this:")
+
+(ADP:CODE-BLOCK (SUM-LIST-EXAMPLE)
+  SUM-LIST-EXAMPLE)
+```
+
+First we indicate in the list after `code-block` that we will use the code tag named `sum-list-example`. Then, we use it. Now, each time you change the call to `sum-list` in your test code the tutorial will be automatically changed. You can specify as many tags as you want in both [ADP:CODE-TAG](/docs/user-api.md#macro-code-tag) and [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block) macros.
+
+### Hiding your code
+
 #### Variable: A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE
 
 ```Lisp
