@@ -144,6 +144,7 @@ of elements must be lists where its first elements are the keywords :item or :it
 a nested list is added."
   (when adppvt:*add-documentation*
     (labels ((check-items (item-list)
+	       (assert (not (null item-list)) () "Expected at least one expression in a itemize form.")
 	       (loop for item in item-list
 		     if (not (eq (car item) :item))
 		       do (if (eq (car item) :itemize) 
@@ -269,6 +270,7 @@ the code assigned to that tag is prin1-ed instead of the symbol."
     (check-type tags list "a list")
     (loop for tag in tags
 	  do (check-type tag symbol "a symbol"))
+    (assert (not (null code)) () "Expected at least one expression in a code-block form.")
     (with-gensyms (expr)
       `(progn
 	 (adppvt:emplace-adp-element :code-block (loop for ,expr in ',code
@@ -283,6 +285,7 @@ the code assigned to that tag is prin1-ed instead of the symbol."
 (adv-defmacro code-example (&body code)
   "Same as code-block, but tags cannot be used and the code is evaluated. The standard output and the results of each piece of code are also printed."
   (when adppvt:*add-documentation*
+    (assert (not (null code)) () "Expected at least one expression in a code-example form.")
     (let ((evaluated-code (loop for expr in code
 				collect (with-gensyms (output result)
 					  `(let* ((,output (make-array 10 :adjustable t :fill-pointer 0 :element-type 'character))

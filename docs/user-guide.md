@@ -124,7 +124,5 @@ Note that in the _Salary_ column we used multiple values in each cell. Each cell
 
 You can add lists with [ADP:ITEMIZE](/docs/user-api.md#macro-itemize). For example:
 
-``````
-
 ### Tags and references
 

@@ -121,7 +121,7 @@
 
 (text "You can add lists with " (function-ref itemize) ". For example:")
 
-(code-block ())
+
 
 (subsubheader "Tags and references" tags-subsubheader)
 
