@@ -459,8 +459,8 @@ You can use it in a code example too. Writing this:
 You will see this:
 
 ```
-(LOOP FOR I FROM 0 BELOW #:HIDE
-      DO #:HIDE (PRINT "Here is the important code!!!") #:HIDE)
+(LOOP FOR I FROM 0 BELOW ...
+      DO ... (PRINT "Here is the important code!!!") ...)
 
 "Prepare irrelevant things..." 
 "Here is the important code!!!" 

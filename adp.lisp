@@ -291,7 +291,7 @@ the code assigned to that tag is prin1-ed instead of the symbol."
 					  `(let* ((,output (make-array 10 :adjustable t :fill-pointer 0 :element-type 'character))
 						  (,result (multiple-value-list (with-output-to-string (*standard-output* ,output)
 										  ,(adppvt:remove-code-tag-exprs expr)))))
-					     (list ',(adppvt:process-code-tag '#:dummy-tag expr)
+					     (list (adppvt:process-code-tag '#:dummy-tag ',expr)
 						   ,output
 						   ,result))))))
       `(progn
