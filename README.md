@@ -42,3 +42,10 @@ For now, you need to install this project downloading the source. But soon it wi
 
 The ADP project only depends on Alexandria. However, each style can have other dependencies.
 
+## Available styles
+
+| Keyword name | File type | Authors |
+| --- | --- | --- |
+| GITHUB-MD | `md` | [Héctor Galbis Sanchis](https://github.com/Hectarea1996) |
+
+
