@@ -428,7 +428,7 @@ When explaining some piece of code you should focus on the important parts. Or, 
 
 ```
 (ADP:CODE-BLOCK NIL
-  (LET (...)
+  (LET ((CODE-KIDE NIL (X 5) (Y 6)))
     (DOING SOME STUFF)
     (DOING MORE STUFF)))
 ```
@@ -436,7 +436,7 @@ When explaining some piece of code you should focus on the important parts. Or, 
 You will see this:
 
 ```
-(LET ((X 5) (Y 6))
+(LET (...)
   (DOING SOME STUFF)
   (DOING MORE STUFF))
 ```
