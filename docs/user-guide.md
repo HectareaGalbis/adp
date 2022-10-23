@@ -42,7 +42,18 @@ If you want to generate documentation of this definition you only need to use th
 (ADP:DEFUN FOO (A B C) "Multiply a by the sum of b and c." (* A (+ B C)))
 ```
 
-That's all! Actually, note that if you load your project as always after changing some defuns, you will see that nothing happens. Your system is loaded normally and nothing changes. This is because the documentation generation is disabled by default. So, even you add ADP code your original code remains the same.
+And you will see something like this:
+
+#### Function: FOO
+
+```Lisp
+(defun FOO (A B C)
+  ...)
+```
+
+Multiply a by the sum of b and c.
+
+That's all! Actually, note that if you load your project as always after changing some defuns, you will see that nothing happens. Your system is loaded normally and nothing changes. This is because the documentation generation is disabled by default. So, even if you add ADP code, the original code remains the same.
 
 Same as with [ADP:DEFUN](/docs/user-api.md#macro-defun), every macro that defines something is redefined to print documentation. You can see every macro here: [API documentation functions](/docs/user-api.md#api-documentation-functions)
 

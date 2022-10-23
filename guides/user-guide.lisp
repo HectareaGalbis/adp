@@ -41,12 +41,17 @@
 
 (text "If you want to generate documentation of this definition you only need to use the macro " (function-ref defun) " instead of " (cl-ref defun) ".")
 
-(code-block ()
+(code-block (defun-example)
+  defun-example)
+
+(text "And you will see something like this:")
+
+(code-tag (defun-example)
   (defun foo (a b c)
     "Multiply a by the sum of b and c."
     (* a (+ b c))))
 
-(text "That's all! Actually, note that if you load your project as always after changing some defuns, you will see that nothing happens. Your system is loaded normally and nothing changes. This is because the documentation generation is disabled by default. So, even you add ADP code your original code remains the same.")
+(text "That's all! Actually, note that if you load your project as always after changing some defuns, you will see that nothing happens. Your system is loaded normally and nothing changes. This is because the documentation generation is disabled by default. So, even if you add ADP code, the original code remains the same.")
 
 (text "Same as with " (function-ref defun) ", every macro that defines something is redefined to print documentation. You can see every macro here: " (header-ref api-subheader))
 

@@ -774,7 +774,7 @@
 				 (processed-contents (mapcan (lambda (code)
 							       (if (code-block-tagp code)
 								   (let ((associated-code (coerce (get-code-tag (cadr code)) 'list)))
-								     (assert associated-code () "~s is not a code-tag." associated-code)
+								     (assert associated-code () "~s is not a code-tag." (cadr code))
 								     associated-code)
 								   (list code)))
 							     contents)))
