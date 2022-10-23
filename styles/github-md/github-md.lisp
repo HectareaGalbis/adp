@@ -141,7 +141,8 @@
   (format stream "```")
   (loop for expr in code
 	do (terpri stream)
-	   (adppvt:custom-prin1 expr stream "..."))
+	   (adppvt:custom-prin1 expr stream "...")
+	   (terpri stream))
   (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
     (format stream "~%~a~{~%~s~}~%" output results))
   (format stream "```~%~%"))
