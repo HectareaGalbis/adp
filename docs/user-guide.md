@@ -441,6 +441,44 @@ You will see this:
   (DOING MORE STUFF))
 ```
 
+You can use it in a code example too. Writing this:
+
+```
+(ADP:CODE-EXAMPLE
+  (LOOP FOR I FROM 0 BELOW (CODE-KIDE NIL
+                            (LENGTH
+                             '(SOME-PRIVATE-STUFF YOUR-PIN YOUR-PASSWORD
+                               OR-WHATEVER)))
+        DO (CODE-KIDE NIL (PRINT "Prepare irrelevant things...")) (PRINT
+                                                                   "Here is the important code!!!") (CODE-KIDE
+                                                                                                     NIL
+                                                                                                     (PRINT
+                                                                                                      "Freeing irrelevant resources..."))))
+```
+
+You will see this:
+
+```
+(LOOP FOR I FROM 0 BELOW #:HIDE
+      DO #:HIDE (PRINT "Here is the important code!!!") #:HIDE)
+
+"Prepare irrelevant things..." 
+"Here is the important code!!!" 
+"Freeing irrelevant resources..." 
+"Prepare irrelevant things..." 
+"Here is the important code!!!" 
+"Freeing irrelevant resources..." 
+"Prepare irrelevant things..." 
+"Here is the important code!!!" 
+"Freeing irrelevant resources..." 
+"Prepare irrelevant things..." 
+"Here is the important code!!!" 
+"Freeing irrelevant resources..." 
+NIL
+```
+
+This form is similar to [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block) or [ADP:CODE-TAG](/docs/user-api.md#macro-code-tag). It receives as first argument a list of tags,
+
 #### Variable: A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE
 
 ```Lisp

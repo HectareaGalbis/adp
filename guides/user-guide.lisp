@@ -397,6 +397,26 @@
     (doing some stuff)
     (doing more stuff)))
 
+(text "You can use it in a code example too. Writing this:")
+
+(code-block ()
+  (code-example
+    (loop for i from 0 below (code-kide () (length '(some-private-stuff your-pin your-password or-whatever)))
+	  do (code-kide () (print "Prepare irrelevant things..."))
+	     (print "Here is the important code!!!")
+	     (code-kide () (print "Freeing irrelevant resources...")))))
+
+(text "You will see this:")
+
+
+(code-example
+  (loop for i from 0 below (code-hide () (length '(some-private-stuff your-pin your-password or-whatever)))
+	do (code-hide () (print "Prepare irrelevant things..."))
+	   (print "Here is the important code!!!")
+	   (code-hide () (print "Freeing irrelevant resources..."))))
+
+
+(text "This form is similar to " (function-ref code-block) " or " (function-ref code-tag) ". It receives as first argument a list of tags,")
 
 
 
