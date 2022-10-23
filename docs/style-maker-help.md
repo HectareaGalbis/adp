@@ -1,0 +1,1312 @@
+# Style-maker helper functions
+
+## Miscellanea
+
+#### Variable: \*CUSTOM-PPRINT-DISPATCH\*
+
+```Lisp
+(defparameter ADP-PRIVATE:*CUSTOM-PPRINT-DISPATCH* (COPY-PPRINT-DISPATCH))
+```
+
+An extension of *print-pprint-dispatch*. The define functions (like defun) from adp will be printed with pretty indentation as if they were from cl. Internal symbols will be printed without the package extension even if *print-escape* is true.
+
+#### Function: CUSTOM-PRIN1
+
+```Lisp
+(defun ADP-PRIVATE:CUSTOM-PRIN1 (CODE &OPTIONAL STREAM (HIDE-STR NIL))
+  ...)
+```
+
+It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol which verifies hide-symbolp is found, then hide-str is princ-ed instead.
+
+## API function components
+
+### Defclass components
+
+#### Function: DEFCLASS-CLASS-NAME
+
+```Lisp
+(defun ADP-PRIVATE:DEFCLASS-CLASS-NAME (DEFCLASS-SOURCE)
+  ...)
+```
+
+#### Function: DEFCLASS-SUPERCLASS-NAMES
+
+```Lisp
+(defun ADP-PRIVATE:DEFCLASS-SUPERCLASS-NAMES (DEFCLASS-SOURCE)
+  ...)
+```
+
+#### Function: DEFCLASS-SLOT-SPECIFIERS
+
+```Lisp
+(defun ADP-PRIVATE:DEFCLASS-SLOT-SPECIFIERS (DEFCLASS-SOURCE)
+  ...)
+```
+
+#### Function: DEFCLASS-SLOT-NAMES
+
+```Lisp
+(defun ADP-PRIVATE:DEFCLASS-SLOT-NAMES (DEFCLASS-SOURCE)
+  ...)
+```
+
+#### Function: DEFCLASS-SLOT-OPTIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFCLASS-SLOT-OPTIONS (DEFCLASS-SOURCE)
+  ...)
+```
+
+#### Function: DEFCLASS-READER-FUNCTION-NAMES
+
+```Lisp
+(defun ADP-PRIVATE:DEFCLASS-READER-FUNCTION-NAMES (DEFCLASS-SOURCE)
+  ...)
+```
+
+#### Function: DEFCLASS-WRITER-FUNCTION-NAMES
+
+```Lisp
+(defun ADP-PRIVATE:DEFCLASS-WRITER-FUNCTION-NAMES (DEFCLASS-SOURCE)
+  ...)
+```
+
+#### Function: DEFCLASS-ACCESSOR-FUNCTION-NAMES
+
+```Lisp
+(defun ADP-PRIVATE:DEFCLASS-ACCESSOR-FUNCTION-NAMES (DEFCLASS-SOURCE)
+  ...)
+```
+
+#### Function: DEFCLASS-ALLOCATION-TYPES
+
+```Lisp
+(defun ADP-PRIVATE:DEFCLASS-ALLOCATION-TYPES (DEFCLASS-SOURCE)
+  ...)
+```
+
+#### Function: DEFCLASS-INITARG-NAMES
+
+```Lisp
+(defun ADP-PRIVATE:DEFCLASS-INITARG-NAMES (DEFCLASS-SOURCE)
+  ...)
+```
+
+#### Function: DEFCLASS-INITFORMS
+
+```Lisp
+(defun ADP-PRIVATE:DEFCLASS-INITFORMS (DEFCLASS-SOURCE)
+  ...)
+```
+
+#### Function: DEFCLASS-TYPE-SPECIFIERS
+
+```Lisp
+(defun ADP-PRIVATE:DEFCLASS-TYPE-SPECIFIERS (DEFCLASS-SOURCE)
+  ...)
+```
+
+#### Function: DEFCLASS-SLOT-DOCUMENTATIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFCLASS-SLOT-DOCUMENTATIONS (DEFCLASS-SOURCE)
+  ...)
+```
+
+#### Function: DEFCLASS-CLASS-OPTIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFCLASS-CLASS-OPTIONS (DEFCLASS-SOURCE)
+  ...)
+```
+
+#### Function: DEFCLASS-DEFAULT-INITARGS
+
+```Lisp
+(defun ADP-PRIVATE:DEFCLASS-DEFAULT-INITARGS (DEFCLASS-SOURCE)
+  ...)
+```
+
+#### Function: DEFCLASS-DOCUMENTATION
+
+```Lisp
+(defun ADP-PRIVATE:DEFCLASS-DOCUMENTATION (DEFCLASS-SOURCE)
+  ...)
+```
+
+#### Function: DEFCLASS-METACLASS
+
+```Lisp
+(defun ADP-PRIVATE:DEFCLASS-METACLASS (DEFCLASS-SOURCE)
+  ...)
+```
+
+#### Macro: WITH-DEFCLASS-COMPONENTS
+
+```Lisp
+(defmacro ADP-PRIVATE:WITH-DEFCLASS-COMPONENTS (((&REST #:COMPONENT-REST-ARGS0)
+                                                 #:FUNCTION-BODY-ARG1)
+                                                &BODY #:BODY-ARG2)
+  ...)
+```
+
+### Defconstant components
+
+#### Function: DEFCONSTANT-NAME
+
+```Lisp
+(defun ADP-PRIVATE:DEFCONSTANT-NAME (DEFCONSTANT-SOURCE)
+  ...)
+```
+
+#### Function: DEFCONSTANT-INITIAL-VALUE
+
+```Lisp
+(defun ADP-PRIVATE:DEFCONSTANT-INITIAL-VALUE (DEFCONSTANT-SOURCE)
+  ...)
+```
+
+#### Function: DEFCONSTANT-DOCUMENTATION
+
+```Lisp
+(defun ADP-PRIVATE:DEFCONSTANT-DOCUMENTATION (DEFCONSTANT-SOURCE)
+  ...)
+```
+
+#### Macro: WITH-DEFCONSTANT-COMPONENTS
+
+```Lisp
+(defmacro ADP-PRIVATE:WITH-DEFCONSTANT-COMPONENTS (((&REST
+                                                     #:COMPONENT-REST-ARGS0)
+                                                    #:FUNCTION-BODY-ARG1)
+                                                   &BODY #:BODY-ARG2)
+  ...)
+```
+
+### Defgeneric components
+
+#### Function: DEFGENERIC-FUNCTION-NAME
+
+```Lisp
+(defun ADP-PRIVATE:DEFGENERIC-FUNCTION-NAME (DEFGENERIC-SOURCE)
+  ...)
+```
+
+#### Function: DEFGENERIC-GF-LAMBDA-LIST
+
+```Lisp
+(defun ADP-PRIVATE:DEFGENERIC-GF-LAMBDA-LIST (DEFGENERIC-SOURCE)
+  ...)
+```
+
+#### Function: DEFGENERIC-OPTIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFGENERIC-OPTIONS (DEFGENERIC-SOURCE)
+  ...)
+```
+
+#### Function: DEFGENERIC-ARGUMENT-PRECEDENCE-ORDER
+
+```Lisp
+(defun ADP-PRIVATE:DEFGENERIC-ARGUMENT-PRECEDENCE-ORDER (DEFGENERIC-SOURCE)
+  ...)
+```
+
+#### Function: DEFGENERIC-GF-DECLARATIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFGENERIC-GF-DECLARATIONS (DEFGENERIC-SOURCE)
+  ...)
+```
+
+#### Function: DEFGENERIC-DOCUMENTATION
+
+```Lisp
+(defun ADP-PRIVATE:DEFGENERIC-DOCUMENTATION (DEFGENERIC-SOURCE)
+  ...)
+```
+
+#### Function: DEFGENERIC-METHOD-COMBINATION
+
+```Lisp
+(defun ADP-PRIVATE:DEFGENERIC-METHOD-COMBINATION (DEFGENERIC-SOURCE)
+  ...)
+```
+
+#### Function: DEFGENERIC-GENERIC-FUNCTION-CLASS
+
+```Lisp
+(defun ADP-PRIVATE:DEFGENERIC-GENERIC-FUNCTION-CLASS (DEFGENERIC-SOURCE)
+  ...)
+```
+
+#### Function: DEFGENERIC-METHOD-CLASS
+
+```Lisp
+(defun ADP-PRIVATE:DEFGENERIC-METHOD-CLASS (DEFGENERIC-SOURCE)
+  ...)
+```
+
+#### Function: DEFGENERIC-METHOD-DESCRIPTIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFGENERIC-METHOD-DESCRIPTIONS (DEFGENERIC-SOURCE)
+  ...)
+```
+
+#### Macro: WITH-DEFGENERIC-COMPONENTS
+
+```Lisp
+(defmacro ADP-PRIVATE:WITH-DEFGENERIC-COMPONENTS (((&REST
+                                                    #:COMPONENT-REST-ARGS0)
+                                                   #:FUNCTION-BODY-ARG1)
+                                                  &BODY #:BODY-ARG2)
+  ...)
+```
+
+### Define-compiler-macro components
+
+#### Function: DEFINE-COMPILER-MACRO-NAME
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-COMPILER-MACRO-NAME (DEFINE-COMPILER-MACRO-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-COMPILER-MACRO-LAMBDA-LIST
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-COMPILER-MACRO-LAMBDA-LIST (DEFINE-COMPILER-MACRO-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-COMPILER-MACRO-DECLARATIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-COMPILER-MACRO-DECLARATIONS (DEFINE-COMPILER-MACRO-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-COMPILER-MACRO-DOCUMENTATION
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-COMPILER-MACRO-DOCUMENTATION (DEFINE-COMPILER-MACRO-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-COMPILER-MACRO-FORMS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-COMPILER-MACRO-FORMS (DEFINE-COMPILER-MACRO-SOURCE)
+  ...)
+```
+
+#### Macro: WITH-DEFINE-COMPILER-MACRO-COMPONENTS
+
+```Lisp
+(defmacro ADP-PRIVATE:WITH-DEFINE-COMPILER-MACRO-COMPONENTS (((&REST
+                                                               #:COMPONENT-REST-ARGS0)
+                                                              #:FUNCTION-BODY-ARG1)
+                                                             &BODY #:BODY-ARG2)
+  ...)
+```
+
+### Define-condition components
+
+#### Function: DEFINE-CONDITION-NAME
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-CONDITION-NAME (DEFINE-CONDITION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-CONDITION-PARENT-TYPES
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-CONDITION-PARENT-TYPES (DEFINE-CONDITION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-CONDITION-SLOT-SPECS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-CONDITION-SLOT-SPECS (DEFINE-CONDITION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-CONDITION-SLOT-NAMES
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-CONDITION-SLOT-NAMES (DEFINE-CONDITION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-CONDITION-SLOT-OPTIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-CONDITION-SLOT-OPTIONS (DEFINE-CONDITION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-CONDITION-SLOT-READERS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-CONDITION-SLOT-READERS (DEFINE-CONDITION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-CONDITION-SLOT-WRITERS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-CONDITION-SLOT-WRITERS (DEFINE-CONDITION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-CONDITION-SLOT-ACCESSORS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-CONDITION-SLOT-ACCESSORS (DEFINE-CONDITION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-CONDITION-SLOT-ALLOCATIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-CONDITION-SLOT-ALLOCATIONS (DEFINE-CONDITION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-CONDITION-SLOT-INITARGS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-CONDITION-SLOT-INITARGS (DEFINE-CONDITION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-CONDITION-SLOT-INITFORMS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-CONDITION-SLOT-INITFORMS (DEFINE-CONDITION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-CONDITION-SLOT-TYPES
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-CONDITION-SLOT-TYPES (DEFINE-CONDITION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-CONDITION-OPTIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-CONDITION-OPTIONS (DEFINE-CONDITION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-CONDITION-DEFAULT-INITARGS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-CONDITION-DEFAULT-INITARGS (DEFINE-CONDITION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-CONDITION-DOCUMENTATION
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-CONDITION-DOCUMENTATION (DEFINE-CONDITION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-CONDITION-REPORT-NAME
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-CONDITION-REPORT-NAME (DEFINE-CONDITION-SOURCE)
+  ...)
+```
+
+#### Macro: WITH-DEFINE-CONDITION-COMPONENTS
+
+```Lisp
+(defmacro ADP-PRIVATE:WITH-DEFINE-CONDITION-COMPONENTS (((&REST
+                                                          #:COMPONENT-REST-ARGS0)
+                                                         #:FUNCTION-BODY-ARG1)
+                                                        &BODY #:BODY-ARG2)
+  ...)
+```
+
+### Define-method-combination components
+
+#### Function: DEFINE-METHOD-COMBINATION-NAME
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-METHOD-COMBINATION-NAME (DEFINE-METHOD-COMBINATION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-METHOD-COMBINATION-SHORT-FORM-OPTIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-METHOD-COMBINATION-SHORT-FORM-OPTIONS (DEFINE-METHOD-COMBINATION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-METHOD-COMBINATION-IDENTITY-WITH-ONE-ARGUMENT
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-METHOD-COMBINATION-IDENTITY-WITH-ONE-ARGUMENT (DEFINE-METHOD-COMBINATION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-METHOD-COMBINATION-OPERATOR
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-METHOD-COMBINATION-OPERATOR (DEFINE-METHOD-COMBINATION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-METHOD-COMBINATION-LAMBDA-LIST
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-METHOD-COMBINATION-LAMBDA-LIST (DEFINE-METHOD-COMBINATION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-METHOD-COMBINATION-METHOD-GROUP-SPECIFIERS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-METHOD-COMBINATION-METHOD-GROUP-SPECIFIERS (DEFINE-METHOD-COMBINATION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-METHOD-COMBINATION-METHOD-GROUP-SPECIFIER-NAMES
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-METHOD-COMBINATION-METHOD-GROUP-SPECIFIER-NAMES (DEFINE-METHOD-COMBINATION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-METHOD-COMBINATION-QUALIFIER-PATTERNS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-METHOD-COMBINATION-QUALIFIER-PATTERNS (DEFINE-METHOD-COMBINATION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-METHOD-COMBINATION-PREDICATES
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-METHOD-COMBINATION-PREDICATES (DEFINE-METHOD-COMBINATION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-METHOD-COMBINATION-LONG-FORM-OPTIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-METHOD-COMBINATION-LONG-FORM-OPTIONS (DEFINE-METHOD-COMBINATION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-METHOD-COMBINATION-DESCRIPTIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-METHOD-COMBINATION-DESCRIPTIONS (DEFINE-METHOD-COMBINATION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-METHOD-COMBINATION-ORDERS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-METHOD-COMBINATION-ORDERS (DEFINE-METHOD-COMBINATION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-METHOD-COMBINATION-REQUIREDS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-METHOD-COMBINATION-REQUIREDS (DEFINE-METHOD-COMBINATION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-METHOD-COMBINATION-ARGUMENTS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-METHOD-COMBINATION-ARGUMENTS (DEFINE-METHOD-COMBINATION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-METHOD-COMBINATION-GENERIC-FUNCTION
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-METHOD-COMBINATION-GENERIC-FUNCTION (DEFINE-METHOD-COMBINATION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-METHOD-COMBINATION-DECLARATIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-METHOD-COMBINATION-DECLARATIONS (DEFINE-METHOD-COMBINATION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-METHOD-COMBINATION-DOCUMENTATION
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-METHOD-COMBINATION-DOCUMENTATION (DEFINE-METHOD-COMBINATION-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-METHOD-COMBINATION-FORMS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-METHOD-COMBINATION-FORMS (DEFINE-METHOD-COMBINATION-SOURCE)
+  ...)
+```
+
+#### Macro: WITH-DEFINE-METHOD-COMBINATION-COMPONENTS
+
+```Lisp
+(defmacro ADP-PRIVATE:WITH-DEFINE-METHOD-COMBINATION-COMPONENTS (((&REST
+                                                                   #:COMPONENT-REST-ARGS0)
+                                                                  #:FUNCTION-BODY-ARG1)
+                                                                 &BODY
+                                                                 #:BODY-ARG2)
+  ...)
+```
+
+### Define-modify-macro components
+
+#### Function: DEFINE-MODIFY-MACRO-NAME
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-MODIFY-MACRO-NAME (DEFINE-MODIFY-MACRO-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-MODIFY-MACRO-LAMBDA-LIST
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-MODIFY-MACRO-LAMBDA-LIST (DEFINE-MODIFY-MACRO-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-MODIFY-MACRO-FUNCTION
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-MODIFY-MACRO-FUNCTION (DEFINE-MODIFY-MACRO-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-MODIFY-MACRO-DOCUMENTATION
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-MODIFY-MACRO-DOCUMENTATION (DEFINE-MODIFY-MACRO-SOURCE)
+  ...)
+```
+
+#### Macro: WITH-DEFINE-MODIFY-MACRO-COMPONENTS
+
+```Lisp
+(defmacro ADP-PRIVATE:WITH-DEFINE-MODIFY-MACRO-COMPONENTS (((&REST
+                                                             #:COMPONENT-REST-ARGS0)
+                                                            #:FUNCTION-BODY-ARG1)
+                                                           &BODY #:BODY-ARG2)
+  ...)
+```
+
+### Define-setf-expander components
+
+#### Function: DEFINE-SETF-EXPANDER-ACCESS-FN
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-SETF-EXPANDER-ACCESS-FN (DEFINE-SETF-EXPANDER-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-SETF-EXPANDER-LAMBDA-LIST
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-SETF-EXPANDER-LAMBDA-LIST (DEFINE-SETF-EXPANDER-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-SETF-EXPANDER-DECLARATIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-SETF-EXPANDER-DECLARATIONS (DEFINE-SETF-EXPANDER-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-SETF-EXPANDER-DOCUMENTATION
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-SETF-EXPANDER-DOCUMENTATION (DEFINE-SETF-EXPANDER-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-SETF-EXPANDER-FORMS
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-SETF-EXPANDER-FORMS (DEFINE-SETF-EXPANDER-SOURCE)
+  ...)
+```
+
+#### Macro: WITH-DEFINE-SETF-EXPANDER-COMPONENTS
+
+```Lisp
+(defmacro ADP-PRIVATE:WITH-DEFINE-SETF-EXPANDER-COMPONENTS (((&REST
+                                                              #:COMPONENT-REST-ARGS0)
+                                                             #:FUNCTION-BODY-ARG1)
+                                                            &BODY #:BODY-ARG2)
+  ...)
+```
+
+### Define-symbol-macro components
+
+#### Function: DEFINE-SYMBOL-MACRO-SYMBOL
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-SYMBOL-MACRO-SYMBOL (DEFINE-SYMBOL-MACRO-SOURCE)
+  ...)
+```
+
+#### Function: DEFINE-SYMBOL-MACRO-EXPANSION
+
+```Lisp
+(defun ADP-PRIVATE:DEFINE-SYMBOL-MACRO-EXPANSION (DEFINE-SYMBOL-MACRO-SOURCE)
+  ...)
+```
+
+#### Macro: WITH-DEFINE-SYMBOL-MACRO-COMPONENTS
+
+```Lisp
+(defmacro ADP-PRIVATE:WITH-DEFINE-SYMBOL-MACRO-COMPONENTS (((&REST
+                                                             #:COMPONENT-REST-ARGS0)
+                                                            #:FUNCTION-BODY-ARG1)
+                                                           &BODY #:BODY-ARG2)
+  ...)
+```
+
+### Defmacro components
+
+#### Function: DEFMACRO-NAME
+
+```Lisp
+(defun ADP-PRIVATE:DEFMACRO-NAME (DEFMACRO-SOURCE)
+  ...)
+```
+
+#### Function: DEFMACRO-LAMBDA-LIST
+
+```Lisp
+(defun ADP-PRIVATE:DEFMACRO-LAMBDA-LIST (DEFMACRO-SOURCE)
+  ...)
+```
+
+#### Function: DEFMACRO-DECLARATIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFMACRO-DECLARATIONS (DEFMACRO-SOURCE)
+  ...)
+```
+
+#### Function: DEFMACRO-DOCUMENTATION
+
+```Lisp
+(defun ADP-PRIVATE:DEFMACRO-DOCUMENTATION (DEFMACRO-SOURCE)
+  ...)
+```
+
+#### Function: DEFMACRO-FORMS
+
+```Lisp
+(defun ADP-PRIVATE:DEFMACRO-FORMS (DEFMACRO-SOURCE)
+  ...)
+```
+
+#### Macro: WITH-DEFMACRO-COMPONENTS
+
+```Lisp
+(defmacro ADP-PRIVATE:WITH-DEFMACRO-COMPONENTS (((&REST #:COMPONENT-REST-ARGS0)
+                                                 #:FUNCTION-BODY-ARG1)
+                                                &BODY #:BODY-ARG2)
+  ...)
+```
+
+### defmethod components
+
+#### Function: DEFMETHOD-FUNCTION-NAME
+
+```Lisp
+(defun ADP-PRIVATE:DEFMETHOD-FUNCTION-NAME (DEFMETHOD-SOURCE)
+  ...)
+```
+
+#### Function: DEFMETHOD-METHOD-QUALIFIERS
+
+```Lisp
+(defun ADP-PRIVATE:DEFMETHOD-METHOD-QUALIFIERS (DEFMETHOD-SOURCE)
+  ...)
+```
+
+#### Function: DEFMETHOD-SPECIALIZED-LAMBDA-LIST
+
+```Lisp
+(defun ADP-PRIVATE:DEFMETHOD-SPECIALIZED-LAMBDA-LIST (DEFMETHOD-SOURCE)
+  ...)
+```
+
+#### Function: DEFMETHOD-DECLARATIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFMETHOD-DECLARATIONS (DEFMETHOD-SOURCE)
+  ...)
+```
+
+#### Function: DEFMETHOD-DOCUMENTATION
+
+```Lisp
+(defun ADP-PRIVATE:DEFMETHOD-DOCUMENTATION (DEFMETHOD-SOURCE)
+  ...)
+```
+
+#### Function: DEFMETHOD-FORMS
+
+```Lisp
+(defun ADP-PRIVATE:DEFMETHOD-FORMS (DEFMETHOD-SOURCE)
+  ...)
+```
+
+#### Macro: WITH-DEFMETHOD-COMPONENTS
+
+```Lisp
+(defmacro ADP-PRIVATE:WITH-DEFMETHOD-COMPONENTS (((&REST
+                                                   #:COMPONENT-REST-ARGS0)
+                                                  #:FUNCTION-BODY-ARG1)
+                                                 &BODY #:BODY-ARG2)
+  ...)
+```
+
+### Defpackage components
+
+#### Function: DEFPACKAGE-OPTIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFPACKAGE-OPTIONS (DEFPACKAGE-SOURCE)
+  ...)
+```
+
+#### Function: DEFPACKAGE-DEFINED-PACKAGE-NAME
+
+```Lisp
+(defun ADP-PRIVATE:DEFPACKAGE-DEFINED-PACKAGE-NAME (DEFPACKAGE-SOURCE)
+  ...)
+```
+
+#### Function: DEFPACKAGE-NICKNAMES
+
+```Lisp
+(defun ADP-PRIVATE:DEFPACKAGE-NICKNAMES (DEFPACKAGE-SOURCE)
+  ...)
+```
+
+#### Function: DEFPACKAGE-DOCUMENTATION
+
+```Lisp
+(defun DEFPACKAGE-DOCUMENTATION (DEFPACKAGE-SOURCE)
+  ...)
+```
+
+#### Function: DEFPACKAGE-USE-PACKAGE-NAMES
+
+```Lisp
+(defun ADP-PRIVATE:DEFPACKAGE-USE-PACKAGE-NAMES (DEFPACKAGE-SOURCE)
+  ...)
+```
+
+#### Function: DEFPACKAGE-SHADOW-SYMBOL-NAMES
+
+```Lisp
+(defun ADP-PRIVATE:DEFPACKAGE-SHADOW-SYMBOL-NAMES (DEFPACKAGE-SOURCE)
+  ...)
+```
+
+#### Function: DEFPACKAGE-SHADOWING-IMPORT-FROM-PACKAGE-NAMES
+
+```Lisp
+(defun ADP-PRIVATE:DEFPACKAGE-SHADOWING-IMPORT-FROM-PACKAGE-NAMES (DEFPACKAGE-SOURCE)
+  ...)
+```
+
+#### Function: DEFPACKAGE-SHADOWING-IMPORT-FROM-SYMBOL-NAMES
+
+```Lisp
+(defun ADP-PRIVATE:DEFPACKAGE-SHADOWING-IMPORT-FROM-SYMBOL-NAMES (DEFPACKAGE-SOURCE)
+  ...)
+```
+
+#### Function: DEFPACKAGE-IMPORT-FROM-PACKAGE-NAMES
+
+```Lisp
+(defun ADP-PRIVATE:DEFPACKAGE-IMPORT-FROM-PACKAGE-NAMES (DEFPACKAGE-SOURCE)
+  ...)
+```
+
+#### Function: DEFPACKAGE-IMPORT-FROM-SYMBOL-NAMES
+
+```Lisp
+(defun ADP-PRIVATE:DEFPACKAGE-IMPORT-FROM-SYMBOL-NAMES (DEFPACKAGE-SOURCE)
+  ...)
+```
+
+#### Function: DEFPACKAGE-EXPORT-SYMBOL-NAMES
+
+```Lisp
+(defun ADP-PRIVATE:DEFPACKAGE-EXPORT-SYMBOL-NAMES (DEFPACKAGE-SOURCE)
+  ...)
+```
+
+#### Function: DEFPACKAGE-IMPORT-SYMBOL-NAMES
+
+```Lisp
+(defun ADP-PRIVATE:DEFPACKAGE-IMPORT-SYMBOL-NAMES (DEFPACKAGE-SOURCE)
+  ...)
+```
+
+#### Function: DEFPACKAGE-SIZE
+
+```Lisp
+(defun ADP-PRIVATE:DEFPACKAGE-SIZE (DEFPACKAGE-SOURCE)
+  ...)
+```
+
+#### Macro: WITH-DEFPACKAGE-COMPONENTS
+
+```Lisp
+(defmacro ADP-PRIVATE:WITH-DEFPACKAGE-COMPONENTS (((&REST
+                                                    #:COMPONENT-REST-ARGS0)
+                                                   #:FUNCTION-BODY-ARG1)
+                                                  &BODY #:BODY-ARG2)
+  ...)
+```
+
+### Defparameter components
+
+#### Function: DEFPARAMETER-NAME
+
+```Lisp
+(defun ADP-PRIVATE:DEFPARAMETER-NAME (DEFPARAMETER-SOURCE)
+  ...)
+```
+
+#### Function: DEFPARAMETER-INITIAL-VALUE
+
+```Lisp
+(defun ADP-PRIVATE:DEFPARAMETER-INITIAL-VALUE (DEFPARAMETER-SOURCE)
+  ...)
+```
+
+#### Function: DEFPARAMETER-DOCUMENTATION
+
+```Lisp
+(defun ADP-PRIVATE:DEFPARAMETER-DOCUMENTATION (DEFPARAMETER-SOURCE)
+  ...)
+```
+
+#### Macro: WITH-DEFPARAMETER-COMPONENTS
+
+```Lisp
+(defmacro ADP-PRIVATE:WITH-DEFPARAMETER-COMPONENTS (((&REST
+                                                      #:COMPONENT-REST-ARGS0)
+                                                     #:FUNCTION-BODY-ARG1)
+                                                    &BODY #:BODY-ARG2)
+  ...)
+```
+
+### Defsetf components
+
+#### Function: DEFSETF-ACCESS-FN
+
+```Lisp
+(defun ADP-PRIVATE:DEFSETF-ACCESS-FN (DEFSETF-SOURCE)
+  ...)
+```
+
+#### Function: DEFSETF-UPDATE-FN
+
+```Lisp
+(defun ADP-PRIVATE:DEFSETF-UPDATE-FN (DEFSETF-SOURCE)
+  ...)
+```
+
+#### Function: DEFSETF-DOCUMENTATION
+
+```Lisp
+(defun ADP-PRIVATE:DEFSETF-DOCUMENTATION (DEFSETF-SOURCE)
+  ...)
+```
+
+#### Macro: WITH-DEFSETF-COMPONENTS
+
+```Lisp
+(defmacro ADP-PRIVATE:WITH-DEFSETF-COMPONENTS (((&REST #:COMPONENT-REST-ARGS0)
+                                                #:FUNCTION-BODY-ARG1)
+                                               &BODY #:BODY-ARG2)
+  ...)
+```
+
+### Defstruct components
+
+#### Function: DEFSTRUCT-NAME-AND-OPTIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-NAME-AND-OPTIONS (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-STRUCTURE-NAME
+
+```Lisp
+(defun DEFSTRUCT-STRUCTURE-NAME (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-OPTIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-OPTIONS (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-CONC-NAME-OPTION
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-CONC-NAME-OPTION (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-CONSTRUCTOR-OPTIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-CONSTRUCTOR-OPTIONS (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-COPIER-OPTION
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-COPIER-OPTION (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-PREDICATE-OPTION
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-PREDICATE-OPTION (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-INCLUDE-OPTION
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-INCLUDE-OPTION (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-PRINTER-OPTION
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-PRINTER-OPTION (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-PRINT-OBJECT-OPTION
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-PRINT-OBJECT-OPTION (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-PRINT-FUNCTION-OPTION
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-PRINT-FUNCTION-OPTION (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-TYPE-OPTION
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-TYPE-OPTION (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-NAMED-OPTION
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-NAMED-OPTION (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-INITIAL-OFFSET-OPTION
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-INITIAL-OFFSET-OPTION (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-SLOT-DESCRIPTIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-SLOT-DESCRIPTIONS (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-SLOT-OPTIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-SLOT-OPTIONS (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-CONC-NAME
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-CONC-NAME (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-CONSTRUCTOR-ARGLISTS
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-CONSTRUCTOR-ARGLISTS (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-CONSTRUCTOR-NAMES
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-CONSTRUCTOR-NAMES (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-COPIER-NAME
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-COPIER-NAME (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-INCLUDED-STRUCTURE-NAME
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-INCLUDED-STRUCTURE-NAME (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-INCLUDE-OPTION-SLOT-DESCRIPTORS
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-INCLUDE-OPTION-SLOT-DESCRIPTORS (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-INITIAL-OFFSET
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-INITIAL-OFFSET (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-PREDICATE-NAME
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-PREDICATE-NAME (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-PRINTER-NAME
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-PRINTER-NAME (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-SLOT-NAMES
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-SLOT-NAMES (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-SLOT-INITFORMS
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-SLOT-INITFORMS (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-SLOT-TYPES
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-SLOT-TYPES (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-SLOT-READ-ONLY-PS
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-SLOT-READ-ONLY-PS (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-TYPE
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-TYPE (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Function: DEFSTRUCT-DOCUMENTATION
+
+```Lisp
+(defun ADP-PRIVATE:DEFSTRUCT-DOCUMENTATION (DEFSTRUCT-SOURCE)
+  ...)
+```
+
+#### Macro: WITH-DEFSTRUCT-COMPONENTS
+
+```Lisp
+(defmacro ADP-PRIVATE:WITH-DEFSTRUCT-COMPONENTS (((&REST
+                                                   #:COMPONENT-REST-ARGS0)
+                                                  #:FUNCTION-BODY-ARG1)
+                                                 &BODY #:BODY-ARG2)
+  ...)
+```
+
+### Deftype components
+
+#### Function: DEFTYPE-NAME
+
+```Lisp
+(defun ADP-PRIVATE:DEFTYPE-NAME (DEFTYPE-SOURCE)
+  ...)
+```
+
+#### Function: DEFTYPE-LAMBDA-LIST
+
+```Lisp
+(defun ADP-PRIVATE:DEFTYPE-LAMBDA-LIST (DEFTYPE-SOURCE)
+  ...)
+```
+
+#### Function: DEFTYPE-DECLARATIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFTYPE-DECLARATIONS (DEFTYPE-SOURCE)
+  ...)
+```
+
+#### Function: DEFTYPE-DOCUMENTATION
+
+```Lisp
+(defun ADP-PRIVATE:DEFTYPE-DOCUMENTATION (DEFTYPE-SOURCE)
+  ...)
+```
+
+#### Function: DEFTYPE-FORMS
+
+```Lisp
+(defun ADP-PRIVATE:DEFTYPE-FORMS (DEFTYPE-SOURCE)
+  ...)
+```
+
+#### Macro: WITH-DEFTYPE-COMPONENTS
+
+```Lisp
+(defmacro ADP-PRIVATE:WITH-DEFTYPE-COMPONENTS (((&REST #:COMPONENT-REST-ARGS0)
+                                                #:FUNCTION-BODY-ARG1)
+                                               &BODY #:BODY-ARG2)
+  ...)
+```
+
+### Defun components
+
+#### Function: DEFUN-FUNCTION-NAME
+
+```Lisp
+(defun ADP-PRIVATE:DEFUN-FUNCTION-NAME (DEFUN-SOURCE)
+  ...)
+```
+
+#### Function: DEFUN-LAMBDA-LIST
+
+```Lisp
+(defun ADP-PRIVATE:DEFUN-LAMBDA-LIST (DEFUN-SOURCE)
+  ...)
+```
+
+#### Function: DEFUN-DECLARATIONS
+
+```Lisp
+(defun ADP-PRIVATE:DEFUN-DECLARATIONS (DEFUN-SOURCE)
+  ...)
+```
+
+#### Function: DEFUN-DOCUMENTATION
+
+```Lisp
+(defun ADP-PRIVATE:DEFUN-DOCUMENTATION (DEFUN-SOURCE)
+  ...)
+```
+
+#### Function: DEFUN-FORMS
+
+```Lisp
+(defun ADP-PRIVATE:DEFUN-FORMS (DEFUN-SOURCE)
+  ...)
+```
+
+#### Macro: WITH-DEFUN-COMPONENTS
+
+```Lisp
+(defmacro ADP-PRIVATE:WITH-DEFUN-COMPONENTS (((&REST #:COMPONENT-REST-ARGS0)
+                                              #:FUNCTION-BODY-ARG1)
+                                             &BODY #:BODY-ARG2)
+  ...)
+```
+
+### Defvar components
+
+#### Function: DEFVAR-NAME
+
+```Lisp
+(defun ADP-PRIVATE:DEFVAR-NAME (DEFVAR-SOURCE)
+  ...)
+```
+
+#### Function: DEFVAR-INITIAL-VALUE
+
+```Lisp
+(defun ADP-PRIVATE:DEFVAR-INITIAL-VALUE (DEFVAR-SOURCE)
+  ...)
+```
+
+#### Function: DEFVAR-DOCUMENTATION
+
+```Lisp
+(defun ADP-PRIVATE:DEFVAR-DOCUMENTATION (DEFVAR-SOURCE)
+  ...)
+```
+
+#### Macro: WITH-DEFVAR-COMPONENTS
+
+```Lisp
+(defmacro ADP-PRIVATE:WITH-DEFVAR-COMPONENTS (((&REST #:COMPONENT-REST-ARGS0)
+                                               #:FUNCTION-BODY-ARG1)
+                                              &BODY #:BODY-ARG2)
+  ...)
+```
+
