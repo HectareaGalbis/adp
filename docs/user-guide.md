@@ -615,7 +615,8 @@ I hope this guide is useful. I usually see Common Lisp projects that looks aweso
 #### Type: ALSO-A-TYPE?
 
 ```Lisp
-(deftype ALSO-A-TYPE? NIL)
+(deftype ALSO-A-TYPE? NIL
+  ...)
 ```
 
 Go back to [Function-tags, symbol-tags and type-tags](/docs/user-guide.md#function-tags-symbol-tags-and-type-tags)

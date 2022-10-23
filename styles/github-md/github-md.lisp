@@ -285,7 +285,7 @@
   (adppvt:with-deftype-components ((name lambda-list documentation) source)
     (format stream "#### Type: ~a~%~%" name)
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
-      (format stream "```Lisp~%(deftype ~s ~s)~%```~%~%" name lambda-list))
+      (format stream "```Lisp~%(deftype ~s ~s~%  ...)~%```~%~%" name lambda-list))
     (when documentation
       (format stream "~a~%~%" documentation))))
 
