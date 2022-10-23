@@ -479,6 +479,14 @@
     z-tag))
 
 
+(subheader "Tips and final comments")
+
+(text "I hope this guide is useful. I usually see Common Lisp projects that looks awesome but they lack guides or even documentation. That's why I started to document all my projects and then I realized that I needed some tool to make it easier. I know that there are already other documentation generators, but none of them suits my needs. Luckily, Common Lisp makes doing this kind of tools relatively easy compared to other languages. Lastly, I want to give you some tips or ways to use ADP that I ended up doing myself.")
+
+(itemize (:item (bold-italic "Use a different system for documentation generation") ": I recommend to use a different system to indicate all the files you need to load to generate the documentation. So, if you have a system named " (code-inline :my-system) " then create another system named " (code-inline :my-system/docs) ", for example. Although ADP will not execute anything unless you use the function " (function-ref load-documentation-system) ", I think this should make your projects cleaner. And, let's be honest, I'm still learning the language and I don't want to break other people's code. I did this for ADP, so you can see an example in the file " (code-inline "adp.asd") ".")
+	 (:item (bold-italic "Handling error messages") ": I tried to make informative error messages but sometimes this cannot be possible. Or, at least, I can't do it better. The most common errors I have had when using ADP were undefined variable errors. Remember that " (function-ref code-inline) " works the same as " (function-ref text) ". You can't write " (code-inline "(code-inline name-of-function)") ", you must write this instead " (code-inline "(code-inline \"name-of-function\")") " or " (code-inline "(code-inline 'name-of-function)") ". Also, be careful when using " (function-ref function-ref) " or similars. If you don't write correctly the macro, some implementations will treat that call as a function call and will treat the argument as a variable. That's not a variable that ADP or you have defined and it is sure that it will raise an undefined variable error.")
+	 (:item "That's all! Enjoy using ADP. I leave you with " (symbol-ref a-parameter-defined-at-the-end-of-the-file) " and " (type-ref also-a-type?) " again."))
+
 
 
 (code-tag (end-parameter-code)

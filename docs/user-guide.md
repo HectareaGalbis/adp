@@ -553,6 +553,14 @@ You will see this:
           FINALLY (RETURN (VALUES ... ... YZ-LIST)))))
 ```
 
+## Tips and final comments
+
+I hope this guide is useful. I usually see Common Lisp projects that looks awesome but they lack guides or even documentation. That's why I started to document all my projects and then I realized that I needed some tool to make it easier. I know that there are already other documentation generators, but none of them suits my needs. Luckily, Common Lisp makes doing this kind of tools relatively easy compared to other languages. Lastly, I want to give you some tips or ways to use ADP that I ended up doing myself.
+
+* ***Use a different system for documentation generation***: I recommend to use a different system to indicate all the files you need to load to generate the documentation. So, if you have a system named `MY-SYSTEM` then create another system named `MY-SYSTEM/DOCS`, for example. Although ADP will not execute anything unless you use the function [ADP:LOAD-DOCUMENTATION-SYSTEM](/docs/user-api.md#function-load-documentation-system), I think this should make your projects cleaner. And, let's be honest, I'm still learning the language and I don't want to break other people's code. I did this for ADP, so you can see an example in the file `adp.asd`.
+* ***Handling error messages***: I tried to make informative error messages but sometimes this cannot be possible. Or, at least, I can't do it better. The most common errors I have had when using ADP were undefined variable errors. Remember that [ADP:CODE-INLINE](/docs/user-api.md#macro-code-inline) works the same as [ADP:TEXT](/docs/user-api.md#macro-text). You can't write `(code-inline name-of-function)`, you must write this instead `(code-inline "name-of-function")` or `(code-inline 'name-of-function)`. Also, be careful when using [ADP:FUNCTION-REF](/docs/user-api.md#macro-function-ref) or similars. If you don't write correctly the macro, some implementations will treat that call as a function call and will treat the argument as a variable. That's not a variable that ADP or you have defined and it is sure that it will raise an undefined variable error.
+* That's all! Enjoy using ADP. I leave you with [A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file) and [ALSO-A-TYPE?](/docs/user-guide.md#condition-also-a-type) again.
+
 #### Variable: A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE
 
 ```Lisp
