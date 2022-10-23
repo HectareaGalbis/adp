@@ -324,11 +324,11 @@ Then you will see this:
 
 Go to the top: [The ADP User Guide](/docs/user-guide.md#the-adp-user-guide)
 
-Note that the macro is used inside a [ADP:TEXT](/docs/user-api.md#macro-text) form. Same as with [ADP:BOLD](/docs/user-api.md#macro-bold) or [ADP:ITALIC](/docs/user-api.md#macro-italic) [ADP:HEADER-REF](/docs/user-api.md#macro-header-ref) only can be used inside [ADP:TEXT](/docs/user-api.md#macro-text), [ADP:TABLE](/docs/user-api.md#macro-table) and [ADP:ITEMIZE](/docs/user-api.md#macro-itemize).
+Note that the macro is used inside a [ADP:TEXT](/docs/user-api.md#macro-text) form. Same as with [ADP:BOLD](/docs/user-api.md#macro-bold) or [ADP:ITALIC](/docs/user-api.md#macro-italic), [ADP:HEADER-REF](/docs/user-api.md#macro-header-ref) only can be used inside [ADP:TEXT](/docs/user-api.md#macro-text), [ADP:TABLE](/docs/user-api.md#macro-table) or [ADP:ITEMIZE](/docs/user-api.md#macro-itemize).
 
 ### Function-tags, symbol-tags and type-tags
 
-These tags are symbols associated with a function, a variable or a type. More specifically, the macros used to define things like [ADP:DEFUN](/docs/user-api.md#macro-defun), [ADP:DEFPARAMETER](/docs/user-api.md#macro-defparameter) or [ADP:DEFSTRUCT](/docs/user-api.md#macro-defstruct) can create automatically a function-tag, a symbol-tag or a type-tag respectively. The tag created is the symbol of the name of the function, variable or type defined respectively. ADP defines three types of tags because the same symbol can refer to a function, a variable and a type simultaneously. The next list shows what type of tags are defined by which macros:
+These tags are symbols associated with a function, a variable or a type respectively. More specifically, the macros used to define things like [ADP:DEFUN](/docs/user-api.md#macro-defun), [ADP:DEFPARAMETER](/docs/user-api.md#macro-defparameter) or [ADP:DEFSTRUCT](/docs/user-api.md#macro-defstruct) can create automatically a function-tag, a symbol-tag or a type-tag respectively. The tag created is the symbol of the name of the function, variable or type defined respectively. ADP defines three types of tags because the same symbol can refer to a function, a variable and a type simultaneously. The next list shows what type of tags are defined by which macros:
 
 * Function-tags:
   * [ADP:DEFGENERIC](/docs/user-api.md#macro-defgeneric)

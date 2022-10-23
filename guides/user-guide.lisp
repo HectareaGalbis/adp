@@ -283,12 +283,12 @@
 (code-tag (header-ref-example)
   (text "Go to the top: " (header-ref user-guide-header)))
 
-(text "Note that the macro is used inside a " (function-ref text) " form. Same as with " (function-ref bold) " or " (function-ref italic) " " (function-ref header-ref) " only can be used inside " (function-ref text) ", " (function-ref table) " and " (function-ref itemize) ".")
+(text "Note that the macro is used inside a " (function-ref text) " form. Same as with " (function-ref bold) " or " (function-ref italic) ", " (function-ref header-ref) " only can be used inside " (function-ref text) ", " (function-ref table) " or " (function-ref itemize) ".")
 
 
 (subsubheader "Function-tags, symbol-tags and type-tags" function-tags-subsubheader)
 
-(text "These tags are symbols associated with a function, a variable or a type. More specifically, the macros used to define things like " (function-ref defun) ", " (function-ref defparameter) " or " (function-ref defstruct) " can create automatically a function-tag, a symbol-tag or a type-tag respectively. The tag created is the symbol of the name of the function, variable or type defined respectively. ADP defines three types of tags because the same symbol can refer to a function, a variable and a type simultaneously. The next list shows what type of tags are defined by which macros:")
+(text "These tags are symbols associated with a function, a variable or a type respectively. More specifically, the macros used to define things like " (function-ref defun) ", " (function-ref defparameter) " or " (function-ref defstruct) " can create automatically a function-tag, a symbol-tag or a type-tag respectively. The tag created is the symbol of the name of the function, variable or type defined respectively. ADP defines three types of tags because the same symbol can refer to a function, a variable and a type simultaneously. The next list shows what type of tags are defined by which macros:")
 
 (itemize (:item "Function-tags:")
 	 (:itemize (:item (function-ref defgeneric))
