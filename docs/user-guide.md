@@ -354,7 +354,7 @@ Using a type tag: [ALSO-A-TYPE?](/docs/user-guide.md#condition-also-a-type)
 
 ### File-tags
 
-I lied before saying that tags are symbols. Actually, file-tags are a pathname. Do you remember the macro [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file)? The pathname you specify in that macro will be converted to a file-tag. For example, I wrote in the source file `adp.lisp` the next expression to create the file `docs/user-api.md`:
+I lied before saying that tags are symbols. Actually, file-tags are pathnames. Do you remember the macro [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file)? The pathname you specify in that macro will be converted to a file-tag. For example, I wrote in the source file `adp.lisp` the next expression to create the file `docs/user-api.md`:
 
 ```
 (ADP:WRITE-IN-FILE #P"docs/user-api")
@@ -368,7 +368,7 @@ Now I can use the macro [ADP:FILE-REF](/docs/user-api.md#macro-file-ref) to crea
 
 You will see this:
 
-Go to the file [docs/user-api](docs/user-api.md)
+Go to the file [docs/user-api](/docs/user-api.md)
 
 Note the use of `#P` to create a pathname.
 
@@ -579,7 +579,7 @@ I hope this guide is useful. I usually see Common Lisp projects that looks aweso
 
 * ***Use a different system for documentation generation***: I recommend to use a different system to indicate all the files you need to load to generate the documentation. So, if you have a system named `MY-SYSTEM` then create another system named `MY-SYSTEM/DOCS`, for example. Although ADP will not execute anything unless you use the function [ADP:LOAD-DOCUMENTATION-SYSTEM](/docs/user-api.md#function-load-documentation-system), I think this should make your projects cleaner. And, let's be honest, I'm still learning the language and I don't want to break other people's code. I did this separation for ADP, so you can see an example in the file `adp.asd`.
 * ***Handling error messages***: I tried to make informative error messages but sometimes this cannot be possible. Or, at least, I can't do it better. The most common errors I have had when using ADP were undefined variable errors. Remember that [ADP:CODE-INLINE](/docs/user-api.md#macro-code-inline) works the same as [ADP:TEXT](/docs/user-api.md#macro-text). You can't write `(code-inline name-of-function)`, you must write this instead `(code-inline "name-of-function")` or `(code-inline 'name-of-function)`. Also, be careful when using [ADP:FUNCTION-REF](/docs/user-api.md#macro-function-ref) or similars. If you don't write correctly the macro, some implementations will treat that call as a function call and will treat the argument as a variable. That's not a variable that ADP or you have defined and it is sure that it will raise an undefined variable error.
-* ***Read the API***: Maybe reading the [docs/user-api](docs/user-api.md) can make you understand better how some macros work (or not). At least, you may be interested in seeing the section [Additional functions](/docs/user-api.md#additional-functions).
+* ***Read the API***: Maybe reading the [docs/user-api](/docs/user-api.md) can make you understand better how some macros work (or not). At least, you may be interested in seeing the section [Additional functions](/docs/user-api.md#additional-functions).
 * That's all! Enjoy using ADP. I leave you with [A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file) and [ALSO-A-TYPE?](/docs/user-guide.md#condition-also-a-type) again.
 
 #### Variable: A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE

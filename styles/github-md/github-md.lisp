@@ -57,7 +57,7 @@
 
 (adppvt:def-file-ref-writer (stream root-path file-path)
     (declare (ignore root-path))
-  (format stream "[~a](~a.md)" file-path file-path))
+  (format stream "[~a](/~a.md)" file-path file-path))
 
 
 (defun convert-to-github-header-anchor (str)

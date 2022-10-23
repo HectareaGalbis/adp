@@ -323,7 +323,7 @@
 
 (subsubheader "File-tags")
 
-(text "I lied before saying that tags are symbols. Actually, file-tags are a pathname. Do you remember the macro " (function-ref write-in-file) "? The pathname you specify in that macro will be converted to a file-tag. For example, I wrote in the source file " (code-inline "adp.lisp") " the next expression to create the file " (code-inline "docs/user-api.md") ":")
+(text "I lied before saying that tags are symbols. Actually, file-tags are pathnames. Do you remember the macro " (function-ref write-in-file) "? The pathname you specify in that macro will be converted to a file-tag. For example, I wrote in the source file " (code-inline "adp.lisp") " the next expression to create the file " (code-inline "docs/user-api.md") ":")
 
 (code-block ()
   (write-in-file #P"docs/user-api"))
