@@ -449,11 +449,14 @@ You can use it in a code example too. Writing this:
                             (LENGTH
                              '(SOME-PRIVATE-STUFF YOUR-PIN YOUR-PASSWORD
                                OR-WHATEVER)))
-        DO (CODE-KIDE NIL (PRINT "Prepare irrelevant things...")) (PRINT
-                                                                   "Here is the important code!!!") (CODE-KIDE
-                                                                                                     NIL
-                                                                                                     (PRINT
-                                                                                                      "Freeing irrelevant resources..."))))
+        DO (CODE-KIDE NIL
+            (LET ((IRRELEVANT-CODE 5))
+              IRRELEVANT-CODE)) (PRINT
+                                 "Here is the important code!!!") (CODE-KIDE
+                                                                   NIL
+                                                                   (LET ((MORE-IRRELEVANT
+                                                                          6))
+                                                                     MORE-IRRELEVANT))))
 ```
 
 You will see this:
@@ -462,18 +465,10 @@ You will see this:
 (LOOP FOR I FROM 0 BELOW ...
       DO ... (PRINT "Here is the important code!!!") ...)
 
-"Prepare irrelevant things..." 
 "Here is the important code!!!" 
-"Freeing irrelevant resources..." 
-"Prepare irrelevant things..." 
 "Here is the important code!!!" 
-"Freeing irrelevant resources..." 
-"Prepare irrelevant things..." 
 "Here is the important code!!!" 
-"Freeing irrelevant resources..." 
-"Prepare irrelevant things..." 
 "Here is the important code!!!" 
-"Freeing irrelevant resources..." 
 NIL
 ```
 

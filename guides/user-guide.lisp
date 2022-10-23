@@ -402,18 +402,22 @@
 (code-block ()
   (code-example
     (loop for i from 0 below (code-kide () (length '(some-private-stuff your-pin your-password or-whatever)))
-	  do (code-kide () (print "Prepare irrelevant things..."))
+	  do (code-kide () (let ((irrelevant-code 5))
+			     irrelevant-code))
 	     (print "Here is the important code!!!")
-	     (code-kide () (print "Freeing irrelevant resources...")))))
+	     (code-kide () (let ((more-irrelevant 6))
+			     more-irrelevant)))))
 
 (text "You will see this:")
 
 
 (code-example
   (loop for i from 0 below (code-hide () (length '(some-private-stuff your-pin your-password or-whatever)))
-	do (code-hide () (print "Prepare irrelevant things..."))
+	do (code-hide () (let ((irrelevant-code 5))
+			   irrelevant-code))
 	   (print "Here is the important code!!!")
-	   (code-hide () (print "Freeing irrelevant resources..."))))
+	   (code-hide () (let ((more-irrelevant 6))
+			   more-irrelevant))))
 
 
 (text "This form is similar to " (function-ref code-block) " or " (function-ref code-tag) ". It receives as first argument a list of tags,")
