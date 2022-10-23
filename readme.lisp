@@ -55,7 +55,7 @@
 (subheader "Available styles")
 
 (table ((:cell "Keyword name") (:cell "File type") (:cell "Authors"))
-       ((:cell :github-md) (:cell (code-inline "md")) (:cell (web-link "Héctor Galbis Sanchis" "https://github.com/Hectarea1996"))))
+       ((:cell ":github-md") (:cell (code-inline "md")) (:cell (web-link "Héctor Galbis Sanchis" "https://github.com/Hectarea1996"))))
 
 
 (write-in-file #P"README")
