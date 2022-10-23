@@ -40,9 +40,9 @@ For now, you need to install this project downloading the source. But soon it wi
 
 ## Available styles
 
-| Keyword name | File type | Authors |
-| --- | --- | --- |
-| :github-md | `md` | [Héctor Galbis Sanchis](https://github.com/Hectarea1996) |
+| Keyword name | File type | Extra dependencies | Authors |
+| --- | --- | --- | --- |
+| :github-md | `md` | NIL | [Héctor Galbis Sanchis](https://github.com/Hectarea1996) |
 
 
 ## Dependencies

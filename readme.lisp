@@ -49,8 +49,8 @@
 
 (subheader "Available styles")
 
-(table ((:cell "Keyword name") (:cell "File type") (:cell "Authors"))
-       ((:cell ":github-md") (:cell (code-inline "md")) (:cell (web-link "Héctor Galbis Sanchis" "https://github.com/Hectarea1996"))))
+(table ((:cell "Keyword name") (:cell "File type") (:cell "Extra dependencies") (:cell "Authors"))
+       ((:cell ":github-md") (:cell (code-inline "md")) (:cell nil) (:cell (web-link "Héctor Galbis Sanchis" "https://github.com/Hectarea1996"))))
 
 
 (subheader "Dependencies")
