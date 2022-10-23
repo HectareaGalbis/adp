@@ -16,7 +16,7 @@ After installing ADP, you must add it as a dependency in your project, like you 
   ...)
 ```
 
-You only need to add `:adp` to the `depends on` list.
+You only need to add `:adp` to the `:depends-on` list.
 
 ```
 (ASDF/PARSE-DEFSYSTEM:DEFSYSTEM :MY-SYSTEM

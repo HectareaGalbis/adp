@@ -20,7 +20,7 @@
     :depends-on (:uiop :alexandria)
     (code-hide ())))
 
-(text "You only need to add " (code-inline ":adp") " to the " (code-inline "depends on") " list.")
+(text "You only need to add " (code-inline ":adp") " to the " (code-inline ":depends-on") " list.")
 
 (code-block ()
   (asdf:defsystem :my-system
