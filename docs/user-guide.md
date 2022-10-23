@@ -373,7 +373,7 @@ Finally, an example using a type-tag:
 (ADP:TEXT "Using a type tag: " (ADP:TYPE-REF ALSO-A-TYPE?))
 ```
 
-Using a type tag: [ALSO-A-TYPE?](/docs/user-guide.md#condition-also-a-type)
+Using a type tag: [ALSO-A-TYPE?](/docs/user-guide.md#type-also-a-type)
 
 ### File-tags
 
@@ -437,7 +437,7 @@ A code-tag named `sum-list-example` is created and you can now use it in the tut
 
 First we indicate in the list after `code-block` that we will use the code tag named `sum-list-example`. Then, we use it. Now, each time you change the call to `sum-list` in your test code the tutorial will be automatically changed. You can specify as many tags as you want in both [ADP:CODE-TAG](/docs/user-api.md#macro-code-tag) and [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block) macros.
 
-Let's see a live example. Do you remember the symbol [A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file) and the type [ALSO-A-TYPE?](/docs/user-guide.md#condition-also-a-type). In the source file I have written this:
+Let's see a live example. Do you remember the symbol [A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file) and the type [ALSO-A-TYPE?](/docs/user-guide.md#type-also-a-type). In the source file I have written this:
 
 ```
 (CODE-LAG (END-PARAMETER-CODE)
@@ -458,7 +458,7 @@ So, if I write this:
 You will see this:
 
 ```
-(ADP:DEFTYPE ALSO-A-TYPE? () NIL)
+(ADP:DEFTYPE ALSO-A-TYPE? () 'VECTOR)
 
 (SOME-CODE-IN (THE-MIDDLE))
 
@@ -604,7 +604,7 @@ I hope this guide is useful. I usually see Common Lisp projects that looks aweso
 * ***Handling error messages***: I tried to make informative error messages but sometimes this cannot be possible. Or, at least, I can't do it better. The most common errors I have had when using ADP were undefined variable errors. Remember that [ADP:CODE-INLINE](/docs/user-api.md#macro-code-inline) works the same as [ADP:TEXT](/docs/user-api.md#macro-text). You can't write `(code-inline name-of-function)`, you must write this instead `(code-inline "name-of-function")` or `(code-inline 'name-of-function)`. Also, be careful when using [ADP:FUNCTION-REF](/docs/user-api.md#macro-function-ref) or similars. If you don't write correctly the macro, some implementations will treat that call as a function call and will treat the argument as a variable. That's not a variable that ADP or you have defined and it is sure that it will raise an undefined variable error.
 * ***Tags belong to a package!***: Note that almost all the tags are actually symbols, and symbols belong to a package. If you define a tag and you want to make a reference to it from another package, remember to add the package extension to the symbol name. For example, suppose that you define the symbol-tag `MY-TAG` in the package `MY-PKG`. Then, in another package you must write `(symbol-ref my-pkg:my-tag)`, or `(symbol-ref my-pkg::my-tag)` if the symbol is not exported. And yes, you should export the tags you want to use in other packages.
 * ***Read the API***: Maybe reading the [docs/user-api](/docs/user-api.md) can make you understand better how some macros work (or not). At least, you may be interested in seeing the section [Additional functions](/docs/user-api.md#additional-functions).
-* ***That's all! Enjoy using ADP.*** I leave you with [A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file) and [ALSO-A-TYPE?](/docs/user-guide.md#condition-also-a-type) again.
+* ***That's all! Enjoy using ADP.*** I leave you with [A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file) and [ALSO-A-TYPE?](/docs/user-guide.md#type-also-a-type) again.
 
 #### Variable: A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE
 

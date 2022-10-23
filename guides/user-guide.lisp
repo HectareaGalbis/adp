@@ -530,7 +530,7 @@
 
 (code-tag (end-type-code)
   (deftype also-a-type? ()
-    nil))
+    'vector))
 
 (text "Go back to " (header-ref function-tags-subsubheader))
 
