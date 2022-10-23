@@ -239,7 +239,6 @@ And you will see:
 
 (VALUES "Hello" "world")
 
-
 0 
 1 
 2 
@@ -509,7 +508,6 @@ You will see this:
 ```
 (LOOP FOR I FROM 0 BELOW ...
       DO ... (PRINT "Here is the important code!!!") ...)
-
 
 "Here is the important code!!!" 
 "Here is the important code!!!" 
