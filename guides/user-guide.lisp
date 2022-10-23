@@ -420,7 +420,64 @@
 			   more-irrelevant))))
 
 
-(text "This form is similar to " (function-ref code-block) " or " (function-ref code-tag) ". It receives as first argument a list of tags,")
+(text "The " (code-inline "code-hide") " form is similar to " (function-ref code-block) " or " (function-ref code-tag) ". It receives as first argument a list of tags but they only take effect inside the " (function-ref code-tag) " macro. Imagine you have the following piece of code in your project:")
+
+(code-block (large-function-example)
+  large-function-example)
+
+(code-tag (x-tag y-tag z-tag large-function-example)
+  (cl:defun some-large-function (x y z)
+    (let ((code-hide (y-tag z-tag) (post-x (1+ x)))
+	  (code-hide (x-tag z-tag) (post-y (1+ y)))
+	  (code-hide (x-tag y-tag) (post-z (1+ z))))
+      (loop for i from 0 below 10
+	    collect (code-hide (y-tag z-tag) post-x into x-list)
+	    collect (code-hide (x-tag z-tag) post-y into y-list)
+	    collect (code-hide (x-tag) (cons post-y post-z) into yz-list)
+	    finally (return (values (code-hide (y-tag z-tag) x-list)
+				    (code-hide (x-tag z-tag) y-list)
+				    (code-hide (x-tag) yz-list)))))))
+
+(text "The example can be large and hard to read as well. This piece of code uses the variables " (code-inline 'x) ", " (code-inline 'y) " and " (code-inline 'z) " in different ways and you may want to explain how each one participates in the function. We can show different parts of the code depending of the tags we specify. In this case you can write this:")
+
+(code-block ()
+  (code-lag (x-tag y-tag z-tag)
+	    (cl:defun some-large-function (x y z)
+	      (let ((code-kide (y-tag z-tag) (post-x (1+ x)))
+		    (code-kide (x-tag z-tag) (post-y (1+ y)))
+		    (code-kide (x-tag y-tag) (post-z (1+ z))))
+		(loop for i from 0 below 10
+		      collect (code-kide (y-tag z-tag) post-x into x-list)
+		      collect (code-kide (x-tag z-tag) post-y into y-list)
+		      collect (code-kide (x-tag) (cons post-y post-z) into yz-list)
+		      finally (return (values (code-kide (y-tag z-tag) x-list)
+					      (code-kide (x-tag z-tag) y-list)
+					      (code-kide (x-tag) yz-list))))))))
+
+(text "Note that we are using three tags here. Also, we are indicating when a piece of code must be hidden using the corresponding tags. If I write this:")
+
+(code-block (tag-x-example)
+  tag-x-example)
+
+(text "You will see this:")
+
+(code-tag (tag-x-example)
+  (code-block (x-tag)
+    x-tag))
+
+(text "Same occurs if I use " (code-inline 'y-tag) " and " (code-inline 'z-tag) ". If I write this:")
+
+(code-block (tag-yz-example)
+  tag-y-example
+  tag-z-example)
+
+(text "You will see this:")
+
+(code-tag (tag-yz-example)
+  (code-block (y-tag)
+    y-tag)
+  (code-block (z-tag)
+    z-tag))
 
 
 

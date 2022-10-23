@@ -472,7 +472,84 @@ You will see this:
 NIL
 ```
 
-This form is similar to [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block) or [ADP:CODE-TAG](/docs/user-api.md#macro-code-tag). It receives as first argument a list of tags,
+The `code-hide` form is similar to [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block) or [ADP:CODE-TAG](/docs/user-api.md#macro-code-tag). It receives as first argument a list of tags but they only take effect inside the [ADP:CODE-TAG](/docs/user-api.md#macro-code-tag) macro. Imagine you have the following piece of code in your project:
+
+```
+(DEFUN SOME-LARGE-FUNCTION (X Y Z)
+  (LET ((POST-X (1+ X)) (POST-Y (1+ Y)) (POST-Z (1+ Z)))
+    (LOOP FOR I FROM 0 BELOW 10
+          COLLECT POST-X INTO X-LIST
+          COLLECT POST-Y INTO Y-LIST
+          COLLECT (CONS POST-Y POST-Z) INTO YZ-LIST
+          FINALLY (RETURN (VALUES X-LIST Y-LIST YZ-LIST)))))
+```
+
+The example can be large and hard to read as well. This piece of code uses the variables `X`, `Y` and `Z` in different ways and you may want to explain how each one participates in the function. We can show different parts of the code depending of the tags we specify. In this case you can write this:
+
+```
+(CODE-LAG (X-TAG Y-TAG Z-TAG)
+ (DEFUN SOME-LARGE-FUNCTION (X Y Z)
+   (LET ((CODE-KIDE (Y-TAG Z-TAG) (POST-X (1+ X)))
+         (CODE-KIDE (X-TAG Z-TAG) (POST-Y (1+ Y)))
+         (CODE-KIDE (X-TAG Y-TAG) (POST-Z (1+ Z))))
+     (LOOP FOR I FROM 0 BELOW 10
+           COLLECT (CODE-KIDE (Y-TAG Z-TAG) POST-X INTO X-LIST)
+           COLLECT (CODE-KIDE (X-TAG Z-TAG) POST-Y INTO Y-LIST)
+           COLLECT (CODE-KIDE (X-TAG) (CONS POST-Y POST-Z) INTO YZ-LIST)
+           FINALLY (RETURN
+                    (VALUES (CODE-KIDE (Y-TAG Z-TAG) X-LIST)
+                            (CODE-KIDE (X-TAG Z-TAG) Y-LIST)
+                            (CODE-KIDE (X-TAG) YZ-LIST)))))))
+```
+
+Note that we are using three tags here. Also, we are indicating when a piece of code must be hidden using the corresponding tags. If I write this:
+
+```
+(ADP:CODE-BLOCK (X-TAG)
+  X-TAG)
+```
+
+You will see this:
+
+```
+(DEFUN SOME-LARGE-FUNCTION (X Y Z)
+  (LET ((POST-X (1+ X)) ... ...)
+    (LOOP FOR I FROM 0 BELOW 10
+          COLLECT POST-X INTO X-LIST
+          COLLECT ...
+          COLLECT ...
+          FINALLY (RETURN (VALUES X-LIST ... ...)))))
+```
+
+Same occurs if I use `Y-TAG` and `Z-TAG`. If I write this:
+
+```
+TAG-Y-EXAMPLE
+
+TAG-Z-EXAMPLE
+```
+
+You will see this:
+
+```
+(DEFUN SOME-LARGE-FUNCTION (X Y Z)
+  (LET (... (POST-Y (1+ Y)) ...)
+    (LOOP FOR I FROM 0 BELOW 10
+          COLLECT ...
+          COLLECT POST-Y INTO Y-LIST
+          COLLECT (CONS POST-Y POST-Z) INTO YZ-LIST
+          FINALLY (RETURN (VALUES ... Y-LIST YZ-LIST)))))
+```
+
+```
+(DEFUN SOME-LARGE-FUNCTION (X Y Z)
+  (LET (... ... (POST-Z (1+ Z)))
+    (LOOP FOR I FROM 0 BELOW 10
+          COLLECT ...
+          COLLECT ...
+          COLLECT (CONS POST-Y POST-Z) INTO YZ-LIST
+          FINALLY (RETURN (VALUES ... ... YZ-LIST)))))
+```
 
 #### Variable: A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE
 
