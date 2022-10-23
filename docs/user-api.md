@@ -198,7 +198,7 @@ the code assigned to that tag is prin1-ed instead of the symbol.
   ...)
 ```
 
-Same as code-block, but tags cannot be used and the code is evaluated. The standard output and the results of each piece of code are also printed.
+Same as code-block, but tags cannot be used and the code is evaluated. The standard output and the last-form's results are also printed.
 
 ## API documentation functions
 

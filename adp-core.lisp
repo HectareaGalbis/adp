@@ -516,8 +516,10 @@
 (defvar *function-ref-proc* nil)
 (defvar *type-ref-proc* nil)
 
-(declaim (type (or null (function (stream list) t)) *code-block-proc* *code-example-proc*))
+(declaim (type (or null (function (stream list) t)) *code-block-proc*))
 (defvar *code-block-proc* nil)
+
+(declaim (type (or null (function (stream list string list) t)) *code-example-proc*))
 (defvar *code-example-proc* nil)
 
 

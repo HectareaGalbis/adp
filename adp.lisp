@@ -283,20 +283,15 @@ the code assigned to that tag is prin1-ed instead of the symbol."
 
 
 (adv-defmacro code-example (&body code)
-  "Same as code-block, but tags cannot be used and the code is evaluated. The standard output and the results of each piece of code are also printed."
+  "Same as code-block, but tags cannot be used and the code is evaluated. The standard output and the last-form's results are also printed."
   (when adppvt:*add-documentation*
     (assert (not (null code)) () "Expected at least one expression in a code-example form.")
-    (let ((evaluated-code (loop for expr in code
-				collect (with-gensyms (output result)
-					  `(let* ((,output (make-array 10 :adjustable t :fill-pointer 0 :element-type 'character))
-						  (,result (multiple-value-list (with-output-to-string (*standard-output* ,output)
-										  ,(adppvt:remove-code-tag-exprs expr)))))
-					     (list (adppvt:process-code-tag '#:dummy-tag ',expr)
-						   ,output
-						   ,result))))))
-      `(progn
-	 (adppvt:emplace-adp-element :code-example (list ,@evaluated-code))
-	 (values)))))
+    (with-gensyms (output result)
+      `(let* ((,output (make-array 10 :adjustable t :fill-pointer 0 :element-type 'character))
+	      (,result (multiple-value-list (with-output-to-string (*standard-output* ,output)
+					      ,@(adppvt:remove-code-tag-exprs code)))))
+
+	 (adppvt:emplace-adp-element :code-example (adppvt:process-code-tag '#:dummy-tag ',code) ,output ,result)))))
 
 
 ;; ----- API functions -----

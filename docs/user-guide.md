@@ -227,16 +227,17 @@ On the other hand, [ADP:CODE-EXAMPLE](/docs/user-api.md#macro-code-example) do e
 ```
 (ADP:CODE-EXAMPLE
   (LOOP FOR I FROM 0 BELOW 10
-        DO (PRINT I)
-        FINALLY (RETURN (VALUES "Hello" "world"))))
+        DO (PRINT I))
+  (VALUES "Hello" "world"))
 ```
 
 And you will see:
 
 ```
 (LOOP FOR I FROM 0 BELOW 10
-      DO (PRINT I)
-      FINALLY (RETURN (VALUES "Hello" "world")))
+      DO (PRINT I))
+
+(VALUES "Hello" "world")
 
 0 
 1 
