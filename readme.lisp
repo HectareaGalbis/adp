@@ -53,11 +53,6 @@
        ((:cell ":github-md") (:cell (code-inline "md")) (:cell nil) (:cell (web-link "Héctor Galbis Sanchis" "https://github.com/Hectarea1996"))))
 
 
-(subheader "Dependencies")
-
-(text "The ADP project only depends on Alexandria. However, each style can have other dependencies.")
-
-
 (write-in-file #P"README")
 
 

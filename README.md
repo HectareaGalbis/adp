@@ -45,7 +45,3 @@ For now, you need to install this project downloading the source. But soon it wi
 | :github-md | `md` | NIL | [Héctor Galbis Sanchis](https://github.com/Hectarea1996) |
 
 
-## Dependencies
-
-The ADP project only depends on Alexandria. However, each style can have other dependencies.
-
