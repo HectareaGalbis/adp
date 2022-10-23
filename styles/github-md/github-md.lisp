@@ -139,8 +139,9 @@
 
 (adppvt:def-code-example-writer (stream code output results)
   (format stream "```")
-  (terpri stream)
-  (adppvt:custom-prin1 code stream "...")
+  (loop for expr in code
+	do (terpri stream)
+	   (adppvt:custom-prin1 expr stream "..."))
   (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
     (format stream "~%~a~{~%~s~}~%" output results))
   (format stream "```~%~%"))

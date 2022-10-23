@@ -234,9 +234,9 @@ On the other hand, [ADP:CODE-EXAMPLE](/docs/user-api.md#macro-code-example) do e
 And you will see:
 
 ```
-((LOOP FOR I FROM 0 BELOW 10
-       DO (PRINT I))
- (VALUES "Hello" "world"))
+(LOOP FOR I FROM 0 BELOW 10
+      DO (PRINT I))
+(VALUES "Hello" "world")
 
 0 
 1 
@@ -505,8 +505,8 @@ You can use it in a code example too. Writing this:
 You will see this:
 
 ```
-((LOOP FOR I FROM 0 BELOW ...
-       DO ... (PRINT "Here is the important code!!!") ...))
+(LOOP FOR I FROM 0 BELOW ...
+      DO ... (PRINT "Here is the important code!!!") ...)
 
 "Here is the important code!!!" 
 "Here is the important code!!!" 
