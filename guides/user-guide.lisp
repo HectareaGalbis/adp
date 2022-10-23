@@ -211,8 +211,8 @@
 (code-tag (code-example-example)
   (code-example
     (loop for i from 0 below 10
-	  do (print i)
-	  finally (return (values "Hello" "world")))))
+	  do (print i))
+    (values "Hello" "world")))
 
 (text "Both with " (function-ref code-block) " and with " (function-ref code-example) " you can write multiple expressions.")
 
