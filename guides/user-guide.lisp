@@ -63,26 +63,30 @@
 
 (subsubheader "Headers" headers-subsubheader)
 
-(text "You can add headers in your documentation. In other words, they work as titles or subtitles. You can this way organize your guide with different sections (like I do in this guide). The macros that add headers are " (function-ref header) ", " (function-ref subheader) " and " (function-ref subsubheader) ". They need a string as the first argument.")
+(text "You can add headers in your documentation. In other words, they work as titles or subtitles. You can this way organize your guide with different sections (like I do in this guide). The macros that add headers are " (function-ref header) ", " (function-ref subheader) " and " (function-ref subsubheader) ". They need a string as the first argument. For example, if I write this:")
 
-(code-block ()
-  (header "The title of my guide.")
-  (subheader "A section of my guide.")
-  (subsubheader "A subsection of my guide."))
+(code-block (headers-example)
+  headers-example)
 
-(text "As I said, I'm using headers in this guide. This is a header: " (header-ref user-guide-header) ". This is a subheader: " (header-ref setting-up-subheader) ". And this is a subsubheader: " (header-ref headers-subsubheader) ". Note that I can make a reference to a header. I can achieve this with header-tags. We will see this later in " (header-ref tags-subheader) ".")
+(text "You will see this:")
+
+(code-tag (headers-example)
+  (header "This is a header")
+  (subheader "This is a subheader")
+  (subsubheader "This is a subsubheader"))
 
 
 (subsubheader "Text")
 
 (text "When you want to add text you must use the macro " (function-ref text) ". It receives a variable number of arguments. Each argument is evaluated at run-time and its result is " (cl-ref princ) "-ed. Then, all the content that has been " (cl-ref princ) "-ed is concatenated into a single string and finally it is printed in the documentation file. For example:")
 
-(code-block ()
-  (text "This is the text macro. The result of 3+4 is " (+ 3 4) ". As we will see later you can enrich the text with " (bold "bold words") ", " (italic "italic words") ", " (bold-italic "bold-italic words") " and more."))
+(code-block (text-example)
+  text-example)
 
 (text "If I use that right now:")
 
-(text "This is the text macro. The result of 3+4 is " (+ 3 4) ". As we will see later you can stylize the text with " (bold "bold words") ", " (italic "italic words") ", or " (bold-italic "bold-italic words") " among other styles.")
+(code-tag (text-example)
+  (text "This is the text macro. The result of 3+4 is " (+ 3 4) ". As we will see later you can enrich the text with " (bold "bold words") ", " (italic "italic words") ", " (bold-italic "bold-italic words") " and more."))
 
 
 (subsubheader "Tables")

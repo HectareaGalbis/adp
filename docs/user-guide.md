@@ -63,17 +63,23 @@ The other group of functions are intended to generate guides and tutorials (like
 
 ### Headers
 
-You can add headers in your documentation. In other words, they work as titles or subtitles. You can this way organize your guide with different sections (like I do in this guide). The macros that add headers are [ADP:HEADER](/docs/user-api.md#macro-header), [ADP:SUBHEADER](/docs/user-api.md#macro-subheader) and [ADP:SUBSUBHEADER](/docs/user-api.md#macro-subsubheader). They need a string as the first argument.
+You can add headers in your documentation. In other words, they work as titles or subtitles. You can this way organize your guide with different sections (like I do in this guide). The macros that add headers are [ADP:HEADER](/docs/user-api.md#macro-header), [ADP:SUBHEADER](/docs/user-api.md#macro-subheader) and [ADP:SUBSUBHEADER](/docs/user-api.md#macro-subsubheader). They need a string as the first argument. For example, if I write this:
 
 ```
-(ADP:HEADER "The title of my guide.")
+(ADP:HEADER "This is a header")
 
-(ADP:SUBHEADER "A section of my guide.")
+(ADP:SUBHEADER "This is a subheader")
 
-(ADP:SUBSUBHEADER "A subsection of my guide.")
+(ADP:SUBSUBHEADER "This is a subsubheader")
 ```
 
-As I said, I'm using headers in this guide. This is a header: [The ADP User Guide](/docs/user-guide.md#the-adp-user-guide). This is a subheader: [Setting up ADP](/docs/user-guide.md#setting-up-adp). And this is a subsubheader: [Headers](/docs/user-guide.md#headers). Note that I can make a reference to a header. I can achieve this with header-tags. We will see this later in [Cross references](/docs/user-guide.md#cross-references).
+You will see this:
+
+# This is a header
+
+## This is a subheader
+
+### This is a subsubheader
 
 ### Text
 
@@ -88,7 +94,7 @@ When you want to add text you must use the macro [ADP:TEXT](/docs/user-api.md#ma
 
 If I use that right now:
 
-This is the text macro. The result of 3+4 is 7. As we will see later you can stylize the text with **bold words**, _italic words_, or ***bold-italic words*** among other styles.
+This is the text macro. The result of 3+4 is 7. As we will see later you can enrich the text with **bold words**, _italic words_, ***bold-italic words*** and more.
 
 ### Tables
 
