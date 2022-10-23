@@ -382,6 +382,20 @@
 
 (subsubheader "Hiding your code")
 
+(text "When explaining some piece of code you should focus on the important parts. Or, equivalently, you should hide the irrelevant ones. You can hide parts of the code using the form " (code-inline "code-hide") ". This form is neither a function nor a macro. It is just a form recognized by " (function-ref code-block) ", " (function-ref code-example) " and " (function-ref code-tag) ". I can't use a code block using " (code-inline "code-hide") " because it will be hidden. So, I'm using " (code-inline "code-kide") ". For example, if I write this:")
+
+(code-block (simple-hide-example)
+  simple-hide-example)
+
+(text "You will see this:")
+
+(code-tag (simple-hide-example)
+  (code-block ()
+    (let ((code-hide () (x 5) (y 6)))
+      (doing some stuff)
+      (doing more stuff))))
+
+
 
 
 

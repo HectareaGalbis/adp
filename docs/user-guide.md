@@ -424,6 +424,23 @@ You will see this:
 
 ### Hiding your code
 
+When explaining some piece of code you should focus on the important parts. Or, equivalently, you should hide the irrelevant ones. You can hide parts of the code using the form `code-hide`. This form is neither a function nor a macro. It is just a form recognized by [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block), [ADP:CODE-EXAMPLE](/docs/user-api.md#macro-code-example) and [ADP:CODE-TAG](/docs/user-api.md#macro-code-tag). I can't use a code block using `code-hide` because it will be hidden. So, I'm using `code-kide`. For example, if I write this:
+
+```
+(ADP:CODE-BLOCK NIL
+  (LET (...)
+    (DOING SOME STUFF)
+    (DOING MORE STUFF)))
+```
+
+You will see this:
+
+```
+(LET ((X 5) (Y 6))
+  (DOING SOME STUFF)
+  (DOING MORE STUFF))
+```
+
 #### Variable: A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE
 
 ```Lisp
