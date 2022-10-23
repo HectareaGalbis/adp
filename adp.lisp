@@ -525,7 +525,7 @@ arguments to let the user customize briefly how documentation is printed."
 
 ;; ----- Additional functions -----
 
-(adv-subheader "Additional functions")
+(adv-subheader "Additional functions" additional-functions-subheader)
 
 (adv-defmacro cl-ref (sym)
   "Add a reference to a Common Lisp symbol when using the macros text, table or itemize."

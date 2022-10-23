@@ -249,7 +249,7 @@
 
 (subheader "Cross references" tags-subheader)
 
-(text "ADP supports cross references with tags. A tag is a just a symbol with some information associated. There are five types of tags: header-tags, function-tags, symbol-tags, type-tags and code-tags.")
+(text "ADP supports cross references with tags. A tag is a just a symbol with some information associated. There are six types of tags: header-tags, function-tags, symbol-tags, type-tags, file-tags and code-tags.")
 
 
 (subsubheader "Header-tags")
@@ -319,6 +319,26 @@
 
 (code-tag (type-ref-example)
   (text "Using a type tag: " (type-ref also-a-type?)))
+
+
+(subsubheader "File-tags")
+
+(text "I lied before saying that tags are symbols. Actually, file-tags are a pathname. Do you remember the macro " (function-ref write-in-file) "? The pathname you specify in that macro will be converted to a file-tag. For example, I wrote in the source file " (code-inline "adp.lisp") " the next expression to create the file " (code-inline "docs/user-api.md") ":")
+
+(code-block ()
+  (write-in-file #P"docs/user-api"))
+
+(text "Now I can use the macro " (function-ref file-ref) " to create a reference to that file. If I write this:")
+
+(code-block (file-ref-example)
+  file-ref-example)
+
+(text "You will see this:")
+
+(code-tag (file-ref-example)
+  (text "Go to the file " (file-ref #P"docs/user-api")))
+
+(text "Note the use of " (code-inline "#P") " to create a pathname.")
 
 
 (subsubheader "Code-tags")
@@ -483,8 +503,9 @@
 
 (text "I hope this guide is useful. I usually see Common Lisp projects that looks awesome but they lack guides or even documentation. That's why I started to document all my projects and then I realized that I needed some tool to make it easier. I know that there are already other documentation generators, but none of them suits my needs. Luckily, Common Lisp makes doing this kind of tools relatively easy compared to other languages. Lastly, I want to give you some tips or ways to use ADP that I ended up doing myself.")
 
-(itemize (:item (bold-italic "Use a different system for documentation generation") ": I recommend to use a different system to indicate all the files you need to load to generate the documentation. So, if you have a system named " (code-inline :my-system) " then create another system named " (code-inline :my-system/docs) ", for example. Although ADP will not execute anything unless you use the function " (function-ref load-documentation-system) ", I think this should make your projects cleaner. And, let's be honest, I'm still learning the language and I don't want to break other people's code. I did this for ADP, so you can see an example in the file " (code-inline "adp.asd") ".")
+(itemize (:item (bold-italic "Use a different system for documentation generation") ": I recommend to use a different system to indicate all the files you need to load to generate the documentation. So, if you have a system named " (code-inline :my-system) " then create another system named " (code-inline :my-system/docs) ", for example. Although ADP will not execute anything unless you use the function " (function-ref load-documentation-system) ", I think this should make your projects cleaner. And, let's be honest, I'm still learning the language and I don't want to break other people's code. I did this separation for ADP, so you can see an example in the file " (code-inline "adp.asd") ".")
 	 (:item (bold-italic "Handling error messages") ": I tried to make informative error messages but sometimes this cannot be possible. Or, at least, I can't do it better. The most common errors I have had when using ADP were undefined variable errors. Remember that " (function-ref code-inline) " works the same as " (function-ref text) ". You can't write " (code-inline "(code-inline name-of-function)") ", you must write this instead " (code-inline "(code-inline \"name-of-function\")") " or " (code-inline "(code-inline 'name-of-function)") ". Also, be careful when using " (function-ref function-ref) " or similars. If you don't write correctly the macro, some implementations will treat that call as a function call and will treat the argument as a variable. That's not a variable that ADP or you have defined and it is sure that it will raise an undefined variable error.")
+	 (:item (bold-italic "Read the API") ": Maybe reading the " (file-ref #P"docs/user-api") " can make you understand better how some macros work (or not). At least, you may be interested in seeing the section " (header-ref additional-functions-subheader) ".")
 	 (:item "That's all! Enjoy using ADP. I leave you with " (symbol-ref a-parameter-defined-at-the-end-of-the-file) " and " (type-ref also-a-type?) " again."))
 
 
