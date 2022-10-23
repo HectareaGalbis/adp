@@ -524,9 +524,11 @@ You will see this:
 Same occurs if I use `Y-TAG` and `Z-TAG`. If I write this:
 
 ```
-TAG-Y-EXAMPLE
+(ADP:CODE-BLOCK (Y-TAG)
+  Y-TAG)
 
-TAG-Z-EXAMPLE
+(ADP:CODE-BLOCK (Z-TAG)
+  Z-TAG)
 ```
 
 You will see this:

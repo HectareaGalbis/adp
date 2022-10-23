@@ -468,8 +468,7 @@
 (text "Same occurs if I use " (code-inline 'y-tag) " and " (code-inline 'z-tag) ". If I write this:")
 
 (code-block (tag-yz-example)
-  tag-y-example
-  tag-z-example)
+  tag-yz-example)
 
 (text "You will see this:")
 
