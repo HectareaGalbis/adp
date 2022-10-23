@@ -199,7 +199,7 @@
   (this is not (valid code))
   (but it (is (ok))))
 
-(text "Note that " (code-inline 'nil) " is printed after " (code-inline "code-block") ". This is because we can pass some symbols to " (function-ref code-block) " in order to change a bit how it works. But, we will see that in later sections.")
+(text "Note that " (code-inline 'nil) " or, equivalently, " (code-inline "()") " is used after " (code-inline "code-block") ". This is because we can pass some symbols to " (function-ref code-block) " in order to change a bit how it works. But, we will see that in later sections.")
 
 (text "On the other hand, " (function-ref code-example) " do evaluate the code. And what is more, it prints the standard output as well as the returned values. For example:")
 
@@ -219,9 +219,9 @@
 
 (subheader "Generating the documentation")
 
-(text "There are still some useful macros that I didn't explain yet. However, I think it is now a good time to learn how to actually generate the documentation. You may have multiple files where the macros expalined above are used. But, where the documentation will be printed in? Which files will be generated?")
+(text "There are still some useful macros that I didn't explain yet. However, I think it is now a good time to learn how to actually generate the documentation. You may have multiple files where the macros explained above are used. But, where the documentation will be printed in? Which files will be generated?")
 
-(text "First, we need to understand how ADP works. When you load a project and a file contains calls to some of the above macros, ADP will store information from these macros (functions or symbols defined, tables, lists, text, etc). At every moment we can decide to associate the information gathered so far with a file using the macro " (function-ref write-in-file) ". A good way to use ADP is calling " (function-ref write-in-file) " at the end of every file of code from your project. Doing that will create as many documentation files as code files your project has. Let's see an example. Imagine we have the following code in a file (it doesn't matter where it is located or even its name.)")
+(text "First, we need to understand how ADP works. When you load a project and a file contains calls to some of the above macros, ADP will store information from these macros (functions or symbols defined, tables, lists, text, etc). At every moment we can decide to associate the information gathered so far with a file using the macro " (function-ref write-in-file) ". A good way to use ADP is calling " (function-ref write-in-file) " at the end of every file of code from your project. Doing that will create as many documentation files as code files your project has. Let's see an example. Imagine we have the following code in a file (it doesn't matter where it is located or even its name).")
 
 (code-block ()
   (header "My API")
@@ -252,6 +252,11 @@
   (load-documentation-system :my-system :github-md))
 
 (text "The second argument is the desired style. In this case the used style is " (code-inline :github-md) ". This style generates " (code-inline "md") " files to be used in the GitHub platform.")
+
+(text "I did this as well to generate the ADP documentation. If you take a look at the file " (code-inline "adp.asd") " you will see a system named " (code-inline "adp/doc") ". That system loads every file that is needed to generate all the ADP documentation. And I did that using this expression:")
+
+(code-block ()
+  (adp:load-documentation-system :adp/doc :github-md))
 
 (text "And that's all! The documentation is ready to be read.")
 

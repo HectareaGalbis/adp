@@ -220,7 +220,7 @@ And you will see:
 (BUT IT (IS (OK)))
 ```
 
-Note that `NIL` is printed after `code-block`. This is because we can pass some symbols to [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block) in order to change a bit how it works. But, we will see that in later sections.
+Note that `NIL` or, equivalently, `()` is used after `code-block`. This is because we can pass some symbols to [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block) in order to change a bit how it works. But, we will see that in later sections.
 
 On the other hand, [ADP:CODE-EXAMPLE](/docs/user-api.md#macro-code-example) do evaluate the code. And what is more, it prints the standard output as well as the returned values. For example:
 
@@ -256,9 +256,9 @@ Both with [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block) and with [ADP:COD
 
 ## Generating the documentation
 
-There are still some useful macros that I didn't explain yet. However, I think it is now a good time to learn how to actually generate the documentation. You may have multiple files where the macros expalined above are used. But, where the documentation will be printed in? Which files will be generated?
+There are still some useful macros that I didn't explain yet. However, I think it is now a good time to learn how to actually generate the documentation. You may have multiple files where the macros explained above are used. But, where the documentation will be printed in? Which files will be generated?
 
-First, we need to understand how ADP works. When you load a project and a file contains calls to some of the above macros, ADP will store information from these macros (functions or symbols defined, tables, lists, text, etc). At every moment we can decide to associate the information gathered so far with a file using the macro [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file). A good way to use ADP is calling [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file) at the end of every file of code from your project. Doing that will create as many documentation files as code files your project has. Let's see an example. Imagine we have the following code in a file (it doesn't matter where it is located or even its name.)
+First, we need to understand how ADP works. When you load a project and a file contains calls to some of the above macros, ADP will store information from these macros (functions or symbols defined, tables, lists, text, etc). At every moment we can decide to associate the information gathered so far with a file using the macro [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file). A good way to use ADP is calling [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file) at the end of every file of code from your project. Doing that will create as many documentation files as code files your project has. Let's see an example. Imagine we have the following code in a file (it doesn't matter where it is located or even its name).
 
 ```
 (ADP:HEADER "My API")
@@ -293,6 +293,12 @@ When all your documentation is associated with a file, it is time to generate th
 ```
 
 The second argument is the desired style. In this case the used style is `GITHUB-MD`. This style generates `md` files to be used in the GitHub platform.
+
+I did this as well to generate the ADP documentation. If you take a look at the file `adp.asd` you will see a system named `adp/doc`. That system loads every file that is needed to generate all the ADP documentation. And I did that using this expression:
+
+```
+(ADP:LOAD-DOCUMENTATION-SYSTEM :ADP/DOC :GITHUB-MD)
+```
 
 And that's all! The documentation is ready to be read.
 
