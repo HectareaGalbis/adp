@@ -400,3 +400,22 @@ arguments to let the user customize briefly how documentation is printed.
 
 Add a reference to a Common Lisp symbol when using the macros text, table or itemize.
 
+## Macro characters
+
+The next table shows what macro characters can be used and what they expand to:
+
+| Character | Macro | Example |
+| --- | --- | --- |
+| b | [ADP:BOLD](/docs/user-api.md#macro-bold) | `@b("This text is bold")` |
+| i | [ADP:ITALIC](/docs/user-api.md#macro-italic) | `@i("This text is italic")` |
+| e | [ADP:ITALIC](/docs/user-api.md#macro-italic) | `@e("This text is emphasized")` |
+| c | [ADP:CODE-INLINE](/docs/user-api.md#macro-code-inline) | `@c("This text is inlined")` |
+| w | [ADP:HEADER-REF](/docs/user-api.md#macro-header-ref) | `@w("Name of link" "www.example.com")` |
+| h | [ADP:HEADER-REF](/docs/user-api.md#macro-header-ref) | `@h(header)` |
+| f | [ADP:FUNCTION-REF](/docs/user-api.md#macro-function-ref) | `@f(function)` |
+| s | [ADP:SYMBOL-REF](/docs/user-api.md#macro-symbol-ref) | `@s(variable)` |
+| t | [ADP:TYPE-REF](/docs/user-api.md#macro-type-ref) | `@t(type)` |
+| p | [ADP:FILE-REF](/docs/user-api.md#macro-file-ref) | `@p(#P"path/to/file")` |
+| l | [ADP:CL-REF](/docs/user-api.md#macro-cl-ref) | `@l(princ)` |
+
+
