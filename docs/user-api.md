@@ -408,9 +408,9 @@ The next table shows what macro characters can be used and what they expand to:
 | --- | --- | --- |
 | @b | [ADP:BOLD](/docs/user-api.md#macro-bold) | `@b("This text is bold")` |
 | @i | [ADP:ITALIC](/docs/user-api.md#macro-italic) | `@i("This text is italic")` |
-| @e | [ADP:ITALIC](/docs/user-api.md#macro-italic) | `@e("This text is emphasized")` |
+| @e | [ADP:BOLD-ITALIC](/docs/user-api.md#macro-bold-italic) | `@e("This text is emphasized")` |
 | @c | [ADP:CODE-INLINE](/docs/user-api.md#macro-code-inline) | `@c("This text is inlined")` |
-| @w | [ADP:HEADER-REF](/docs/user-api.md#macro-header-ref) | `@w("Name of link" "www.example.com")` |
+| @w | [ADP:WEB-LINK](/docs/user-api.md#macro-web-link) | `@w("Name of link" "www.example.com")` |
 | @h | [ADP:HEADER-REF](/docs/user-api.md#macro-header-ref) | `@h(header)` |
 | @f | [ADP:FUNCTION-REF](/docs/user-api.md#macro-function-ref) | `@f(function)` |
 | @s | [ADP:SYMBOL-REF](/docs/user-api.md#macro-symbol-ref) | `@s(variable)` |
