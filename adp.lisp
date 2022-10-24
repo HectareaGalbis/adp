@@ -520,12 +520,55 @@ arguments to let the user customize briefly how documentation is printed."
 
 ;; ----- Additional functions -----
 
-(adv-subheader "Additional functions" additional-functions-subheader)
+(subheader "Additional functions" additional-functions-subheader)
 
-(adv-defmacro cl-ref (sym)
+(defmacro cl-ref (sym)
   "Add a reference to a Common Lisp symbol when using the macros text, table or itemize."
   (let ((result (hyperspec:lookup sym)))
     (assert result () "The symbol ~s is not a valid Common Lisp symbol." sym)
     `(web-link ,(prin1-to-string sym) ,result)))
+
+
+;; ----- Macro characters -----
+
+(subheader "Macro characters")
+
+(text "The next table shows what macro characters can be used and what they expand to:")
+
+(table ((:cell "Character") (:cell "Macro") (:cell "Example"))
+       ((:cell #\b) (:cell (function-ref bold)) (:cell (code-inline "@b(\"This text is bold\")")))
+       ((:cell #\i) (:cell (function-ref italic)) (:cell (code-inline "@i(\"This text is italic\")")))
+       ((:cell #\e) (:cell (function-ref italic)) (:cell (code-inline "@e(\"This text is emphasized\")")))
+       ((:cell #\c) (:cell (function-ref code-inline)) (:cell (code-inline "@c(\"This text is inlined\")")))
+       ((:cell #\w) (:cell (function-ref header-ref)) (:cell (code-inline "@w(\"Name of link\" \"www.example.com\")")))
+       ((:cell #\h) (:cell (function-ref header-ref)) (:cell (code-inline "@h(header)")))
+       ((:cell #\f) (:cell (function-ref function-ref)) (:cell (code-inline "@f(function)")))
+       ((:cell #\s) (:cell (function-ref symbol-ref)) (:cell (code-inline "@s(variable)")))
+       ((:cell #\t) (:cell (function-ref type-ref)) (:cell (code-inline "@t(type)")))
+       ((:cell #\p) (:cell (function-ref file-ref)) (:cell (code-inline "@p(#P\"path/to/file\")")))
+       ((:cell #\l) (:cell (function-ref cl-ref)) (:cell (code-inline "@l(princ)"))))
+
+(make-dispatch-macro-character #\@ t)
+
+(cl:defun adp-reader-macro-dispatch (stream char num-arg)
+  (declare (ignore num-arg))
+  (let ((list (read stream))
+	(macro (case char
+		 (#\b 'bold)
+		 (#\i 'italic)
+		 (#\e 'bold-italic)
+		 (#\c 'code-inline)
+		 (#\w 'web-link)
+		 (#\h 'header-ref)
+		 (#\f 'function-ref)
+		 (#\s 'symbol-ref)
+		 (#\t 'type-ref)
+		 (#\p 'file-ref)
+		 (#\l 'cl-ref))))
+    (cons macro list)))
+
+(loop for char in '(#\b #\i #\e #\c #\w #\h #\f #\s #\t #\p #\l)
+      do (set-dispatch-macro-character #\@ char #'adp-reader-macro-dispatch))
+
 
 (adv-write-in-file #P"docs/user-api")
