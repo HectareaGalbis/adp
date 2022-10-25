@@ -16,7 +16,7 @@
   :author "Héctor Galbis Sanchis"
   :description "ADP, add documentation, please."
   :license "The Unlicense"
-  :depends-on (:uiop :alexandria)
+  :depends-on (:alexandria :hyperspec)
   :components ((:file "package")
 	       (:file "adp-core")
 	       (:file "adp")
