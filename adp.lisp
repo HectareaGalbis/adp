@@ -144,12 +144,14 @@ of elements must be lists where its first elements are the keywords :item or :it
 a nested list is added."
   (when adppvt:*add-documentation*
     (labels ((check-items (item-list)
-	       (assert (not (null item-list)) () "Expected at least one expression in a itemize form.")
-	       (loop for item in item-list
-		     if (not (eq (car item) :item))
-		       do (if (eq (car item) :itemize) 
-			      (check-items (cdr item))
-			      (error "Each item of itemize must be a list starting with :item ot :itemize. Found: ~s" item)))))
+	       (assert (not (null item-list)) () "Expected at least one expression in a itemize/:itemize form.")
+	       (assert (and (listp (car item-list)) (not (eq (caar item-list) :itemize))) () "The first element of itemize/:itemize must be a list starting with :item.")
+	       (loop for item in (cdr item-list)
+		     if (not (and (listp item)
+				  (member (car item) '(:item :itemize))))
+		       do (error "Each item of itemize/:itemize must be a list starting with :item ot :itemize.")
+		     if (eq (car item) :itemize)
+		       do (check-items (cdr item)))))
       (check-items items))
     (labels ((process-itemize-items (item-list)
 	       (loop for item in item-list
