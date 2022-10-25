@@ -83,6 +83,53 @@
   (setf (fill-pointer *project-adp-files*) 0))
 
 
+;; ----- adp table of contents -----
+
+(declaim (ftype (function (pathname) vector) adp-files-file-headers))
+(defun adp-files-file-headers (path)
+  (let ((headers (make-array 10 :adjustable t :fill-pointer 0)))
+    (loop for file across *project-adp-files*
+	  for file-path = (adp-file-path file)
+	  when (equal path file-path)
+	    do (let ((file-contents (adp-file-contents file)))
+		 (loop for element across file-contents
+		       when (member (adp-element-key-type element) '(:header :subheader :subsubheader))
+			 do (vector-push-extend element)))
+	    and return headers)))
+
+(declaim (ftype (function () vector) adp-files-headers))
+(defun adp-files-headers ()
+  (let ((headers (make-array 100 :adjustable t :fill-pointer 0)))
+    (loop for file across *project-adp-files*
+	  for file-contents = (adp-file-contents file)
+	  do (loop for element across file-contents
+		   when (member (adp-element-key-type element) '(:header :subheader :subsubheader))
+		     do (vector-push-extend element)))
+    (values headers)))
+
+
+(defun create-toc-list (headers)
+  (labels ((header-deep> (header1 header2)
+	     (or (and (not (eq header1 header2))
+		      (or (eq header1 :header)
+			  (eq header2 :subsubheader)))
+		 (and (eq header1 :subheader)
+		      (eq header2 :subsubheader)))))
+    (loop for header across headers
+	  for header-type = (adp-element-key-type header)
+	  for nesting-level = (if (header-deep> header-type prev-header-type)
+				  (1+ prev-nesting-level)
+				  (case header-type
+				    (:header 0)
+				    (:subheader (if (eq prev-header-type :subheader)
+						    prev-nesting-level
+						    (1- prev-nesting-level)))
+				    (:subsubheader prev-nesting-level)))
+	  for prev-header-type = :subsubheader then (adp-element-key-type header)
+	  for prev-nesting-level = 0 then nesting-level
+	  ))) ; Seguir e insertar uninterned symbols en los headers cuando no se usa el arg opcional
+
+
 ;; ----- adp ref tags -----
 
 (declaim (type (vector pathname) *file-tags*))
