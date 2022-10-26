@@ -103,7 +103,7 @@
     (loop for file across *project-adp-files*
 	  for file-contents = (adp-file-contents file)
 	  do (loop for element across file-contents
-		   when (member (adp-element-key-type element) '(:header :subheader :subsubheader))
+		   when (member (adp-element-key-type element) '(:header :subheader))
 		     do (vector-push-extend element headers)))
     (values headers)))
 
@@ -161,12 +161,11 @@
 			 into toc-list
 		       and do (incf index)
 		     finally (return toc-list))))
-      (print (create-headers-toc-list-aux 0)))))
+      (create-headers-toc-list-aux 0))))
 
 (declaim (ftype (function () list) create-toc-list))
 (defun create-toc-list ()
   (let ((headers (adp-files-headers)))
-    (print headers)
     (create-headers-toc-list headers)))
 
 (declaim (ftype (function (pathname) list) create-mini-toc-list))
