@@ -86,7 +86,7 @@
 
 
 (adv-defmacro table-of-contents ()
-  "Add a list of all headers, subheaders and subsubheaders used in the system. The headers from different
+  "Add a list of all headers and subheaders used in the system. The headers from different
 files are shown in the same order the files are loaded."
   (when adppvt:*add-documentation*
     '(progn

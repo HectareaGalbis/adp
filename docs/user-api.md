@@ -36,7 +36,7 @@ Same as header, but add a subsubheader.
   ...)
 ```
 
-Add a list of all headers, subheaders and subsubheaders used in the system. The headers from different
+Add a list of all headers and subheaders used in the system. The headers from different
 files are shown in the same order the files are loaded.
 
 #### Macro: MINI-TABLE-OF-CONTENTS
