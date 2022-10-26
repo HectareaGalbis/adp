@@ -54,7 +54,7 @@
   (when adppvt:*add-documentation*
     (check-type str string "a string")
     (check-type tag (or null symbol) "a symbol")
-    (let ((fixed-tag (or tag (gensym "HEADER-TAG"))))
+    (let ((fixed-tag (or tag (gensym))))
       `(progn
 	 (adppvt:push-header-tag ',fixed-tag ,str)
 	 (adppvt:emplace-adp-element :header ,str ',fixed-tag)
@@ -66,7 +66,7 @@
   (when adppvt:*add-documentation*
     (check-type str string "a string")
     (check-type tag (or null symbol) "a symbol")
-    (let ((fixed-tag (or tag (gensym "SUBHEADER-TAG"))))
+    (let ((fixed-tag (or tag (gensym))))
       `(progn
 	 (adppvt:push-header-tag ',fixed-tag ,str)
 	 (adppvt:emplace-adp-element :subheader ,str ',fixed-tag)
@@ -78,7 +78,7 @@
   (when adppvt:*add-documentation*
     (check-type str string "a string")
     (check-type tag (or null symbol) "a symbol")
-    (let ((fixed-tag (or tag (gensym "SUBSUBHEADER-TAG"))))
+    (let ((fixed-tag (or tag (gensym))))
       `(progn
 	 (adppvt:push-header-tag ',fixed-tag ,str)
 	 (adppvt:emplace-adp-element :subsubheader ,str ',fixed-tag)
