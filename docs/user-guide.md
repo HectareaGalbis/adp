@@ -376,26 +376,6 @@ Finally, an example using a type-tag:
 
 Using a type tag: [ALSO-A-TYPE?](/docs/user-guide.md#type-also-a-type)
 
-### File-tags
-
-I lied before saying that tags are symbols. Actually, file-tags are pathnames. Do you remember the macro [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file)? The pathname you specify in that macro will be converted to a file-tag. For example, I wrote in the source file `adp.lisp` the next expression to create the file `docs/user-api.md`:
-
-```
-(ADP:WRITE-IN-FILE #P"docs/user-api")
-```
-
-Now I can use the macro [ADP:FILE-REF](/docs/user-api.md#macro-file-ref) to create a reference to that file. If I write this:
-
-```
-(ADP:TEXT "Go to the file " (ADP:FILE-REF #P"docs/user-api"))
-```
-
-You will see this:
-
-Go to the file [docs/user-api](/docs/user-api.md)
-
-Note the use of `#P` to create a pathname.
-
 ### Code-tags
 
 Code-tags work differently to those we have just seen above. Code-tags are used inside the [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block) macro. Imagine that you are making a tutorial. You are explaining how some piece of code works and you test that code in a different file to make sure your tutorial is well done. But one day, you decide to change your code. Now the tutorial needs to be changed too. To avoid writing your code twice you can use code-tags. Suppose that your code looks like this:
@@ -604,7 +584,7 @@ I hope this guide is useful. I usually see Common Lisp projects that looks aweso
 * ***Use a different system for documentation generation***: I recommend to use a different system to indicate all the files you need to load to generate the documentation. So, if you have a system named `MY-SYSTEM` then create another system named `MY-SYSTEM/DOCS`. Although ADP will not execute anything unless you use the function [ADP:LOAD-DOCUMENTATION-SYSTEM](/docs/user-api.md#function-load-documentation-system), I think this should make your projects cleaner. And, let's be honest, I'm still learning the language and I don't want to break other people's code. I did this separation for ADP, so you can see an example in the file `adp.asd`.
 * ***Handling error messages***: I tried to make informative error messages but sometimes this cannot be possible. Or, at least, I can't do it better. The most common errors I have had when using ADP were undefined variable errors. Remember that [ADP:CODE-INLINE](/docs/user-api.md#macro-code-inline) works the same as [ADP:TEXT](/docs/user-api.md#macro-text). You can't write `(code-inline name-of-function)`, you must write this instead `(code-inline "name-of-function")` or `(code-inline 'name-of-function)`. Also, be careful when using [ADP:FUNCTION-REF](/docs/user-api.md#macro-function-ref) or similars. If you don't write correctly the macro, some implementations will treat that call as a function call and will treat the argument as a variable. That's not a variable that ADP or you have defined and it is sure that it will raise an undefined variable error.
 * ***Tags belong to a package!***: Note that almost all the tags are actually symbols, and symbols belong to a package. If you define a tag and you want to make a reference to it from another package, remember to add the package extension to the symbol name. For example, suppose that you define the symbol-tag `MY-TAG` in the package `MY-PKG`. Then, in another package you must write `(symbol-ref my-pkg:my-tag)`, or `(symbol-ref my-pkg::my-tag)` if the symbol is not exported. And yes, you should export the tags you want to use in other packages.
-* ***Read the API***: Maybe reading the [docs/user-api](/docs/user-api.md) can make you understand better how some macros work (or not). At least, you may be interested in seeing the section [Additional functions](/docs/user-api.md#additional-functions).
+* ***Read the API***: Maybe reading [ADP User Interface](/docs/user-api.md#adp-user-interface) can make you understand better how some macros work (or not). At least, you may be interested in seeing the section [Additional functions](/docs/user-api.md#additional-functions).
 * ***That's all! Enjoy using ADP.*** I leave you with [A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file) and [ALSO-A-TYPE?](/docs/user-guide.md#type-also-a-type) again.
 
 #### Variable: A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE

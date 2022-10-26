@@ -40,33 +40,6 @@
      (cl:defun ,@defun-body)))
 
 
-(cl:defmacro adv-write-in-file (file-path)
-  (when adppvt:*add-documentation*
-    (check-type file-path pathname "a pathname")
-    (assert (pathname-directory file-path) (file-path) "The ~s pathname has not a directory part." file-path)
-    (assert (pathname-name file-path) (file-path) "The ~s pathname has not a name part." file-path)
-    (with-gensyms (let-file-path header-tag header-str symbol-tag function-tag type-tag)
-      (once-only (file-path)
-	`(progn
-	   (let ((,let-file-path (make-pathname :directory (cons :relative (cdr (pathname-directory ,file-path)))
-						:name (pathname-name ,file-path))))
-	     (adppvt:push-adp-file ,let-file-path)
-	     (adppvt:push-file-tag ,let-file-path)
-	     (loop for (,header-tag . ,header-str) across adppvt:*header-tags*
-		   do (adppvt:add-header-tag-path ,header-tag ,header-str ,let-file-path)
-		   finally (adppvt:empty-header-tags))
-	     (loop for ,symbol-tag across adppvt:*symbol-tags*
-		   do (adppvt:add-symbol-tag-path ,symbol-tag ,let-file-path)
-		   finally (adppvt:empty-symbol-tags))
-	     (loop for ,function-tag across adppvt:*function-tags*
-		   do (adppvt:add-function-tag-path ,function-tag ,let-file-path)
-		   finally (adppvt:empty-function-tags))
-	     (loop for ,type-tag across adppvt:*type-tags*
-		   do (adppvt:add-type-tag-path ,type-tag ,let-file-path)
-		   finally (adppvt:empty-type-tags)))
-	   (values))))))
-
-
 ;; ----- ADP interface -----
 
 (adv-header "ADP User Interface" user-api-header)
@@ -112,10 +85,19 @@
        (values))))
 
 
+(adv-defmacro table-of-contents ()
+  (when adppvt:*add-documentation*
+    (adppvt:emplace-adp-element :table-of-contents)))
+
+
+(adv-defmacro mini-table-of-contents ()
+  (when adppvt:*add-documentation*
+    (adppvt:emplace-adp-element :mini-table-of-contents)))
+
+
 (adv-defmacro text (&rest objects)
   "Add plain text. The arguments in objects can be any lisp object. They will be princ-ed and concatenated into a single string.
-You can use the following macros to enrich your text: bold, italic, bold-italic, code-inline, web-link, header-ref, symbol-ref, 
-function-ref, type-ref and file-ref."
+You can use the following macros to enrich your text: bold, italic, bold-italic, code-inline, web-link, header-ref, symbol-ref, function-ref and type-ref."
   (when adppvt:*add-documentation*
     `(progn
        (adppvt:emplace-adp-element :text ,@objects)
@@ -205,14 +187,6 @@ where the image is located."
     (check-type name string "a string")
     (check-type link string "a string")
     `(adppvt:create-web-link-text ,name ,link)))
-
-
-(adv-defmacro file-ref (path)
-  "Add a reference to a documentation file when using the macros text, table or itemize. The argument is the pathname, relative 
-to the system's root directory, to the referenced file. Only pathnames used with write-in-file are valid. "
-  (when adppvt:*add-documentation*
-    (check-type path pathname "a pathname")
-    `(adppvt:create-file-ref-text ,path)))
 
 
 (adv-defmacro header-ref (tag)
@@ -480,7 +454,6 @@ macro can be used multiple times."
 							       nil)
 						:name (pathname-name ,file-path))))
 	     (adppvt:push-adp-file ,let-file-path)
-	     (adppvt:push-file-tag ,let-file-path)
 	     (loop for (,header-tag . ,header-str) across adppvt:*header-tags*
 		   do (adppvt:add-header-tag-path ,header-tag ,header-str ,let-file-path)
 		   finally (adppvt:empty-header-tags))
@@ -547,7 +520,6 @@ arguments to let the user customize briefly how documentation is printed."
        ((:cell "@f") (:cell (function-ref function-ref)) (:cell (code-inline "@f(function)")))
        ((:cell "@s") (:cell (function-ref symbol-ref)) (:cell (code-inline "@s(variable)")))
        ((:cell "@t") (:cell (function-ref type-ref)) (:cell (code-inline "@t(type)")))
-       ((:cell "@p") (:cell (function-ref file-ref)) (:cell (code-inline "@p(#P\"path/to/file\")")))
        ((:cell "@l") (:cell (function-ref cl-ref)) (:cell (code-inline "@l(princ)"))))
 
 (make-dispatch-macro-character #\@ t)
@@ -565,7 +537,6 @@ arguments to let the user customize briefly how documentation is printed."
 		 (#\f 'function-ref)
 		 (#\s 'symbol-ref)
 		 (#\t 'type-ref)
-		 (#\p 'file-ref)
 		 (#\l 'cl-ref))))
     (cons macro list)))
 
@@ -573,4 +544,4 @@ arguments to let the user customize briefly how documentation is printed."
       do (set-dispatch-macro-character #\@ char #'adp-reader-macro-dispatch))
 
 
-(adv-write-in-file #P"docs/user-api")
+(write-in-file #P"docs/user-api")

@@ -335,26 +335,6 @@
   (text "Using a type tag: " (type-ref also-a-type?)))
 
 
-(subsubheader "File-tags")
-
-(text "I lied before saying that tags are symbols. Actually, file-tags are pathnames. Do you remember the macro " (function-ref write-in-file) "? The pathname you specify in that macro will be converted to a file-tag. For example, I wrote in the source file " (code-inline "adp.lisp") " the next expression to create the file " (code-inline "docs/user-api.md") ":")
-
-(code-block ()
-  (write-in-file #P"docs/user-api"))
-
-(text "Now I can use the macro " (function-ref file-ref) " to create a reference to that file. If I write this:")
-
-(code-block (file-ref-example)
-  file-ref-example)
-
-(text "You will see this:")
-
-(code-tag (file-ref-example)
-  (text "Go to the file " (file-ref #P"docs/user-api")))
-
-(text "Note the use of " (code-inline "#P") " to create a pathname.")
-
-
 (subsubheader "Code-tags")
 
 (text "Code-tags work differently to those we have just seen above. Code-tags are used inside the " (function-ref code-block) " macro. Imagine that you are making a tutorial. You are explaining how some piece of code works and you test that code in a different file to make sure your tutorial is well done. But one day, you decide to change your code. Now the tutorial needs to be changed too. To avoid writing your code twice you can use code-tags. Suppose that your code looks like this:")
@@ -520,7 +500,7 @@
 (itemize (:item (bold-italic "Use a different system for documentation generation") ": I recommend to use a different system to indicate all the files you need to load to generate the documentation. So, if you have a system named " (code-inline :my-system) " then create another system named " (code-inline :my-system/docs) ". Although ADP will not execute anything unless you use the function " (function-ref load-documentation-system) ", I think this should make your projects cleaner. And, let's be honest, I'm still learning the language and I don't want to break other people's code. I did this separation for ADP, so you can see an example in the file " (code-inline "adp.asd") ".")
 	 (:item (bold-italic "Handling error messages") ": I tried to make informative error messages but sometimes this cannot be possible. Or, at least, I can't do it better. The most common errors I have had when using ADP were undefined variable errors. Remember that " (function-ref code-inline) " works the same as " (function-ref text) ". You can't write " (code-inline "(code-inline name-of-function)") ", you must write this instead " (code-inline "(code-inline \"name-of-function\")") " or " (code-inline "(code-inline 'name-of-function)") ". Also, be careful when using " (function-ref function-ref) " or similars. If you don't write correctly the macro, some implementations will treat that call as a function call and will treat the argument as a variable. That's not a variable that ADP or you have defined and it is sure that it will raise an undefined variable error.")
 	 (:item (bold-italic "Tags belong to a package!") ": Note that almost all the tags are actually symbols, and symbols belong to a package. If you define a tag and you want to make a reference to it from another package, remember to add the package extension to the symbol name. For example, suppose that you define the symbol-tag " (code-inline 'my-tag) " in the package " (code-inline :my-pkg) ". Then, in another package you must write " (code-inline "(symbol-ref my-pkg:my-tag)") ", or " (code-inline "(symbol-ref my-pkg::my-tag)") " if the symbol is not exported. And yes, you should export the tags you want to use in other packages.")
-	 (:item (bold-italic "Read the API") ": Maybe reading the " (file-ref #P"docs/user-api") " can make you understand better how some macros work (or not). At least, you may be interested in seeing the section " (header-ref additional-functions-subheader) ".")
+	 (:item (bold-italic "Read the API") ": Maybe reading " (header-ref user-api-header) " can make you understand better how some macros work (or not). At least, you may be interested in seeing the section " (header-ref additional-functions-subheader) ".")
 	 (:item (bold-italic "That's all! Enjoy using ADP.") " I leave you with " (symbol-ref a-parameter-defined-at-the-end-of-the-file) " and " (type-ref also-a-type?) " again."))
 
 

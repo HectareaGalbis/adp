@@ -35,8 +35,7 @@
 			     (format stream "~%")))))
     (itemize-aux items 0)))
 
-(adppvt:def-image-writer (stream alt-text root-path rel-image-path)
-  (declare (ignore root-path))
+(adppvt:def-image-writer (stream alt-text rel-image-path)
   (format stream "![~a](/~a)~%~%" alt-text rel-image-path))
 
 (adppvt:def-bold-writer (stream text)
@@ -54,10 +53,6 @@
 
 (adppvt:def-web-link-writer (stream name link)
   (format stream "[~a](~a)" name link))
-
-(adppvt:def-file-ref-writer (stream root-path file-path)
-    (declare (ignore root-path))
-  (format stream "[~a](/~a.md)" file-path file-path))
 
 
 (defun convert-to-github-header-anchor (str)
@@ -83,16 +78,15 @@
 	(format nil "~a" sym))))
 
 
-(adppvt:def-header-ref-writer (stream tag header-text root-path file-path)
-  (declare (ignore tag root-path))
+(adppvt:def-header-ref-writer (stream tag header-text file-path)
+  (declare (ignore tag))
   (format stream "[~a](/~a.md#~a)" header-text file-path (convert-to-github-header-anchor header-text)))
 
 (defun symbol-macro-p (sym &optional env)
   (let ((*macroexpand-hook* (constantly nil)))
     (nth-value 1 (macroexpand-1 sym env))))
 
-(adppvt:def-symbol-ref-writer (stream tag root-path file-path)
-  (declare (ignore root-path))
+(adppvt:def-symbol-ref-writer (stream tag file-path)
   (let* ((symbol-header (cond
 			  ((symbol-macro-p tag)
 			   (format nil "Symbol macro: ~a" (symbol-github-name tag)))
@@ -103,8 +97,7 @@
 	 (*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
     (format stream "[~s](/~a.md#~a)" tag file-path symbol-anchor)))
 
-(adppvt:def-function-ref-writer (stream tag root-path file-path)
-  (declare (ignore root-path))
+(adppvt:def-function-ref-writer (stream tag file-path)
   (let* ((function-header (cond
 			    ((macro-function tag)
 			     (format nil "Macro: ~a" tag))
@@ -115,8 +108,7 @@
 	 (*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
     (format stream "[~s](/~a.md#~a)" tag file-path function-anchor)))
 
-(adppvt:def-type-ref-writer (stream tag root-path file-path)
-  (declare (ignore root-path))
+(adppvt:def-type-ref-writer (stream tag file-path)
   (let* ((type-header (cond
 			((subtypep tag 'condition)
 			 (format nil "Condition: ~a" tag))

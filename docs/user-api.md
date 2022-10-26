@@ -29,6 +29,20 @@ Same as header, but add a subheader.
 
 Same as header, but add a subsubheader.
 
+#### Macro: TABLE-OF-CONTENTS
+
+```Lisp
+(defmacro TABLE-OF-CONTENTS NIL
+  ...)
+```
+
+#### Macro: MINI-TABLE-OF-CONTENTS
+
+```Lisp
+(defmacro MINI-TABLE-OF-CONTENTS NIL
+  ...)
+```
+
 #### Macro: TEXT
 
 ```Lisp
@@ -37,8 +51,7 @@ Same as header, but add a subsubheader.
 ```
 
 Add plain text. The arguments in objects can be any lisp object. They will be princ-ed and concatenated into a single string.
-You can use the following macros to enrich your text: bold, italic, bold-italic, code-inline, web-link, header-ref, symbol-ref, 
-function-ref, type-ref and file-ref.
+You can use the following macros to enrich your text: bold, italic, bold-italic, code-inline, web-link, header-ref, symbol-ref, function-ref and type-ref.
 
 #### Macro: TABLE
 
@@ -116,16 +129,6 @@ Add inlined style to text when using the macros text, table or itemize. Each arg
 ```
 
 Add a hyperlink. The text showed is name and link must be a valid web URL. Both arguments must be strings.
-
-#### Macro: FILE-REF
-
-```Lisp
-(defmacro ADP:FILE-REF (PATH)
-  ...)
-```
-
-Add a reference to a documentation file when using the macros text, table or itemize. The argument is the pathname, relative 
-to the system's root directory, to the referenced file. Only pathnames used with write-in-file are valid. 
 
 #### Macro: HEADER-REF
 
@@ -415,7 +418,6 @@ The next table shows what macro characters can be used and what they expand to:
 | @f | [ADP:FUNCTION-REF](/docs/user-api.md#macro-function-ref) | `@f(function)` |
 | @s | [ADP:SYMBOL-REF](/docs/user-api.md#macro-symbol-ref) | `@s(variable)` |
 | @t | [ADP:TYPE-REF](/docs/user-api.md#macro-type-ref) | `@t(type)` |
-| @p | [ADP:FILE-REF](/docs/user-api.md#macro-file-ref) | `@p(#P"path/to/file")` |
 | @l | [ADP:CL-REF](/docs/user-api.md#macro-cl-ref) | `@l(princ)` |
 
 

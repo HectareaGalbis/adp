@@ -96,13 +96,6 @@
   ...)
 ```
 
-#### Macro: DEF-FILE-REF-WRITER
-
-```Lisp
-(defmacro ADP-PRIVATE:DEF-FILE-REF-WRITER (#:WRITER-ARGS1 &BODY #:BODY-ARG2)
-  ...)
-```
-
 #### Macro: DEF-HEADER-REF-WRITER
 
 ```Lisp

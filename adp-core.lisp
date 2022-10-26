@@ -90,12 +90,12 @@
   (let ((headers (make-array 10 :adjustable t :fill-pointer 0)))
     (loop for file across *project-adp-files*
 	  for file-path = (adp-file-path file)
-	  when (equal path file-path)
-	    do (let ((file-contents (adp-file-contents file)))
-		 (loop for element across file-contents
-		       when (member (adp-element-key-type element) '(:header :subheader :subsubheader))
-			 do (vector-push-extend element)))
-	    and return headers)))
+	  until (equal path file-path)
+	  finally (let ((file-contents (adp-file-contents file)))
+		    (loop for element across file-contents
+			  when (member (adp-element-key-type element) '(:header :subheader :subsubheader))
+			    do (vector-push-extend element headers))))
+    (values headers)))
 
 (declaim (ftype (function () vector) adp-files-headers))
 (defun adp-files-headers ()
@@ -104,36 +104,71 @@
 	  for file-contents = (adp-file-contents file)
 	  do (loop for element across file-contents
 		   when (member (adp-element-key-type element) '(:header :subheader :subsubheader))
-		     do (vector-push-extend element)))
+		     do (vector-push-extend element headers)))
     (values headers)))
 
 
-(defun create-toc-list (headers)
-  (labels ((header-deep> (header1 header2)
-	     (or (and (not (eq header1 header2))
-		      (or (eq header1 :header)
-			  (eq header2 :subsubheader)))
-		 (and (eq header1 :subheader)
-		      (eq header2 :subsubheader)))))
-    (loop for header across headers
-	  for header-type = (adp-element-key-type header)
-	  for nesting-level = (if (header-deep> header-type prev-header-type)
-				  (1+ prev-nesting-level)
-				  (case header-type
-				    (:header 0)
-				    (:subheader (if (eq prev-header-type :subheader)
-						    prev-nesting-level
-						    (1- prev-nesting-level)))
-				    (:subsubheader prev-nesting-level)))
-	  for prev-header-type = :subsubheader then (adp-element-key-type header)
-	  for prev-nesting-level = 0 then nesting-level
-	  ))) ; Seguir e insertar uninterned symbols en los headers cuando no se usa el arg opcional
+(defun header-contents-tag (header)
+  (let* ((header-contents (adp-element-contents header)))
+    (cadr header-contents)))
 
+
+(defun header-deep-level (header-type)
+  (case header-type
+    (:header 0)
+    (:subheader 1)
+    (:subsubheader 2)))
+
+
+(defun create-toc-deep-levels (headers)
+  (let ((deep-levels (make-array 100 :adjustable t :fill-pointer 0 :element-type 'fixnum)))
+    (loop for header across headers
+	  for prev-min-deep-level = (header-deep-level :subsubheader) then next-min-deep-level
+	  for prev-deep-level = (header-deep-level :subsubheader) then next-deep-level
+	  for (next-min-deep-level next-deep-level) = (let ((header-deep-level (header-deep-level (adp-element-key-type header))))
+							(cond
+							  ((> header-deep-level prev-deep-level)
+							   (let ((next-deep-level (1+ prev-deep-level)))
+							     (list prev-min-deep-level next-deep-level)))
+							  ((< header-deep-level prev-deep-level)
+							   (if (>= header-deep-level prev-min-deep-level)
+							       (list prev-min-deep-level (- header-deep-level prev-min-deep-level))
+							       (list header-deep-level 0)))
+							  (t
+							   (list prev-min-deep-level header-deep-level))))
+	  do (vector-push-extend next-deep-level deep-levels))
+    (values deep-levels)))
+
+(defun create-headers-toc-list (headers)
+  (let* ((deep-levels (create-toc-deep-levels headers))
+	 (total-deep-levels (length deep-levels))
+	 (index 0))
+    (labels ((create-headers-toc-list-aux ()
+	       (loop while (< index total-deep-levels)
+		     for header = (aref headers index)
+		     for prev-deep-level = (aref deep-levels 0) then deep-level
+		     for deep-level = (aref deep-levels index)
+		     collect (cond
+			       ((> deep-level prev-deep-level)
+				(cons :itemize (create-headers-toc-list-aux)))
+			       ((< deep-level prev-deep-level)
+				(return toc-list))
+			       (t
+				`(:item (text (create-header-ref-text ,(header-contents-tag header))))))
+		       into toc-list
+		     do (incf index)
+		     finally (return toc-list))))
+      (create-headers-toc-list-aux))))
+
+(defun create-toc-list ()
+  (let ((headers (adp-files-headers)))
+    (create-headers-toc-list headers)))
+
+(defun create-mini-toc-list (path)
+  (let ((headers (adp-files-file-headers path)))
+    (create-headers-toc-list headers)))
 
 ;; ----- adp ref tags -----
-
-(declaim (type (vector pathname) *file-tags*))
-(defvar *file-tags* (make-array 10 :adjustable t :fill-pointer 0 :element-type 'pathname))
 
 (declaim (type (vector (cons symbol string)) *header-tags*))
 (defvar *header-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
@@ -143,10 +178,6 @@
 (defvar *function-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
 (defvar *type-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
 
-(declaim (ftype (function (pathname) boolean) file-tagp))
-(defun file-tagp (tag)
-  (loop for file-tag across *file-tags*
-	  thereis (equal tag file-tag)))
 
 (declaim (ftype (function (symbol) boolean) header-tagp symbol-tagp function-tagp type-tagp))
 (defun header-tagp (tag)
@@ -165,12 +196,6 @@
   (loop for type-tag across *type-tags*
 	  thereis (eq tag type-tag)))
 
-
-(declaim (ftype (function (pathname) t) push-file-tag))
-(defun push-file-tag (path)
-  (when (file-tagp path)
-    (return-from push-file-tag))
-  (vector-push-extend path *file-tags*))
 
 (declaim (ftype (function (symbol string) t) push-header-tag))
 (defun push-header-tag (tag str)
@@ -195,11 +220,7 @@
   (vector-push-extend tag *type-tags*))
 
 
-(declaim (ftype (function () t) empty-file-tags empty-header-tags empty-symbol-tags empty-function-tags
-		empty-type-tags))
-(defun empty-file-tags ()
-  (setf (fill-pointer *file-tags*) 0))
-
+(declaim (ftype (function () t) empty-header-tags empty-symbol-tags empty-function-tags empty-type-tags))
 (defun empty-header-tags ()
   (setf (fill-pointer *header-tags*) 0))
 
@@ -358,7 +379,6 @@
 (defparameter *bold-italic-symbol* '#:bolditalic)
 (defparameter *code-inline-symbol* '#:code-inline)
 (defparameter *web-link-symbol* '#:web-link)
-(defparameter *file-ref-symbol* '#:file)
 (defparameter *header-ref-symbol* '#:header)
 (defparameter *symbol-ref-symbol* '#:symbol)
 (defparameter *function-ref-symbol* '#:function)
@@ -382,10 +402,6 @@
 (defun create-web-link-text (text link)
   (list *web-link-symbol* text link))
 
-(declaim (ftype (function (pathname) (cons pathname list)) create-file-ref))
-(defun create-file-ref-text (path)
-  (list *file-ref-symbol* path))
-
 (declaim (ftype (function (symbol) (cons symbol list)) create-header-ref-text create-symbol-ref-text
 		create-function-ref-text create-type-ref-text))
 (defun create-header-ref-text (label)
@@ -400,7 +416,7 @@
 (defun create-type-ref-text (label)
   (list *type-ref-symbol* label))
 
-(declaim (ftype (function (t) boolean) bold-textp italic-textp code-inline-textp web-link-textp file-ref-textp
+(declaim (ftype (function (t) boolean) bold-textp italic-textp code-inline-textp web-link-textp
 		header-ref-textp symbol-ref-textp function-ref-textp type-ref-textp))
 (defun bold-textp (arg)
   (and (listp arg)
@@ -421,10 +437,6 @@
 (defun web-link-textp (arg)
   (and (listp arg)
        (eq (car arg) *web-link-symbol*)))
-
-(defun file-ref-textp (arg)
-  (and (listp arg)
-       (eq (car arg) *file-ref-symbol*)))
 
 (defun header-ref-textp (arg)
   (and (listp arg)
@@ -508,7 +520,6 @@
 (defun remove-current-data ()
   (empty-adp-elements)
   (empty-adp-files)
-  (empty-file-tags)
   (empty-header-tags)
   (empty-symbol-tags)
   (empty-function-tags)
@@ -550,9 +561,6 @@
 
 (declaim (type (or null (function (stream string string) t)) *web-link-proc*))
 (defvar *web-link-proc* nil)
-
-(declaim (type (or null (function (stream pathname pathname))) *file-ref-proc*))
-(defvar *file-ref-proc* nil)
 
 (declaim (type (or null (function (stream symbol string pathname pathname) t)) *header-ref-proc*))
 (defvar *header-ref-proc* nil)
@@ -620,7 +628,6 @@
 	*bold-italic-proc* nil
 	*code-inline-proc* nil
 	*web-link-proc* nil
-	*file-ref-proc* nil
 	*header-ref-proc* nil
 	*symbol-ref-proc* nil
 	*function-ref-proc* nil
@@ -677,8 +684,6 @@
     (error "The function code-inline is not defined in the current style."))
   (unless *web-link-proc*
     (error "The function web-link is not defined in the current style."))
-  (unless *file-ref-proc*
-    (error "The function file-ref is not defined in the current style."))
   (unless *header-ref-proc*
     (error "The function header-ref is not defined in the current style."))
   (unless *symbol-ref-proc*
@@ -747,7 +752,6 @@
 					  (bold-italic-textp arg)
 					  (code-inline-textp arg)
 					  (web-link-textp arg)
-					  (file-ref-textp arg)
 					  (header-ref-textp arg)
 					  (symbol-ref-textp arg)
 					  (function-ref-textp arg)
@@ -758,8 +762,8 @@
     (values sliced-text)))
 
 
-(declaim (ftype (function (pathname &rest t) string) slice-format))
-(defun slice-format (root-path &rest args)
+(declaim (ftype (function (&rest t) string) slice-format))
+(defun slice-format (&rest args)
   (with-output-to-string (stream)
     (loop for arg in args
 	  do (cond
@@ -779,56 +783,56 @@
 		(destructuring-bind (name link) (cdr arg)
 		  (check-space-at-boundaries (symbol-name (car arg)) name)
 		  (funcall *web-link-proc* stream name link)))
-	       ((file-ref-textp arg)
-		(assert (file-tagp (cadr arg)) ((cadr arg)) "~s is not a file tag." (cadr arg))
-		(let* ((file-path (cadr arg)))
-		  (funcall *file-ref-proc* stream root-path file-path)))
 	       ((header-ref-textp arg)
 		(assert (get-header-tag-path (cadr arg)) ((cadr arg)) "~s is not a header tag." (cadr arg)) 
 		(let* ((header-tag (cadr arg))
 		       (header-str-path (get-header-tag-path header-tag))
 		       (header-str (car header-str-path))
 		       (header-rel-path (cdr header-str-path)))
-		  (funcall *header-ref-proc* stream header-tag header-str root-path header-rel-path)))
+		  (funcall *header-ref-proc* stream header-tag header-str header-rel-path)))
 	       ((symbol-ref-textp arg)
 		(assert (get-symbol-tag-path (cadr arg)) ((cadr arg)) "~s is not a symbol tag." (cadr arg))
 		(let* ((symbol-tag (cadr arg))
 		       (symbol-path (get-symbol-tag-path symbol-tag)))
-		  (funcall *symbol-ref-proc* stream symbol-tag root-path symbol-path)))
+		  (funcall *symbol-ref-proc* stream symbol-tag symbol-path)))
 	       ((function-ref-textp arg)
 		(assert (get-function-tag-path (cadr arg)) ((cadr arg)) "~s is not a function tag." (cadr arg))
 		(let* ((function-tag (cadr arg))
 		       (function-path (get-function-tag-path function-tag)))
-		  (funcall *function-ref-proc* stream function-tag root-path function-path)))
+		  (funcall *function-ref-proc* stream function-tag function-path)))
 	       ((type-ref-textp arg)
 		(assert (get-type-tag-path (cadr arg)) ((cadr arg)) "~s is not a type tag." (cadr arg))
 		(let* ((type-tag (cadr arg))
 		       (type-path (get-type-tag-path type-tag)))
-		  (funcall *type-ref-proc* stream type-tag root-path type-path)))
+		  (funcall *type-ref-proc* stream type-tag type-path)))
 	       (t (princ arg stream))))))
 
 
 (declaim (ftype (function (stream pathname (vector adp-element)) t) write-file-contents))
-(defun write-file-contents (stream root-path elements)
+(defun write-file-contents (stream rel-path elements)
   (loop for element across elements
 	do (case (adp-element-key-type element)
 	     (:header (apply *header-proc* stream (adp-element-contents element)))
 	     (:subheader (apply *subheader-proc* stream (adp-element-contents element)))
 	     (:subsubheader (apply *subsubheader-proc* stream (adp-element-contents element)))
-	     (:text (funcall *text-proc* stream (apply #'slice-format root-path (adp-element-contents element))))
+	     (:text (funcall *text-proc* stream (apply #'slice-format (adp-element-contents element))))
 	     (:table (funcall *table-proc* stream (loop for row in (adp-element-contents element)
 							collect (loop for elem in row
-								      collect (apply #'slice-format root-path (cdr elem))))))
-	     (:itemize (labels ((write-itemize (item-list)
-				  (loop for item in item-list
-					if (eq (car item) :item)
-					  collect (list :item (apply #'slice-format root-path (cdr item)))
-					else
-					  collect (list* :itemize (write-itemize (cdr item))))))
-			 (let ((item-list (adp-element-contents element)))
-			   (funcall *itemize-proc* stream (write-itemize item-list)))))
+								      collect (apply #'slice-format (cdr elem))))))
+	     ((:itemize :table-of-contents :mini-table-of-contents)
+	      (labels ((write-itemize (item-list)
+			 (loop for item in item-list
+			       if (eq (car item) :item)
+				 collect (list :item (apply #'slice-format (cdr item)))
+			       else
+				 collect (list* :itemize (write-itemize (cdr item))))))
+		(let ((item-list (case (adp-element-key-type element)
+				   (:table-of-contents (create-toc-list))
+				   (:mini-table-of-contents (create-mini-toc-list rel-path))
+				   (:itemize (adp-element-contents element)))))
+		  (funcall *itemize-proc* stream (write-itemize item-list)))))
 	     (:image (destructuring-bind (alt-text image-path) (adp-element-contents element)
-		       (funcall *image-proc* stream alt-text root-path image-path)))
+		       (funcall *image-proc* stream alt-text image-path)))
 	     (:code-block (let* ((contents (car (adp-element-contents element)))
 				 (processed-contents (mapcan (lambda (code)
 							       (if (code-block-tagp code)
@@ -871,7 +875,7 @@
     (with-open-file (stream complete-path :direction :output :if-does-not-exist :create :if-exists :supersede)
       (when *file-header-proc*
 	(funcall *file-header-proc* stream))
-      (write-file-contents stream root-path elements)
+      (write-file-contents stream rel-path elements)
       (when *file-foot-proc*
 	(funcall *file-foot-proc* stream)))))
 
