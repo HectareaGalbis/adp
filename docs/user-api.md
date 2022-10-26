@@ -32,7 +32,7 @@ Same as header, but add a subsubheader.
 #### Macro: TABLE-OF-CONTENTS
 
 ```Lisp
-(defmacro TABLE-OF-CONTENTS NIL
+(defmacro ADP:TABLE-OF-CONTENTS NIL
   ...)
 ```
 
@@ -42,7 +42,7 @@ files are shown in the same order the files are loaded.
 #### Macro: MINI-TABLE-OF-CONTENTS
 
 ```Lisp
-(defmacro MINI-TABLE-OF-CONTENTS NIL
+(defmacro ADP:MINI-TABLE-OF-CONTENTS NIL
   ...)
 ```
 

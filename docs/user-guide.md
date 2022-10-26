@@ -106,10 +106,10 @@ You will see this:
 
 ### Table of contents
 
-You can show all the headers and subheaders used in your system with [TABLE-OF-CONTENTS](/docs/user-api.md#macro-table-of-contents). For example, if I write right now this expression in my source code:
+You can show all the headers and subheaders used in your system with [ADP:TABLE-OF-CONTENTS](/docs/user-api.md#macro-table-of-contents). For example, if I write right now this expression in my source code:
 
 ```
-(TABLE-OF-CONTENTS)
+(ADP:TABLE-OF-CONTENTS)
 ```
 
 You will see all the ADP system headers:
@@ -142,10 +142,10 @@ You will see all the ADP system headers:
   * [Tips and final comments](/docs/user-guide.md#tips-and-final-comments)
 * [The Style-maker Guide](/docs/style-maker-guide.md#the-style-maker-guide)
 
-Another option is to add a mini table of contents in each documentation file you generate (we will see how to generate them later). You only need to use the macro [MINI-TABLE-OF-CONTENTS](/docs/user-api.md#macro-mini-table-of-contents). Then, if I use this:
+Another option is to add a mini table of contents in each documentation file you generate (we will see how to generate them later). You only need to use the macro [ADP:MINI-TABLE-OF-CONTENTS](/docs/user-api.md#macro-mini-table-of-contents). Then, if I use this:
 
 ```
-(MINI-TABLE-OF-CONTENTS)
+(ADP:MINI-TABLE-OF-CONTENTS)
 ```
 
 You will see the same as the beginning of this file:
