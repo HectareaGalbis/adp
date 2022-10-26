@@ -81,6 +81,106 @@ You will see this:
 
 ### This is a subsubheader
 
+### Table of contents
+
+You can show all the headers, subheaders and subsubheaders used in your system with [TABLE-OF-CONTENTS](/docs/user-api.md#macro-table-of-contents). For example, if I write right now this expression in my source code:
+
+```
+(TABLE-OF-CONTENTS)
+```
+
+You will see all the ADP system headers:
+
+* [ADP User Interface](/docs/user-api.md#adp-user-interface)
+  * [Literate programming functions](/docs/user-api.md#literate-programming-functions)
+  * [API documentation functions](/docs/user-api.md#api-documentation-functions)
+  * [Documentation writer function](/docs/user-api.md#documentation-writer-function)
+  * [Additional functions](/docs/user-api.md#additional-functions)
+  * [Macro characters](/docs/user-api.md#macro-characters)
+* [Style-maker interface](/docs/style-maker-api.md#style-maker-interface)
+  * [Style parameters](/docs/style-maker-api.md#style-parameters)
+  * [Customizable writer macros](/docs/style-maker-api.md#customizable-writer-macros)
+* [Style-maker helper functions](/docs/style-maker-help.md#style-maker-helper-functions)
+  * [Miscellanea](/docs/style-maker-help.md#miscellanea)
+  * [API function components](/docs/style-maker-help.md#api-function-components)
+    * [Defclass components](/docs/style-maker-help.md#defclass-components)
+    * [Defconstant components](/docs/style-maker-help.md#defconstant-components)
+    * [Defgeneric components](/docs/style-maker-help.md#defgeneric-components)
+    * [Define-compiler-macro components](/docs/style-maker-help.md#define-compiler-macro-components)
+    * [Define-condition components](/docs/style-maker-help.md#define-condition-components)
+    * [Define-method-combination components](/docs/style-maker-help.md#define-method-combination-components)
+    * [Define-modify-macro components](/docs/style-maker-help.md#define-modify-macro-components)
+    * [Define-setf-expander components](/docs/style-maker-help.md#define-setf-expander-components)
+    * [Define-symbol-macro components](/docs/style-maker-help.md#define-symbol-macro-components)
+    * [Defmacro components](/docs/style-maker-help.md#defmacro-components)
+    * [defmethod components](/docs/style-maker-help.md#defmethod-components)
+    * [Defpackage components](/docs/style-maker-help.md#defpackage-components)
+    * [Defparameter components](/docs/style-maker-help.md#defparameter-components)
+    * [Defsetf components](/docs/style-maker-help.md#defsetf-components)
+    * [Defstruct components](/docs/style-maker-help.md#defstruct-components)
+    * [Deftype components](/docs/style-maker-help.md#deftype-components)
+    * [Defun components](/docs/style-maker-help.md#defun-components)
+    * [Defvar components](/docs/style-maker-help.md#defvar-components)
+* [Add Documentation, Please](/README.md#add-documentation-please)
+  * [Introduction](/README.md#introduction)
+  * [Installation](/README.md#installation)
+  * [Documentation](/README.md#documentation)
+  * [Available styles](/README.md#available-styles)
+* [The ADP User Guide](/docs/user-guide.md#the-adp-user-guide)
+  * [Setting up ADP](/docs/user-guide.md#setting-up-adp)
+  * [Functions to generate the API](/docs/user-guide.md#functions-to-generate-the-api)
+  * [Functions to generate guides.](/docs/user-guide.md#functions-to-generate-guides)
+    * [Headers](/docs/user-guide.md#headers)
+* [This is a header](/docs/user-guide.md#this-is-a-header)
+  * [This is a subheader](/docs/user-guide.md#this-is-a-subheader)
+    * [This is a subsubheader](/docs/user-guide.md#this-is-a-subsubheader)
+    * [Table of contents](/docs/user-guide.md#table-of-contents)
+    * [Text](/docs/user-guide.md#text)
+    * [Tables](/docs/user-guide.md#tables)
+    * [Lists](/docs/user-guide.md#lists)
+    * [Text enrichment](/docs/user-guide.md#text-enrichment)
+    * [Images](/docs/user-guide.md#images)
+    * [Code blocks](/docs/user-guide.md#code-blocks)
+  * [Generating the documentation](/docs/user-guide.md#generating-the-documentation)
+  * [Cross references](/docs/user-guide.md#cross-references)
+    * [Header-tags](/docs/user-guide.md#header-tags)
+    * [Function-tags, symbol-tags and type-tags](/docs/user-guide.md#function-tags-symbol-tags-and-type-tags)
+    * [Code-tags](/docs/user-guide.md#code-tags)
+    * [Hiding your code](/docs/user-guide.md#hiding-your-code)
+  * [Tips and final comments](/docs/user-guide.md#tips-and-final-comments)
+* [The Style-maker Guide](/docs/style-maker-guide.md#the-style-maker-guide)
+
+Another option is to add a mini table of contents in each documentation file you generate (we will see how later). You only need to use the macro [MINI-TABLE-OF-CONTENTS](/docs/user-api.md#macro-mini-table-of-contents). Then, if I use this:
+
+```
+(MINI-TABLE-OF-CONTENTS)
+```
+
+You will see the list of headers used in this file:
+
+* [The ADP User Guide](/docs/user-guide.md#the-adp-user-guide)
+  * [Setting up ADP](/docs/user-guide.md#setting-up-adp)
+  * [Functions to generate the API](/docs/user-guide.md#functions-to-generate-the-api)
+  * [Functions to generate guides.](/docs/user-guide.md#functions-to-generate-guides)
+    * [Headers](/docs/user-guide.md#headers)
+* [This is a header](/docs/user-guide.md#this-is-a-header)
+  * [This is a subheader](/docs/user-guide.md#this-is-a-subheader)
+    * [This is a subsubheader](/docs/user-guide.md#this-is-a-subsubheader)
+    * [Table of contents](/docs/user-guide.md#table-of-contents)
+    * [Text](/docs/user-guide.md#text)
+    * [Tables](/docs/user-guide.md#tables)
+    * [Lists](/docs/user-guide.md#lists)
+    * [Text enrichment](/docs/user-guide.md#text-enrichment)
+    * [Images](/docs/user-guide.md#images)
+    * [Code blocks](/docs/user-guide.md#code-blocks)
+  * [Generating the documentation](/docs/user-guide.md#generating-the-documentation)
+  * [Cross references](/docs/user-guide.md#cross-references)
+    * [Header-tags](/docs/user-guide.md#header-tags)
+    * [Function-tags, symbol-tags and type-tags](/docs/user-guide.md#function-tags-symbol-tags-and-type-tags)
+    * [Code-tags](/docs/user-guide.md#code-tags)
+    * [Hiding your code](/docs/user-guide.md#hiding-your-code)
+  * [Tips and final comments](/docs/user-guide.md#tips-and-final-comments)
+
 ### Text
 
 When you want to add text you must use the macro [ADP:TEXT](/docs/user-api.md#macro-text). It receives a variable number of arguments. Each argument is evaluated at run-time and its result is [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)-ed. Then, all the content that has been [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)-ed is concatenated into a single string and finally it is printed in the documentation file. For example:

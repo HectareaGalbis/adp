@@ -3,26 +3,26 @@
 (in-package :adp)
 
 
-(cl:defmacro adv-header (str &optional label)
+(cl:defmacro adv-header (str &optional tag)
   (when adppvt:*add-documentation*
     (check-type str string "a string")
-    (check-type label (or null symbol) "a symbol")
-    `(progn
-       ,@(when label
-	   `((adppvt:push-header-tag ',label ,str)))
-       (adppvt:emplace-adp-element :header ,str ',label)
-       (values))))
+    (check-type tag (or null symbol) "a symbol")
+    (let ((fixed-tag (or tag (gensym "HEADER-TAG"))))
+      `(progn
+	 (adppvt:push-header-tag ',fixed-tag ,str)
+	 (adppvt:emplace-adp-element :header ,str ',fixed-tag)
+	 (values)))))
 
 
-(cl:defmacro adv-subheader (str &optional label)
+(cl:defmacro adv-subheader (str &optional tag)
   (when adppvt:*add-documentation*
     (check-type str string "a string")
-    (check-type label (or null symbol) "a symbol")
-    `(progn
-       ,@(when label
-	   `((adppvt:push-header-tag ',label ,str)))
-       (adppvt:emplace-adp-element :subheader ,str ',label)
-       (values))))
+    (check-type tag (or null symbol) "a symbol")
+    (let ((fixed-tag (or tag (gensym "SUBHEADER-TAG"))))
+      `(progn
+	 (adppvt:push-header-tag ',fixed-tag ,str)
+	 (adppvt:emplace-adp-element :subheader ,str ',fixed-tag)
+	 (values)))))
 
 
 (cl:defmacro adv-defmacro (&body defmacro-body)
@@ -54,11 +54,11 @@
   (when adppvt:*add-documentation*
     (check-type str string "a string")
     (check-type tag (or null symbol) "a symbol")
-    `(progn
-       ,@(when tag
-	   `((adppvt:push-header-tag ',tag ,str)))
-       (adppvt:emplace-adp-element :header ,str ',tag)
-       (values))))
+    (let ((fixed-tag (or tag (gensym "HEADER-TAG"))))
+      `(progn
+	 (adppvt:push-header-tag ',fixed-tag ,str)
+	 (adppvt:emplace-adp-element :header ,str ',fixed-tag)
+	 (values)))))
 
 
 (adv-defmacro subheader (str &optional tag)
@@ -66,11 +66,11 @@
   (when adppvt:*add-documentation*
     (check-type str string "a string")
     (check-type tag (or null symbol) "a symbol")
-    `(progn
-       ,@(when tag
-	   `((adppvt:push-header-tag ',tag ,str)))
-       (adppvt:emplace-adp-element :subheader ,str ',tag)
-       (values))))
+    (let ((fixed-tag (or tag (gensym "SUBHEADER-TAG"))))
+      `(progn
+	 (adppvt:push-header-tag ',fixed-tag ,str)
+	 (adppvt:emplace-adp-element :subheader ,str ',fixed-tag)
+	 (values)))))
 
 
 (adv-defmacro subsubheader (str &optional tag)
@@ -78,21 +78,27 @@
   (when adppvt:*add-documentation*
     (check-type str string "a string")
     (check-type tag (or null symbol) "a symbol")
-    `(progn
-       ,@(when tag
-	   `((adppvt:push-header-tag ',tag ,str)))
-       (adppvt:emplace-adp-element :subsubheader ,str ',tag)
-       (values))))
+    (let ((fixed-tag (or tag (gensym "SUBSUBHEADER-TAG"))))
+      `(progn
+	 (adppvt:push-header-tag ',fixed-tag ,str)
+	 (adppvt:emplace-adp-element :subsubheader ,str ',fixed-tag)
+	 (values)))))
 
 
 (adv-defmacro table-of-contents ()
+  "Add a list of all headers, subheaders and subsubheaders used."
   (when adppvt:*add-documentation*
-    (adppvt:emplace-adp-element :table-of-contents)))
+    '(progn
+      (adppvt:emplace-adp-element :table-of-contents)
+      (values))))
 
 
 (adv-defmacro mini-table-of-contents ()
+  "Add a list of all headers, subheaders and subsubheaders used in the current documentation file."
   (when adppvt:*add-documentation*
-    (adppvt:emplace-adp-element :mini-table-of-contents)))
+    '(progn
+      (adppvt:emplace-adp-element :mini-table-of-contents)
+      (values))))
 
 
 (adv-defmacro text (&rest objects)

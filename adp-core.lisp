@@ -108,18 +108,22 @@
     (values headers)))
 
 
+(declaim (ftype (function (adp-element) symbol) header-contents-tag))
 (defun header-contents-tag (header)
   (let* ((header-contents (adp-element-contents header)))
     (cadr header-contents)))
 
 
+(declaim (ftype (function (keyword) fixnum) header-deep-level))
 (defun header-deep-level (header-type)
   (case header-type
     (:header 0)
     (:subheader 1)
-    (:subsubheader 2)))
+    (:subsubheader 2)
+    (t (error "Header type ~s not recognized." header-type))))
 
 
+(declaim (ftype (function ((vector adp-element)) (vector fixnum)) create-toc-deep-level))
 (defun create-toc-deep-levels (headers)
   (let ((deep-levels (make-array 100 :adjustable t :fill-pointer 0 :element-type 'fixnum)))
     (loop for header across headers
@@ -139,31 +143,33 @@
 	  do (vector-push-extend next-deep-level deep-levels))
     (values deep-levels)))
 
+(declaim (ftype (function ((vector adp-element)) list) create-headers-toc-list))
 (defun create-headers-toc-list (headers)
   (let* ((deep-levels (create-toc-deep-levels headers))
 	 (total-deep-levels (length deep-levels))
 	 (index 0))
-    (labels ((create-headers-toc-list-aux ()
+    (labels ((create-headers-toc-list-aux (current-level)
 	       (loop while (< index total-deep-levels)
 		     for header = (aref headers index)
-		     for prev-deep-level = (aref deep-levels 0) then deep-level
 		     for deep-level = (aref deep-levels index)
-		     collect (cond
-			       ((> deep-level prev-deep-level)
-				(cons :itemize (create-headers-toc-list-aux)))
-			       ((< deep-level prev-deep-level)
-				(return toc-list))
-			       (t
-				`(:item (text (create-header-ref-text ,(header-contents-tag header))))))
-		       into toc-list
-		     do (incf index)
+		     until (< deep-level current-level)
+		     if (> deep-level current-level)
+		       collect (cons :itemize (create-headers-toc-list-aux (1+ current-level)))
+			 into toc-list
+		     else
+		       collect `(:item ,(create-header-ref-text (header-contents-tag header)))
+			 into toc-list
+		       and do (incf index)
 		     finally (return toc-list))))
-      (create-headers-toc-list-aux))))
+      (print (create-headers-toc-list-aux 0)))))
 
+(declaim (ftype (function () list) create-toc-list))
 (defun create-toc-list ()
   (let ((headers (adp-files-headers)))
+    (print headers)
     (create-headers-toc-list headers)))
 
+(declaim (ftype (function (pathname) list) create-mini-toc-list))
 (defun create-mini-toc-list (path)
   (let ((headers (adp-files-file-headers path)))
     (create-headers-toc-list headers)))

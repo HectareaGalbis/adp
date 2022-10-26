@@ -36,12 +36,16 @@ Same as header, but add a subsubheader.
   ...)
 ```
 
+Add a list of all headers, subheaders and subsubheaders used.
+
 #### Macro: MINI-TABLE-OF-CONTENTS
 
 ```Lisp
 (defmacro MINI-TABLE-OF-CONTENTS NIL
   ...)
 ```
+
+Add a list of all headers, subheaders and subsubheaders used in the current documentation file.
 
 #### Macro: TEXT
 
