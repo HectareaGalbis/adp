@@ -17,7 +17,7 @@ An extension of \*print-pprint-dispatch\*. The define functions (like defun) fro
   ...)
 ```
 
-It is like prin1, but uses \*custom-pprint-dispatch\* instead. Also, if a symbol which verifies hide-symbolp is found, then hide-str is princ-ed instead.
+It is like prin1, but uses \*custom-pprint-dispatch\* instead. Also, if hidden code is found, then hide-str is princ-ed.
 
 ## API function components
 

@@ -45,7 +45,7 @@
 
 (declaim (ftype (function (t &optional stream (or string null)) t) custom-prin1))
 (adp:defun custom-prin1 (code &optional stream (hide-str nil))
-  "It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if a symbol which verifies hide-symbolp is found, then hide-str is princ-ed instead."
+  "It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if hidden code is found, then hide-str is princ-ed."
   (let ((custom-pprint-dispatch (copy-pprint-dispatch *custom-pprint-dispatch*)))
     (labels ((custom-hide-print (stream sym)
 	       (if (adppvt:hide-symbolp sym)
