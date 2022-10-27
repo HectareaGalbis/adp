@@ -441,15 +441,15 @@ The next table shows what macro characters can be used and what they expand to:
 
 | Character | Macro | Example |
 | --- | --- | --- |
-| @b | [ADP:BOLD](/docs/user-api.md#macro-bold) | `@b("This text is bold")` |
-| @i | [ADP:ITALIC](/docs/user-api.md#macro-italic) | `@i("This text is italic")` |
-| @e | [ADP:BOLD-ITALIC](/docs/user-api.md#macro-bold-italic) | `@e("This text is emphasized")` |
-| @c | [ADP:CODE-INLINE](/docs/user-api.md#macro-code-inline) | `@c("This text is inlined")` |
-| @w | [ADP:WEB-LINK](/docs/user-api.md#macro-web-link) | `@w("Name of link" "www.example.com")` |
-| @h | [ADP:HEADER-REF](/docs/user-api.md#macro-header-ref) | `@h(header)` |
-| @f | [ADP:FUNCTION-REF](/docs/user-api.md#macro-function-ref) | `@f(function)` |
-| @s | [ADP:SYMBOL-REF](/docs/user-api.md#macro-symbol-ref) | `@s(variable)` |
-| @t | [ADP:TYPE-REF](/docs/user-api.md#macro-type-ref) | `@t(type)` |
-| @l | [ADP:CL-REF](/docs/user-api.md#macro-cl-ref) | `@l(princ)` |
+| @b | [ADP:BOLD](/docs/user-api.md#macro-adpbold) | `@b("This text is bold")` |
+| @i | [ADP:ITALIC](/docs/user-api.md#macro-adpitalic) | `@i("This text is italic")` |
+| @e | [ADP:BOLD-ITALIC](/docs/user-api.md#macro-adpbold-italic) | `@e("This text is emphasized")` |
+| @c | [ADP:CODE-INLINE](/docs/user-api.md#macro-adpcode-inline) | `@c("This text is inlined")` |
+| @w | [ADP:WEB-LINK](/docs/user-api.md#macro-adpweb-link) | `@w("Name of link" "www.example.com")` |
+| @h | [ADP:HEADER-REF](/docs/user-api.md#macro-adpheader-ref) | `@h(header)` |
+| @f | [ADP:FUNCTION-REF](/docs/user-api.md#macro-adpfunction-ref) | `@f(function)` |
+| @s | [ADP:SYMBOL-REF](/docs/user-api.md#macro-adpsymbol-ref) | `@s(variable)` |
+| @t | [ADP:TYPE-REF](/docs/user-api.md#macro-adptype-ref) | `@t(type)` |
+| @l | [ADP:CL-REF](/docs/user-api.md#macro-adpcl-ref) | `@l(princ)` |
 
 
