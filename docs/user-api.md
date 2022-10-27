@@ -48,6 +48,27 @@ files are shown in the same order the files are loaded.
 
 Add a list of all headers, subheaders and subsubheaders used in the current documentation file.
 
+#### Macro: TABLE-OF-FUNCTIONS
+
+```Lisp
+(defmacro ADP:TABLE-OF-FUNCTIONS NIL
+  ...)
+```
+
+#### Macro: TABLE-OF-SYMBOLS
+
+```Lisp
+(defmacro ADP:TABLE-OF-SYMBOLS NIL
+  ...)
+```
+
+#### Macro: TABLE-OF-TYPES
+
+```Lisp
+(defmacro ADP:TABLE-OF-TYPES NIL
+  ...)
+```
+
 #### Macro: TEXT
 
 ```Lisp

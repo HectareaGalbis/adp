@@ -539,4 +539,6 @@
 
 (text "Go back to " (header-ref function-tags-subsubheader))
 
+(table-of-functions)
+
 (write-in-file #P"docs/user-guide")

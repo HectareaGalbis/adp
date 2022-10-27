@@ -292,6 +292,55 @@
 (defun empty-type-tags-table ()
   (setf *type-tags-table* (make-hash-table)))
 
+
+;; ----- table of functions/symbols/types -----
+
+(declaim (ftype (function () list) create-table-of-functions create-table-of-symbols create-table-of-types))
+(defun create-table-of-functions ()
+  (let ((functions-list (sort (hash-table-keys *function-tags-table*) #'string>=))
+	(temp-list nil)
+	(items-list nil))
+    (loop for function-tag in functions-list
+	  for prev-letter = (aref (symbol-name function-tag) 0) then current-letter
+	  for current-letter = (aref (symbol-name function-tag) 0)
+	  if (equal prev-letter current-letter)
+	    do (push `(:item ,(create-function-ref-text function-tag)) temp-list)
+	  else
+	    do (push `(:itemize ,@temp-list) items-list)
+	    and do (push `(:item ,prev-letter) items-list)
+	    and do (setf temp-list nil)
+	    and do (push `(:item ,(create-function-ref-text function-tag)) temp-list)
+	  finally (return items-list))))
+
+(defun create-table-of-symbols ()
+  (let ((symbols-array (sort (copy-array *symbol-tags*) #'string<=)))
+    (loop for symbol-tag across symbols-array
+	  for prev-letter = '#:dummy then current-letter
+	  for current-letter = (aref (symbol-name symbol-tag) 0)
+	  if (equal prev-letter current-letter)
+	    collect `(:item ,(create-symbol-ref-text symbol-tag))
+	      into temp-list
+	  else
+	    collect `(:item ,prev-letter) into symbols-list
+	    and collect `(:itemize ,@temp-list) into symbols-list
+	    and do (setf temp-list nil)
+	  finally (return symbols-list))))
+
+(defun create-table-of-types ()
+  (let ((types-array (sort (copy-array *type-tags*) #'string<=)))
+    (loop for type-tag across types-array
+	  for prev-letter = '#:dummy then current-letter
+	  for current-letter = (aref (symbol-name type-tag) 0)
+	  if (equal prev-letter current-letter)
+	    collect `(:item ,(create-type-ref-text type-tag))
+	      into temp-list
+	  else
+	    collect `(:item ,prev-letter)
+	    and collect `(:itemize ,@temp-list) into types-list
+	    and do (setf temp-list nil)
+	  finally (return types-list))))
+
+
 ;; ----- adp code tags -----
 
 (declaim (type hash-table *code-tags*))
@@ -824,7 +873,7 @@
 	     (:table (funcall *table-proc* stream (loop for row in (adp-element-contents element)
 							collect (loop for elem in row
 								      collect (apply #'slice-format (cdr elem))))))
-	     ((:itemize :table-of-contents :mini-table-of-contents)
+	     ((:itemize :table-of-contents :mini-table-of-contents :table-of-functions :table-of-symbols :table-of-types)
 	      (labels ((write-itemize (item-list)
 			 (loop for item in item-list
 			       if (eq (car item) :item)
@@ -832,6 +881,9 @@
 			       else
 				 collect (list* :itemize (write-itemize (cdr item))))))
 		(let ((item-list (case (adp-element-key-type element)
+				   (:table-of-functions (create-table-of-functions))
+				   (:table-of-symbols (create-table-of-symbols))
+				   (:table-of-types (create-table-of-types))
 				   (:table-of-contents (create-toc-list))
 				   (:mini-table-of-contents (create-mini-toc-list rel-path))
 				   (:itemize (adp-element-contents element)))))

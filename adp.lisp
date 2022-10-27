@@ -102,6 +102,25 @@ files are shown in the same order the files are loaded."
       (values))))
 
 
+(adv-defmacro table-of-functions ()
+  (when adppvt:*add-documentation*
+    '(progn
+      (adppvt:emplace-adp-element :table-of-functions)
+      (values))))
+
+(adv-defmacro table-of-symbols ()
+  (when adppvt:*add-documentation*
+    '(progn
+      (adppvt:emplace-adp-element :table-of-symbols)
+      (values))))
+
+(adv-defmacro table-of-types ()
+  (when adppvt:*add-documentation*
+    '(progn
+      (adppvt:emplace-adp-element :table-of-types)
+      (values))))
+
+
 (adv-defmacro text (&rest objects)
   "Add plain text. The arguments in objects can be any lisp object. They will be princ-ed and concatenated into a single string.
 You can use the following macros to enrich your text: bold, italic, bold-italic, code-inline, web-link, header-ref, symbol-ref, function-ref and type-ref."
