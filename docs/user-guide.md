@@ -6,6 +6,7 @@ I will try to do my best explaining how to use ADP. If this is not sufficient, n
 
 * [The ADP User Guide](/docs/user-guide.md#the-adp-user-guide)
   * [Setting up ADP](/docs/user-guide.md#setting-up-adp)
+  * [Setting up ADP](/docs/user-guide.md#setting-up-adp)
   * [Functions to generate the API](/docs/user-guide.md#functions-to-generate-the-api)
   * [Functions to generate guides.](/docs/user-guide.md#functions-to-generate-guides)
     * [Headers](/docs/user-guide.md#headers)
@@ -26,6 +27,8 @@ I will try to do my best explaining how to use ADP. If this is not sufficient, n
     * [Code-tags](/docs/user-guide.md#code-tags)
     * [Hiding your code](/docs/user-guide.md#hiding-your-code)
   * [Tips and final comments](/docs/user-guide.md#tips-and-final-comments)
+
+## Setting up ADP
 
 ## Setting up ADP
 
@@ -132,7 +135,8 @@ You will see all the ADP system headers:
   * [Documentation](/README.md#documentation)
   * [Available styles](/README.md#available-styles)
 * [The ADP User Guide](/docs/user-guide.md#the-adp-user-guide)
-  * [Setting up ADP](/docs/user-guide.md#setting-up-adp)
+  * [Setting up ADP](/docs/user-guide.md#setting-up-adp-1)
+  * [Setting up ADP](/docs/user-guide.md#setting-up-adp-2)
   * [Functions to generate the API](/docs/user-guide.md#functions-to-generate-the-api)
   * [Functions to generate guides.](/docs/user-guide.md#functions-to-generate-guides)
 * [This is a header](/docs/user-guide.md#this-is-a-header)
@@ -151,7 +155,8 @@ Another option is to add a mini table of contents in each documentation file you
 You will see the same as the beginning of this file:
 
 * [The ADP User Guide](/docs/user-guide.md#the-adp-user-guide)
-  * [Setting up ADP](/docs/user-guide.md#setting-up-adp)
+  * [Setting up ADP](/docs/user-guide.md#setting-up-adp-1)
+  * [Setting up ADP](/docs/user-guide.md#setting-up-adp-2)
   * [Functions to generate the API](/docs/user-guide.md#functions-to-generate-the-api)
   * [Functions to generate guides.](/docs/user-guide.md#functions-to-generate-guides)
     * [Headers](/docs/user-guide.md#headers)

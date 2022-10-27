@@ -11,8 +11,9 @@
 
 (mini-table-of-contents)
 
+(subheader "Setting up ADP" setting-up-subheader-primero)
 
-(subheader "Setting up ADP" setting-up-subheader)
+(subheader "Setting up ADP" setting-up-subheader-segundo)
 
 (text "After installing ADP, you must add it as a dependency in your project, like you have been doing for every project you want to use. For example, if you have a system like this:")
 
