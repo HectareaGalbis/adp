@@ -78,29 +78,6 @@
   (subsubheader "This is a subsubheader"))
 
 
-(subsubheader "Table of contents")
-
-(text "You can show all the headers and subheaders used in your system with " (function-ref table-of-contents) ". For example, if I write right now this expression in my source code:")
-
-(code-block (toc-example)
-  toc-example)
-
-(text "You will see all the ADP system headers:")
-
-(code-tag (toc-example)
-  (table-of-contents))
-
-(text "Another option is to add a mini table of contents in each documentation file you generate (we will see how to generate them later). You only need to use the macro " (function-ref mini-table-of-contents) ". Then, if I use this:")
-
-(code-block (mini-toc-example)
-  mini-toc-example)
-
-(text "You will see the same as the beginning of this file:")
-
-(code-tag (mini-toc-example)
-  (mini-table-of-contents))
-
-
 (subsubheader "Text")
 
 (text "When you want to add text you must use the macro " (function-ref text) ". It receives a variable number of arguments. Each argument is evaluated at run-time and its result is " (cl-ref princ) "-ed. Then, all the content that has been " (cl-ref princ) "-ed is concatenated into a single string and finally it is printed in the documentation file. For example:")
@@ -539,10 +516,5 @@
 
 (text "Go back to " (header-ref function-tags-subsubheader))
 
-(table-of-functions)
-
-(table-of-symbols)
-
-(table-of-types)
 
 (write-in-file #P"docs/user-guide")

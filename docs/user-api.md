@@ -29,46 +29,6 @@ Same as header, but add a subheader.
 
 Same as header, but add a subsubheader.
 
-#### Macro: TABLE-OF-CONTENTS
-
-```Lisp
-(defmacro ADP:TABLE-OF-CONTENTS NIL
-  ...)
-```
-
-Add a list of all headers and subheaders used in the system. The headers from different
-files are shown in the same order the files are loaded.
-
-#### Macro: MINI-TABLE-OF-CONTENTS
-
-```Lisp
-(defmacro ADP:MINI-TABLE-OF-CONTENTS NIL
-  ...)
-```
-
-Add a list of all headers, subheaders and subsubheaders used in the current documentation file.
-
-#### Macro: TABLE-OF-FUNCTIONS
-
-```Lisp
-(defmacro ADP:TABLE-OF-FUNCTIONS NIL
-  ...)
-```
-
-#### Macro: TABLE-OF-SYMBOLS
-
-```Lisp
-(defmacro ADP:TABLE-OF-SYMBOLS NIL
-  ...)
-```
-
-#### Macro: TABLE-OF-TYPES
-
-```Lisp
-(defmacro ADP:TABLE-OF-TYPES NIL
-  ...)
-```
-
 #### Macro: TEXT
 
 ```Lisp
@@ -428,6 +388,52 @@ arguments to let the user customize briefly how documentation is printed.
 ```
 
 Add a reference to a Common Lisp symbol when using the macros text, table or itemize.
+
+#### Macro: TABLE-OF-CONTENTS
+
+```Lisp
+(defmacro ADP:TABLE-OF-CONTENTS NIL
+  ...)
+```
+
+Add a list of all headers and subheaders used in the system. The headers from different
+files are shown in the same order the files are loaded.
+
+#### Macro: MINI-TABLE-OF-CONTENTS
+
+```Lisp
+(defmacro ADP:MINI-TABLE-OF-CONTENTS NIL
+  ...)
+```
+
+Add a list of all headers, subheaders and subsubheaders used in the current documentation file.
+
+#### Macro: TABLE-OF-FUNCTIONS
+
+```Lisp
+(defmacro ADP:TABLE-OF-FUNCTIONS NIL
+  ...)
+```
+
+Add an ordered list of all functions and macros defined using ADP.
+
+#### Macro: TABLE-OF-SYMBOLS
+
+```Lisp
+(defmacro ADP:TABLE-OF-SYMBOLS NIL
+  ...)
+```
+
+Add an ordered list of all variables defined using ADP.
+
+#### Macro: TABLE-OF-TYPES
+
+```Lisp
+(defmacro ADP:TABLE-OF-TYPES NIL
+  ...)
+```
+
+Add an ordered list of all types defined using ADP.
 
 ## Macro characters
 

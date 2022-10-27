@@ -85,42 +85,6 @@
 	 (values)))))
 
 
-(adv-defmacro table-of-contents ()
-  "Add a list of all headers and subheaders used in the system. The headers from different
-files are shown in the same order the files are loaded."
-  (when adppvt:*add-documentation*
-    '(progn
-      (adppvt:emplace-adp-element :table-of-contents)
-      (values))))
-
-
-(adv-defmacro mini-table-of-contents ()
-  "Add a list of all headers, subheaders and subsubheaders used in the current documentation file."
-  (when adppvt:*add-documentation*
-    '(progn
-      (adppvt:emplace-adp-element :mini-table-of-contents)
-      (values))))
-
-
-(adv-defmacro table-of-functions ()
-  (when adppvt:*add-documentation*
-    '(progn
-      (adppvt:emplace-adp-element :table-of-functions)
-      (values))))
-
-(adv-defmacro table-of-symbols ()
-  (when adppvt:*add-documentation*
-    '(progn
-      (adppvt:emplace-adp-element :table-of-symbols)
-      (values))))
-
-(adv-defmacro table-of-types ()
-  (when adppvt:*add-documentation*
-    '(progn
-      (adppvt:emplace-adp-element :table-of-types)
-      (values))))
-
-
 (adv-defmacro text (&rest objects)
   "Add plain text. The arguments in objects can be any lisp object. They will be princ-ed and concatenated into a single string.
 You can use the following macros to enrich your text: bold, italic, bold-italic, code-inline, web-link, header-ref, symbol-ref, function-ref and type-ref."
@@ -528,6 +492,47 @@ arguments to let the user customize briefly how documentation is printed."
   (let ((result (hyperspec:lookup sym)))
     (assert result () "The symbol ~s is not a valid Common Lisp symbol." sym)
     `(web-link ,(prin1-to-string sym) ,result)))
+
+
+(defmacro table-of-contents ()
+  "Add a list of all headers and subheaders used in the system. The headers from different
+files are shown in the same order the files are loaded."
+  (when adppvt:*add-documentation*
+    '(progn
+      (adppvt:emplace-adp-element :table-of-contents)
+      (values))))
+
+
+(defmacro mini-table-of-contents ()
+  "Add a list of all headers, subheaders and subsubheaders used in the current documentation file."
+  (when adppvt:*add-documentation*
+    '(progn
+      (adppvt:emplace-adp-element :mini-table-of-contents)
+      (values))))
+
+
+(defmacro table-of-functions ()
+  "Add an ordered list of all functions and macros defined using ADP."
+  (when adppvt:*add-documentation*
+    '(progn
+      (adppvt:emplace-adp-element :table-of-functions)
+      (values))))
+
+
+(defmacro table-of-symbols ()
+  "Add an ordered list of all variables defined using ADP."
+  (when adppvt:*add-documentation*
+    '(progn
+      (adppvt:emplace-adp-element :table-of-symbols)
+      (values))))
+
+
+(defmacro table-of-types ()
+  "Add an ordered list of all types defined using ADP."
+  (when adppvt:*add-documentation*
+    '(progn
+      (adppvt:emplace-adp-element :table-of-types)
+      (values))))
 
 
 ;; ----- Macro characters -----
