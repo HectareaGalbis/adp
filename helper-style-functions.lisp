@@ -2,6 +2,8 @@
 
 (in-package :adppvt)
 
+(adp:write-in-file #P"docs/style-maker-help")
+
 (adp:header "Style-maker helper functions" style-maker-helper-header)
 
 
@@ -1112,6 +1114,3 @@
   (cadddr defvar-source))
 
 (def-with-components defvar name initial-value documentation)
-
-
-(adp:write-in-file #P"docs/style-maker-help")

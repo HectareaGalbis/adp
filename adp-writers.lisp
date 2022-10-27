@@ -1,6 +1,7 @@
 
 (in-package :adppvt)
 
+(adp:write-in-file #P"docs/style-maker-api")
 
 (adp:header "Style-maker interface" style-maker-api-header)
 
@@ -78,6 +79,3 @@
 (def-customizable-writer def-file-header-writer *file-header-proc* 1)
 (def-customizable-writer def-file-foot-writer *file-foot-proc* 1)
 (def-customizable-writer def-system-files-writer *system-files-proc* 1)
-
-
-(adp:write-in-file #P"docs/style-maker-api")

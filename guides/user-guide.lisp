@@ -1,6 +1,7 @@
 
 (in-package :adp)
 
+(write-in-file #P"docs/user-guide")
 
 (code-tag (code-user-guide-header)
   (header "The ADP User Guide" user-guide-header))
@@ -515,6 +516,3 @@
     'vector))
 
 (text "Go back to " (header-ref function-tags-subsubheader))
-
-
-(write-in-file #P"docs/user-guide")

@@ -9,7 +9,7 @@
     (check-type tag (or null symbol) "a symbol")
     (let ((fixed-tag (or tag (gensym "HEADER-TAG"))))
       `(progn
-	 (adppvt:push-header-tag ',fixed-tag ,str)
+	 (adppvt:add-header-tag ',fixed-tag ,str)
 	 (adppvt:emplace-adp-element :header ,str ',fixed-tag)
 	 (values)))))
 
@@ -20,7 +20,7 @@
     (check-type tag (or null symbol) "a symbol")
     (let ((fixed-tag (or tag (gensym "SUBHEADER-TAG"))))
       `(progn
-	 (adppvt:push-header-tag ',fixed-tag ,str)
+	 (adppvt:add-header-tag ',fixed-tag ,str)
 	 (adppvt:emplace-adp-element :subheader ,str ',fixed-tag)
 	 (values)))))
 
@@ -28,19 +28,35 @@
 (cl:defmacro adv-defmacro (&body defmacro-body)
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:push-function-tag (car ',defmacro-body))
+	 `((adppvt:add-function-tag (car ',defmacro-body))
 	   (adppvt:emplace-adp-element :defmacro '(cl:defmacro ,@defmacro-body) (car ',defmacro-body))))
      (cl:defmacro ,@defmacro-body)))
 
 (cl:defmacro adv-defun (&body defun-body)
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:push-function-tag (car ',defun-body))
+	 `((adppvt:add-function-tag (car ',defun-body))
 	   (adppvt:emplace-adp-element :defun '(cl:defun ,@defun-body) (car ',defun-body))))
      (cl:defun ,@defun-body)))
 
 
+(cl:defmacro adv-write-in-file (file-path)
+  (when adppvt:*add-documentation*
+    (check-type file-path pathname "a pathname")
+    (assert (pathname-name file-path) (file-path) "The ~s pathname has not a name part." file-path)
+    (with-gensyms (let-file-path)
+      (once-only (file-path)
+	`(progn
+	   (let ((,let-file-path (make-pathname :directory (if (pathname-directory ,file-path)
+							       (cons :relative (cdr (pathname-directory ,file-path)))
+							       nil)
+						:name (pathname-name ,file-path))))
+	     (adppvt:push-adp-file ,let-file-path))
+	   (values))))))
+
 ;; ----- ADP interface -----
+
+(adv-write-in-file #P"docs/user-api")
 
 (adv-header "ADP User Interface" user-api-header)
 
@@ -56,7 +72,7 @@
     (check-type tag (or null symbol) "a symbol")
     (let ((fixed-tag (or tag (gensym))))
       `(progn
-	 (adppvt:push-header-tag ',fixed-tag ,str)
+	 (adppvt:add-header-tag ',fixed-tag ,str)
 	 (adppvt:emplace-adp-element :header ,str ',fixed-tag)
 	 (values)))))
 
@@ -68,7 +84,7 @@
     (check-type tag (or null symbol) "a symbol")
     (let ((fixed-tag (or tag (gensym))))
       `(progn
-	 (adppvt:push-header-tag ',fixed-tag ,str)
+	 (adppvt:add-header-tag ',fixed-tag ,str)
 	 (adppvt:emplace-adp-element :subheader ,str ',fixed-tag)
 	 (values)))))
 
@@ -80,7 +96,7 @@
     (check-type tag (or null symbol) "a symbol")
     (let ((fixed-tag (or tag (gensym))))
       `(progn
-	 (adppvt:push-header-tag ',fixed-tag ,str)
+	 (adppvt:add-header-tag ',fixed-tag ,str)
 	 (adppvt:emplace-adp-element :subsubheader ,str ',fixed-tag)
 	 (values)))))
 
@@ -268,7 +284,7 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a defclass declaration. The macro expands to cl:defclass. Also, the class name is used to create a type-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:push-type-tag (car ',defclass-body))
+	 `((adppvt:add-type-tag (car ',defclass-body))
 	   (adppvt:emplace-adp-element :defclass '(cl:defclass ,@defclass-body) (car ',defclass-body))))
      (cl:defclass ,@defclass-body)))
 
@@ -277,7 +293,7 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a defconstant declaration. The macro expands to cl:defconstant. Also, the constant name is used to create a symbol-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:push-symbol-tag (car ',defconstant-body))
+	 `((adppvt:add-symbol-tag (car ',defconstant-body))
 	   (adppvt:emplace-adp-element :defconstant '(cl:defconstant ,@defconstant-body) (car ',defconstant-body))))
      (cl:defconstant ,@defconstant-body)))
 
@@ -286,7 +302,7 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a defgeneric declaration. The macro expands to cl:defgeneric. Also, the generic function name is used to create a function-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:push-function-tag (car ',defgeneric-body))
+	 `((adppvt:add-function-tag (car ',defgeneric-body))
 	   (adppvt:emplace-adp-element :defgeneric '(cl:defgeneric ,@defgeneric-body) (car ',defgeneric-body))))
      (cl:defgeneric ,@defgeneric-body)))
 
@@ -303,7 +319,7 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a define-condition declaration. The macro expands to cl:define-condition. Also, the condition name is used to create a type-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:push-type-tag (car ',define-condition-body))
+	 `((adppvt:add-type-tag (car ',define-condition-body))
 	   (adppvt:emplace-adp-element :define-condition '(cl:define-condition ,@define-condition-body) (car ',define-condition-body))))
      (cl:define-condition ,@define-condition-body)))
 
@@ -320,7 +336,7 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a define-modify-macro declaration. The macro expands to cl:define-modify-macro. Also, the macro name is used to create a function-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:push-function-tag (car ',define-modify-macro-body))
+	 `((adppvt:add-function-tag (car ',define-modify-macro-body))
 	   (adppvt:emplace-adp-element :define-modify-macro '(cl:define-modify-macro ,@define-modify-macro-body) (car ',define-modify-macro-body))))
      (cl:define-modify-macro ,@define-modify-macro-body)))
 
@@ -337,7 +353,7 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a define-symbol-macro declaration. The macro expands to cl:define-symbol-macro. Also, the symbol name is used to create a symbol-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:push-symbol-tag (car ',define-symbol-macro-body))
+	 `((adppvt:add-symbol-tag (car ',define-symbol-macro-body))
 	   (adppvt:emplace-adp-element :define-symbol-macro '(cl:define-symbol-macro ,@define-symbol-macro-body) (car ',define-symbol-macro-body))))
      (cl:define-symbol-macro ,@define-symbol-macro-body)))
 
@@ -346,7 +362,7 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a defmacro declaration. The macro expands to cl:defmacro. Also, the macro name is used to create a function-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:push-function-tag (car ',defmacro-body))
+	 `((adppvt:add-function-tag (car ',defmacro-body))
 	   (adppvt:emplace-adp-element :defmacro '(cl:defmacro ,@defmacro-body) (car ',defmacro-body))))
      (cl:defmacro ,@defmacro-body)))
 
@@ -371,7 +387,7 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a defparameter declaration. The macro expands to cl:defparameter. Also, the parameter name is used to create a symbol-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:push-symbol-tag (car ',defparameter-body))
+	 `((adppvt:add-symbol-tag (car ',defparameter-body))
 	   (adppvt:emplace-adp-element :defparameter '(cl:defparameter ,@defparameter-body) (car ',defparameter-body))))
      (cl:defparameter ,@defparameter-body)))
 
@@ -388,7 +404,7 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a defstruct declaration. The macro expands to cl:defstruct. Also, the struct name is used to create a type-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:push-type-tag (car ',defstruct-body))
+	 `((adppvt:add-type-tag (car ',defstruct-body))
 	   (adppvt:emplace-adp-element :defstruct '(cl:defstruct ,@defstruct-body) (car ',defstruct-body))))
      (cl:defstruct ,@defstruct-body)))
 
@@ -397,7 +413,7 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a deftype declaration. The macro expands to cl:deftype. Also, the type name is used to create a type-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:push-type-tag (car ',deftype-body))
+	 `((adppvt:add-type-tag (car ',deftype-body))
 	   (adppvt:emplace-adp-element :deftype '(cl:deftype ,@deftype-body) (car ',deftype-body))))
      (cl:deftype ,@deftype-body)))
 
@@ -407,7 +423,7 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   `(progn
      ,@(when adppvt:*add-documentation*
 	 `((when (symbolp (car ',defun-body))
-	     (adppvt:push-function-tag (car ',defun-body)))
+	     (adppvt:add-function-tag (car ',defun-body)))
 	   (adppvt:emplace-adp-element :defun '(cl:defun ,@defun-body) (if (symbolp (car ',defun-body))
 									   (car ',defun-body)
 									   nil))))
@@ -418,7 +434,7 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a defvar declaration. The macro expands to cl:defvar. Also, the variable name is used to create a symbol-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:push-symbol-tag (car ',defvar-body))
+	 `((adppvt:add-symbol-tag (car ',defvar-body))
 	   (adppvt:emplace-adp-element :defvar '(cl:defvar ,@defvar-body) (car ',defvar-body))))
      (cl:defvar ,@defvar-body)))
 
@@ -436,26 +452,14 @@ macro can be used multiple times."
   (when adppvt:*add-documentation*
     (check-type file-path pathname "a pathname")
     (assert (pathname-name file-path) (file-path) "The ~s pathname has not a name part." file-path)
-    (with-gensyms (let-file-path header-tag header-str symbol-tag function-tag type-tag)
+    (with-gensyms (let-file-path)
       (once-only (file-path)
 	`(progn
 	   (let ((,let-file-path (make-pathname :directory (if (pathname-directory ,file-path)
 							       (cons :relative (cdr (pathname-directory ,file-path)))
 							       nil)
 						:name (pathname-name ,file-path))))
-	     (adppvt:push-adp-file ,let-file-path)
-	     (loop for (,header-tag . ,header-str) across adppvt:*header-tags*
-		   do (adppvt:add-header-tag-path ,header-tag ,header-str ,let-file-path)
-		   finally (adppvt:empty-header-tags))
-	     (loop for ,symbol-tag across adppvt:*symbol-tags*
-		   do (adppvt:add-symbol-tag-path ,symbol-tag ,let-file-path)
-		   finally (adppvt:empty-symbol-tags))
-	     (loop for ,function-tag across adppvt:*function-tags*
-		   do (adppvt:add-function-tag-path ,function-tag ,let-file-path)
-		   finally (adppvt:empty-function-tags))
-	     (loop for ,type-tag across adppvt:*type-tags*
-		   do (adppvt:add-type-tag-path ,type-tag ,let-file-path)
-		   finally (adppvt:empty-type-tags)))
+	     (adppvt:push-adp-file ,let-file-path))
 	   (values))))))
 
 
@@ -573,6 +577,3 @@ files are shown in the same order the files are loaded."
 
 (loop for char in '(#\b #\i #\e #\c #\w #\h #\f #\s #\t #\p #\l)
       do (set-dispatch-macro-character #\@ char #'adp-reader-macro-dispatch))
-
-
-(write-in-file #P"docs/user-api")
