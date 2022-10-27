@@ -11,7 +11,6 @@
 
 (mini-table-of-contents)
 
-(subheader "Setting up ADP" setting-up-subheader-primero)
 
 (subheader "Setting up ADP" setting-up-subheader-segundo)
 

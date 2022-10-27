@@ -2,49 +2,18 @@
 (in-package :adp/github-md)
 
 
-;; ----- Aux functions -----
-
-(defun convert-to-github-header-anchor (str)
-  (let ((down-str (string-downcase str))
-	(simple-str (make-array 100 :adjustable t :fill-pointer 0 :element-type 'character)))
-    (loop for down-char across down-str
-	  do (when (or (alphanumericp down-char)
-		       (char= down-char #\space)
-		       (char= down-char #\-))
-	       (vector-push-extend down-char simple-str)))
-    (loop for i from 0 below (fill-pointer simple-str)
-	  do (when (char= (aref simple-str i) #\space)
-	       (setf (aref simple-str i) #\-)))
-    (values simple-str)))
-
-(defparameter *used-header-tags* (make-hash-table :test 'equal))
-
-(defun add-header-tag (text tag)
-  (let ((github-header (convert-to-github-header-anchor text)))
-    (when (not (gethash github-header *used-header-tags*))
-      (setf (gethash github-header *used-header-tags*) (make-array 2 :adjustable t :fill-pointer 0 :element-type 'symbol :initial-element '#:dummy)))
-    (vector-push-extend tag (gethash github-header *used-header-tags*))))
-
-(defun get-header-repetition (text tag)
-  (let* ((github-header (convert-to-github-header-anchor text))
-	 (tag-vector (gethash github-header *used-header-tags*)))
-    (if (>= (length tag-vector) 2)
-	(1+ (position tag tag-vector))
-	nil)))
-
-
 ;; ----- guide functions -----
 
 (adppvt:def-header-writer (stream text tag)
-  (add-header-tag text tag)
+  (declare (ignore tag))
   (format stream "# ~a~%~%" text))
 
 (adppvt:def-subheader-writer (stream text tag)
-  (add-header-tag text tag)
+  (declare (ignore tag))
   (format stream "## ~a~%~%" text))
 
 (adppvt:def-subsubheader-writer (stream text tag)
-  (add-header-tag text tag)
+  (declare (ignore tag))
   (format stream "### ~a~%~%" text))
 
 (adppvt:def-text-writer (stream text)
@@ -86,6 +55,19 @@
   (format stream "[~a](~a)" name link))
 
 
+(defun convert-to-github-header-anchor (str)
+  (let ((down-str (string-downcase str))
+	(simple-str (make-array 100 :adjustable t :fill-pointer 0 :element-type 'character)))
+    (loop for down-char across down-str
+	  do (when (or (alphanumericp down-char)
+		       (char= down-char #\space)
+		       (char= down-char #\-))
+	       (vector-push-extend down-char simple-str)))
+    (loop for i from 0 below (fill-pointer simple-str)
+	  do (when (char= (aref simple-str i) #\space)
+	       (setf (aref simple-str i) #\-)))
+    (values simple-str)))
+
 
 (defun symbol-github-name (sym)
   (let* ((sym-name (symbol-name sym))
@@ -97,8 +79,8 @@
 
 
 (adppvt:def-header-ref-writer (stream tag header-text file-path)
-  (let ((header-repetition (get-header-repetition header-text tag)))
-    (format stream "[~a](/~a.md#~a~@[-~s~])" header-text file-path (convert-to-github-header-anchor header-text) header-repetition)))
+  (declare (ignore tag))
+  (format stream "[~a](/~a.md#~a)" header-text file-path (convert-to-github-header-anchor header-text)))
 
 (defun symbol-macro-p (sym &optional env)
   (let ((*macroexpand-hook* (constantly nil)))
