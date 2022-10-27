@@ -33,6 +33,18 @@
 
 (text "Your system is now ready to use ADP.")
 
+
+(subheader "Selecting a file to write in")
+
+(text "Before start using the macros to write documentation, we need to select a file where to store it. We can do this using the " (function-ref write-in-file) " macro. You can always add this macro after " (cl-ref in-package) ".")
+
+(code-block ()
+  (in-package :my-pkg)
+
+  (write-in-file #P"docs/my-file"))
+
+(text "We need to pass a pathname to " (function-ref write-in-file) ". This pathname will be relative to the system's root directory. So, in this case a file named " (code-inline "my-file") " will be created inside the " (code-inline "docs") " directory in your system's root directory. Besides, note that the pathname does not include an extension. This is because later you can select between different styles and each style will generate different types of files. After writing this line of code we can start to use the rest of the macros.")
+
 (subheader "Functions to generate the API")
 
 (text "I'm sure your code defines a lot of things like functions, macros and symbols. In order to do that you have had to use define macros like " (cl-ref defun) ", " (cl-ref defmacro) " or " (cl-ref defparameter) ". Print some documentation of this definitions is very easy with ADP. For example, consider this function definition:")
@@ -222,34 +234,9 @@
 
 (subheader "Generating the documentation")
 
-(text "There are still some useful macros that I didn't explain yet. However, I think it is now a good time to learn how to actually generate the documentation. You may have multiple files where the macros explained above are used. But, where the documentation will be printed in? Which files will be generated?")
+(text "There are still some useful macros that I didn't explain yet. However, I think it is now a good time to learn how to actually generate the documentation. You may have multiple files where the macros explained above are used. Also, all the information is associated with a file because you have used the macro " (function-ref write-in-file) " whereever you have needed.")
 
-(text "First, we need to understand how ADP works. When you load a project and a file contains calls to some of the above macros, ADP will store information from these macros (functions or symbols defined, tables, lists, text, etc). At every moment we can decide to associate the information gathered so far with a file using the macro " (function-ref write-in-file) ". A good way to use ADP is calling " (function-ref write-in-file) " at the end of every file of code from your project. Doing that will create as many documentation files as code files your project has. Let's see an example. Imagine we have the following code in a file (it doesn't matter where it is located or even its name).")
-
-(code-block ()
-  (header "My API")
-  (defun foo ()
-    "This function does a lot of things"
-    (code-hide ()))
-  (defun bar ()
-    "This function also does a lot of things")
-  (defparameter *global-param* (code-hide ()) "This parameter is awesome"))
-
-(text "Now, we want to create a file where to print this information in. In order to do that, we must use " (function-ref write-in-file) ".")
-
-(code-block ()
-  (header "My API")
-  (defun foo ()
-    "This function does a lot of things"
-    (code-hide ()))
-  (defun bar ()
-    "This function also does a lot of things")
-  (defparameter *global-param* (code-hide ()) "This paramter is awesome")
-  (write-in-file #P"docs/my-api"))
-
-(text "This macro receives only the pathname to the file where to print in the documentation. The pathname must be relative to the system's root directory. Also note that I didn't use any extension in the pathname. That's because ADP let you choose between different styles to generate the documentation and each style will create their own files. After using " (function-ref write-in-file) ", the header, the two functions and the parameter are associated with the file that will be located at " (code-inline "docs/my-api") ". If the pathname was already used in another call to " (function-ref write-in-file) ", the new content will be appended to the information already gathered.")
-
-(text "When all your documentation is associated with a file, it is time to generate the files and print the documentation. The function that must be used now is " (function-ref load-documentation-system) ". As the name suggests, you are going to load your system. In fact, it will load you system with the documentation generation enabled so, while forms are evaluated the documentation is gathered and also is associated with the pertinent files. When the system is completely loaded, the file generation and documentation printing begins. For example, if your system is named " (code-inline :my-system) ", then you can eval this expression in the REPL:")
+(text "Now it is time to generate the files and print the documentation. The function that must be used now is " (function-ref load-documentation-system) ". As the name suggests, you are going to load your system. In fact, it will load your system with the documentation generation enabled so, while forms are evaluated the documentation is gathered. When the system is completely loaded, the file generation and documentation printing begins. For example, if your system is named " (code-inline :my-system) ", then you can eval this expression in the REPL:")
 
 (code-block ()
   (load-documentation-system :my-system :github-md))

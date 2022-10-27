@@ -6,6 +6,7 @@ I will try to do my best explaining how to use ADP. If this is not sufficient, n
 
 * [The ADP User Guide](/docs/user-guide.md#the-adp-user-guide)
   * [Setting up ADP](/docs/user-guide.md#setting-up-adp)
+  * [Selecting a file to write in](/docs/user-guide.md#selecting-a-file-to-write-in)
   * [Functions to generate the API](/docs/user-guide.md#functions-to-generate-the-api)
   * [Functions to generate guides.](/docs/user-guide.md#functions-to-generate-guides)
     * [Headers](/docs/user-guide.md#headers)
@@ -49,6 +50,18 @@ You only need to add `:adp` to the `:depends-on` list.
 ```
 
 Your system is now ready to use ADP.
+
+## Selecting a file to write in
+
+Before start using the macros to write documentation, we need to select a file where to store it. We can do this using the [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file) macro. You can always add this macro after [IN-PACKAGE](http://www.lispworks.com/reference/HyperSpec/Body/m_in_pkg.htm).
+
+```
+(IN-PACKAGE :MY-PKG)
+
+(ADP:WRITE-IN-FILE #P"docs/my-file")
+```
+
+We need to pass a pathname to [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file). This pathname will be relative to the system's root directory. So, in this case a file named `my-file` will be created inside the `docs` directory in your system's root directory. Besides, note that the pathname does not include an extension. This is because later you can select between different styles and each style will generate different types of files. After writing this line of code we can start to use the rest of the macros.
 
 ## Functions to generate the API
 
@@ -279,37 +292,9 @@ Both with [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block) and with [ADP:COD
 
 ## Generating the documentation
 
-There are still some useful macros that I didn't explain yet. However, I think it is now a good time to learn how to actually generate the documentation. You may have multiple files where the macros explained above are used. But, where the documentation will be printed in? Which files will be generated?
+There are still some useful macros that I didn't explain yet. However, I think it is now a good time to learn how to actually generate the documentation. You may have multiple files where the macros explained above are used. Also, all the information is associated with a file because you have used the macro [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file) whereever you have needed.
 
-First, we need to understand how ADP works. When you load a project and a file contains calls to some of the above macros, ADP will store information from these macros (functions or symbols defined, tables, lists, text, etc). At every moment we can decide to associate the information gathered so far with a file using the macro [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file). A good way to use ADP is calling [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file) at the end of every file of code from your project. Doing that will create as many documentation files as code files your project has. Let's see an example. Imagine we have the following code in a file (it doesn't matter where it is located or even its name).
-
-```
-(ADP:HEADER "My API")
-
-(ADP:DEFUN FOO () "This function does a lot of things" ...)
-
-(ADP:DEFUN BAR () "This function also does a lot of things")
-
-(ADP:DEFPARAMETER *GLOBAL-PARAM* ... "This parameter is awesome")
-```
-
-Now, we want to create a file where to print this information in. In order to do that, we must use [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file).
-
-```
-(ADP:HEADER "My API")
-
-(ADP:DEFUN FOO () "This function does a lot of things" ...)
-
-(ADP:DEFUN BAR () "This function also does a lot of things")
-
-(ADP:DEFPARAMETER *GLOBAL-PARAM* ... "This paramter is awesome")
-
-(ADP:WRITE-IN-FILE #P"docs/my-api")
-```
-
-This macro receives only the pathname to the file where to print in the documentation. The pathname must be relative to the system's root directory. Also note that I didn't use any extension in the pathname. That's because ADP let you choose between different styles to generate the documentation and each style will create their own files. After using [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file), the header, the two functions and the parameter are associated with the file that will be located at `docs/my-api`. If the pathname was already used in another call to [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file), the new content will be appended to the information already gathered.
-
-When all your documentation is associated with a file, it is time to generate the files and print the documentation. The function that must be used now is [ADP:LOAD-DOCUMENTATION-SYSTEM](/docs/user-api.md#function-load-documentation-system). As the name suggests, you are going to load your system. In fact, it will load you system with the documentation generation enabled so, while forms are evaluated the documentation is gathered and also is associated with the pertinent files. When the system is completely loaded, the file generation and documentation printing begins. For example, if your system is named `MY-SYSTEM`, then you can eval this expression in the REPL:
+Now it is time to generate the files and print the documentation. The function that must be used now is [ADP:LOAD-DOCUMENTATION-SYSTEM](/docs/user-api.md#function-load-documentation-system). As the name suggests, you are going to load your system. In fact, it will load your system with the documentation generation enabled so, while forms are evaluated the documentation is gathered. When the system is completely loaded, the file generation and documentation printing begins. For example, if your system is named `MY-SYSTEM`, then you can eval this expression in the REPL:
 
 ```
 (ADP:LOAD-DOCUMENTATION-SYSTEM :MY-SYSTEM :GITHUB-MD)
