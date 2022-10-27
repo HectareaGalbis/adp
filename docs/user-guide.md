@@ -694,6 +694,9 @@ I hope this guide is useful. I usually see Common Lisp projects that looks aweso
 
 Go back to [Function-tags, symbol-tags and type-tags](/docs/user-guide.md#function-tags-symbol-tags-and-type-tags)
 
+* B
+  * [ADP:BOLD](/docs/user-api.md#macro-bold)
+  * [ADP:BOLD-ITALIC](/docs/user-api.md#macro-bold-italic)
 * C
   * [ADP:CL-REF](/docs/user-api.md#macro-cl-ref)
   * [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block)
@@ -962,4 +965,12 @@ Go back to [Function-tags, symbol-tags and type-tags](/docs/user-guide.md#functi
   * [ADP-PRIVATE:WITH-DEFUN-COMPONENTS](/docs/style-maker-help.md#macro-with-defun-components)
   * [ADP-PRIVATE:WITH-DEFVAR-COMPONENTS](/docs/style-maker-help.md#macro-with-defvar-components)
   * [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file)
+
+* *
+  * [ADP-PRIVATE:*CUSTOM-PPRINT-DISPATCH*](/docs/style-maker-help.md#variable-custom-pprint-dispatch)
+* A
+  * [A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file)
+
+* A
+  * [ALSO-A-TYPE?](/docs/user-guide.md#type-also-a-type)
 

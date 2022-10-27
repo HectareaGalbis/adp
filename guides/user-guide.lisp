@@ -541,4 +541,8 @@
 
 (table-of-functions)
 
+(table-of-symbols)
+
+(table-of-types)
+
 (write-in-file #P"docs/user-guide")

@@ -310,35 +310,48 @@
 	    and do (push `(:item ,prev-letter) items-list)
 	    and do (setf temp-list nil)
 	    and do (push `(:item ,(create-function-ref-text function-tag)) temp-list)
-	  finally (return items-list))))
+	  finally (when temp-list
+		    (push `(:itemize ,@temp-list) items-list)
+		    (push `(:item ,current-letter) items-list))
+		  (return items-list))))
 
 (defun create-table-of-symbols ()
-  (let ((symbols-array (sort (copy-array *symbol-tags*) #'string<=)))
-    (loop for symbol-tag across symbols-array
-	  for prev-letter = '#:dummy then current-letter
+  (let ((symbols-list (sort (hash-table-keys *symbol-tags-table*) #'string>=))
+	(temp-list nil)
+	(items-list nil))
+    (loop for symbol-tag in symbols-list
+	  for prev-letter = (aref (symbol-name symbol-tag) 0) then current-letter
 	  for current-letter = (aref (symbol-name symbol-tag) 0)
 	  if (equal prev-letter current-letter)
-	    collect `(:item ,(create-symbol-ref-text symbol-tag))
-	      into temp-list
+	    do (push `(:item ,(create-symbol-ref-text symbol-tag)) temp-list)
 	  else
-	    collect `(:item ,prev-letter) into symbols-list
-	    and collect `(:itemize ,@temp-list) into symbols-list
+	    do (push `(:itemize ,@temp-list) items-list)
+	    and do (push `(:item ,prev-letter) items-list)
 	    and do (setf temp-list nil)
-	  finally (return symbols-list))))
+	    and do (push `(:item ,(create-symbol-ref-text symbol-tag)) temp-list)
+	  finally (when temp-list
+		    (push `(:itemize ,@temp-list) items-list)
+		    (push `(:item ,current-letter) items-list))
+		  (return items-list))))
 
 (defun create-table-of-types ()
-  (let ((types-array (sort (copy-array *type-tags*) #'string<=)))
-    (loop for type-tag across types-array
-	  for prev-letter = '#:dummy then current-letter
+  (let ((types-list (sort (hash-table-keys *type-tags-table*) #'string>=))
+	(temp-list nil)
+	(items-list nil))
+    (loop for type-tag in types-list
+	  for prev-letter = (aref (symbol-name type-tag) 0) then current-letter
 	  for current-letter = (aref (symbol-name type-tag) 0)
 	  if (equal prev-letter current-letter)
-	    collect `(:item ,(create-type-ref-text type-tag))
-	      into temp-list
+	    do (push `(:item ,(create-type-ref-text type-tag)) temp-list)
 	  else
-	    collect `(:item ,prev-letter)
-	    and collect `(:itemize ,@temp-list) into types-list
+	    do (push `(:itemize ,@temp-list) items-list)
+	    and do (push `(:item ,prev-letter) items-list)
 	    and do (setf temp-list nil)
-	  finally (return types-list))))
+	    and do (push `(:item ,(create-type-ref-text type-tag)) temp-list)
+	  finally (when temp-list
+		    (push `(:itemize ,@temp-list) items-list)
+		    (push `(:item ,current-letter) items-list))
+		  (return items-list))))
 
 
 ;; ----- adp code tags -----
