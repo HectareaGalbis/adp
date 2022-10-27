@@ -58,7 +58,7 @@ I'm sure your code defines a lot of things like functions, macros and symbols. I
 (DEFUN FOO (A B C) "Multiply a by the sum of b and c." (* A (+ B C)))
 ```
 
-If you want to generate documentation of this definition you only need to use the macro [ADP:DEFUN](/docs/user-api.md#macro-adpdefun) instead of [DEFUN](http://www.lispworks.com/reference/HyperSpec/Body/m_defun.htm).
+If you want to generate documentation of this definition you only need to use the macro [ADP:DEFUN](/docs/user-api.md#macro-defun) instead of [DEFUN](http://www.lispworks.com/reference/HyperSpec/Body/m_defun.htm).
 
 ```
 (ADP:DEFUN FOO (A B C) "Multiply a by the sum of b and c." (* A (+ B C)))
@@ -77,7 +77,7 @@ Multiply a by the sum of b and c.
 
 That's all! Actually, note that if you load your project as always after changing some defuns, you will see that nothing happens. Your system is loaded normally and nothing changes. This is because the documentation generation is disabled by default. So, even if you add ADP code, the original code remains the same.
 
-Same as with [ADP:DEFUN](/docs/user-api.md#macro-adpdefun), every macro that defines something is redefined to print documentation. You can see every macro here: [API documentation functions](/docs/user-api.md#api-documentation-functions)
+Same as with [ADP:DEFUN](/docs/user-api.md#macro-defun), every macro that defines something is redefined to print documentation. You can see every macro here: [API documentation functions](/docs/user-api.md#api-documentation-functions)
 
 ## Functions to generate guides.
 
@@ -85,7 +85,7 @@ The other group of functions are intended to generate guides and tutorials (like
 
 ### Headers
 
-You can add headers in your documentation. In other words, they work as titles or subtitles. You can this way organize your guide with different sections (like I do in this guide). The macros that add headers are [ADP:HEADER](/docs/user-api.md#macro-adpheader), [ADP:SUBHEADER](/docs/user-api.md#macro-adpsubheader) and [ADP:SUBSUBHEADER](/docs/user-api.md#macro-adpsubsubheader). They need a string as the first argument. For example, if I write this:
+You can add headers in your documentation. In other words, they work as titles or subtitles. You can this way organize your guide with different sections (like I do in this guide). The macros that add headers are [ADP:HEADER](/docs/user-api.md#macro-header), [ADP:SUBHEADER](/docs/user-api.md#macro-subheader) and [ADP:SUBSUBHEADER](/docs/user-api.md#macro-subsubheader). They need a string as the first argument. For example, if I write this:
 
 ```
 (ADP:HEADER "This is a header")
@@ -105,7 +105,7 @@ You will see this:
 
 ### Text
 
-When you want to add text you must use the macro [ADP:TEXT](/docs/user-api.md#macro-adptext). It receives a variable number of arguments. Each argument is evaluated at run-time and its result is [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)-ed. Then, all the content that has been [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)-ed is concatenated into a single string and finally it is printed in the documentation file. For example:
+When you want to add text you must use the macro [ADP:TEXT](/docs/user-api.md#macro-text). It receives a variable number of arguments. Each argument is evaluated at run-time and its result is [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)-ed. Then, all the content that has been [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)-ed is concatenated into a single string and finally it is printed in the documentation file. For example:
 
 ```
 (ADP:TEXT "This is the text macro. The result of 3+4 is " (+ 3 4)
@@ -120,7 +120,7 @@ This is the text macro. The result of 3+4 is 7. As we will see later you can enr
 
 ### Tables
 
-You can add tables using the macro [ADP:TABLE](/docs/user-api.md#macro-adptable). The best way to see how to use it is an example. Imagine we want to show some data stored in some variables.
+You can add tables using the macro [ADP:TABLE](/docs/user-api.md#macro-table). The best way to see how to use it is an example. Imagine we want to show some data stored in some variables.
 
 ```
 (DEFPARAMETER PETER-INFO '(34 "Peter Garcia" 1435))
@@ -157,11 +157,11 @@ And you will see this:
 | 53 | Laura Beneyto | 1543€ |
 
 
-Note that in the _Salary_ column we used multiple values in each cell. Each cell can accept multiple values and they are treated as if they are in the [ADP:TEXT](/docs/user-api.md#macro-adptext) macro. In other words, each element in a cell is [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)-ed and the results are concatenated.
+Note that in the _Salary_ column we used multiple values in each cell. Each cell can accept multiple values and they are treated as if they are in the [ADP:TEXT](/docs/user-api.md#macro-text) macro. In other words, each element in a cell is [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)-ed and the results are concatenated.
 
 ### Lists
 
-You can add lists with [ADP:ITEMIZE](/docs/user-api.md#macro-adpitemize). For example:
+You can add lists with [ADP:ITEMIZE](/docs/user-api.md#macro-itemize). For example:
 
 ```
 (ADP:ITEMIZE (:ITEM "Vegetables:")
@@ -184,11 +184,11 @@ You will see this:
   * 0.5Kg of apples
   * 6 oranges
 
-Note that each item inside [ADP:ITEMIZE](/docs/user-api.md#macro-adpitemize) is a list starting with `ITEM` or `ITEMIZE`. When you use `ITEM` every object will be [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)-ed and then concatenated. In other words, it works the same as [ADP:TEXT](/docs/user-api.md#macro-adptext) or [ADP:TABLE](/docs/user-api.md#macro-adptable). On the other hand, when using `ITEMIZE` you are indicating that you want a sublist of items.
+Note that each item inside [ADP:ITEMIZE](/docs/user-api.md#macro-itemize) is a list starting with `ITEM` or `ITEMIZE`. When you use `ITEM` every object will be [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)-ed and then concatenated. In other words, it works the same as [ADP:TEXT](/docs/user-api.md#macro-text) or [ADP:TABLE](/docs/user-api.md#macro-table). On the other hand, when using `ITEMIZE` you are indicating that you want a sublist of items.
 
 ### Text enrichment
 
-Inside a [ADP:TEXT](/docs/user-api.md#macro-adptext) form, a `CELL` from a [ADP:TABLE](/docs/user-api.md#macro-adptable) form and a `ITEM` form a [ADP:ITEMIZE](/docs/user-api.md#macro-adpitemize) form, we can enrich the text with the macros [ADP:BOLD](/docs/user-api.md#macro-adpbold), [ADP:ITALIC](/docs/user-api.md#macro-adpitalic), [ADP:BOLD-ITALIC](/docs/user-api.md#macro-adpbold-italic) and [ADP:WEB-LINK](/docs/user-api.md#macro-adpweb-link). For example:
+Inside a [ADP:TEXT](/docs/user-api.md#macro-text) form, a `CELL` from a [ADP:TABLE](/docs/user-api.md#macro-table) form and a `ITEM` form a [ADP:ITEMIZE](/docs/user-api.md#macro-itemize) form, we can enrich the text with the macros [ADP:BOLD](/docs/user-api.md#macro-bold), [ADP:ITALIC](/docs/user-api.md#macro-italic), [ADP:BOLD-ITALIC](/docs/user-api.md#macro-bold-italic) and [ADP:WEB-LINK](/docs/user-api.md#macro-web-link). For example:
 
 ```
 (ADP:TEXT "As " (ADP:BOLD "Andrew") " said: "
@@ -202,7 +202,7 @@ You will see this:
 
 As **Andrew** said: _You only need 6_ [coins](https://en.wikipedia.org/wiki/Coin) _to enter in_ ***The Giant Red Tree.***
 
-Note that spaces are placed out of enrichment functions (after `italic` and `web-link` calls). Also, you cannot nest calls of [ADP:BOLD](/docs/user-api.md#macro-adpbold), [ADP:ITALIC](/docs/user-api.md#macro-adpitalic), [ADP:BOLD-ITALIC](/docs/user-api.md#macro-adpbold-italic) and [ADP:WEB-LINK](/docs/user-api.md#macro-adpweb-link). For example, if you try this:
+Note that spaces are placed out of enrichment functions (after `italic` and `web-link` calls). Also, you cannot nest calls of [ADP:BOLD](/docs/user-api.md#macro-bold), [ADP:ITALIC](/docs/user-api.md#macro-italic), [ADP:BOLD-ITALIC](/docs/user-api.md#macro-bold-italic) and [ADP:WEB-LINK](/docs/user-api.md#macro-web-link). For example, if you try this:
 
 ```
 (ADP:TEXT (ADP:BOLD (ADP:ITALIC "This should be bold-italic.")))
@@ -212,7 +212,7 @@ an error will be raised.
 
 ### Images
 
-You can add images with the macro [ADP:IMAGE](/docs/user-api.md#macro-adpimage). For example, an image is located at `guides/images/`. If I evaluate the next expression:
+You can add images with the macro [ADP:IMAGE](/docs/user-api.md#macro-image). For example, an image is located at `guides/images/`. If I evaluate the next expression:
 
 ```
 (ADP:IMAGE "Lisp logo" #P"guides/images/Lisp_logo.svg")
@@ -226,7 +226,7 @@ The first argument is the alternative text of the image. If for some reason the 
 
 ### Code blocks
 
-A good Lisp tutorial must include Lisp code examples. ADP defines two macros to print code blocks: [ADP:CODE-BLOCK](/docs/user-api.md#macro-adpcode-block) and [ADP:CODE-EXAMPLE](/docs/user-api.md#macro-adpcode-example). The main difference is that the former does not evaluate the code to be printed. So, for example:
+A good Lisp tutorial must include Lisp code examples. ADP defines two macros to print code blocks: [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block) and [ADP:CODE-EXAMPLE](/docs/user-api.md#macro-code-example). The main difference is that the former does not evaluate the code to be printed. So, for example:
 
 ```
 (ADP:CODE-BLOCK NIL
@@ -242,9 +242,9 @@ And you will see:
 (BUT IT (IS (OK)))
 ```
 
-Note that `NIL` or, equivalently, `()` is used after `code-block`. This is because we can pass some symbols to [ADP:CODE-BLOCK](/docs/user-api.md#macro-adpcode-block) in order to change a bit how it works. But, we will see that in later sections.
+Note that `NIL` or, equivalently, `()` is used after `code-block`. This is because we can pass some symbols to [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block) in order to change a bit how it works. But, we will see that in later sections.
 
-On the other hand, [ADP:CODE-EXAMPLE](/docs/user-api.md#macro-adpcode-example) do evaluate the code. And what is more, it prints the standard output as well as the returned values. For example:
+On the other hand, [ADP:CODE-EXAMPLE](/docs/user-api.md#macro-code-example) do evaluate the code. And what is more, it prints the standard output as well as the returned values. For example:
 
 ```
 (ADP:CODE-EXAMPLE
@@ -275,13 +275,13 @@ And you will see:
 "world"
 ```
 
-Both with [ADP:CODE-BLOCK](/docs/user-api.md#macro-adpcode-block) and with [ADP:CODE-EXAMPLE](/docs/user-api.md#macro-adpcode-example) you can write multiple expressions.
+Both with [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block) and with [ADP:CODE-EXAMPLE](/docs/user-api.md#macro-code-example) you can write multiple expressions.
 
 ## Generating the documentation
 
 There are still some useful macros that I didn't explain yet. However, I think it is now a good time to learn how to actually generate the documentation. You may have multiple files where the macros explained above are used. But, where the documentation will be printed in? Which files will be generated?
 
-First, we need to understand how ADP works. When you load a project and a file contains calls to some of the above macros, ADP will store information from these macros (functions or symbols defined, tables, lists, text, etc). At every moment we can decide to associate the information gathered so far with a file using the macro [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-adpwrite-in-file). A good way to use ADP is calling [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-adpwrite-in-file) at the end of every file of code from your project. Doing that will create as many documentation files as code files your project has. Let's see an example. Imagine we have the following code in a file (it doesn't matter where it is located or even its name).
+First, we need to understand how ADP works. When you load a project and a file contains calls to some of the above macros, ADP will store information from these macros (functions or symbols defined, tables, lists, text, etc). At every moment we can decide to associate the information gathered so far with a file using the macro [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file). A good way to use ADP is calling [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file) at the end of every file of code from your project. Doing that will create as many documentation files as code files your project has. Let's see an example. Imagine we have the following code in a file (it doesn't matter where it is located or even its name).
 
 ```
 (ADP:HEADER "My API")
@@ -293,7 +293,7 @@ First, we need to understand how ADP works. When you load a project and a file c
 (ADP:DEFPARAMETER *GLOBAL-PARAM* ... "This parameter is awesome")
 ```
 
-Now, we want to create a file where to print this information in. In order to do that, we must use [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-adpwrite-in-file).
+Now, we want to create a file where to print this information in. In order to do that, we must use [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file).
 
 ```
 (ADP:HEADER "My API")
@@ -307,9 +307,9 @@ Now, we want to create a file where to print this information in. In order to do
 (ADP:WRITE-IN-FILE #P"docs/my-api")
 ```
 
-This macro receives only the pathname to the file where to print in the documentation. The pathname must be relative to the system's root directory. Also note that I didn't use any extension in the pathname. That's because ADP let you choose between different styles to generate the documentation and each style will create their own files. After using [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-adpwrite-in-file), the header, the two functions and the parameter are associated with the file that will be located at `docs/my-api`. If the pathname was already used in another call to [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-adpwrite-in-file), the new content will be appended to the information already gathered.
+This macro receives only the pathname to the file where to print in the documentation. The pathname must be relative to the system's root directory. Also note that I didn't use any extension in the pathname. That's because ADP let you choose between different styles to generate the documentation and each style will create their own files. After using [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file), the header, the two functions and the parameter are associated with the file that will be located at `docs/my-api`. If the pathname was already used in another call to [ADP:WRITE-IN-FILE](/docs/user-api.md#macro-write-in-file), the new content will be appended to the information already gathered.
 
-When all your documentation is associated with a file, it is time to generate the files and print the documentation. The function that must be used now is [ADP:LOAD-DOCUMENTATION-SYSTEM](/docs/user-api.md#function-adpload-documentation-system). As the name suggests, you are going to load your system. In fact, it will load you system with the documentation generation enabled so, while forms are evaluated the documentation is gathered and also is associated with the pertinent files. When the system is completely loaded, the file generation and documentation printing begins. For example, if your system is named `MY-SYSTEM`, then you can eval this expression in the REPL:
+When all your documentation is associated with a file, it is time to generate the files and print the documentation. The function that must be used now is [ADP:LOAD-DOCUMENTATION-SYSTEM](/docs/user-api.md#function-load-documentation-system). As the name suggests, you are going to load your system. In fact, it will load you system with the documentation generation enabled so, while forms are evaluated the documentation is gathered and also is associated with the pertinent files. When the system is completely loaded, the file generation and documentation printing begins. For example, if your system is named `MY-SYSTEM`, then you can eval this expression in the REPL:
 
 ```
 (ADP:LOAD-DOCUMENTATION-SYSTEM :MY-SYSTEM :GITHUB-MD)
@@ -331,13 +331,13 @@ ADP supports cross references with tags. A tag is a just a symbol with some info
 
 ### Header-tags
 
-A header-tag is a symbol with a header associated. We have already seen how to add a header to the documentation. But I didn't say that the macros [ADP:HEADER](/docs/user-api.md#macro-adpheader), [ADP:SUBHEADER](/docs/user-api.md#macro-adpsubheader) and [ADP:SUBSUBHEADER](/docs/user-api.md#macro-adpsubsubheader) receives a second optional argument. As you can imagine, this second argument must be a symbol that will be converted to a header tag. For example, the first header of this file is created with this expression:
+A header-tag is a symbol with a header associated. We have already seen how to add a header to the documentation. But I didn't say that the macros [ADP:HEADER](/docs/user-api.md#macro-header), [ADP:SUBHEADER](/docs/user-api.md#macro-subheader) and [ADP:SUBSUBHEADER](/docs/user-api.md#macro-subsubheader) receives a second optional argument. As you can imagine, this second argument must be a symbol that will be converted to a header tag. For example, the first header of this file is created with this expression:
 
 ```
 (ADP:HEADER "The ADP User Guide" USER-GUIDE-HEADER)
 ```
 
-Now the symbol `user-guide-header` is a header-tag. We can make a reference to that header with the macro [ADP:HEADER-REF](/docs/user-api.md#macro-adpheader-ref). For example, if I write this:
+Now the symbol `user-guide-header` is a header-tag. We can make a reference to that header with the macro [ADP:HEADER-REF](/docs/user-api.md#macro-header-ref). For example, if I write this:
 
 ```
 (ADP:TEXT "Go to the top: " (ADP:HEADER-REF USER-GUIDE-HEADER))
@@ -347,29 +347,29 @@ Then you will see this:
 
 Go to the top: [The ADP User Guide](/docs/user-guide.md#the-adp-user-guide)
 
-Note that the macro is used inside a [ADP:TEXT](/docs/user-api.md#macro-adptext) form. Same as with [ADP:BOLD](/docs/user-api.md#macro-adpbold) or [ADP:ITALIC](/docs/user-api.md#macro-adpitalic), [ADP:HEADER-REF](/docs/user-api.md#macro-adpheader-ref) only can be used inside [ADP:TEXT](/docs/user-api.md#macro-adptext), [ADP:TABLE](/docs/user-api.md#macro-adptable) or [ADP:ITEMIZE](/docs/user-api.md#macro-adpitemize).
+Note that the macro is used inside a [ADP:TEXT](/docs/user-api.md#macro-text) form. Same as with [ADP:BOLD](/docs/user-api.md#macro-bold) or [ADP:ITALIC](/docs/user-api.md#macro-italic), [ADP:HEADER-REF](/docs/user-api.md#macro-header-ref) only can be used inside [ADP:TEXT](/docs/user-api.md#macro-text), [ADP:TABLE](/docs/user-api.md#macro-table) or [ADP:ITEMIZE](/docs/user-api.md#macro-itemize).
 
 ### Function-tags, symbol-tags and type-tags
 
-These tags are symbols associated with a function, a variable or a type respectively. More specifically, the macros used to define things like [ADP:DEFUN](/docs/user-api.md#macro-adpdefun), [ADP:DEFPARAMETER](/docs/user-api.md#macro-adpdefparameter) or [ADP:DEFSTRUCT](/docs/user-api.md#macro-adpdefstruct) can create automatically a function-tag, a symbol-tag or a type-tag respectively. The tag created is the symbol of the name of the function, variable or type defined respectively. ADP defines three types of tags because the same symbol can refer to a function, a variable and a type simultaneously. The next list shows what type of tags are defined by which macros:
+These tags are symbols associated with a function, a variable or a type respectively. More specifically, the macros used to define things like [ADP:DEFUN](/docs/user-api.md#macro-defun), [ADP:DEFPARAMETER](/docs/user-api.md#macro-defparameter) or [ADP:DEFSTRUCT](/docs/user-api.md#macro-defstruct) can create automatically a function-tag, a symbol-tag or a type-tag respectively. The tag created is the symbol of the name of the function, variable or type defined respectively. ADP defines three types of tags because the same symbol can refer to a function, a variable and a type simultaneously. The next list shows what type of tags are defined by which macros:
 
 * Function-tags:
-  * [ADP:DEFGENERIC](/docs/user-api.md#macro-adpdefgeneric)
-  * [ADP:DEFINE-MODIFY-MACRO](/docs/user-api.md#macro-adpdefine-modify-macro)
-  * [ADP:DEFMACRO](/docs/user-api.md#macro-adpdefmacro)
-  * [ADP:DEFUN](/docs/user-api.md#macro-adpdefun)
+  * [ADP:DEFGENERIC](/docs/user-api.md#macro-defgeneric)
+  * [ADP:DEFINE-MODIFY-MACRO](/docs/user-api.md#macro-define-modify-macro)
+  * [ADP:DEFMACRO](/docs/user-api.md#macro-defmacro)
+  * [ADP:DEFUN](/docs/user-api.md#macro-defun)
 * Symbol-tags:
-  * [ADP:DEFCONSTANT](/docs/user-api.md#macro-adpdefconstant)
-  * [ADP:DEFINE-SYMBOL-MACRO](/docs/user-api.md#macro-adpdefine-symbol-macro)
-  * [ADP:DEFPARAMETER](/docs/user-api.md#macro-adpdefparameter)
-  * [ADP:DEFVAR](/docs/user-api.md#macro-adpdefvar)
+  * [ADP:DEFCONSTANT](/docs/user-api.md#macro-defconstant)
+  * [ADP:DEFINE-SYMBOL-MACRO](/docs/user-api.md#macro-define-symbol-macro)
+  * [ADP:DEFPARAMETER](/docs/user-api.md#macro-defparameter)
+  * [ADP:DEFVAR](/docs/user-api.md#macro-defvar)
 * Type-tags:
-  * [ADP:DEFCLASS](/docs/user-api.md#macro-adpdefclass)
-  * [ADP:DEFINE-CONDITION](/docs/user-api.md#macro-adpdefine-condition)
-  * [ADP:DEFSTRUCT](/docs/user-api.md#macro-adpdefstruct)
-  * [ADP:DEFTYPE](/docs/user-api.md#macro-adpdeftype)
+  * [ADP:DEFCLASS](/docs/user-api.md#macro-defclass)
+  * [ADP:DEFINE-CONDITION](/docs/user-api.md#macro-define-condition)
+  * [ADP:DEFSTRUCT](/docs/user-api.md#macro-defstruct)
+  * [ADP:DEFTYPE](/docs/user-api.md#macro-deftype)
 
-Same as with header-tags, we can make reference to functions, variables and types with [ADP:FUNCTION-REF](/docs/user-api.md#macro-adpfunction-ref), [ADP:SYMBOL-REF](/docs/user-api.md#macro-adpsymbol-ref) and [ADP:TYPE-REF](/docs/user-api.md#macro-adptype-ref). For example, to make a reference to an ADP macro:
+Same as with header-tags, we can make reference to functions, variables and types with [ADP:FUNCTION-REF](/docs/user-api.md#macro-function-ref), [ADP:SYMBOL-REF](/docs/user-api.md#macro-symbol-ref) and [ADP:TYPE-REF](/docs/user-api.md#macro-type-ref). For example, to make a reference to an ADP macro:
 
 ```
 (ADP:TEXT "A reference to an ADP macro: " (ADP:FUNCTION-REF ADP:HEADER))
@@ -377,9 +377,9 @@ Same as with header-tags, we can make reference to functions, variables and type
 
 You will see this:
 
-A reference to an ADP macro: [ADP:HEADER](/docs/user-api.md#macro-adpheader)
+A reference to an ADP macro: [ADP:HEADER](/docs/user-api.md#macro-header)
 
-Note again that [ADP:FUNCTION-REF](/docs/user-api.md#macro-adpfunction-ref) only can be used inside [ADP:TEXT](/docs/user-api.md#macro-adptext), [ADP:TABLE](/docs/user-api.md#macro-adptable) or [ADP:ITEMIZE](/docs/user-api.md#macro-adpitemize). The same goes to [ADP:SYMBOL-REF](/docs/user-api.md#macro-adpsymbol-ref) and [ADP:TYPE-REF](/docs/user-api.md#macro-adptype-ref).
+Note again that [ADP:FUNCTION-REF](/docs/user-api.md#macro-function-ref) only can be used inside [ADP:TEXT](/docs/user-api.md#macro-text), [ADP:TABLE](/docs/user-api.md#macro-table) or [ADP:ITEMIZE](/docs/user-api.md#macro-itemize). The same goes to [ADP:SYMBOL-REF](/docs/user-api.md#macro-symbol-ref) and [ADP:TYPE-REF](/docs/user-api.md#macro-type-ref).
 
 A cool thing about cross references is that you can make a reference to something that is not currently defined but will be. For example, a variable will be defined at the end of this file but we can make a reference now. I'm writing the next expression:
 
@@ -388,7 +388,7 @@ A cool thing about cross references is that you can make a reference to somethin
           (ADP:SYMBOL-REF A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE) ".")
 ```
 
-In the future, we will define the symbol [A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE](/docs/user-guide.md#variable-adpa-parameter-defined-at-the-end-of-the-file).
+In the future, we will define the symbol [A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file).
 
 Finally, an example using a type-tag:
 
@@ -396,11 +396,11 @@ Finally, an example using a type-tag:
 (ADP:TEXT "Using a type tag: " (ADP:TYPE-REF ALSO-A-TYPE?))
 ```
 
-Using a type tag: ["ALSO-A-TYPE?"](/docs/user-guide.md#type-adpalso-a-type)
+Using a type tag: [ALSO-A-TYPE?](/docs/user-guide.md#type-also-a-type)
 
 ### Code-tags
 
-Code-tags work differently to those we have just seen above. Code-tags are used inside the [ADP:CODE-BLOCK](/docs/user-api.md#macro-adpcode-block) macro. Imagine that you are making a tutorial. You are explaining how some piece of code works and you test that code in a different file to make sure your tutorial is well done. But one day, you decide to change your code. Now the tutorial needs to be changed too. To avoid writing your code twice you can use code-tags. Suppose that your code looks like this:
+Code-tags work differently to those we have just seen above. Code-tags are used inside the [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block) macro. Imagine that you are making a tutorial. You are explaining how some piece of code works and you test that code in a different file to make sure your tutorial is well done. But one day, you decide to change your code. Now the tutorial needs to be changed too. To avoid writing your code twice you can use code-tags. Suppose that your code looks like this:
 
 ```
 (ADP:DEFUN SUM-LIST (INT-LIST)
@@ -419,7 +419,7 @@ And you write in your tutorial that the function `sum-list` can be used the way 
   (SUM-LIST '(1 2 3)))
 ```
 
-But now you decide to use vectors rather than lists. You didn't use code-tags so you must change your code in two different places. Let's create now a code-tag using the macro [ADP:CODE-TAG](/docs/user-api.md#macro-adpcode-tag). Unfortunately, the macro [ADP:CODE-TAG](/docs/user-api.md#macro-adpcode-tag) cannot be printed inside code-block. So, I will use `code-lag` instead:
+But now you decide to use vectors rather than lists. You didn't use code-tags so you must change your code in two different places. Let's create now a code-tag using the macro [ADP:CODE-TAG](/docs/user-api.md#macro-code-tag). Unfortunately, the macro [ADP:CODE-TAG](/docs/user-api.md#macro-code-tag) cannot be printed inside code-block. So, I will use `code-lag` instead:
 
 ```
 (ADP:DEFUN SUM-LIST (INT-LIST)
@@ -438,9 +438,9 @@ A code-tag named `sum-list-example` is created and you can now use it in the tut
   SUM-LIST-EXAMPLE)
 ```
 
-First we indicate in the list after `code-block` that we will use the code tag named `sum-list-example`. Then, we use it. Now, each time you change the call to `sum-list` in your test code the tutorial will be automatically changed. You can specify as many tags as you want in both [ADP:CODE-TAG](/docs/user-api.md#macro-adpcode-tag) and [ADP:CODE-BLOCK](/docs/user-api.md#macro-adpcode-block) macros.
+First we indicate in the list after `code-block` that we will use the code tag named `sum-list-example`. Then, we use it. Now, each time you change the call to `sum-list` in your test code the tutorial will be automatically changed. You can specify as many tags as you want in both [ADP:CODE-TAG](/docs/user-api.md#macro-code-tag) and [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block) macros.
 
-Let's see a live example. Do you remember the symbol [A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE](/docs/user-guide.md#variable-adpa-parameter-defined-at-the-end-of-the-file) and the type ["ALSO-A-TYPE?"](/docs/user-guide.md#type-adpalso-a-type)?. In the source file I have written this:
+Let's see a live example. Do you remember the symbol [A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file) and the type [ALSO-A-TYPE?](/docs/user-guide.md#type-also-a-type)?. In the source file I have written this:
 
 ```
 (CODE-LAG (END-PARAMETER-CODE)
@@ -470,7 +470,7 @@ You will see this:
 
 ### Hiding your code
 
-When explaining some piece of code you should focus on the important parts. Or, equivalently, you should hide the irrelevant ones. You can hide parts of the code using the form `code-hide`. This form is neither a function nor a macro. It is just a form recognized by [ADP:CODE-BLOCK](/docs/user-api.md#macro-adpcode-block), [ADP:CODE-EXAMPLE](/docs/user-api.md#macro-adpcode-example) and [ADP:CODE-TAG](/docs/user-api.md#macro-adpcode-tag). I can't use a code block using `code-hide` because it will be hidden. So, I'm using `code-kide`. For example, if I write this:
+When explaining some piece of code you should focus on the important parts. Or, equivalently, you should hide the irrelevant ones. You can hide parts of the code using the form `code-hide`. This form is neither a function nor a macro. It is just a form recognized by [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block), [ADP:CODE-EXAMPLE](/docs/user-api.md#macro-code-example) and [ADP:CODE-TAG](/docs/user-api.md#macro-code-tag). I can't use a code block using `code-hide` because it will be hidden. So, I'm using `code-kide`. For example, if I write this:
 
 ```
 (ADP:CODE-BLOCK NIL
@@ -518,7 +518,7 @@ You will see this:
 NIL
 ```
 
-The `code-hide` form is similar to [ADP:CODE-BLOCK](/docs/user-api.md#macro-adpcode-block) or [ADP:CODE-TAG](/docs/user-api.md#macro-adpcode-tag). It receives as first argument a list of tags but they only take effect inside the [ADP:CODE-TAG](/docs/user-api.md#macro-adpcode-tag) macro. Imagine you have the following piece of code in your project:
+The `code-hide` form is similar to [ADP:CODE-BLOCK](/docs/user-api.md#macro-code-block) or [ADP:CODE-TAG](/docs/user-api.md#macro-code-tag). It receives as first argument a list of tags but they only take effect inside the [ADP:CODE-TAG](/docs/user-api.md#macro-code-tag) macro. Imagine you have the following piece of code in your project:
 
 ```
 (DEFUN SOME-LARGE-FUNCTION (X Y Z)
@@ -603,11 +603,11 @@ You will see this:
 
 I hope this guide is useful. I usually see Common Lisp projects that looks awesome but they lack guides or even documentation. That's why I started to document all my projects and then I realized that I needed some tool to make it easier. I know that there are already other documentation generators, but none of them suits my needs. Luckily, Common Lisp makes doing this kind of tools relatively easy compared to other languages. Lastly, I want to give you some tips or ways to use ADP that I ended up doing myself.
 
-* ***Use a different system for documentation generation***: I recommend to use a different system to indicate all the files you need to load to generate the documentation. So, if you have a system named `MY-SYSTEM` then create another system named `MY-SYSTEM/DOCS`. Although ADP will not execute anything unless you use the function [ADP:LOAD-DOCUMENTATION-SYSTEM](/docs/user-api.md#function-adpload-documentation-system), I think this should make your projects cleaner. And, let's be honest, I'm still learning the language and I don't want to break other people's code. I did this separation for ADP, so you can see an example in the file `adp.asd`.
-* ***Handling error messages***: I tried to make informative error messages but sometimes this cannot be possible. Or, at least, I can't do it better. The most common errors I have had when using ADP were undefined variable errors. Remember that [ADP:CODE-INLINE](/docs/user-api.md#macro-adpcode-inline) works the same as [ADP:TEXT](/docs/user-api.md#macro-adptext). You can't write `(code-inline name-of-function)`, you must write this instead `(code-inline "name-of-function")` or `(code-inline 'name-of-function)`. Also, be careful when using [ADP:FUNCTION-REF](/docs/user-api.md#macro-adpfunction-ref) or similars. If you don't write correctly the macro, some implementations will treat that call as a function call and will treat the argument as a variable. That's not a variable that ADP or you have defined and it is sure that it will raise an undefined variable error.
+* ***Use a different system for documentation generation***: I recommend to use a different system to indicate all the files you need to load to generate the documentation. So, if you have a system named `MY-SYSTEM` then create another system named `MY-SYSTEM/DOCS`. Although ADP will not execute anything unless you use the function [ADP:LOAD-DOCUMENTATION-SYSTEM](/docs/user-api.md#function-load-documentation-system), I think this should make your projects cleaner. And, let's be honest, I'm still learning the language and I don't want to break other people's code. I did this separation for ADP, so you can see an example in the file `adp.asd`.
+* ***Handling error messages***: I tried to make informative error messages but sometimes this cannot be possible. Or, at least, I can't do it better. The most common errors I have had when using ADP were undefined variable errors. Remember that [ADP:CODE-INLINE](/docs/user-api.md#macro-code-inline) works the same as [ADP:TEXT](/docs/user-api.md#macro-text). You can't write `(code-inline name-of-function)`, you must write this instead `(code-inline "name-of-function")` or `(code-inline 'name-of-function)`. Also, be careful when using [ADP:FUNCTION-REF](/docs/user-api.md#macro-function-ref) or similars. If you don't write correctly the macro, some implementations will treat that call as a function call and will treat the argument as a variable. That's not a variable that ADP or you have defined and it is sure that it will raise an undefined variable error.
 * ***Tags belong to a package!***: Note that almost all the tags are actually symbols, and symbols belong to a package. If you define a tag and you want to make a reference to it from another package, remember to add the package extension to the symbol name. For example, suppose that you define the symbol-tag `MY-TAG` in the package `MY-PKG`. Then, in another package you must write `(symbol-ref my-pkg:my-tag)`, or `(symbol-ref my-pkg::my-tag)` if the symbol is not exported. And yes, you should export the tags you want to use in other packages.
 * ***Read the API***: Maybe reading [ADP User Interface](/docs/user-api.md#adp-user-interface) can make you understand better how some macros work (or not). At least, you may be interested in seeing the section [Additional functions](/docs/user-api.md#additional-functions).
-* ***That's all! Enjoy using ADP.*** I leave you with [A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE](/docs/user-guide.md#variable-adpa-parameter-defined-at-the-end-of-the-file) and ["ALSO-A-TYPE?"](/docs/user-guide.md#type-adpalso-a-type) again.
+* ***That's all! Enjoy using ADP.*** I leave you with [A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file) and [ALSO-A-TYPE?](/docs/user-guide.md#type-also-a-type) again.
 
 #### Variable: A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE
 
