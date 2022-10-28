@@ -204,8 +204,6 @@
 
 (declaim (ftype (function (symbol string pathname) t) add-header-tag-path))
 (defun add-header-tag (tag str)
-  (when (eq tag 'adp::user-api-header)
-    (print tag))
   (when (gethash tag *header-tags*)
     (error "Header tag ~s already used." tag))
   (when (find-symbol (symbol-name tag))
