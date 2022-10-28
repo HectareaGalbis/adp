@@ -485,7 +485,7 @@
 
 (subheader "Known issues")
 
-(text "I want ADP to modify as minimum as possible the code executed from your system. However, not every macro can perform actions at compile time. So, when you enable the documentation generation the ADP macros will expand to extra code. If you don't reload again your porject (using the :force option) or restart the Lisp process, the macros will be already expanded in future loads of your project and ADP will try to gather information even it is disabled. If you don't want to reload again the whole project, I recommend to start a new Lisp process for each time you want to generate documentation. In other words, you can follow the following golden route:")
+(text "I want ADP to modify as minimum as possible the code executed from your system. However, not every macro can perform actions at compile time. So, when you enable the documentation generation, the ADP macros will expand to extra code. If you don't reload again your porject (using the :force option) or restart the Lisp process, the macros will be already expanded in future loads of your project and ADP will try to gather information even it is disabled. If you don't want to reload again the whole project, I recommend to start a new Lisp process for each time you want to generate documentation. In other words, you can follow the following golden route:")
 
 (itemize (:item "Start a new Lisp process or restart the current one.")
 	 (:item "Load ADP.")
