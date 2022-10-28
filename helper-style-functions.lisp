@@ -62,7 +62,7 @@
 
 ;; ----- Components functions -----
 
-(adp:subheader "API function components" api-components-subheader)
+(adp:subheader "API function components")
 
 (defun documentationp (expr)
   (stringp expr))
@@ -94,7 +94,7 @@
 
 ;; ----- defclass components -----
 
-(adp:subsubheader "Defclass components" defclass-components-subsubheader)
+(adp:subsubheader "Defclass components")
 
 (adp:defun defclass-class-name (defclass-source)
   (cadr defclass-source))
@@ -211,7 +211,7 @@
 
 ;; ----- defconstant components -----
 
-(adp:subsubheader "Defconstant components" defconstant-components-subsubheader)
+(adp:subsubheader "Defconstant components")
 
 (adp:defun defconstant-name (defconstant-source)
   (cadr defconstant-source))
@@ -227,7 +227,7 @@
 
 ;; ----- defgeneric components -----
 
-(adp:subsubheader "Defgeneric components" defgeneric-components-subsubheader)
+(adp:subsubheader "Defgeneric components")
 
 (adp:defun defgeneric-function-name (defgeneric-source)
   (cadr defgeneric-source))
@@ -281,7 +281,7 @@
 
 ;; ----- define-compiler-macro components -----
 
-(adp:subsubheader "Define-compiler-macro components" define-compiler-macro-components-subsubheader)
+(adp:subsubheader "Define-compiler-macro components")
 
 (adp:defun define-compiler-macro-name (define-compiler-macro-source)
   (cadr define-compiler-macro-source))
@@ -317,7 +317,7 @@
 
 ;; ----- define-condition components -----
 
-(adp:subsubheader "Define-condition components" define-condition-components-subsubheader)
+(adp:subsubheader "Define-condition components")
 
 (adp:defun define-condition-name (define-condition-source)
   (cadr define-condition-source))
@@ -428,7 +428,7 @@
 
 ;; ----- define-method-combination components -----
 
-(adp:subsubheader "Define-method-combination components" define-method-combination-components-subsubheader)
+(adp:subsubheader "Define-method-combination components")
 
 (adp:defun define-method-combination-name (define-method-combination-source)
   (cadr define-method-combination-source))
@@ -558,7 +558,7 @@
 
 ;; ----- define-modify-macro components -----
 
-(adp:subsubheader "Define-modify-macro components" define-modify-macro-components-subsubheader)
+(adp:subsubheader "Define-modify-macro components")
 
 (adp:defun define-modify-macro-name (define-modify-macro-source)
   (cadr define-modify-macro-source))
@@ -577,7 +577,7 @@
 
 ;; ----- define-setf-expander components -----
 
-(adp:subsubheader "Define-setf-expander components" define-setf-expander-components-subsubheader)
+(adp:subsubheader "Define-setf-expander components")
 
 (adp:defun define-setf-expander-access-fn (define-setf-expander-source)
   (cadr define-setf-expander-source))
@@ -613,7 +613,7 @@
 
 ;; ----- define-symbol-macro components -----
 
-(adp:subsubheader "Define-symbol-macro components" define-symbol-macro-components-subsubheader)
+(adp:subsubheader "Define-symbol-macro components")
 
 (adp:defun define-symbol-macro-symbol (define-symbol-macro-source)
   (cadr define-symbol-macro-source))
@@ -626,7 +626,7 @@
 
 ;; ----- defmacro components -----
 
-(adp:subsubheader "Defmacro components" defmacro-components-subsubheader)
+(adp:subsubheader "Defmacro components")
 
 (adp:defun defmacro-name (defmacro-source)
   (cadr defmacro-source))
@@ -662,7 +662,7 @@
 
 ;; ----- defmethod components -----
 
-(adp:subsubheader "defmethod components" defmethod-components-subsubheader)
+(adp:subsubheader "defmethod components")
 
 (adp:defun defmethod-function-name (defmethod-source)
   (cadr defmethod-source))
@@ -709,7 +709,7 @@
 
 ;; ----- defpackage components -----
 
-(adp:subsubheader "Defpackage components" defpackage-components-subsubheader)
+(adp:subsubheader "Defpackage components")
 
 (adp:defun defpackage-options (defpackage-source)
   (cddr defpackage-source))
@@ -787,7 +787,7 @@
 
 ;; ----- defparameter components -----
 
-(adp:subsubheader "Defparameter components" defparameter-components-subsubheader)
+(adp:subsubheader "Defparameter components")
 
 (adp:defun defparameter-name (defparameter-source)
   (cadr defparameter-source))
@@ -803,7 +803,7 @@
 
 ;; ----- defsetf components -----
 
-(adp:subsubheader "Defsetf components" defsetf-components-subsubheader)
+(adp:subsubheader "Defsetf components")
 
 (adp:defun defsetf-access-fn (defsetf-source)
   (cadr defsetf-source))
@@ -821,7 +821,7 @@
 
 ;; ----- defstruct -----
 
-(adp:subsubheader "Defstruct components" defstruct-components-subsubheader)
+(adp:subsubheader "Defstruct components")
 
 (adp:defun defstruct-name-and-options (defstruct-source)
   (cadr defstruct-source))
@@ -1030,7 +1030,7 @@
 
 ;; ----- deftype components -----
 
-(adp:subsubheader "Deftype components" deftype-components-subsubheader)
+(adp:subsubheader "Deftype components")
 
 (adp:defun deftype-name (deftype-source)
   (cadr deftype-source))
@@ -1066,7 +1066,7 @@
 
 ;; ----- defun components -----
 
-(adp:subsubheader "Defun components" defun-components-subsubheader)
+(adp:subsubheader "Defun components")
 
 (adp:defun defun-function-name (defun-source)
   (cadr defun-source))
@@ -1102,7 +1102,7 @@
 
 ;; ----- defvar components -----
 
-(adp:subsubheader "Defvar components" defvar-components-subsubheader)
+(adp:subsubheader "Defvar components")
 
 (adp:defun defvar-name (defvar-source)
   (cadr defvar-source))

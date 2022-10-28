@@ -3,7 +3,7 @@
 
 (write-in-file #P"README")
 
-(header "Add Documentation, Please" adp-header)
+(header "Add Documentation, Please")
 
 (text "Welcome to ADP!")
 

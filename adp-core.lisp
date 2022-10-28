@@ -73,6 +73,8 @@
 
 (declaim (ftype (function (adp-element) t) push-adp-element))
 (defun push-adp-element (elem)
+  (when (not *current-adp-file-contents*)
+    (error "No documentation file assigned. Use write-in-file."))
   (vector-push-extend elem *current-adp-file-contents*))
 
 (declaim (ftype (function (keyword &rest t) t) emplace-adp-element))
@@ -173,69 +175,26 @@
 
 ;; ----- adp ref tags -----
 
-;; (declaim (type (vector (cons symbol string)) *header-tags*))
-;; (defvar *header-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
+(declaim (type (vector symbol) *never-used-header-tags*))
+(defvar *never-used-header-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
 
-;; (declaim (type (vector symbol) *symbol-tags* *function-tags* *type-tags*))
-;; (defvar *symbol-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
-;; (defvar *function-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
-;; (defvar *type-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
+(declaim (ftype (function (symbol) t) add-never-used-header-tag))
+(defun add-never-used-header-tag (tag)
+  (vector-push-extend tag *never-used-header-tags*))
 
+(declaim (ftype (function (symbol) t) remove-never-used-header-tag))
+(defun remove-never-used-header-tag (tag)
+  (let ((vector-length (length *never-used-header-tags*)))
+    (loop for i from 0 below vector-length
+	  if (eq tag (aref *never-used-header-tags* i))
+	    do (setf (aref *never-used-header-tags* i)
+		     (aref *never-used-header-tags* (1- vector-length)))
+	       (decf (fill-pointer *never-used-header-tags*))
+	    and return nil)))
 
-;; (declaim (ftype (function (symbol) boolean) header-tagp symbol-tagp function-tagp type-tagp))
-;; (defun header-tagp (tag)
-;;   (loop for header-tag across *header-tags*
-;; 	  thereis (eq tag header-tag)))
-
-;; (defun symbol-tagp (tag)
-;;   (loop for symbol-tag across *symbol-tags*
-;; 	  thereis (eq tag symbol-tag)))
-
-;; (defun function-tagp (tag)
-;;   (loop for function-tag across *function-tags*
-;; 	  thereis (eq tag function-tag)))
-
-;; (defun type-tagp (tag)
-;;   (loop for type-tag across *type-tags*
-;; 	  thereis (eq tag type-tag)))
-
-
-;; (declaim (ftype (function (symbol string) t) push-header-tag))
-;; (defun push-header-tag (tag str)
-;;   (when (header-tagp tag)
-;;     (warn "The header tag ~s is already used." tag))
-;;   (vector-push-extend (cons tag str) *header-tags*))
-
-;; (declaim (ftype (function (symbol) t) push-symbol-tag push-function-tag push-type-tag))
-;; (defun push-symbol-tag (tag)
-;;   (when (symbol-tagp tag)
-;;     (warn "The symbol tag ~s is already used." tag))
-;;   (vector-push-extend tag *symbol-tags*))
-
-;; (defun push-function-tag (tag)
-;;   (when (function-tagp tag)
-;;     (warn "The function tag ~s is already used." tag))
-;;   (vector-push-extend tag *function-tags*))
-
-;; (defun push-type-tag (tag)
-;;   (when (type-tagp tag)
-;;     (warn "The type tag ~s is already used." tag))
-;;   (vector-push-extend tag *type-tags*))
-
-
-;; (declaim (ftype (function () t) empty-header-tags empty-symbol-tags empty-function-tags empty-type-tags))
-;; (defun empty-header-tags ()
-;;   (setf (fill-pointer *header-tags*) 0))
-
-;; (defun empty-symbol-tags ()
-;;   (setf (fill-pointer *symbol-tags*) 0))
-
-;; (defun empty-function-tags ()
-;;   (setf (fill-pointer *function-tags*) 0))
-
-;; (defun empty-type-tags ()
-;;   (setf (fill-pointer *type-tags*) 0))
-
+(declaim (ftype (function () t) empty-never-used-header-tags))
+(defun empty-never-used-header-tags ()
+  (setf (fill-pointer *never-used-header-tags*) 0))
 
 (declaim (type hash-table *header-tags-table* *symbol-tags-table* *function-tags-table* *type-tags-table*))
 (defvar *header-tags* (make-hash-table))
@@ -245,6 +204,12 @@
 
 (declaim (ftype (function (symbol string pathname) t) add-header-tag-path))
 (defun add-header-tag (tag str)
+  (when (eq tag 'adp::user-api-header)
+    (print tag))
+  (when (gethash tag *header-tags*)
+    (error "Header tag ~s already used." tag))
+  (when (find-symbol (symbol-name tag))
+    (add-never-used-header-tag tag))
   (setf (gethash tag *header-tags*) (cons str *current-adp-file*)))
 
 
@@ -354,13 +319,36 @@
 
 ;; ----- adp code tags -----
 
+(declaim (type (vector symbol) *never-used-code-tags*))
+(defvar *never-used-code-tags* (make-array 100 :adjustable t :fill-pointer 0 :element-type 'symbol))
+
+(declaim (ftype (function (symbol) t) add-never-used-code-tag))
+(defun add-never-used-code-tag (tag)
+  (vector-push-extend tag *never-used-code-tags*))
+
+(declaim (ftype (function (symbol) t) remove-never-used-code-tag))
+(defun remove-never-used-code-tag (tag)
+  (let ((vector-length (length *never-used-code-tags*)))
+    (loop for i from 0 below vector-length
+	  if (eq tag (aref *never-used-code-tags* i))
+	    do (setf (aref *never-used-code-tags* i)
+		     (aref *never-used-code-tags* (1- vector-length)))
+	       (decf (fill-pointer *never-used-code-tags*))
+	    and return nil)))
+
+(declaim (ftype (function () t) empty-never-used-code-tags))
+(defun empty-never-used-code-tags ()
+  (setf (fill-pointer *never-used-code-tags*) 0))
+
+
 (declaim (type hash-table *code-tags*))
 (defvar *code-tags* (make-hash-table))
 
 (declaim (ftype (function (symbol &rest t) t) add-code-tag))
 (defun add-code-tag (tag &rest list-code)
   (when (not (gethash tag *code-tags*))
-      (setf (gethash tag *code-tags*) (make-array 10 :adjustable t :fill-pointer 0)))
+    (setf (gethash tag *code-tags*) (make-array 10 :adjustable t :fill-pointer 0)))
+  (add-never-used-code-tag tag)
   (loop for code in list-code
 	do (vector-push-extend code (gethash tag *code-tags*))))
 
@@ -588,6 +576,8 @@
   (empty-symbol-tags)
   (empty-function-tags)
   (empty-type-tags)
+  (empty-never-used-header-tags)
+  (empty-never-used-code-tags)
   (empty-code-tags)
   (empty-style-parameters))
 
@@ -849,6 +839,7 @@
 		       (header-str-path (get-header-tag-info header-tag))
 		       (header-str (car header-str-path))
 		       (header-rel-path (cdr header-str-path)))
+		  (remove-never-used-header-tag header-tag)
 		  (funcall *header-ref-proc* stream header-tag header-str header-rel-path)))
 	       ((symbol-ref-textp arg)
 		(assert (get-symbol-tag-info (cadr arg)) ((cadr arg)) "~s is not a symbol tag." (cadr arg))
@@ -901,6 +892,7 @@
 							       (if (code-block-tagp code)
 								   (let ((associated-code (coerce (get-code-tag (cadr code)) 'list)))
 								     (assert associated-code () "~s is not a code-tag." (cadr code))
+								     (remove-never-used-code-tag (cadr code))
 								     associated-code)
 								   (list code)))
 							     contents)))
@@ -949,4 +941,8 @@
   (loop for file across *project-adp-files*
 	for rel-path = (adp-file-path file)
 	for file-elements = (adp-file-contents file)
-	do (write-file root-path rel-path file-elements)))
+	do (write-file root-path rel-path file-elements))
+  (loop for never-used-header-tag across *never-used-header-tags*
+	do (warn "The header tag ~s is defined but never used." never-used-header-tag))
+  (loop for never-used-code-tag across *never-used-code-tags*
+	do (warn "The code tag ~s is defined but never used." never-used-code-tag)))

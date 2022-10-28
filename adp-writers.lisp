@@ -8,7 +8,7 @@
 
 ;; ----- style parameters -----
 
-(adp:subheader "Style parameters" style-parameters-subheader)
+(adp:subheader "Style parameters")
 
 (adp:defmacro def-style-parameter (name &key (value nil) (key-name nil) (required nil))
   (check-type name symbol "a symbol")
@@ -35,7 +35,7 @@
 
 ;; ----- guide functions -----
 
-(adp:subheader "Customizable writer macros" customizable-subheader)
+(adp:subheader "Customizable writer macros")
 
 (def-customizable-writer def-header-writer *header-proc* 3)
 (def-customizable-writer def-subheader-writer *subheader-proc* 3)

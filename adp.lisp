@@ -7,38 +7,46 @@
   (when adppvt:*add-documentation*
     (check-type str string "a string")
     (check-type tag (or null symbol) "a symbol")
-    (let ((fixed-tag (or tag (gensym "HEADER-TAG"))))
-      `(progn
-	 (adppvt:add-header-tag ',fixed-tag ,str)
-	 (adppvt:emplace-adp-element :header ,str ',fixed-tag)
-	 (values)))))
+    (let ((fixed-tag (or tag (gensym))))
+      `(if adppvt:*add-documentation*
+	   (progn
+	     (adppvt:add-header-tag ',fixed-tag ,str)
+	     (adppvt:emplace-adp-element :header ,str ',fixed-tag)
+	     (values))
+	   (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process.")))))
 
 
 (cl:defmacro adv-subheader (str &optional tag)
   (when adppvt:*add-documentation*
     (check-type str string "a string")
     (check-type tag (or null symbol) "a symbol")
-    (let ((fixed-tag (or tag (gensym "SUBHEADER-TAG"))))
-      `(progn
-	 (adppvt:add-header-tag ',fixed-tag ,str)
-	 (adppvt:emplace-adp-element :subheader ,str ',fixed-tag)
-	 (values)))))
-
+    (let ((fixed-tag (or tag (gensym))))
+      `(if adppvt:*add-documentation*
+	   (progn
+	     (adppvt:add-header-tag ',fixed-tag ,str)
+	     (adppvt:emplace-adp-element :subheader ,str ',fixed-tag)
+	     (values))
+	   (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process.")))))
 
 (cl:defmacro adv-defmacro (&body defmacro-body)
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:add-function-tag (car ',defmacro-body))
-	   (adppvt:emplace-adp-element :defmacro '(cl:defmacro ,@defmacro-body) (car ',defmacro-body))))
+	 `((if adppvt:*add-documentation*
+	       (progn
+		 (adppvt:add-function-tag (car ',defmacro-body))
+		 (adppvt:emplace-adp-element :defmacro '(cl:defmacro ,@defmacro-body) (car ',defmacro-body)))
+	       (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
      (cl:defmacro ,@defmacro-body)))
 
 (cl:defmacro adv-defun (&body defun-body)
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:add-function-tag (car ',defun-body))
-	   (adppvt:emplace-adp-element :defun '(cl:defun ,@defun-body) (car ',defun-body))))
+	 `((if adppvt:*add-documentation*
+	       (progn
+		 (adppvt:add-function-tag (car ',defun-body))
+		 (adppvt:emplace-adp-element :defun '(cl:defun ,@defun-body) (car ',defun-body)))
+	       (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
      (cl:defun ,@defun-body)))
-
 
 (cl:defmacro adv-write-in-file (file-path)
   (when adppvt:*add-documentation*
@@ -46,13 +54,16 @@
     (assert (pathname-name file-path) (file-path) "The ~s pathname has not a name part." file-path)
     (with-gensyms (let-file-path)
       (once-only (file-path)
-	`(progn
-	   (let ((,let-file-path (make-pathname :directory (if (pathname-directory ,file-path)
-							       (cons :relative (cdr (pathname-directory ,file-path)))
-							       nil)
-						:name (pathname-name ,file-path))))
-	     (adppvt:push-adp-file ,let-file-path))
-	   (values))))))
+	`(if adppvt:*add-documentation*
+	     (progn
+	       (let ((,let-file-path (make-pathname :directory (if (pathname-directory ,file-path)
+								   (cons :relative (cdr (pathname-directory ,file-path)))
+								   nil)
+						    :name (pathname-name ,file-path))))
+		 (adppvt:push-adp-file ,let-file-path))
+	       (values))
+	     (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))))
+
 
 ;; ----- ADP interface -----
 
@@ -63,7 +74,7 @@
 
 ;; ----- Guide functions -----
 
-(adv-subheader "Literate programming functions" literate-subheader)
+(adv-subheader "Literate programming functions")
 
 (adv-defmacro header (str &optional tag)
   "Add a header with name str. Also, if tag is not nil but a symbol, a new header-tag is created."	      
@@ -71,10 +82,12 @@
     (check-type str string "a string")
     (check-type tag (or null symbol) "a symbol")
     (let ((fixed-tag (or tag (gensym))))
-      `(progn
-	 (adppvt:add-header-tag ',fixed-tag ,str)
-	 (adppvt:emplace-adp-element :header ,str ',fixed-tag)
-	 (values)))))
+      `(if adppvt:*add-documentation*
+	   (progn
+	     (adppvt:add-header-tag ',fixed-tag ,str)
+	     (adppvt:emplace-adp-element :header ,str ',fixed-tag)
+	     (values))
+	   (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process.")))))
 
 
 (adv-defmacro subheader (str &optional tag)
@@ -83,10 +96,12 @@
     (check-type str string "a string")
     (check-type tag (or null symbol) "a symbol")
     (let ((fixed-tag (or tag (gensym))))
-      `(progn
-	 (adppvt:add-header-tag ',fixed-tag ,str)
-	 (adppvt:emplace-adp-element :subheader ,str ',fixed-tag)
-	 (values)))))
+      `(if adppvt:*add-documentation*
+	   (progn
+	     (adppvt:add-header-tag ',fixed-tag ,str)
+	     (adppvt:emplace-adp-element :subheader ,str ',fixed-tag)
+	     (values))
+	   (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process.")))))
 
 
 (adv-defmacro subsubheader (str &optional tag)
@@ -95,19 +110,23 @@
     (check-type str string "a string")
     (check-type tag (or null symbol) "a symbol")
     (let ((fixed-tag (or tag (gensym))))
-      `(progn
-	 (adppvt:add-header-tag ',fixed-tag ,str)
-	 (adppvt:emplace-adp-element :subsubheader ,str ',fixed-tag)
-	 (values)))))
+      `(if adppvt:*add-documentation*
+	   (progn
+	     (adppvt:add-header-tag ',fixed-tag ,str)
+	     (adppvt:emplace-adp-element :subsubheader ,str ',fixed-tag)
+	     (values))
+	   (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process.")))))
 
 
 (adv-defmacro text (&rest objects)
   "Add plain text. The arguments in objects can be any lisp object. They will be princ-ed and concatenated into a single string.
 You can use the following macros to enrich your text: bold, italic, bold-italic, code-inline, web-link, header-ref, symbol-ref, function-ref and type-ref."
   (when adppvt:*add-documentation*
-    `(progn
-       (adppvt:emplace-adp-element :text ,@objects)
-       (values))))
+    `(if adppvt:*add-documentation*
+	 (progn
+	   (adppvt:emplace-adp-element :text ,@objects)
+	   (values))
+	 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
 
 
 (adv-defmacro table (&rest rows)
@@ -118,11 +137,13 @@ are treated as if using the macro text."
 	  do (check-type row list "a list")
 	     (loop for elem in row
 		   do (assert (eq (car elem) :cell) () "Each cell of a table must be a list starting with :cell. Found: ~s" elem)))
-    `(progn
-       (adppvt:emplace-adp-element :table ,@(loop for row in rows
-						  collect (cons 'list (loop for elem in row
-									    collect (cons 'list elem)))))
-       (values))))
+    `(if adppvt:*add-documentation*
+	 (progn
+	   (adppvt:emplace-adp-element :table ,@(loop for row in rows
+						      collect (cons 'list (loop for elem in row
+										collect (cons 'list elem)))))
+	   (values))
+	 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
 
 
 (adv-defmacro itemize (&rest items)
@@ -147,9 +168,11 @@ a nested list is added."
 		       collect (cons 'list item)
 		     else
 		       collect (list* 'list :itemize (process-itemize-items (cdr item))))))
-      `(progn
-	 (adppvt:emplace-adp-element :itemize ,@(process-itemize-items items))
-	 (values)))))
+      `(if adppvt:*add-documentation*
+	   (progn
+	     (adppvt:emplace-adp-element :itemize ,@(process-itemize-items items))
+	     (values))
+	   (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process.")))))
 
 
 (adv-defmacro image (alt-text path)
@@ -158,33 +181,43 @@ where the image is located."
   (when adppvt:*add-documentation*
     (check-type alt-text string "a string")
     (check-type path pathname "a pathname")
-    `(progn
-       (adppvt:emplace-adp-element :image ,alt-text ,path)
-       (values))))
+    `(if adppvt:*add-documentation*
+	 (progn
+	   (adppvt:emplace-adp-element :image ,alt-text ,path)
+	   (values))
+	 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
 
 
 (adv-defmacro bold (&rest args)
   "Add bold style to text when using the macros text, table or itemize. Each argument is princ-ed and concatenated into a string."
   (when adppvt:*add-documentation*
-    `(adppvt:create-bold-text ,@args)))
+    `(if adppvt:*add-documentation*
+	 (adppvt:create-bold-text ,@args)
+	 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
 
 
 (adv-defmacro italic (&rest args)
   "Add italic style to text when using the macros text, table or itemize. Each argument is princ-ed and concatenated into a string."
   (when adppvt:*add-documentation*
-    `(adppvt:create-italic-text ,@args)))
+    `(if adppvt:*add-documentation*
+	 (adppvt:create-italic-text ,@args)
+	 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
 
 
 (adv-defmacro bold-italic (&rest args)
   "Add bold and italic style to text when using the macros text, table or itemize. Each argument is princ-ed and concatenated into a string."
   (when adppvt:*add-documentation*
-    `(adppvt:create-bold-italic-text ,@args)))
+    `(if adppvt:*add-documentation*
+	 (adppvt:create-bold-italic-text ,@args)
+	 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
 
 
 (adv-defmacro code-inline (&rest code)
   "Add inlined style to text when using the macros text, table or itemize. Each argument is princ-ed and concatenated into a string."
   (when adppvt:*add-documentation*
-    `(adppvt:create-code-inline-text ,@code)))
+    `(if adppvt:*add-documentation*
+	 (adppvt:create-code-inline-text ,@code)
+	 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
 
 
 (adv-defmacro web-link (name link)
@@ -192,7 +225,9 @@ where the image is located."
   (when adppvt:*add-documentation*
     (check-type name string "a string")
     (check-type link string "a string")
-    `(adppvt:create-web-link-text ,name ,link)))
+    `(if adppvt:*add-documentation*
+	 (adppvt:create-web-link-text ,name ,link)
+	 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
 
 
 (adv-defmacro header-ref (tag)
@@ -200,7 +235,9 @@ where the image is located."
 Only the symbols used with the macros header, subheader and subsubheader are valid."
   (when adppvt:*add-documentation*
     (check-type tag symbol "a symbol")
-    `(adppvt:create-header-ref-text ',tag)))
+    `(if adppvt:*add-documentation*
+	 (adppvt:create-header-ref-text ',tag)
+	 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
 
 
 (adv-defmacro symbol-ref (tag)
@@ -208,7 +245,9 @@ Only the symbols used with the macros header, subheader and subsubheader are val
 defined with adp:deconstant, adp:define-symbol-macro, adp:defparameter or adp:defvar."
   (when adppvt:*add-documentation*
     (check-type tag symbol "a symbol")
-    `(adppvt:create-symbol-ref-text ',tag)))
+    `(if adppvt:*add-documentation*
+	 (adppvt:create-symbol-ref-text ',tag)
+	 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
 
 
 (adv-defmacro function-ref (tag)
@@ -216,7 +255,9 @@ defined with adp:deconstant, adp:define-symbol-macro, adp:defparameter or adp:de
 defined with adp:defgeneric, adp:define-modify-macro, adp:defmacro or adp:defun."
   (when adppvt:*add-documentation*
     (check-type tag symbol "a symbol")
-    `(adppvt:create-function-ref-text ',tag)))
+    `(if adppvt:*add-documentation*
+	 (adppvt:create-function-ref-text ',tag)
+	 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
 
 
 (adv-defmacro type-ref (tag)
@@ -224,7 +265,9 @@ defined with adp:defgeneric, adp:define-modify-macro, adp:defmacro or adp:defun.
 defined with adp:defclass, adp:define-condition, adp:defstruct or adp:deftype."
   (when adppvt:*add-documentation*
     (check-type tag symbol "a symbol")
-    `(adppvt:create-type-ref-text ',tag)))
+    `(if adppvt:*add-documentation*
+	 (adppvt:create-type-ref-text ',tag)
+	 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
 
 
 (adv-defmacro code-tag (tags &body code)
@@ -240,8 +283,10 @@ tags in code-hide is empty, the that piece of code will be hidden for every tag 
 	   (check-type tags list "a list")
 	   (loop for tag in tags
 		 do (check-type tag symbol "a symbol"))
-	   `((loop for ,tag in ',tags
-		   do (apply #'adppvt:add-code-tag ,tag (adppvt:process-code-tag ,tag ',code)))))
+	   `((if adppvt:*add-documentation*
+		 (loop for ,tag in ',tags
+		       do (apply #'adppvt:add-code-tag ,tag (adppvt:process-code-tag ,tag ',code)))
+		 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
        ,@(adppvt:remove-own-code-hide-exprs code))))
 
 
@@ -251,17 +296,20 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   (when adppvt:*add-documentation*
     (check-type tags list "a list")
     (loop for tag in tags
-	  do (check-type tag symbol "a symbol"))
+	  do (check-type tag symbol "a symbol")
+	     (assert (member tag code) () "The tag ~s is not present in code-block code." tag))
     (assert (not (null code)) () "Expected at least one expression in a code-block form.")
     (with-gensyms (expr)
-      `(progn
-	 (adppvt:emplace-adp-element :code-block (loop for ,expr in ',code
-						       if (and (symbolp ,expr)
-							       (member ,expr ',tags))
-							 collect (adppvt:create-code-block-tag ,expr)
-						       else
-							 collect (adppvt:process-code-tag '#:dummy-tag ,expr)))
-	 (values)))))
+      `(if adppvt:*add-documentation*
+	   (progn
+	     (adppvt:emplace-adp-element :code-block (loop for ,expr in ',code
+							   if (and (symbolp ,expr)
+								   (member ,expr ',tags))
+							     collect (adppvt:create-code-block-tag ,expr)
+							   else
+							     collect (adppvt:process-code-tag '#:dummy-tag ,expr)))
+	     (values))
+	   (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process.")))))
 
 
 (adv-defmacro code-example (&body code)
@@ -269,11 +317,14 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   (when adppvt:*add-documentation*
     (assert (not (null code)) () "Expected at least one expression in a code-example form.")
     (with-gensyms (output result)
-      `(let* ((,output (make-array 10 :adjustable t :fill-pointer 0 :element-type 'character))
-	      (,result (multiple-value-list (with-output-to-string (*standard-output* ,output)
-					      ,@(adppvt:remove-code-tag-exprs code)))))
+      `(if adppvt:*add-documentation*
+	   (let* ((,output (make-array 10 :adjustable t :fill-pointer 0 :element-type 'character))
+		  (,result (multiple-value-list (with-output-to-string (*standard-output* ,output)
+						  ,@(adppvt:remove-code-tag-exprs code)))))
 
-	 (adppvt:emplace-adp-element :code-example (adppvt:process-code-tag '#:dummy-tag ',code) ,output ,result)))))
+	     (adppvt:emplace-adp-element :code-example (adppvt:process-code-tag '#:dummy-tag ',code) ,output ,result)
+	     (values))
+	   (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process.")))))
 
 
 ;; ----- API functions -----
@@ -284,8 +335,11 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a defclass declaration. The macro expands to cl:defclass. Also, the class name is used to create a type-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:add-type-tag (car ',defclass-body))
-	   (adppvt:emplace-adp-element :defclass '(cl:defclass ,@defclass-body) (car ',defclass-body))))
+	 `((if adppvt:*add-documentation*
+	       (progn
+		 (adppvt:add-type-tag (car ',defclass-body))
+		 (adppvt:emplace-adp-element :defclass '(cl:defclass ,@defclass-body) (car ',defclass-body)))
+	       (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
      (cl:defclass ,@defclass-body)))
 
 
@@ -293,8 +347,11 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a defconstant declaration. The macro expands to cl:defconstant. Also, the constant name is used to create a symbol-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:add-symbol-tag (car ',defconstant-body))
-	   (adppvt:emplace-adp-element :defconstant '(cl:defconstant ,@defconstant-body) (car ',defconstant-body))))
+	 `((if adppvt:*add-documentation*
+	       (progn
+		 (adppvt:add-symbol-tag (car ',defconstant-body))
+		 (adppvt:emplace-adp-element :defconstant '(cl:defconstant ,@defconstant-body) (car ',defconstant-body)))
+	       (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
      (cl:defconstant ,@defconstant-body)))
 
 
@@ -302,8 +359,11 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a defgeneric declaration. The macro expands to cl:defgeneric. Also, the generic function name is used to create a function-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:add-function-tag (car ',defgeneric-body))
-	   (adppvt:emplace-adp-element :defgeneric '(cl:defgeneric ,@defgeneric-body) (car ',defgeneric-body))))
+	 `((if adppvt:*add-documentation*
+	       (progn
+		 (adppvt:add-function-tag (car ',defgeneric-body))
+		 (adppvt:emplace-adp-element :defgeneric '(cl:defgeneric ,@defgeneric-body) (car ',defgeneric-body)))
+	       (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
      (cl:defgeneric ,@defgeneric-body)))
 
 
@@ -311,7 +371,9 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a define-compiler-macro declaration. The macro expands to cl:define-compiler-macro."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:emplace-adp-element :define-compiler-macro '(cl:define-compiler-macro ,@define-compiler-macro-body))))
+	 `((if adppvt:*add-documentation*
+	       (adppvt:emplace-adp-element :define-compiler-macro '(cl:define-compiler-macro ,@define-compiler-macro-body))
+	       (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
      (cl:define-compiler-macro ,@define-compiler-macro-body)))
 
 
@@ -319,8 +381,11 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a define-condition declaration. The macro expands to cl:define-condition. Also, the condition name is used to create a type-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:add-type-tag (car ',define-condition-body))
-	   (adppvt:emplace-adp-element :define-condition '(cl:define-condition ,@define-condition-body) (car ',define-condition-body))))
+	 `((if adppvt:*add-documentation*
+	       (progn
+		 (adppvt:add-type-tag (car ',define-condition-body))
+		 (adppvt:emplace-adp-element :define-condition '(cl:define-condition ,@define-condition-body) (car ',define-condition-body)))
+	       (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
      (cl:define-condition ,@define-condition-body)))
 
 
@@ -328,7 +393,9 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a define-method-combination declaration. The macro expands to cl:define-method-combination."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:emplace-adp-element :define-method-combination '(cl:define-method-combination ,@define-method-combination-body))))
+	 `((if adppvt:*add-documentation*
+	       (adppvt:emplace-adp-element :define-method-combination '(cl:define-method-combination ,@define-method-combination-body))
+	       (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
      (cl:define-method-combination ,@define-method-combination-body)))
 
 
@@ -336,8 +403,11 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a define-modify-macro declaration. The macro expands to cl:define-modify-macro. Also, the macro name is used to create a function-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:add-function-tag (car ',define-modify-macro-body))
-	   (adppvt:emplace-adp-element :define-modify-macro '(cl:define-modify-macro ,@define-modify-macro-body) (car ',define-modify-macro-body))))
+	 `((if adppvt:*add-documentation*
+	       (progn
+		 (adppvt:add-function-tag (car ',define-modify-macro-body))
+		 (adppvt:emplace-adp-element :define-modify-macro '(cl:define-modify-macro ,@define-modify-macro-body) (car ',define-modify-macro-body)))
+	       (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
      (cl:define-modify-macro ,@define-modify-macro-body)))
 
 
@@ -345,7 +415,9 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a define-setf-expander declaration. The macro expands to cl:define-setf-expander."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:emplace-adp-element :define-setf-expander '(cl:define-setf-expander ,@define-setf-expander-body))))
+	 `((if adppvt:*add-documentation*
+	       (adppvt:emplace-adp-element :define-setf-expander '(cl:define-setf-expander ,@define-setf-expander-body))
+	       (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
      (cl:define-setf-expander ,@define-setf-expander-body)))
 
 
@@ -353,8 +425,11 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a define-symbol-macro declaration. The macro expands to cl:define-symbol-macro. Also, the symbol name is used to create a symbol-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:add-symbol-tag (car ',define-symbol-macro-body))
-	   (adppvt:emplace-adp-element :define-symbol-macro '(cl:define-symbol-macro ,@define-symbol-macro-body) (car ',define-symbol-macro-body))))
+	 `((if adppvt:*add-documentation*
+	       (progn
+		 (adppvt:add-symbol-tag (car ',define-symbol-macro-body))
+		 (adppvt:emplace-adp-element :define-symbol-macro '(cl:define-symbol-macro ,@define-symbol-macro-body) (car ',define-symbol-macro-body)))
+	       (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
      (cl:define-symbol-macro ,@define-symbol-macro-body)))
 
 
@@ -362,8 +437,11 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a defmacro declaration. The macro expands to cl:defmacro. Also, the macro name is used to create a function-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:add-function-tag (car ',defmacro-body))
-	   (adppvt:emplace-adp-element :defmacro '(cl:defmacro ,@defmacro-body) (car ',defmacro-body))))
+	 `((if adppvt:*add-documentation*
+	       (progn
+		 (adppvt:add-function-tag (car ',defmacro-body))
+		 (adppvt:emplace-adp-element :defmacro '(cl:defmacro ,@defmacro-body) (car ',defmacro-body)))
+	       (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
      (cl:defmacro ,@defmacro-body)))
 
 
@@ -371,7 +449,9 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a defmethod declaration. The macro expands to cl:defmethod."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:emplace-adp-element :defmethod '(cl:defmethod ,@defmethod-body))))
+	 `((if adppvt:*add-documentation*
+	       (adppvt:emplace-adp-element :defmethod '(cl:defmethod ,@defmethod-body))
+	       (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
      (cl:defmethod ,@defmethod-body)))
 
 
@@ -379,7 +459,9 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a defpackage declaration. The macro expands to cl:defpackage."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:emplace-adp-element :defpackage '(cl:defpackage ,@defpackage-body))))
+	 `((if adppvt:*add-documentation*
+	       (adppvt:emplace-adp-element :defpackage '(cl:defpackage ,@defpackage-body))
+	       (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
      (cl:defpackage ,@defpackage-body)))
 
 
@@ -387,8 +469,11 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a defparameter declaration. The macro expands to cl:defparameter. Also, the parameter name is used to create a symbol-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:add-symbol-tag (car ',defparameter-body))
-	   (adppvt:emplace-adp-element :defparameter '(cl:defparameter ,@defparameter-body) (car ',defparameter-body))))
+	 `((if adppvt:*add-documentation*
+	       (progn
+		 (adppvt:add-symbol-tag (car ',defparameter-body))
+		 (adppvt:emplace-adp-element :defparameter '(cl:defparameter ,@defparameter-body) (car ',defparameter-body)))
+	       (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
      (cl:defparameter ,@defparameter-body)))
 
 
@@ -396,7 +481,9 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a defsetf declaration. The macro expands to cl:defsetf."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:emplace-adp-element :defsetf '(cl:defsetf ,@defsetf-body))))
+	 `((if adppvt:*add-documentation*
+	       (adppvt:emplace-adp-element :defsetf '(cl:defsetf ,@defsetf-body))
+	       (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
      (cl:defsetf ,@defsetf-body)))
 
 
@@ -404,8 +491,11 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a defstruct declaration. The macro expands to cl:defstruct. Also, the struct name is used to create a type-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:add-type-tag (car ',defstruct-body))
-	   (adppvt:emplace-adp-element :defstruct '(cl:defstruct ,@defstruct-body) (car ',defstruct-body))))
+	 `((if adppvt:*add-documentation*
+	       (progn
+		 (adppvt:add-type-tag (car ',defstruct-body))
+		 (adppvt:emplace-adp-element :defstruct '(cl:defstruct ,@defstruct-body) (car ',defstruct-body)))
+	       (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
      (cl:defstruct ,@defstruct-body)))
 
 
@@ -413,8 +503,11 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a deftype declaration. The macro expands to cl:deftype. Also, the type name is used to create a type-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:add-type-tag (car ',deftype-body))
-	   (adppvt:emplace-adp-element :deftype '(cl:deftype ,@deftype-body) (car ',deftype-body))))
+	 `((if adppvt:*add-documentation*
+	       (progn
+		 (adppvt:add-type-tag (car ',deftype-body))
+		 (adppvt:emplace-adp-element :deftype '(cl:deftype ,@deftype-body) (car ',deftype-body)))
+	       (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
      (cl:deftype ,@deftype-body)))
 
 
@@ -422,11 +515,14 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a defun declaration. The macro expands to cl:defun. Also, the function name is used to create a function-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((when (symbolp (car ',defun-body))
-	     (adppvt:add-function-tag (car ',defun-body)))
-	   (adppvt:emplace-adp-element :defun '(cl:defun ,@defun-body) (if (symbolp (car ',defun-body))
-									   (car ',defun-body)
-									   nil))))
+	 `((if adppvt:*add-documentation*
+	       (progn
+		 (when (symbolp (car ',defun-body))
+		   (adppvt:add-function-tag (car ',defun-body)))
+		 (adppvt:emplace-adp-element :defun '(cl:defun ,@defun-body) (if (symbolp (car ',defun-body))
+										 (car ',defun-body)
+										 nil)))
+	       (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
      (cl:defun ,@defun-body)))
 
 
@@ -434,14 +530,17 @@ the code assigned to that tag is prin1-ed instead of the symbol."
   "Add a defvar declaration. The macro expands to cl:defvar. Also, the variable name is used to create a symbol-tag."
   `(progn
      ,@(when adppvt:*add-documentation*
-	 `((adppvt:add-symbol-tag (car ',defvar-body))
-	   (adppvt:emplace-adp-element :defvar '(cl:defvar ,@defvar-body) (car ',defvar-body))))
+	 `((if adppvt:*add-documentation*
+	       (progn
+		 (adppvt:add-symbol-tag (car ',defvar-body))
+		 (adppvt:emplace-adp-element :defvar '(cl:defvar ,@defvar-body) (car ',defvar-body)))
+	       (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
      (cl:defvar ,@defvar-body)))
 
 
 ;; ----- Writer functions -----
 
-(adv-subheader "Documentation writer function" writer-subheader)
+(adv-subheader "Documentation writer function")
 
 
 (adv-defmacro write-in-file (file-path)
@@ -454,13 +553,15 @@ macro can be used multiple times."
     (assert (pathname-name file-path) (file-path) "The ~s pathname has not a name part." file-path)
     (with-gensyms (let-file-path)
       (once-only (file-path)
-	`(progn
-	   (let ((,let-file-path (make-pathname :directory (if (pathname-directory ,file-path)
-							       (cons :relative (cdr (pathname-directory ,file-path)))
-							       nil)
-						:name (pathname-name ,file-path))))
-	     (adppvt:push-adp-file ,let-file-path))
-	   (values))))))
+	`(if adppvt:*add-documentation*
+	     (progn
+	       (let ((,let-file-path (make-pathname :directory (if (pathname-directory ,file-path)
+								   (cons :relative (cdr (pathname-directory ,file-path)))
+								   nil)
+						    :name (pathname-name ,file-path))))
+		 (adppvt:push-adp-file ,let-file-path))
+	       (values))
+	     (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))))
 
 
 (declaim (ftype (function (t symbol &rest t) t) load-documentation-system))
@@ -468,14 +569,16 @@ macro can be used multiple times."
   "Load a system with documentation generation activated. The style must be a keyword denoting a valid style.
 Each style will create different files. The style-args are style-dependent. In other words, each style can have its own 
 arguments to let the user customize briefly how documentation is printed."
-  (assert (asdf:find-system system) (system) "The system ~s was not found." system)
   (adppvt:remove-current-procs)
+  (adppvt:remove-current-data)
+  (assert (asdf:find-system system) (system) "The system ~s was not found." system)
   (let ((style-system (intern (concatenate 'string "ADP/" (symbol-name style)) :keyword)))
     (assert (asdf:find-system style-system) (style-system) "The style ~s was not found." style-system)
-    (asdf:load-system style-system :force t))
+    (print "Hola")
+    (asdf:load-system style-system :force t)
+    (print "Adios"))
   (adppvt:check-current-procs)
   (adppvt:check-style-parameters style-args)
-  (adppvt:remove-current-data)
   (let ((adppvt:*add-documentation* t))
     (asdf:load-system system :force t))
   (loop for (name value) in style-args by #'cddr
