@@ -483,6 +483,16 @@
     z-tag))
 
 
+(subheader "Known issues")
+
+(text "I want ADP to modify as minimum as possible the code executed from your system. However, not every macro can perform actions at compile time. So, when you enable the documentation generation the ADP macros will expand to extra code. If you don't reload again your porject (using the :force option) or restart the Lisp process, the macros will be already expanded in future loads of your project and ADP will try to gather information even it is disabled. If you don't want to reload again the whole project, I recommend to start a new Lisp process for each time you want to generate documentation. In other words, you can follow the following golden route:")
+
+(itemize (:item "Start a new Lisp process or restart the current one.")
+	 (:item "Load ADP.")
+	 (:item "Generate the documentation with " (function-ref load-documentation-system) ".")
+	 (:item "Close/restart the Lisp process."))
+
+
 (subheader "Tips and final comments")
 
 (text "I hope this guide is useful. I usually see Common Lisp projects that looks awesome but they lack guides or even documentation. That's why I started to document all my projects and then I realized that I needed some tool to make it easier. I know that there are already other documentation generators, but none of them suits my needs. Luckily, Common Lisp makes doing this kind of tools relatively easy compared to other languages. Lastly, I want to give you some tips or ways to use ADP that I ended up doing myself.")
