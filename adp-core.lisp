@@ -4,8 +4,8 @@
 
 ;; ----- adp parameters -----
 
-(defvar *add-documentation* nil)
-(defvar *current-style* nil)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+    (defvar *add-documentation* nil))
 
 
 ;; ----- adp files -----
