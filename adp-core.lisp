@@ -924,6 +924,7 @@
 				       :directory (append (pathname-directory root-path) (cdr (pathname-directory rel-path)))
 				       :name (pathname-name rel-path)
 				       :type (funcall *get-file-extension-proc*))))
+    (format t "~%Writing file: ~a" complete-path)
     (ensure-directories-exist complete-path :verbose nil)
     (with-open-file (stream complete-path :direction :output :if-does-not-exist :create :if-exists :supersede)
       (when *file-header-proc*

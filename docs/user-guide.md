@@ -25,7 +25,6 @@ I will try to do my best explaining how to use ADP. If this is not sufficient, n
     * [Function-tags, symbol-tags and type-tags](/docs/user-guide.md#function-tags-symbol-tags-and-type-tags)
     * [Code-tags](/docs/user-guide.md#code-tags)
     * [Hiding your code](/docs/user-guide.md#hiding-your-code)
-  * [Known issues](/docs/user-guide.md#known-issues)
   * [Tips and final comments](/docs/user-guide.md#tips-and-final-comments)
 
 ## Setting up ADP
@@ -584,15 +583,6 @@ You will see this:
           COLLECT (CONS POST-Y POST-Z) INTO YZ-LIST
           FINALLY (RETURN (VALUES ... ... YZ-LIST)))))
 ```
-
-## Known issues
-
-I want ADP to modify as minimum as possible the code executed from your system. However, not every macro can perform actions at compile time. So, when you enable the documentation generation, the ADP macros will expand extra code. If you don't reload again your porject (using the :force option) or restart the Lisp process, the macros will be already expanded in future loads of your project and ADP will try to gather information even it is disabled. Actually, it will not gather any information but it will perform a comparison. In addition, ADP will warn you when this is happening. Lastly, if you don't want to reload again the whole project, I recommend to start a new Lisp process for each time you want to generate documentation. In other words, you can follow the following golden route:
-
-* Start a new Lisp process or restart the current one.
-* Load ADP.
-* Generate the documentation with [ADP:LOAD-DOCUMENTATION-SYSTEM](/docs/user-api.md#function-load-documentation-system).
-* Close/restart the Lisp process.
 
 ## Tips and final comments
 

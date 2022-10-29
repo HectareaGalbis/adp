@@ -564,7 +564,7 @@ macro can be used multiple times."
 	     (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))))
 
 
-(declaim (ftype (function (t symbol &rest t) t) load-documentation-system))
+(declaim (ftype (function (t symbol &rest t) (values &optional)) load-documentation-system))
 (adv-defun load-documentation-system (system style &rest style-args)
   "Load a system with documentation generation activated. The style must be a keyword denoting a valid style.
 Each style will create different files. The style-args are style-dependent. In other words, each style can have its own 
@@ -574,18 +574,20 @@ arguments to let the user customize briefly how documentation is printed."
   (assert (asdf:find-system system) (system) "The system ~s was not found." system)
   (let ((style-system (intern (concatenate 'string "ADP/" (symbol-name style)) :keyword)))
     (assert (asdf:find-system style-system) (style-system) "The style ~s was not found." style-system)
-    (asdf:load-system style-system :force t))
+    (asdf:operate 'asdf:load-source-op style-system :force t))
   (adppvt:check-current-procs)
   (adppvt:check-style-parameters style-args)
   (let ((adppvt:*add-documentation* t))
-    (asdf:load-system system :force t))
+    (asdf:operate 'asdf:load-source-op system :force t))
   (loop for (name value) in style-args by #'cddr
 	do (adppvt:set-parameter-value name value))
   (let* ((root-path (asdf:system-source-directory system))
 	 (fixed-root-path (make-pathname :host (pathname-host root-path)
 					 :device (pathname-device root-path)
 					 :directory (pathname-directory root-path))))
-    (adppvt:write-system-files fixed-root-path)))
+    (adppvt:write-system-files fixed-root-path)
+    (format t "~%~a" "Done!"))
+  (values))
 
 
 ;; ----- Additional functions -----
