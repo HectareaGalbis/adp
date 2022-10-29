@@ -435,16 +435,6 @@ Add an ordered list of all variables defined using ADP.
 
 Add an ordered list of all types defined using ADP.
 
-#### Macro: WITH-MADE-SYMBOLS
-
-```Lisp
-(defmacro ADP:WITH-MADE-SYMBOLS (NAMES &BODY FORMS)
-  ...)
-```
-
-Same as with-gensyms, but it uses make-symbol instead. This is intended for using when defining a macro that
-expands to some form that defines something (like adp:defun or adp:defmacro). If your macro expands to some of that forms the generated symbols may be printed in the documentation. And the symbols from with-gensyms have a different number suffix each time you use it, so the printed documentation could change each time you generate it. Using with-made-symbols avoids that. In other words, the printed documentation remains the same if you don't change the code.
-
 ## Macro characters
 
 The next table shows what macro characters can be used and what they expand to:
