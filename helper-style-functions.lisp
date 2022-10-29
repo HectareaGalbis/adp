@@ -80,7 +80,7 @@
 
 (defmacro def-with-components (name &rest components)
   (let ((name-arg (intern (concatenate 'string "WITH-" (symbol-name name) "-COMPONENTS"))))
-    (with-gensyms (component-rest-args function-body-arg body-arg function-body-value-var let-bindings-var lambda-var)
+    (adp:with-made-symbols (component-rest-args function-body-arg body-arg function-body-value-var let-bindings-var lambda-var)
       `(adp:defmacro ,name-arg (((&rest ,component-rest-args) ,function-body-arg) &body ,body-arg)
        (check-component-symbols ,component-rest-args ',components)
        (let* ((,function-body-value-var (gensym))

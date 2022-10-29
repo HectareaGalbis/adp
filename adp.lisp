@@ -642,6 +642,21 @@ files are shown in the same order the files are loaded."
       (values))))
 
 
+(defmacro with-made-symbols (names &body forms)
+  "Same as with-gensyms, but it uses make-symbol instead. This is intended for using when defining a macro that
+expands to some form that defines something (like adp:defun or adp:defmacro). If your macro expands to some of that forms the generated symbols may be printed in the documentation. And the symbols from with-gensyms have a different number suffix each time you use it, so the printed documentation could change each time you generate it. Using with-made-symbols avoids that. In other words, the printed documentation remains the same if you don't change the code."
+  `(let ,(mapcar (lambda (name)
+                   (multiple-value-bind (symbol string)
+                       (etypecase name
+                         (symbol
+                          (values name (symbol-name name)))
+                         ((cons symbol (cons string-designator null))
+                          (values (first name) (string (second name)))))
+                     `(,symbol (make-symbol ,string))))
+                 names)
+     ,@forms))
+
+
 ;; ----- Macro characters -----
 
 (subheader "Macro characters")

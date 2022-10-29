@@ -23,7 +23,7 @@
 ;; ----- def-writer macros ----- Añadir doc string como argumento
 
 (defmacro def-customizable-writer (writer-name global-proc-name num-args)
-  (with-gensyms (writer-arg writer-args body-arg)
+  (adp:with-made-symbols (writer-arg writer-args body-arg)
     `(adp:defmacro ,writer-name (,writer-args &body ,body-arg)
        (check-type ,writer-args list)
        (assert (= (length ,writer-args) ,num-args) () "The writer must receive ~s arguments." ,num-args)
