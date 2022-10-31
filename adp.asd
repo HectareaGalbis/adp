@@ -1,6 +1,6 @@
 
 
-(asdf:defsystem #:adp
+(asdf:defsystem "adp"
   :author "Héctor Galbis Sanchis"
   :description "Add Documentation, Please. A documentation generator."
   :license "The Unlicense"
