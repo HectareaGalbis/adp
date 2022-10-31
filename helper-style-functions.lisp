@@ -14,7 +14,7 @@
 
 (defparameter *normal-pprint-dispatch* *print-pprint-dispatch*)
 (adp:defparameter *custom-pprint-dispatch* (copy-pprint-dispatch)
-  "An extension of *print-pprint-dispatch*. The define functions (like defun) from adp will be printed with pretty indentation as if they were from cl. Internal symbols will be printed without the package extension even if *print-escape* is true.")
+  "An extension of *print-pprint-dispatch*. The define functions (like defun) from adp will be printed with pretty indentation as if they were from cl. Internal symbols will be printed without the package extension even if *print-escape* is true. Besides, the shortest package nickname will be printed as the package extension of a symbol.")
 
 (set-pprint-dispatch '(cons (member adp:defclass)) (pprint-dispatch '(defclass)) 0 *custom-pprint-dispatch*)
 (set-pprint-dispatch '(cons (member adp:defconstant)) (pprint-dispatch '(defconstant)) 0 *custom-pprint-dispatch*)
