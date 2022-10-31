@@ -32,7 +32,7 @@ I will try to do my best explaining how to use ADP. If this is not sufficient, n
 After installing ADP, you must add it as a dependency in your project, like you have been doing for every project you want to use. For example, if you have a system like this:
 
 ```
-(ASDF/PARSE-DEFSYSTEM:DEFSYSTEM :MY-SYSTEM
+(ASDF/DEFSYSTEM:DEFSYSTEM :MY-SYSTEM
   ...
   :DEPENDS-ON
   (:UIOP :ALEXANDRIA)
@@ -42,7 +42,7 @@ After installing ADP, you must add it as a dependency in your project, like you 
 You only need to add `:adp` to the `:depends-on` list.
 
 ```
-(ASDF/PARSE-DEFSYSTEM:DEFSYSTEM :MY-SYSTEM
+(ASDF/DEFSYSTEM:DEFSYSTEM :MY-SYSTEM
   ...
   :DEPENDS-ON
   (:UIOP :ALEXANDRIA :ADP)

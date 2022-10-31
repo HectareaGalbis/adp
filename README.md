@@ -37,7 +37,7 @@ ADP is available at Ultralisp. If you don't have it, add it to Quicklisp:
 And finally, install ADP:
 
 ```
-(QUICKLISP-CLIENT:QUICKLOAD :ADP)
+(QL:QUICKLOAD :ADP)
 ```
 
 ## Documentation

@@ -34,14 +34,31 @@
 (set-pprint-dispatch '(cons (member adp:deftype)) (pprint-dispatch '(deftype)) 0 *custom-pprint-dispatch*)
 (set-pprint-dispatch '(cons (member adp:defun)) (pprint-dispatch '(defun)) 0 *custom-pprint-dispatch*)
 (set-pprint-dispatch '(cons (member adp:defvar)) (pprint-dispatch '(defvar)) 0 *custom-pprint-dispatch*)
+
+(defun find-shortest-string (strings)
+  (loop for str in strings
+	for shortest = str then (if (< (length str) (length shortest))
+				    str
+				    shortest)
+	finally (return shortest)))
+
 (set-pprint-dispatch 'symbol (lambda (stream sym)
 			       (let* ((sym-package (symbol-package sym))
-				      (internalp (and sym-package
-						      (eq (nth-value 1 (find-symbol (symbol-name sym) sym-package))
-							  :internal)))
-				      (*print-escape* (not internalp))
+				      (nickname (and sym-package
+						     (find-shortest-string (package-nicknames sym-package))))
+				      (print-packagep (and sym-package
+							   (not (equal sym-package (find-package "CL")))
+							   (eq (nth-value 1 (find-symbol (symbol-name sym) sym-package))
+							       :external)))
+				      (package-to-print (and print-packagep
+							     (or nickname
+								 (and (keywordp sym) "")
+								 (package-name sym-package))))
+				      (*print-escape* nil)
 				      (*print-pprint-dispatch* *normal-pprint-dispatch*))
-				 (write sym :stream stream)))
+				 (if print-packagep
+				     (format stream "~a:~a" package-to-print (symbol-name sym))
+				     (format stream "~a" (symbol-name sym)))))
 		     0 *custom-pprint-dispatch*)
 
 
