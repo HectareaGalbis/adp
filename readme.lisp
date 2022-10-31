@@ -36,7 +36,16 @@
 
 (subheader "Installation")
 
-(text "For now, you need to install this project downloading the source. But soon it will be available on Quicklisp.")
+(text "ADP is available at Ultralisp. If you don't have it, add it to Quicklisp:")
+
+(code-block ()
+  (ql-dist:install-dist "http://dist.ultralisp.org/"
+			:prompt nil))
+
+(text "And finally, install ADP:")
+
+(code-block ()
+  (ql:quickload :adp))
 
 
 (subheader "Documentation")
