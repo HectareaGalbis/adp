@@ -8,7 +8,9 @@
 (defparameter ADPPVT:*CUSTOM-PPRINT-DISPATCH* (COPY-PPRINT-DISPATCH))
 ```
 
-An extension of \*print-pprint-dispatch\*. The define functions (like defun) from adp will be printed with pretty indentation as if they were from cl. Internal symbols will be printed without the package extension even if \*print-escape\* is true. Besides, the shortest package nickname will be printed as the package extension of a symbol.
+````
+An extension of *print-pprint-dispatch*. The define functions (like defun) from adp will be printed with pretty indentation as if they were from cl. Internal symbols will be printed without the package extension even if *print-escape* is true. Besides, the shortest package nickname will be printed as the package extension of a symbol.
+````
 
 #### Function: CUSTOM-PRIN1
 
@@ -17,7 +19,9 @@ An extension of \*print-pprint-dispatch\*. The define functions (like defun) fro
   ...)
 ```
 
-It is like prin1, but uses \*custom-pprint-dispatch\* instead. Also, if hidden code is found, then hide-str is princ-ed.
+````
+It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if hidden code is found, then hide-str is princ-ed.
+````
 
 ## API function components
 

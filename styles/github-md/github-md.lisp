@@ -158,7 +158,7 @@
       (format stream "```Lisp~%(defclass ~s ~s~%  ~s~@[~%  (:default-initargs~{ ~s~})~]~[~%  (:metaclass ~s)~])~%```~%~%"
 	      class-name superclass-names slot-specifiers default-initargs metaclass documentation))
     (when documentation
-      (format stream "~a~%~%" (escape-characters documentation)))))
+      (format stream "````~%~a~%````~%~%" (escape-characters documentation)))))
 
 (adppvt:def-defconstant-writer (stream source tag)
   (declare (ignore tag))
@@ -167,7 +167,7 @@
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
       (format stream "```Lisp~%(defconstant ~s ~s)~%```~%~%" name initial-value))
     (when documentation
-      (format stream "~a~%~%" (escape-characters documentation)))))
+      (format stream "````~%~a~%````~%~%" documentation))))
 
 (adppvt:def-defgeneric-writer (stream source tag)
   (declare (ignore tag))
@@ -176,7 +176,7 @@
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
       (format stream "```Lisp~%(defgeneric ~s ~s~%  ...)~%```~%~%" function-name gf-lambda-list))
     (when documentation
-      (format stream "~a~%~%" (escape-characters documentation)))))
+      (format stream "````~%~a~%````~%~%" documentation))))
 
 (adppvt:def-define-compiler-macro-writer (stream source)
   (adppvt:with-define-compiler-macro-components ((name documentation) source)
@@ -184,7 +184,7 @@
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
       (format stream "```Lisp~%(define-compiler-macro ~s~%  ...)~%```~%~%" name))
     (when documentation
-      (format stream "~a~%~%" (escape-characters documentation)))))
+      (format stream "````~%~a~%````~%~%" documentation))))
 
 (adppvt:def-define-condition-writer (stream source tag)
   (declare (ignore tag))
@@ -194,7 +194,7 @@
       (format stream "```Lisp~%(defcondition ~s ~s~%  ~s~@[~%  (:default-initargs~{ ~s~})~]~@[~%  (:report ~s)~])~%```~%~%"
 	      name parent-types slot-specs default-initargs report-name))
     (when documentation
-      (format stream "~a~%~%" (escape-characters documentation)))))
+      (format stream "````~%~a~%````~%~%" documentation))))
 
 (adppvt:def-define-method-combination-writer (stream source)
   (adppvt:with-define-method-combination-components ((name documentation) source)
@@ -202,7 +202,7 @@
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
       (format stream "```Lisp~%(define-method-combination ~s~%  ...)~%```~%~%" name))
     (when documentation
-      (format stream "~a~%~%" (escape-characters documentation)))))
+      (format stream "````~%~a~%````~%~%" documentation))))
 
 (adppvt:def-define-modify-macro-writer (stream source tag)
   (declare (ignore tag))
@@ -211,7 +211,7 @@
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
       (format stream "```Lisp~%(define-modify-macro ~s ~s ~s)~%```~%~%" name lambda-list function))
     (when documentation
-      (format stream "~a~%~%" (escape-characters documentation)))))
+      (format stream "````~%~a~%````~%~%" documentation))))
 
 (adppvt:def-define-setf-expander-writer (stream source)
   (adppvt:with-define-setf-expander-components ((access-fn lambda-list documentation) source)
@@ -219,7 +219,7 @@
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
       (format stream "```Lisp~%(define-setf-expander ~s ~s~%  ...)~%```~%~%" access-fn lambda-list))
     (when documentation
-      (format stream "~a~%~%" (escape-characters documentation)))))
+      (format stream "````~%~a~%````~%~%" documentation))))
 
 (adppvt:def-define-symbol-macro-writer (stream source tag)
   (declare (ignore tag))
@@ -235,7 +235,7 @@
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
       (format stream "```Lisp~%(defmacro ~s ~s~%  ...)~%```~%~%" name lambda-list))
     (when documentation
-      (format stream "~a~%~%" (escape-characters documentation)))))
+      (format stream "````~%~a~%````~%~%" documentation))))
 
 (adppvt:def-defmethod-writer (stream source)
   (adppvt:with-defmethod-components ((function-name method-qualifiers specialized-lambda-list documentation) source)
@@ -243,7 +243,7 @@
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
       (format stream "```Lisp~%(defmethod ~s~{ ~s~} ~s~%  ...)~%```~%~%" function-name method-qualifiers specialized-lambda-list))
     (when documentation
-      (format stream "~a~%~%" (escape-characters documentation)))))
+      (format stream "````~%~a~%````~%~%" documentation))))
 
 (adppvt:def-defpackage-writer (stream source)
   (adppvt:with-defpackage-components ((defined-package-name nicknames use-package-names documentation) source)
@@ -252,7 +252,7 @@
       (format stream "```Lisp~%(defpackage ~s~@[~%  (:nicknames~{ ~s~})~]~@[~%  (:use~{ ~s~})~]~%  ...)~%```~%~%"
 	      defined-package-name nicknames use-package-names))
     (when documentation
-      (format stream "~a~%~%" (escape-characters documentation)))))
+      (format stream "````~%~a~%````~%~%" documentation))))
 
 (adppvt:def-defparameter-writer (stream source tag)
   (declare (ignore tag))
@@ -262,7 +262,7 @@
       (format stream "```Lisp~%(defparameter ~s ~s)~%```~%~%"
 	      name initial-value))
     (when documentation
-      (format stream "~a~%~%" (escape-characters documentation)))))
+      (format stream "````~%~a~%````~%~%" documentation))))
 
 (adppvt:def-defsetf-writer (stream source)
   (adppvt:with-defsetf-components ((access-fn update-fn documentation) source)
@@ -270,7 +270,7 @@
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
       (format stream "```Lisp~%(defsetf ~s ~s)" access-fn update-fn))
     (when documentation
-      (format stream "~a~%~%" (escape-characters documentation)))))
+      (format stream "````~%~a~%````~%~%" documentation))))
 
 (adppvt:def-defstruct-writer (stream source tag)
   (declare (ignore tag))
@@ -279,7 +279,7 @@
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
       (format stream "```Lisp~%(defstruct ~s~%  ~s)~%```~%~%" name-and-options slot-descriptions))
     (when documentation
-      (format stream "~a~%~%" (escape-characters documentation)))))
+      (format stream "````~%~a~%````~%~%" documentation))))
 
 (adppvt:def-deftype-writer (stream source tag)
   (declare (ignore tag))
@@ -288,7 +288,7 @@
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
       (format stream "```Lisp~%(deftype ~s ~s~%  ...)~%```~%~%" name lambda-list))
     (when documentation
-      (format stream "~a~%~%" (escape-characters documentation)))))
+      (format stream "````~%~a~%````~%~%" documentation))))
 
 (adppvt:def-defun-writer (stream source tag)
   (declare (ignore tag))
@@ -297,7 +297,7 @@
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
       (format stream "```Lisp~%(defun ~s ~s~%  ...)~%```~%~%" function-name lambda-list))
     (when documentation
-      (format stream "~a~%~%" (escape-characters documentation)))))
+      (format stream "````~%~a~%````~%~%" documentation))))
 
 (adppvt:def-defvar-writer (stream source tag)
   (declare (ignore tag))
@@ -306,7 +306,7 @@
     (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
       (format stream "```Lisp~%(defvar ~s~@[ ~s~])~%```~%~%" name initial-value))
     (when documentation
-      (format stream "~a~%~%" (escape-characters documentation)))))
+      (format stream "````~%~a~%````~%~%" documentation))))
 
 
 ;; ----- file functions -----

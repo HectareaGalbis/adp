@@ -9,7 +9,9 @@
   ...)
 ```
 
+````
 Add a header with name str. Also, if tag is not nil but a symbol, a new header-tag is created.
+````
 
 #### Macro: SUBHEADER
 
@@ -18,7 +20,9 @@ Add a header with name str. Also, if tag is not nil but a symbol, a new header-t
   ...)
 ```
 
+````
 Same as header, but add a subheader.
+````
 
 #### Macro: SUBSUBHEADER
 
@@ -27,7 +31,9 @@ Same as header, but add a subheader.
   ...)
 ```
 
+````
 Same as header, but add a subsubheader.
+````
 
 #### Macro: TEXT
 
@@ -36,8 +42,10 @@ Same as header, but add a subsubheader.
   ...)
 ```
 
+````
 Add plain text. The arguments in objects can be any lisp object. They will be princ-ed and concatenated into a single string.
 You can use the following macros to enrich your text: bold, italic, bold-italic, code-inline, web-link, header-ref, symbol-ref, function-ref and type-ref.
+````
 
 #### Macro: TABLE
 
@@ -46,8 +54,10 @@ You can use the following macros to enrich your text: bold, italic, bold-italic,
   ...)
 ```
 
+````
 Add a table. Each argument must be a list of lists. Each inner list must have as first element the keyword :cell and the rest 
 are treated as if using the macro text.
+````
 
 #### Macro: ITEMIZE
 
@@ -56,10 +66,12 @@ are treated as if using the macro text.
   ...)
 ```
 
+````
 Add a list of items. Each argument must be a list. Each list must have as first argument the keyword :item or :itemize. If 
 :item is used, the rest of the elements in that list will be treated as if using the macro text. If :itemize is used the rest 
 of elements must be lists where its first elements are the keywords :item or :itemize. In other words, when :itemize is used 
 a nested list is added.
+````
 
 #### Macro: IMAGE
 
@@ -68,8 +80,10 @@ a nested list is added.
   ...)
 ```
 
+````
 Add an image with alt-text as the alternative text and path must be the pathname, relative to the system's root directory, 
 where the image is located.
+````
 
 #### Macro: BOLD
 
@@ -78,7 +92,9 @@ where the image is located.
   ...)
 ```
 
+````
 Add bold style to text when using the macros text, table or itemize. Each argument is princ-ed and concatenated into a string.
+````
 
 #### Macro: ITALIC
 
@@ -87,7 +103,9 @@ Add bold style to text when using the macros text, table or itemize. Each argume
   ...)
 ```
 
+````
 Add italic style to text when using the macros text, table or itemize. Each argument is princ-ed and concatenated into a string.
+````
 
 #### Macro: BOLD-ITALIC
 
@@ -96,7 +114,9 @@ Add italic style to text when using the macros text, table or itemize. Each argu
   ...)
 ```
 
+````
 Add bold and italic style to text when using the macros text, table or itemize. Each argument is princ-ed and concatenated into a string.
+````
 
 #### Macro: CODE-INLINE
 
@@ -105,7 +125,9 @@ Add bold and italic style to text when using the macros text, table or itemize. 
   ...)
 ```
 
+````
 Add inlined style to text when using the macros text, table or itemize. Each argument is princ-ed and concatenated into a string.
+````
 
 #### Macro: WEB-LINK
 
@@ -114,7 +136,9 @@ Add inlined style to text when using the macros text, table or itemize. Each arg
   ...)
 ```
 
+````
 Add a hyperlink. The text showed is name and link must be a valid web URL. Both arguments must be strings.
+````
 
 #### Macro: HEADER-REF
 
@@ -123,8 +147,10 @@ Add a hyperlink. The text showed is name and link must be a valid web URL. Both 
   ...)
 ```
 
+````
 Add a reference to a header when using the macros text, table or itemize. The argument is a symbol denoting a header-tag.
 Only the symbols used with the macros header, subheader and subsubheader are valid.
+````
 
 #### Macro: SYMBOL-REF
 
@@ -133,8 +159,10 @@ Only the symbols used with the macros header, subheader and subsubheader are val
   ...)
 ```
 
+````
 Add a reference to a variable when using the macros text, table or itemize. The argument is a symbol denoting a variable
 defined with adp:deconstant, adp:define-symbol-macro, adp:defparameter or adp:defvar.
+````
 
 #### Macro: FUNCTION-REF
 
@@ -143,8 +171,10 @@ defined with adp:deconstant, adp:define-symbol-macro, adp:defparameter or adp:de
   ...)
 ```
 
+````
 Add a reference to a function symbol when using the macros text, table or itemize. The argument is a symbol denoting a function
 defined with adp:defgeneric, adp:define-modify-macro, adp:defmacro or adp:defun.
+````
 
 #### Macro: TYPE-REF
 
@@ -153,8 +183,10 @@ defined with adp:defgeneric, adp:define-modify-macro, adp:defmacro or adp:defun.
   ...)
 ```
 
+````
 Add a reference to a type symbol when using the macros text, table or itemize. The argument is a symbol denoting a type
 defined with adp:defclass, adp:define-condition, adp:defstruct or adp:deftype.
+````
 
 #### Macro: CODE-TAG
 
@@ -163,12 +195,14 @@ defined with adp:defclass, adp:define-condition, adp:defstruct or adp:deftype.
   ...)
 ```
 
+````
 Assign several tags to a piece of code. The code is placed into a progn form. The argument tags must be a list
 of symbols. If no tags are provided, then code-tag will do nothing. Each symbol in tags will be a code-tag assigned to code. 
 Inside the code-tag form it is correct to use a (code-hide tags &rest forms) form. It only indicates to code-tag 
 which parts of code can be hidden when using the tag in the macro code-block. code-hide accepts also a list of tags. If a tag 
 used in code-tag also appears in code-hide, that piece of code will be hidden when using the macro code-block. If the list of 
 tags in code-hide is empty, the that piece of code will be hidden for every tag used in code-tag.
+````
 
 #### Macro: CODE-BLOCK
 
@@ -177,8 +211,10 @@ tags in code-hide is empty, the that piece of code will be hidden for every tag 
   ...)
 ```
 
+````
 Add a block of code. Each element of code will be prin1-ed but not evaluated. If a symbol is used and that symbol appears as a tag in tags, then 
 the code assigned to that tag is prin1-ed instead of the symbol.
+````
 
 #### Macro: CODE-EXAMPLE
 
@@ -187,7 +223,9 @@ the code assigned to that tag is prin1-ed instead of the symbol.
   ...)
 ```
 
+````
 Same as code-block, but tags cannot be used and the code is evaluated. The standard output and the last-form's results are also printed.
+````
 
 ## API documentation functions
 
@@ -198,7 +236,9 @@ Same as code-block, but tags cannot be used and the code is evaluated. The stand
   ...)
 ```
 
+````
 Add a defclass declaration. The macro expands to cl:defclass. Also, the class name is used to create a type-tag.
+````
 
 #### Macro: DEFCONSTANT
 
@@ -207,7 +247,9 @@ Add a defclass declaration. The macro expands to cl:defclass. Also, the class na
   ...)
 ```
 
+````
 Add a defconstant declaration. The macro expands to cl:defconstant. Also, the constant name is used to create a symbol-tag.
+````
 
 #### Macro: DEFGENERIC
 
@@ -216,7 +258,9 @@ Add a defconstant declaration. The macro expands to cl:defconstant. Also, the co
   ...)
 ```
 
+````
 Add a defgeneric declaration. The macro expands to cl:defgeneric. Also, the generic function name is used to create a function-tag.
+````
 
 #### Macro: DEFINE-COMPILER-MACRO
 
@@ -225,7 +269,9 @@ Add a defgeneric declaration. The macro expands to cl:defgeneric. Also, the gene
   ...)
 ```
 
+````
 Add a define-compiler-macro declaration. The macro expands to cl:define-compiler-macro.
+````
 
 #### Macro: DEFINE-CONDITION
 
@@ -234,7 +280,9 @@ Add a define-compiler-macro declaration. The macro expands to cl:define-compiler
   ...)
 ```
 
+````
 Add a define-condition declaration. The macro expands to cl:define-condition. Also, the condition name is used to create a type-tag.
+````
 
 #### Macro: DEFINE-METHOD-COMBINATION
 
@@ -243,7 +291,9 @@ Add a define-condition declaration. The macro expands to cl:define-condition. Al
   ...)
 ```
 
+````
 Add a define-method-combination declaration. The macro expands to cl:define-method-combination.
+````
 
 #### Macro: DEFINE-MODIFY-MACRO
 
@@ -252,7 +302,9 @@ Add a define-method-combination declaration. The macro expands to cl:define-meth
   ...)
 ```
 
+````
 Add a define-modify-macro declaration. The macro expands to cl:define-modify-macro. Also, the macro name is used to create a function-tag.
+````
 
 #### Macro: DEFINE-SETF-EXPANDER
 
@@ -261,7 +313,9 @@ Add a define-modify-macro declaration. The macro expands to cl:define-modify-mac
   ...)
 ```
 
+````
 Add a define-setf-expander declaration. The macro expands to cl:define-setf-expander.
+````
 
 #### Macro: DEFINE-SYMBOL-MACRO
 
@@ -270,7 +324,9 @@ Add a define-setf-expander declaration. The macro expands to cl:define-setf-expa
   ...)
 ```
 
+````
 Add a define-symbol-macro declaration. The macro expands to cl:define-symbol-macro. Also, the symbol name is used to create a symbol-tag.
+````
 
 #### Macro: DEFMACRO
 
@@ -279,7 +335,9 @@ Add a define-symbol-macro declaration. The macro expands to cl:define-symbol-mac
   ...)
 ```
 
+````
 Add a defmacro declaration. The macro expands to cl:defmacro. Also, the macro name is used to create a function-tag.
+````
 
 #### Macro: DEFMETHOD
 
@@ -288,7 +346,9 @@ Add a defmacro declaration. The macro expands to cl:defmacro. Also, the macro na
   ...)
 ```
 
+````
 Add a defmethod declaration. The macro expands to cl:defmethod.
+````
 
 #### Macro: DEFPACKAGE
 
@@ -297,7 +357,9 @@ Add a defmethod declaration. The macro expands to cl:defmethod.
   ...)
 ```
 
+````
 Add a defpackage declaration. The macro expands to cl:defpackage.
+````
 
 #### Macro: DEFPARAMETER
 
@@ -306,7 +368,9 @@ Add a defpackage declaration. The macro expands to cl:defpackage.
   ...)
 ```
 
+````
 Add a defparameter declaration. The macro expands to cl:defparameter. Also, the parameter name is used to create a symbol-tag.
+````
 
 #### Macro: DEFSETF
 
@@ -315,7 +379,9 @@ Add a defparameter declaration. The macro expands to cl:defparameter. Also, the 
   ...)
 ```
 
+````
 Add a defsetf declaration. The macro expands to cl:defsetf.
+````
 
 #### Macro: DEFSTRUCT
 
@@ -324,7 +390,9 @@ Add a defsetf declaration. The macro expands to cl:defsetf.
   ...)
 ```
 
+````
 Add a defstruct declaration. The macro expands to cl:defstruct. Also, the struct name is used to create a type-tag.
+````
 
 #### Macro: DEFTYPE
 
@@ -333,7 +401,9 @@ Add a defstruct declaration. The macro expands to cl:defstruct. Also, the struct
   ...)
 ```
 
+````
 Add a deftype declaration. The macro expands to cl:deftype. Also, the type name is used to create a type-tag.
+````
 
 #### Macro: DEFUN
 
@@ -342,7 +412,9 @@ Add a deftype declaration. The macro expands to cl:deftype. Also, the type name 
   ...)
 ```
 
+````
 Add a defun declaration. The macro expands to cl:defun. Also, the function name is used to create a function-tag.
+````
 
 #### Macro: DEFVAR
 
@@ -351,7 +423,9 @@ Add a defun declaration. The macro expands to cl:defun. Also, the function name 
   ...)
 ```
 
+````
 Add a defvar declaration. The macro expands to cl:defvar. Also, the variable name is used to create a symbol-tag.
+````
 
 ## Documentation writer function
 
@@ -362,10 +436,12 @@ Add a defvar declaration. The macro expands to cl:defvar. Also, the variable nam
   ...)
 ```
 
+````
 Associate all the information gathered so far with the pathname file-path. This will cause the creation of a file 
 where all the information will be printed in. The pathname will be considered relative to the system's root directory.
 Only the directory and name parts of file-path are considered. The rest are ignored (including the extension). This 
 macro can be used multiple times.
+````
 
 #### Function: LOAD-DOCUMENTATION-SYSTEM
 
@@ -374,9 +450,11 @@ macro can be used multiple times.
   ...)
 ```
 
+````
 Load a system with documentation generation activated. The style must be a keyword denoting a valid style.
 Each style will create different files. The style-args are style-dependent. In other words, each style can have its own 
 arguments to let the user customize briefly how documentation is printed.
+````
 
 ## Additional functions
 
@@ -387,7 +465,9 @@ arguments to let the user customize briefly how documentation is printed.
   ...)
 ```
 
+````
 Add a reference to a Common Lisp symbol when using the macros text, table or itemize.
+````
 
 #### Macro: TABLE-OF-CONTENTS
 
@@ -396,8 +476,10 @@ Add a reference to a Common Lisp symbol when using the macros text, table or ite
   ...)
 ```
 
+````
 Add a list of all headers and subheaders used in the system. The headers from different
 files are shown in the same order the files are loaded.
+````
 
 #### Macro: MINI-TABLE-OF-CONTENTS
 
@@ -406,7 +488,9 @@ files are shown in the same order the files are loaded.
   ...)
 ```
 
+````
 Add a list of all headers, subheaders and subsubheaders used in the current documentation file.
+````
 
 #### Macro: TABLE-OF-FUNCTIONS
 
@@ -415,7 +499,9 @@ Add a list of all headers, subheaders and subsubheaders used in the current docu
   ...)
 ```
 
+````
 Add an ordered list of all functions and macros defined using ADP.
+````
 
 #### Macro: TABLE-OF-SYMBOLS
 
@@ -424,7 +510,9 @@ Add an ordered list of all functions and macros defined using ADP.
   ...)
 ```
 
+````
 Add an ordered list of all variables defined using ADP.
+````
 
 #### Macro: TABLE-OF-TYPES
 
@@ -433,7 +521,9 @@ Add an ordered list of all variables defined using ADP.
   ...)
 ```
 
+````
 Add an ordered list of all types defined using ADP.
+````
 
 ## Macro characters
 

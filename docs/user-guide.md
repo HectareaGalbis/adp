@@ -86,7 +86,9 @@ And you will see something like this:
   ...)
 ```
 
+````
 Multiply a by the sum of b and c.
+````
 
 That's all! Actually, note that if you load your project as always after changing some defuns, you will see that nothing happens. Your system is loaded normally and nothing changes. This is because the documentation generation is disabled by default. So, even if you add ADP code, the original code remains the same.
 
