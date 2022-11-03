@@ -28,7 +28,13 @@ Finally, you can also choose between several styles. Each style creates differen
 
 ## Installation
 
-ADP is available at Quicklisp and Ultralisp.
+ADP is available at Ultralisp. If you don't have it, add it to Quicklisp:
+
+```
+(QL-DIST:INSTALL-DIST "http://dist.ultralisp.org/" :PROMPT NIL)
+```
+
+And finally, install ADP:
 
 ```
 (QL:QUICKLOAD :ADP)
