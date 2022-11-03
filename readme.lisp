@@ -36,16 +36,7 @@
 
 (subheader "Installation")
 
-(text "ADP is available at Ultralisp. If you don't have it, add it to Quicklisp:")
-
-(code-block ()
-  (ql-dist:install-dist "http://dist.ultralisp.org/"
-			:prompt nil))
-
-(text "And finally, install ADP:")
-
-(code-block ()
-  (ql:quickload :adp))
+(text "ADP is available on Quicklisp! So, just eval " (code-inline "(ql:quickload :adp)") ". It is also available on the Ultralisp distribution.")
 
 
 (subheader "Documentation")
