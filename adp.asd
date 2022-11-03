@@ -39,11 +39,11 @@
 		:components ((:file "package")
 			     (:file "github-md")))))
 
-(asdf:defsystem #:adp/html
-  :author ""
-  :description "HTML style for adp"
-  :license "The Unlicense"
-  :depends-on (:adp)
-  :components ((:module "styles/html"
-		:components ((:file "package")
-			     (:file "html")))))
+;; (asdf:defsystem #:adp/html
+;;   :author ""
+;;   :description "HTML style for adp"
+;;   :license "The Unlicense"
+;;   :depends-on (:adp)
+;;   :components ((:module "styles/html"
+;; 		:components ((:file "package")
+;; 			     (:file "html")))))
