@@ -570,6 +570,7 @@ macro can be used multiple times."
     (:documentation "Operation for loading a Lisp file as source with ADP documentation.")))
 
 (cl:defvar *doc-system* nil)
+(cl:defvar *already-visited* nil)
 
 (uiop:with-upgradability ()
   (cl:defmethod asdf:action-description ((o load-doc-source-op) (c asdf:component))
@@ -581,6 +582,9 @@ macro can be used multiple times."
     (asdf/lisp-action:call-with-around-compile-hook
      c #'(lambda ()
            (let ((adppvt:*add-documentation* (equal (asdf:component-system c) *doc-system*)))
+	     (when (not *already-visited*)
+	       (setf *already-visited* t)
+	       (setf *gensym-counter* 0))
 	     (uiop:load* (first (asdf:input-files o c))
 			 :external-format (asdf:component-external-format c))))))
 
@@ -606,7 +610,8 @@ arguments to let the user customize briefly how documentation is printed."
   (adppvt:check-current-procs)
   (adppvt:check-style-parameters style-args)
   (let ((*doc-system* (asdf:find-system system))	 
-	(*gensym-counter* 0))
+	(*gensym-counter* *gensym-counter*)
+	(*already-visited* nil))
     (format t "~%Loading the system ~s" system)
     (asdf:operate 'load-doc-source-op system :force t))
   (loop for (name value) in style-args by #'cddr
