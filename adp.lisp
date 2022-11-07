@@ -564,6 +564,33 @@ macro can be used multiple times."
 	     (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))))
 
 
+(uiop:with-upgradability ()
+  (cl:defclass load-doc-source-op (asdf/lisp-action:basic-load-op asdf/action:downward-operation asdf/action:selfward-operation)
+    ((asdf/action:selfward-operation :initform 'asdf:prepare-source-op :allocation :class))
+    (:documentation "Operation for loading a Lisp file as source with ADP documentation.")))
+
+(cl:defvar *doc-system* nil)
+
+(uiop:with-upgradability ()
+  (cl:defmethod asdf:action-description ((o load-doc-source-op) (c asdf:component))
+    (format nil (uiop:compatfmt "~@<Loading source of ~3i~_~A~@:>") c))
+  (cl:defmethod asdf:action-description ((o load-doc-source-op) (c asdf:parent-component))
+    (format nil (uiop:compatfmt "~@<Loaded source of ~3i~_~A~@:>") c))
+  (cl:defun perform-lisp-load-source (o c)
+    "Perform the loading of a Lisp file as associated to specified action (O . C)"
+    (asdf/lisp-action:call-with-around-compile-hook
+     c #'(lambda ()
+           (let ((adppvt:*add-documentation* (equal (asdf:component-system c) *doc-system*)))
+	     (uiop:load* (first (asdf:input-files o c))
+			 :external-format (asdf:component-external-format c))))))
+
+  (cl:defmethod asdf:perform ((o load-doc-source-op) (c asdf:cl-source-file))
+    (perform-lisp-load-source o c))
+  (cl:defmethod asdf:perform ((o load-doc-source-op) (c asdf:static-file))
+    nil))
+
+
+
 (declaim (ftype (function (t symbol &rest t) (values &optional)) load-documentation-system))
 (adv-defun load-documentation-system (system style &rest style-args)
   "Load a system with documentation generation activated. The style must be a keyword denoting a valid style.
@@ -574,18 +601,21 @@ arguments to let the user customize briefly how documentation is printed."
   (assert (asdf:find-system system) (system) "The system ~s was not found." system)
   (let ((style-system (intern (concatenate 'string "ADP/" (symbol-name style)) :keyword)))
     (assert (asdf:find-system style-system) (style-system) "The style ~s was not found." style-system)
+    (format t "~%Loading the style ~s" style)
     (asdf:operate 'asdf:load-source-op style-system :force t))
   (adppvt:check-current-procs)
   (adppvt:check-style-parameters style-args)
-  (let ((adppvt:*add-documentation* t)
+  (let ((*doc-system* (asdf:find-system system))	 
 	(*gensym-counter* 0))
-    (asdf:operate 'asdf:load-source-op system :force t))
+    (format t "~%Loading the system ~s" system)
+    (asdf:operate 'load-doc-source-op system :force t))
   (loop for (name value) in style-args by #'cddr
 	do (adppvt:set-parameter-value name value))
   (let* ((root-path (asdf:system-source-directory system))
 	 (fixed-root-path (make-pathname :host (pathname-host root-path)
 					 :device (pathname-device root-path)
 					 :directory (pathname-directory root-path))))
+    (format t "~%Writing documentation")
     (adppvt:write-system-files fixed-root-path)
     (format t "~%~a" "Done!"))
   (values))
