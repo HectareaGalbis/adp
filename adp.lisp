@@ -277,17 +277,30 @@ Inside the code-tag form it is correct to use a (code-hide tags &rest forms) for
 which parts of code can be hidden when using the tag in the macro code-block. code-hide accepts also a list of tags. If a tag 
 used in code-tag also appears in code-hide, that piece of code will be hidden when using the macro code-block. If the list of 
 tags in code-hide is empty, the that piece of code will be hidden for every tag used in code-tag."
-  (with-gensyms (tag)
-    `(progn
-       ,@(when adppvt:*add-documentation*
-	   (check-type tags list "a list")
-	   (loop for tag in tags
-		 do (check-type tag symbol "a symbol"))
+  `(progn
+     ,@(when adppvt:*add-documentation*
+	 (check-type tags list "a list")
+	 (loop for tag in tags
+	       do (check-type tag symbol "a symbol"))
+	 (with-gensyms (tag)
 	   `((if adppvt:*add-documentation*
 		 (loop for ,tag in ',tags
 		       do (apply #'adppvt:add-code-tag ,tag (adppvt:process-code-tag ,tag ',code)))
-		 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
-       ,@(adppvt:remove-own-code-hide-exprs code))))
+		 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process.")))))
+     ,@(adppvt:remove-own-code-tag-exprs code)))
+
+
+(adv-defmacro form-tag (tags &body code)
+  "Same as code-tag, but code is not evaluated at all."
+  (when adppvt:*add-documentation*
+    (check-type tags list "a list")
+    (loop for tag in tags
+	  do (check-type tag symbol "a symbol"))
+    (with-gensyms (tag)
+      `(if adppvt:*add-documentation*
+	   (loop for ,tag in ',tags
+		 do (apply #'adppvt:add-code-tag ,tag (adppvt:process-code-tag ,tag ',code)))
+	   (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process.")))))
 
 
 (adv-defmacro code-block ((&rest tags) &body code)

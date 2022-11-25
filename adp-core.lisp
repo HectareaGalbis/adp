@@ -375,48 +375,72 @@
       (and (consp code)
 	   (plistp (cdr code)))))
 
-(intern "CODE-HIDE" :adp) ; Advance intern
-(intern "CODE-TAG" :adp)  ; Advance intern
+(intern "CODE-HIDE"   :adp) ; Advance intern
+(intern "CODE-TAG"    :adp) ; Advance intern
+(intern "CODE-REMOVE" :adp) ; Advance intern
+(intern "CODE-SHOW"   :adp) ; Advance intern
 
 (declaim (ftype (function (t) t) remove-code-tag-exprs))
 (defun remove-code-tag-exprs (code)
   (labels ((remove-code-tag-exprs-aux (code)
 	     (if (plistp code)
 		 (cond
-		   ((member (car code) '(adp::code-tag adp::code-hide))
+		   ((member (car code) '(adp::code-tag adp::code-hide adp::code-remove))
 		    (mapcan #'remove-code-tag-exprs-aux (cddr code)))
+		   ((eq (car code) 'adp::code-show)
+		    nil)
 		   (t
 		    (list (mapcan #'remove-code-tag-exprs-aux code))))
 		 (list code))))
     (car (remove-code-tag-exprs-aux code))))
 
 (declaim (ftype (function (t) t) remove-own-code-focus-exprs))
-(defun remove-own-code-hide-exprs (code)
-  (labels ((remove-own-code-hide-exprs-aux (code)
+(defun remove-own-code-tag-exprs (code)
+  (labels ((remove-own-code-tag-exprs-aux (code)
 	     (if (plistp code)
 		 (cond
-		   ((eq (car code) 'adp::code-hide)
-		    (mapcan #'remove-own-code-hide-exprs-aux (cddr code)))
+		   ((member (car code) '(adp::code-hide adp::code-remove))
+		    (mapcan #'remove-own-code-tag-exprs-aux (cddr code)))
 		   ((eq (car code) 'adp::code-tag)
 		    (list code))
+		   ((eq (car code) 'adp::code-show)
+		    nil)
 		   (t
-		    (list (mapcan #'remove-own-code-hide-exprs-aux code))))
+		    (list (mapcan #'remove-own-code-tag-exprs-aux code))))
 		 (list code))))
-    (car (remove-own-code-hide-exprs-aux code))))
+    (car (remove-own-code-tag-exprs-aux code))))
+
+(declaim (ftype (function (symbol list) boolean) valid-tag-p))
+(defun valid-tag-p (tag tags)
+  (or (null tags)
+      (member tag tags)))
 
 (declaim (ftype (function (symbol t) t) process-code-tag))
 (defun process-code-tag (tag code)
   (labels ((process-aux (tag code)
 	     (if (plistp code)
-		 (if (member (car code) '(adp::code-hide adp::code-tag))
-		     (if (and (eq (car code) 'adp::code-hide)
-			      (or (null (cadr code))
-				  (member tag (cadr code))))
-			 (list *hide-symbol*)
-			 (loop for expr in (cddr code)
-			       append (process-aux tag expr)))
-		     (list (loop for expr in code
-				 append (process-aux tag expr))))
+		 (cond
+		   ((eq (car code) 'adp::code-hide)
+		    (if (valid-tag-p tag (cadr code))
+			(list *hide-symbol*)
+			(loop for expr in (cddr code)
+			      append (process-aux tag expr))))
+		   ((eq (car code) 'adp::code-remove)
+		    (if (valid-tag-p tag (cadr code))
+			nil
+			(loop for expr in (cddr code)
+			      append (process-aux tag expr))))
+		   ((eq (car code) 'adp::code-show)
+		    (if (valid-tag-p tag (cadr code))
+			(loop for expr in (cddr code)
+			      append (process-aux tag expr))
+			nil))
+		   ((eq (car code) 'adp::code-tag)
+		    (loop for expr in (cddr code)
+			  append (process-aux tag expr)))
+		   (t
+		    (list (loop for expr in code
+				append (process-aux tag expr)))))
 		 (list code))))
     (car (process-aux tag code))))
 

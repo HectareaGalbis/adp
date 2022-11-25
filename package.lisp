@@ -22,7 +22,7 @@
 	   #:add-function-tag #:add-type-tag #:empty-header-tags #:empty-symbol-tags
 	   #:empty-function-tags #:empty-type-tags #:emplace-adp-element #:push-adp-file #:empty-adp-elements
 	   #:check-style-parameters #:set-parameter-value #:write-system-files #:add-code-tag #:get-code-tag
-	   #:process-code-tag #:remove-code-tag-exprs #:remove-own-code-hide-exprs #:remove-current-data
+	   #:process-code-tag #:remove-code-tag-exprs #:remove-own-code-tag-exprs #:remove-current-data
 	   #:remove-current-procs #:check-current-procs #:hide-symbolp #:create-bold-text #:create-italic-text
 	   #:create-bold-italic-text #:create-code-inline-text #:create-web-link-text #:create-file-ref-text
 	   #:create-header-ref-text #:create-symbol-ref-text #:create-function-ref-text #:create-type-ref-text
