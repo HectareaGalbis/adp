@@ -61,15 +61,21 @@
   (format stream "~{~{| ~a ~}|~%~}~%~%" (cdr table)))
 
 (adppvt:def-itemize-writer (stream items)
-  (labels ((itemize-aux (item-list level)
+  (labels ((digits (n)
+	     (if (< n 10)
+		 1
+		 (1+ (digits (truncate n 10)))))
+	   (itemize-aux (item-list numbersp indent-space)
 	     (loop for item in item-list
-		   if (eq (car item) :item)
-		     do (format stream "~v@{  ~}* ~a~%" level (cadr item))
-		   else if (eq (car item) :itemize)
-			  do (itemize-aux (cdr item) (1+ level))
-		   finally (when (zerop level)
-			     (format stream "~%")))))
-    (itemize-aux items 0)))
+		   for index = 0 then (if (eq (car item) :item) (1+ index) index)
+		   do (case (car item)
+			(:item (if numbersp
+				   (format stream "~v@{ ~}~s. ~a~%" indent-space (1+ index) (cadr item))
+				   (format stream "~v@{ ~}* ~a~%" indent-space (cadr item))))
+			((:itemize :enumerate) (itemize-aux (cdr item) (eq (car item) :enumerate) (if numbersp
+												      (+ indent-space (digits index) 2)
+												      (+ indent-space 2))))))))
+    (itemize-aux (cdr items) (eq (car items) :enumerate) 0)))
 
 (adppvt:def-image-writer (stream alt-text rel-image-path)
   (format stream "![~a](/~a)~%~%" (escape-characters alt-text) rel-image-path))
@@ -129,23 +135,11 @@
 	 (*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
     (format stream "[~a](/~a.md#~a)" (escape-characters (prin1-to-string tag)) file-path type-anchor)))
 
-(adppvt:def-code-block-writer (stream code-list)
-    (format stream "```")
-  (loop for code in code-list
-	do (terpri stream)
-	   (adppvt:custom-prin1 code stream "...")
-	   (terpri stream))
-  (format stream "```~%~%"))
+(adppvt:def-code-block-writer (stream lang text-code)
+  (format stream "```~@[~a~]~%~a~%```~%~%" lang text-code))
 
-(adppvt:def-code-example-writer (stream code output results)
-  (format stream "```")
-  (loop for expr in code
-	do (terpri stream)
-	   (adppvt:custom-prin1 expr stream "...")
-	   (terpri stream))
-  (let ((*print-pprint-dispatch* adppvt:*custom-pprint-dispatch*))
-    (format stream "~a~{~%~s~}~%" output results))
-  (format stream "```~%~%"))
+(adppvt:def-code-example-writer (stream text-code output results)
+  (format stream "```Lisp~%~a~%~a~{~%~s~}~%```~%~%" text-code output result))
 
 
 ;; ----- api functions -----

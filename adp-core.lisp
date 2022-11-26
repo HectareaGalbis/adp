@@ -160,7 +160,7 @@
 			 into toc-list
 		       and do (incf index)
 		     finally (return toc-list))))
-      (create-headers-toc-list-aux 0))))
+      (cons :itemize (create-headers-toc-list-aux 0)))))
 
 (declaim (ftype (function () list) create-toc-list))
 (defun create-toc-list ()
@@ -268,13 +268,13 @@
 	    do (push `(:item ,(create-function-ref-text function-tag)) temp-list)
 	  else
 	    do (push `(:itemize ,@temp-list) items-list)
-	    and do (push `(:item ,prev-letter) items-list)
-	    and do (setf temp-list nil)
-	    and do (push `(:item ,(create-function-ref-text function-tag)) temp-list)
+	       (push `(:item ,prev-letter) items-list)
+	       (setf temp-list nil)
+	       (push `(:item ,(create-function-ref-text function-tag)) temp-list)
 	  finally (when temp-list
 		    (push `(:itemize ,@temp-list) items-list)
 		    (push `(:item ,current-letter) items-list))
-		  (return items-list))))
+		  (return (cons :itemize items-list)))))
 
 (defun create-table-of-symbols ()
   (let ((symbols-list (sort (hash-table-keys *symbol-tags*) #'string>=))
@@ -293,7 +293,7 @@
 	  finally (when temp-list
 		    (push `(:itemize ,@temp-list) items-list)
 		    (push `(:item ,current-letter) items-list))
-		  (return items-list))))
+		  (return (cons :itemize items-list)))))
 
 (defun create-table-of-types ()
   (let ((types-list (sort (hash-table-keys *type-tags*) #'string>=))
@@ -312,7 +312,7 @@
 	  finally (when temp-list
 		    (push `(:itemize ,@temp-list) items-list)
 		    (push `(:item ,current-letter) items-list))
-		  (return items-list))))
+		  (return (cons :itemize items-list)))))
 
 
 ;; ----- adp code tags -----
@@ -362,8 +362,9 @@
 (defun empty-code-tags ()
   (setf *code-tags* (make-hash-table)))
 
-(declaim (type symbol *hide-symbol*))
+(declaim (type symbol *hide-symbol* *comment-symbol*))
 (defparameter *hide-symbol* '#:hide)
+(defparameter *comment-symbol* '#:comment)
 
 (declaim (ftype (function (t) boolean) hide-symbolp))
 (defun hide-symbolp (code)
@@ -375,17 +376,18 @@
       (and (consp code)
 	   (plistp (cdr code)))))
 
-(intern "CODE-HIDE"   :adp) ; Advance intern
-(intern "CODE-TAG"    :adp) ; Advance intern
-(intern "CODE-REMOVE" :adp) ; Advance intern
-(intern "CODE-SHOW"   :adp) ; Advance intern
+(intern "CODE-HIDE"    :adp) ; Advance intern
+(intern "CODE-TAG"     :adp) ; Advance intern
+(intern "CODE-REMOVE"  :adp) ; Advance intern
+(intern "CODE-SHOW"    :adp) ; Advance intern
+(intern "CODE-COMMENT" :adp) ; Advance intern
 
 (declaim (ftype (function (t) t) remove-code-tag-exprs))
 (defun remove-code-tag-exprs (code)
   (labels ((remove-code-tag-exprs-aux (code)
 	     (if (plistp code)
 		 (cond
-		   ((member (car code) '(adp::code-tag adp::code-hide adp::code-remove))
+		   ((member (car code) '(adp::code-tag adp::code-hide adp::code-remove adp::code-comment))
 		    (mapcan #'remove-code-tag-exprs-aux (cddr code)))
 		   ((eq (car code) 'adp::code-show)
 		    nil)
@@ -403,7 +405,7 @@
 		    (mapcan #'remove-own-code-tag-exprs-aux (cddr code)))
 		   ((eq (car code) 'adp::code-tag)
 		    (list code))
-		   ((eq (car code) 'adp::code-show)
+		   ((member (car code) '(adp::code-show adp::code-comment))
 		    nil)
 		   (t
 		    (list (mapcan #'remove-own-code-tag-exprs-aux code))))
@@ -435,6 +437,9 @@
 			(loop for expr in (cddr code)
 			      append (process-aux tag expr))
 			nil))
+		   ((eq (car code) 'adp::code-comment)
+		    (if (valid-tag-p tag (cadr code))
+			(list `(,*comment-symbol* ,(caddr code)))))
 		   ((eq (car code) 'adp::code-tag)
 		    (loop for expr in (cddr code)
 			  append (process-aux tag expr)))
@@ -604,6 +609,90 @@
   (empty-style-parameters))
 
 
+;; ----- custom-prin1 -----
+
+(defparameter *normal-pprint-dispatch* *print-pprint-dispatch*)
+(adp:defparameter *custom-pprint-dispatch* (copy-pprint-dispatch)
+  "An extension of *print-pprint-dispatch*. The define functions (like defun) from adp will be printed with pretty indentation as if they were from cl. Internal symbols will be printed without the package extension even if *print-escape* is true. Besides, the shortest package nickname will be printed as the package extension of a symbol.")
+
+(set-pprint-dispatch '(cons (member adp:defclass)) (pprint-dispatch '(defclass)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:defconstant)) (pprint-dispatch '(defconstant)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:defgeneric)) (pprint-dispatch '(defgeneric)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:define-compiler-macro)) (pprint-dispatch '(define-compiler-macro)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:define-condition)) (pprint-dispatch '(define-condition)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:define-method-combination)) (pprint-dispatch '(define-method-combination)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:define-modify-macro)) (pprint-dispatch '(define-modify-macro)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:define-setf-expander)) (pprint-dispatch '(define-setf-expander)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:define-symbol-macro)) (pprint-dispatch '(define-symbol-macro)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:defmacro)) (pprint-dispatch '(defmacro)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:defmethod)) (pprint-dispatch '(defmethod)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:defpackage)) (pprint-dispatch '(defpackage)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:defparameter)) (pprint-dispatch '(defparameter)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:defsetf)) (pprint-dispatch '(defsetf)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:defstruct)) (pprint-dispatch '(defstruct)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:deftype)) (pprint-dispatch '(deftype)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:defun)) (pprint-dispatch '(defun)) 0 *custom-pprint-dispatch*)
+(set-pprint-dispatch '(cons (member adp:defvar)) (pprint-dispatch '(defvar)) 0 *custom-pprint-dispatch*)
+
+(defun find-shortest-string (strings)
+  (loop for str in strings
+	for shortest = str then (if (< (length str) (length shortest))
+				    str
+				    shortest)
+	finally (return shortest)))
+
+(set-pprint-dispatch 'symbol (lambda (stream sym)
+			       (let* ((sym-package (symbol-package sym))
+				      (nickname (and sym-package
+						     (find-shortest-string (package-nicknames sym-package))))
+				      (print-package-mode (and sym-package
+							       (not (equal sym-package (find-package "CL")))
+							       (case (nth-value 1 (find-symbol (symbol-name sym) sym-package))
+								 (:external :external)
+								 (:internal (if (or (boundp sym) (fboundp sym))
+										:internal
+										nil))
+								 (t nil))))
+				      (package-to-print (and print-package-mode
+							     (or nickname
+								 (and (keywordp sym) "")
+								 (package-name sym-package))))
+				      (*print-escape* nil)
+				      (*print-pprint-dispatch* *normal-pprint-dispatch*))
+				 (case print-package-mode
+				   (:external (format stream "~a:~a" package-to-print (symbol-name sym)))
+				   (:internal (format stream "~a::~a" package-to-print (symbol-name sym)))
+				   (t (format stream "~a" (symbol-name sym))))))
+		     0 *custom-pprint-dispatch*)
+
+(set-pprint-dispatch `(cons (member ,*comment-symbol*)) (lambda (stream code-comment)
+							  (format stream ";; ~a" (cadr code-comment)))
+		     0 *custom-pprint-dispatch*)
+
+
+(declaim (ftype (function (t &optional stream (or string null)) t) custom-prin1))
+(defun custom-prin1 (code &optional stream (hide-str nil))
+  "It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if hidden code is found, then hide-str is princ-ed."
+  (let ((custom-pprint-dispatch (copy-pprint-dispatch *custom-pprint-dispatch*)))
+    (labels ((custom-hide-print (stream sym)
+	       (if (adppvt:hide-symbolp sym)
+		   (princ hide-str stream)
+		   (let ((*print-pprint-dispatch* *custom-pprint-dispatch*))
+		     (prin1 sym stream)))))
+      (when hide-str
+	(set-pprint-dispatch 'symbol #'custom-hide-print 0 custom-pprint-dispatch))
+      (let ((*print-pprint-dispatch* custom-pprint-dispatch))
+	(prin1 code stream)))))
+
+(declaim (ftype (function ((cons t list)) t) code-custom-prin1))
+(defun code-custom-prin1 (forms stream)
+  (custom-prin1 (car forms) stream "...")
+  (loop for form in (cdr forms)
+	do (terpri stream)
+	   (terpri stream)
+	   (custom-prin1 form stream "...")))
+
+
 ;; ----- writing functions -----
 
 (declaim (type (or null (function (stream string symbol) t)) *header-proc* *subheader-proc* *subsubheader-proc*))
@@ -645,6 +734,9 @@
 
 (declaim (type (or null (function (stream list) t)) *code-block-proc*))
 (defvar *code-block-proc* nil)
+
+(declaim (type (or null (function (stream (or null string) string) t)) *verbatim-code-block-proc*))
+(defvar *verbatim-code-block-proc* nil)
 
 (declaim (type (or null (function (stream list string list) t)) *code-example-proc*))
 (defvar *code-example-proc* nil)
@@ -705,6 +797,7 @@
 	*function-ref-proc* nil
 	*type-ref-proc* nil
 	*code-block-proc* nil
+	*verbatim-code-block-proc* nil
 	*code-example-proc* nil
 	*defclass-proc* nil
 	*defconstant-proc* nil
@@ -766,6 +859,8 @@
     (error "The function type-ref is not defined in the current style."))
   (unless *code-block-proc*
     (error "The function code-block is not defined in the current style."))
+  (unless *verbatim-code-block-proc*
+    (error "The function verbatim-code-block is not defined in the current style."))
   (unless *code-example-proc*
     (error "The function code-example is not defined in the current style."))
   (unless *defclass-proc*
@@ -892,33 +987,38 @@
 	     (:table (funcall *table-proc* stream (loop for row in (adp-element-contents element)
 							collect (loop for elem in row
 								      collect (apply #'slice-format (cdr elem))))))
-	     ((:itemize :table-of-contents :mini-table-of-contents :table-of-functions :table-of-symbols :table-of-types)
+	     ((:itemize :enumerate :table-of-contents :mini-table-of-contents :table-of-functions :table-of-symbols :table-of-types)
 	      (labels ((write-itemize (item-list)
 			 (loop for item in item-list
-			       if (eq (car item) :item)
-				 collect (list :item (apply #'slice-format (cdr item)))
-			       else
-				 collect (list* :itemize (write-itemize (cdr item))))))
+			       collect (case (car item)
+					 (:item                 (list :item (apply #'slice-format (cdr item))))
+					 ((:itemize :enumerate) (list* (car item) (write-itemize (cdr item))))))))
 		(let ((item-list (case (adp-element-key-type element)
 				   (:table-of-functions (create-table-of-functions))
 				   (:table-of-symbols (create-table-of-symbols))
 				   (:table-of-types (create-table-of-types))
 				   (:table-of-contents (create-toc-list))
 				   (:mini-table-of-contents (create-mini-toc-list rel-path))
-				   (:itemize (adp-element-contents element)))))
-		  (funcall *itemize-proc* stream (write-itemize item-list)))))
+				   ((:itemize :enumerate) (car (adp-element-contents element))))))
+		  (funcall *itemize-proc* stream (cons (car item-list) (write-itemize (cdr item-list)))))))
 	     (:image (destructuring-bind (alt-text image-path) (adp-element-contents element)
 		       (funcall *image-proc* stream alt-text image-path)))
-	     (:code-block (let* ((contents (car (adp-element-contents element)))
-				 (processed-contents (mapcan (lambda (code)
-							       (if (code-block-tagp code)
-								   (let ((associated-code (coerce (get-code-tag (cadr code)) 'list)))
-								     (assert associated-code () "~s is not a code-tag." (cadr code))
-								     (remove-never-used-code-tag (cadr code))
-								     associated-code)
-								   (list code)))
-							     contents)))
-			    (funcall *code-block-proc* stream processed-contents)))
+	     ((:code-block :verbatim-code-block)
+	      (let ((lang-text (case (adp-element-key-type element)
+				    (:codeblock (let* ((contents (car (adp-element-contents element)))
+						       (processed-contents (mapcan (lambda (code)
+										     (if (code-block-tagp code)
+											 (let ((associated-code (coerce (get-code-tag (cadr code)) 'list)))
+											   (assert associated-code () "~s is not a code-tag." (cadr code))
+											   (remove-never-used-code-tag (cadr code))
+											   associated-code)
+											 (list code)))
+										   contents))
+						       (text-content (with-output-to-string (str-stream)
+								       (code-custom-prin1 processed-contents str-stream))))
+						  (list "Lisp" text-content)))
+				    (:verbatim-code-block (adp-element-contents element)))))
+		(apply *code-block-proc* stream lang-text)))
 	     (:code-example (apply *code-example-proc* stream (adp-element-contents element)))
 	     (:defclass (apply *defclass-proc* stream (adp-element-contents element)))
 	     (:defconstant (apply *defconstant-proc* stream (adp-element-contents element)))

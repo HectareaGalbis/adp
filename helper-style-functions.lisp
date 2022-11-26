@@ -9,72 +9,10 @@
 
 ;; ----- Miscellanea functions -----
 
-(adp:subheader "Miscellanea")
+;; (adp:subheader "Miscellanea")
 
 
-(defparameter *normal-pprint-dispatch* *print-pprint-dispatch*)
-(adp:defparameter *custom-pprint-dispatch* (copy-pprint-dispatch)
-  "An extension of *print-pprint-dispatch*. The define functions (like defun) from adp will be printed with pretty indentation as if they were from cl. Internal symbols will be printed without the package extension even if *print-escape* is true. Besides, the shortest package nickname will be printed as the package extension of a symbol.")
 
-(set-pprint-dispatch '(cons (member adp:defclass)) (pprint-dispatch '(defclass)) 0 *custom-pprint-dispatch*)
-(set-pprint-dispatch '(cons (member adp:defconstant)) (pprint-dispatch '(defconstant)) 0 *custom-pprint-dispatch*)
-(set-pprint-dispatch '(cons (member adp:defgeneric)) (pprint-dispatch '(defgeneric)) 0 *custom-pprint-dispatch*)
-(set-pprint-dispatch '(cons (member adp:define-compiler-macro)) (pprint-dispatch '(define-compiler-macro)) 0 *custom-pprint-dispatch*)
-(set-pprint-dispatch '(cons (member adp:define-condition)) (pprint-dispatch '(define-condition)) 0 *custom-pprint-dispatch*)
-(set-pprint-dispatch '(cons (member adp:define-method-combination)) (pprint-dispatch '(define-method-combination)) 0 *custom-pprint-dispatch*)
-(set-pprint-dispatch '(cons (member adp:define-modify-macro)) (pprint-dispatch '(define-modify-macro)) 0 *custom-pprint-dispatch*)
-(set-pprint-dispatch '(cons (member adp:define-setf-expander)) (pprint-dispatch '(define-setf-expander)) 0 *custom-pprint-dispatch*)
-(set-pprint-dispatch '(cons (member adp:define-symbol-macro)) (pprint-dispatch '(define-symbol-macro)) 0 *custom-pprint-dispatch*)
-(set-pprint-dispatch '(cons (member adp:defmacro)) (pprint-dispatch '(defmacro)) 0 *custom-pprint-dispatch*)
-(set-pprint-dispatch '(cons (member adp:defmethod)) (pprint-dispatch '(defmethod)) 0 *custom-pprint-dispatch*)
-(set-pprint-dispatch '(cons (member adp:defpackage)) (pprint-dispatch '(defpackage)) 0 *custom-pprint-dispatch*)
-(set-pprint-dispatch '(cons (member adp:defparameter)) (pprint-dispatch '(defparameter)) 0 *custom-pprint-dispatch*)
-(set-pprint-dispatch '(cons (member adp:defsetf)) (pprint-dispatch '(defsetf)) 0 *custom-pprint-dispatch*)
-(set-pprint-dispatch '(cons (member adp:defstruct)) (pprint-dispatch '(defstruct)) 0 *custom-pprint-dispatch*)
-(set-pprint-dispatch '(cons (member adp:deftype)) (pprint-dispatch '(deftype)) 0 *custom-pprint-dispatch*)
-(set-pprint-dispatch '(cons (member adp:defun)) (pprint-dispatch '(defun)) 0 *custom-pprint-dispatch*)
-(set-pprint-dispatch '(cons (member adp:defvar)) (pprint-dispatch '(defvar)) 0 *custom-pprint-dispatch*)
-
-(defun find-shortest-string (strings)
-  (loop for str in strings
-	for shortest = str then (if (< (length str) (length shortest))
-				    str
-				    shortest)
-	finally (return shortest)))
-
-(set-pprint-dispatch 'symbol (lambda (stream sym)
-			       (let* ((sym-package (symbol-package sym))
-				      (nickname (and sym-package
-						     (find-shortest-string (package-nicknames sym-package))))
-				      (print-packagep (and sym-package
-							   (not (equal sym-package (find-package "CL")))
-							   (eq (nth-value 1 (find-symbol (symbol-name sym) sym-package))
-							       :external)))
-				      (package-to-print (and print-packagep
-							     (or nickname
-								 (and (keywordp sym) "")
-								 (package-name sym-package))))
-				      (*print-escape* nil)
-				      (*print-pprint-dispatch* *normal-pprint-dispatch*))
-				 (if print-packagep
-				     (format stream "~a:~a" package-to-print (symbol-name sym))
-				     (format stream "~a" (symbol-name sym)))))
-		     0 *custom-pprint-dispatch*)
-
-
-(declaim (ftype (function (t &optional stream (or string null)) t) custom-prin1))
-(adp:defun custom-prin1 (code &optional stream (hide-str nil))
-  "It is like prin1, but uses *custom-pprint-dispatch* instead. Also, if hidden code is found, then hide-str is princ-ed."
-  (let ((custom-pprint-dispatch (copy-pprint-dispatch *custom-pprint-dispatch*)))
-    (labels ((custom-hide-print (stream sym)
-	       (if (adppvt:hide-symbolp sym)
-		   (princ hide-str stream)
-		   (let ((*print-pprint-dispatch* *custom-pprint-dispatch*))
-		     (prin1 sym stream)))))
-      (when hide-str
-	(set-pprint-dispatch 'symbol #'custom-hide-print 0 custom-pprint-dispatch))
-      (let ((*print-pprint-dispatch* custom-pprint-dispatch))
-	(prin1 code stream)))))
 
 
 ;; ----- Components functions -----

@@ -53,7 +53,7 @@
 (def-customizable-writer def-symbol-ref-writer *symbol-ref-proc* 3)
 (def-customizable-writer def-function-ref-writer *function-ref-proc* 3)
 (def-customizable-writer def-type-ref-writer *type-ref-proc* 3)
-(def-customizable-writer def-code-block-writer *code-block-proc* 2)
+(def-customizable-writer def-code-block-writer *code-block-proc* 3)
 (def-customizable-writer def-code-example-writer *code-example-proc* 4)
 
 (def-customizable-writer def-defclass-writer *defclass-proc* 3)

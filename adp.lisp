@@ -146,33 +146,48 @@ are treated as if using the macro text."
 	 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
 
 
+(eval-when (:compile-toplevel :eval-toplevel :execute)
+  
+  (cl:defun check-items (item-list)
+    (assert (not (null item-list)) () "Expected at least one expression in a itemize/enumerate form.")
+    (assert (and (listp (car item-list)) (not (member (caar item-list) '(itemize enumerate)))) () "The first element of itemize/:itemize must be a list starting with :item.")
+    (loop for item in (cdr item-list)
+	  if (not (and (listp item)
+		       (member (car item) '(item itemize enumerate))))
+	    do (error "Each item of itemize/enumerate must be a list starting with item, itemize or enumerate.")
+	  if (member (car item) '(itemize enumerate))
+	    do (check-items (cdr item))))
+
+  (cl:defun process-itemize-items (item-list)
+    (loop for item in item-list
+	  collect (case (car item)
+		    (item      (list* 'list :item (cdr item)))
+		    (itemize   (list* 'list :itemize (process-itemize-items (cdr item))))
+		    (enumerate (list* 'list :enumerate (process-itemize-items (cdr item))))))))
+
 (adv-defmacro itemize (&rest items)
-  "Add a list of items. Each argument must be a list. Each list must have as first argument the keyword :item or :itemize. If 
-:item is used, the rest of the elements in that list will be treated as if using the macro text. If :itemize is used the rest 
-of elements must be lists where its first elements are the keywords :item or :itemize. In other words, when :itemize is used 
-a nested list is added."
+  "Add a list of items. Each argument must be a list. Each list must start with the symbol item, itemize or enumerate. If 
+item is used, the rest of the elements in that list will be treated as if using the macro text. If itemize or enumerate is used the rest 
+of elements must be lists that must start with item, itemize or enumerate. In other words, when itemize or enumerate is used 
+a nested list is added. A certain symbol will be printed before each element of the list."
   (when adppvt:*add-documentation*
-    (labels ((check-items (item-list)
-	       (assert (not (null item-list)) () "Expected at least one expression in a itemize/:itemize form.")
-	       (assert (and (listp (car item-list)) (not (eq (caar item-list) :itemize))) () "The first element of itemize/:itemize must be a list starting with :item.")
-	       (loop for item in (cdr item-list)
-		     if (not (and (listp item)
-				  (member (car item) '(:item :itemize))))
-		       do (error "Each item of itemize/:itemize must be a list starting with :item ot :itemize.")
-		     if (eq (car item) :itemize)
-		       do (check-items (cdr item)))))
-      (check-items items))
-    (labels ((process-itemize-items (item-list)
-	       (loop for item in item-list
-		     if (eq (car item) :item)
-		       collect (cons 'list item)
-		     else
-		       collect (list* 'list :itemize (process-itemize-items (cdr item))))))
-      `(if adppvt:*add-documentation*
-	   (progn
-	     (adppvt:emplace-adp-element :itemize ,@(process-itemize-items items))
-	     (values))
-	   (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process.")))))
+    (check-items items)
+    `(if adppvt:*add-documentation*
+	 (progn
+	   (adppvt:emplace-adp-element :itemize ,(cons :itemize (process-itemize-items items)))
+	   (values))
+	 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
+
+
+(adv-defmacro enumerate (&rest items)
+  "Same as itemize, but a number is printed before each element."
+  (when adppvt:*add-documentation*
+    (check-items items)
+    `(if adppvt:*add-documentation*
+	 (progn
+	   (adppvt:emplace-adp-element :enumerate ,(cons :enumerate (process-itemize-items items)))
+	   (values))
+	 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
 
 
 (adv-defmacro image (alt-text path)
@@ -271,12 +286,18 @@ defined with adp:defclass, adp:define-condition, adp:defstruct or adp:deftype."
 
 
 (adv-defmacro code-tag (tags &body code)
-  "Assign several tags to a piece of code. The code is placed into a progn form. The argument tags must be a list
-of symbols. If no tags are provided, then code-tag will do nothing. Each symbol in tags will be a code-tag assigned to code. 
-Inside the code-tag form it is correct to use a (code-hide tags &rest forms) form. It only indicates to code-tag 
-which parts of code can be hidden when using the tag in the macro code-block. code-hide accepts also a list of tags. If a tag 
-used in code-tag also appears in code-hide, that piece of code will be hidden when using the macro code-block. If the list of 
-tags in code-hide is empty, the that piece of code will be hidden for every tag used in code-tag."
+  "Assign several tags to several forms. The forms are placed into a progn form. The argument tags must be a list
+of symbols. If no tags are provided, code-tag will do nothing. Each symbol in tags will be a code-tag assigned to code. 
+Inside the code-tag form it is correct to use the next forms: code-hide, code-remove, code-show and code-comment. 
+  - code-hide: It has the syntax (code-hide (&rest tags) &rest forms). code-hide receives a list of tags. If a tag 
+               used in code-tag also appears in code-hide, the rest of forms will be hidden when using the macro code-block. 
+               If the list of tags in code-hide is empty, the forms will be hidden for every tag used in code-tag.
+               Hidding the code means printing \"...\" instead of the forms.
+  - code-remove: Same as code-hide, but removes the code instead of printing \"...\"
+  - code-show: It has the same syntax as code-hide and code-remove and it only takes effect when some tag from code-tag are used
+               in code-show too. The forms in code-show are never evaluated, but will be shown when using code-block.
+  - code-comment: It has the systax (code-comment (&rest tags) comment). It only takes effect when some tag from code-tag is used
+                  in code-comment. The comment will be printed when using code-block as a comment using \";;\""
   `(progn
      ,@(when adppvt:*add-documentation*
 	 (check-type tags list "a list")
@@ -291,7 +312,7 @@ tags in code-hide is empty, the that piece of code will be hidden for every tag 
 
 
 (adv-defmacro form-tag (tags &body code)
-  "Same as code-tag, but code is not evaluated at all."
+  "Same as code-tag, but code is not evaluated."
   (when adppvt:*add-documentation*
     (check-type tags list "a list")
     (loop for tag in tags
@@ -305,7 +326,7 @@ tags in code-hide is empty, the that piece of code will be hidden for every tag 
 
 (adv-defmacro code-block ((&rest tags) &body code)
   "Add a block of code. Each element of code will be prin1-ed but not evaluated. If a symbol is used and that symbol appears as a tag in tags, then 
-the code assigned to that tag is prin1-ed instead of the symbol."
+the code assigned to that tag is printed instead of the symbol."
   (when adppvt:*add-documentation*
     (check-type tags list "a list")
     (loop for tag in tags
@@ -320,9 +341,24 @@ the code assigned to that tag is prin1-ed instead of the symbol."
 								   (member ,expr ',tags))
 							     collect (adppvt:create-code-block-tag ,expr)
 							   else
-							     collect (adppvt:process-code-tag '#:dummy-tag ,expr)))
+							     collect ,expr))
 	     (values))
 	   (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process.")))))
+
+
+(adv-defmacro verbatim-code-block (lang-or-text &optional (text nil textp))
+  "Add a block of text. It can receive up to two arguments. If only one argument is received it must be a string of text that will be printed inside the block.
+If two arguments are received, the text to be printed must be the second one, and the first argument is a string representing the language used for writing
+the text."
+  (check-type lang-or-text string)
+  (check-type textp (or null string) "a string or NIL")
+  (let ((true-lang (and textp lang-or-text))
+	(true-text (if textp text lang-or-text)))
+    `(if adppvt:*add-documentation*
+	 (progn
+	   (adppvt:emplace-adp-element :verbatim-code-block true-lang true-text)
+	   (values))
+	 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
 
 
 (adv-defmacro code-example (&body code)
@@ -333,9 +369,9 @@ the code assigned to that tag is prin1-ed instead of the symbol."
       `(if adppvt:*add-documentation*
 	   (let* ((,output (make-array 10 :adjustable t :fill-pointer 0 :element-type 'character))
 		  (,result (multiple-value-list (with-output-to-string (*standard-output* ,output)
-						  ,@(adppvt:remove-code-tag-exprs code)))))
+						  ,@code))))
 
-	     (adppvt:emplace-adp-element :code-example (adppvt:process-code-tag '#:dummy-tag ',code) ,output ,result)
+	     (adppvt:emplace-adp-element :code-example ,code ,output ,result)
 	     (values))
 	   (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process.")))))
 
