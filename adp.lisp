@@ -130,13 +130,15 @@ You can use the following macros to enrich your text: bold, italic, bold-italic,
 
 
 (adv-defmacro table (&rest rows)
-  "Add a table. Each argument must be a list of lists. Each inner list must have as first element the keyword :cell and the rest 
+  "Add a table. Each argument must be a list of lists. Each inner list must have as first element the symbol cell and the rest 
 are treated as if using the macro text."
   (when adppvt:*add-documentation*
-    (loop for row in rows
+    (loop with row-length = (length (car rows))
+	  for row in rows
 	  do (check-type row list "a list")
+	     (assert (= row-length (length row)) () "Each row must have the same length.")
 	     (loop for elem in row
-		   do (assert (eq (car elem) :cell) () "Each cell of a table must be a list starting with :cell. Found: ~s" elem)))
+		   do (assert (eq (car elem) 'cell) () "Each cell of a table must be a list starting with cell. Found: ~s" elem)))
     `(if adppvt:*add-documentation*
 	 (progn
 	   (adppvt:emplace-adp-element :table ,@(loop for row in rows

@@ -40,6 +40,7 @@
 (def-customizable-writer def-header-writer *header-proc* 3)
 (def-customizable-writer def-subheader-writer *subheader-proc* 3)
 (def-customizable-writer def-subsubheader-writer *subsubheader-proc* 3)
+(def-customizable-writer def-escape-text-writer *escape-text-proc* 2)
 (def-customizable-writer def-text-writer *text-proc* 2)
 (def-customizable-writer def-table-writer *table-proc* 2)
 (def-customizable-writer def-itemize-writer *itemize-proc* 2)

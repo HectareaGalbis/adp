@@ -5,13 +5,14 @@
   (:shadow #:defclass #:defconstant #:defgeneric #:define-compiler-macro #:define-condition
 	   #:define-method-combination #:define-modify-macro #:define-setf-expander #:define-symbol-macro
 	   #:defmacro #:defmethod #:defpackage #:defparameter #:defsetf #:defstruct #:deftype #:defun #:defvar)
-  (:export #:header #:subheader #:subsubheader #:text #:table #:itemize #:image #:bold #:italic #:bold-italic
-	   #:code-inline #:web-link #:file-ref #:header-ref #:symbol-ref #:function-ref #:type-ref #:code-tag
-	   #:code-block #:verbatim-code-block #:code-example #:defclass #:defconstant #:defgeneric
-	   #:define-compiler-macro #:define-condition #:define-method-combination #:define-modify-macro
-	   #:define-setf-expander #:define-symbol-macro #:defmacro #:defmethod #:defpackage #:defparameter
-	   #:defsetf #:defstruct #:deftype #:defun #:defvar #:write-in-file #:load-documentation-system #:cl-ref
-	   #:table-of-contents #:mini-table-of-contents #:table-of-functions #:table-of-symbols #:table-of-types))
+  (:export #:header #:subheader #:subsubheader #:text #:table #:cell #:itemize #:enumerate #:item #:image #:bold
+	   #:italic #:bold-italic #:code-inline #:web-link #:file-ref #:header-ref #:symbol-ref #:function-ref
+	   #:type-ref #:code-tag #:code-block #:verbatim-code-block #:code-example #:defclass #:defconstant
+	   #:defgeneric #:define-compiler-macro #:define-condition #:define-method-combination
+	   #:define-modify-macro #:define-setf-expander #:define-symbol-macro #:defmacro #:defmethod
+	   #:defpackage #:defparameter #:defsetf #:defstruct #:deftype #:defun #:defvar #:write-in-file
+	   #:load-documentation-system #:cl-ref #:table-of-contents #:mini-table-of-contents #:table-of-functions
+	   #:table-of-symbols #:table-of-types))
 
 
 (defpackage #:adp-private
@@ -29,12 +30,13 @@
 	   #:create-code-block-tag
 
 	   #:def-style-parameter #:def-header-writer #:def-subheader-writer #:def-subsubheader-writer
-	   #:def-text-writer #:def-table-writer #:def-itemize-writer #:def-image-writer #:def-bold-writer
-	   #:def-italic-writer #:def-bold-italic-writer #:def-code-inline-writer #:def-web-link-writer
-	   #:def-file-ref-writer #:def-header-ref-writer #:def-symbol-ref-writer #:def-function-ref-writer
-	   #:def-type-ref-writer #:def-code-block-writer #:def-code-example-writer #:def-defclass-writer
-	   #:def-defconstant-writer #:def-defgeneric-writer #:def-define-compiler-macro-writer
-	   #:def-define-condition-writer #:def-define-method-combination-writer #:def-define-modify-macro-writer
+	   #:def-escape-text-writer #:def-text-writer #:def-table-writer #:def-itemize-writer #:def-image-writer
+	   #:def-bold-writer #:def-italic-writer #:def-bold-italic-writer #:def-code-inline-writer
+	   #:def-web-link-writer #:def-file-ref-writer #:def-header-ref-writer #:def-symbol-ref-writer
+	   #:def-function-ref-writer #:def-type-ref-writer #:def-code-block-writer #:def-code-example-writer
+	   #:def-defclass-writer #:def-defconstant-writer #:def-defgeneric-writer
+	   #:def-define-compiler-macro-writer #:def-define-condition-writer
+	   #:def-define-method-combination-writer #:def-define-modify-macro-writer
 	   #:def-define-setf-expander-writer #:def-define-symbol-macro-writer #:def-defmacro-writer
 	   #:def-defmethod-writer #:def-defpackage-writer #:def-defparameter-writer #:def-defsetf-writer
 	   #:def-defstruct-writer #:def-deftype-writer #:def-defun-writer #:def-defvar-writer

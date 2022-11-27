@@ -25,10 +25,10 @@
 	(format nil "~a" sym))))
 
 (defun escape-characters (text)
-  (let ((problematic-chars '(#\* #\_ #\~ #\`))
+  (let ((punctuation-chars '(#\! #\" #\# #\$ #\% #\& #\' #\( #\) #\* #\+ #\, #\- #\. #\/ #\: #\; #\< #\= #\> #\? #\@ #\[ #\\ #\] #\^ #\_ #\` #\{ #\| #\} #\~))
 	(fixed-text (make-array (length text) :adjustable t :fill-pointer 0 :element-type 'character)))
     (loop for char across text
-	  when (member char problematic-chars :test #'char=)
+	  when (member char punctuation-chars :test #'char=)
 	    do (vector-push-extend #\\ fixed-text)
 	  do (vector-push-extend char fixed-text))
     (values fixed-text)))
@@ -51,6 +51,9 @@
 (adppvt:def-subsubheader-writer (stream text tag)
   (declare (ignore tag))
   (format stream "### ~a~%~%" (escape-characters text)))
+
+(adppvt:def-escape-text-writer (stream text)
+  (princ (escape-characters text) stream))
 
 (adppvt:def-text-writer (stream text)
   (format stream "~a~%~%" text))
