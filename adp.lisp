@@ -84,7 +84,7 @@
     (let ((fixed-tag (or tag (gensym))))
       `(if adppvt:*add-documentation*
 	   (progn
-	     (adppvt:add-header-tag ',fixed-tag ,str)
+	     (adppvt:add-header-tag ',fixed-tag ,str *load-truename*)
 	     (adppvt:emplace-adp-element :header ,str ',fixed-tag)
 	     (values))
 	   (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process.")))))
@@ -253,7 +253,7 @@ Only the symbols used with the macros header, subheader and subsubheader are val
   (when adppvt:*add-documentation*
     (check-type tag symbol "a symbol")
     `(if adppvt:*add-documentation*
-	 (adppvt:create-header-ref-text ',tag)
+	 (adppvt:create-header-ref-text ',tag *load-truename*)
 	 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
 
 
@@ -263,7 +263,7 @@ defined with adp:deconstant, adp:define-symbol-macro, adp:defparameter or adp:de
   (when adppvt:*add-documentation*
     (check-type tag symbol "a symbol")
     `(if adppvt:*add-documentation*
-	 (adppvt:create-symbol-ref-text ',tag)
+	 (adppvt:create-symbol-ref-text ',tag *load-truename*)
 	 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
 
 
@@ -273,7 +273,7 @@ defined with adp:defgeneric, adp:define-modify-macro, adp:defmacro or adp:defun.
   (when adppvt:*add-documentation*
     (check-type tag symbol "a symbol")
     `(if adppvt:*add-documentation*
-	 (adppvt:create-function-ref-text ',tag)
+	 (adppvt:create-function-ref-text ',tag *load-truename*)
 	 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
 
 
@@ -283,26 +283,28 @@ defined with adp:defclass, adp:define-condition, adp:defstruct or adp:deftype."
   (when adppvt:*add-documentation*
     (check-type tag symbol "a symbol")
     `(if adppvt:*add-documentation*
-	 (adppvt:create-type-ref-text ',tag)
+	 (adppvt:create-type-ref-text ',tag *load-truename*)
 	 (warn "ADP is trying to gather information even being disabled. Reload every file from the affected system or restart the Lisp process."))))
 
 
 (adv-defmacro code-tag (tags &body code)
   "Assign several tags to several forms. The forms are placed into a progn form. The argument tags must be a list
-of symbols. If no tags are provided, code-tag will do nothing. Each symbol in tags will be a code-tag assigned to code. 
-Inside the code-tag form it is correct to use the next forms: code-hide, code-remove, code-show and code-comment. 
+of symbols. If no tags are provided, an error is raised. Each symbol in tags will be a code-tag assigned to code.
+The same tag can be used several times in different calls to code-tag.  Inside the code-tag form it is correct to use
+the next forms: code-hide, code-remove, code-show and code-comment. 
   - code-hide: It has the syntax (code-hide (&rest tags) &rest forms). code-hide receives a list of tags. If a tag 
                used in code-tag also appears in code-hide, the rest of forms will be hidden when using the macro code-block. 
                If the list of tags in code-hide is empty, the forms will be hidden for every tag used in code-tag.
                Hidding the code means printing \"...\" instead of the forms.
   - code-remove: Same as code-hide, but removes the code instead of printing \"...\"
-  - code-show: It has the same syntax as code-hide and code-remove and it only takes effect when some tag from code-tag are used
-               in code-show too. The forms in code-show are never evaluated, but will be shown when using code-block.
-  - code-comment: It has the systax (code-comment (&rest tags) comment). It only takes effect when some tag from code-tag is used
-                  in code-comment. The comment will be printed when using code-block as a comment using \";;\""
+  - code-quote: It has the same syntax as code-hide and code-remove. The forms in code-quote are never evaluated, but will be
+                shown when using code-block if some tag from code-tag is used in code-quote. Otherwise it won't print anything.
+  - code-comment: It has the systax (code-comment (&rest tags) comment). The comment will be printed when using code-block as
+                  a comment using \";;\" if some tag from code-tag is used in code-comment. Otherwise, it won't print anything."
   `(progn
      ,@(when adppvt:*add-documentation*
 	 (check-type tags list "a list")
+	 (assert (not (null tags)) (tags) "The list of tags must have at least one symbol.")
 	 (loop for tag in tags
 	       do (check-type tag symbol "a symbol"))
 	 (with-gensyms (tag)
@@ -341,7 +343,7 @@ the code assigned to that tag is printed instead of the symbol."
 	     (adppvt:emplace-adp-element :code-block (loop for ,expr in ',code
 							   if (and (symbolp ,expr)
 								   (member ,expr ',tags))
-							     collect (adppvt:create-code-block-tag ,expr)
+							     collect (adppvt:create-code-block-tag ,expr *load-truename*)
 							   else
 							     collect ,expr))
 	     (values))
@@ -667,7 +669,7 @@ arguments to let the user customize briefly how documentation is printed."
     (asdf:operate 'load-doc-source-op system :force t))
   (loop for (name value) in style-args by #'cddr
 	do (adppvt:set-parameter-value name value))
-  (let* ((root-path (asdf:system-source-directory system))
+  (let* ((root-path (truename (asdf:system-source-directory system)))
 	 (fixed-root-path (make-pathname :host (pathname-host root-path)
 					 :device (pathname-device root-path)
 					 :directory (pathname-directory root-path))))
@@ -680,6 +682,15 @@ arguments to let the user customize briefly how documentation is printed."
 ;; ----- Additional functions -----
 
 (subheader "Additional functions" additional-functions-subheader)
+
+
+(defmacro eval-when-adp (&body body)
+  "The body forms will be placed into a progn form only when documentation generation is activated.
+Otherwise, this macro expands to NIL."
+  (when adppvt:*add-documentation*
+    `(progn
+       ,@body)))
+
 
 (defmacro cl-ref (sym)
   "Add a reference to a Common Lisp symbol when using the macros text, table or itemize."
