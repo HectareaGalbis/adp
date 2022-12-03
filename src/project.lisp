@@ -94,10 +94,10 @@
       (with-slots (tag) element
 	(tag-table-set-element type-tags tag element))))
 
-  (:method :after (project (element code-definition))
+
+  (:method :after (project (element code-block))
     (with-slots (code-tags) project
-      (with-slots (tag) element
-	(tag-table-push-element code-tags tag element)))))
+      (setf (slot-value element 'code-tags) code-tags))))
 
 
 (defun project-add-code-tag (project tag code)

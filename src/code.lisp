@@ -166,24 +166,26 @@
   ((code-tags :initarg :code-tags
 	      :type tag-table)
    (code-elements :initarg :code-elements
-		  :type (vector (or code symbol)))) ; Crear code-reference
+		  :type list))
   (:documentation
    "Represent a code block element."))
 
 (define-customizable-writer *code-block-writer* define-code-block-writer 3)
 
 (defmethod element-print ((element code-block) stream)
-  (with-slots (code-exprs code-tags source-location) element
+  (with-slots (code-elements code-tags) element
     (let ((complete-exprs (mapcan (lambda (expr)
-				    (if (symbolp expr)
-					(multiple-value-bind (tag-exprs tag-foundp) (tag-table-find-elements code-tags expr)
-					  (if tag-foundp
-					      (coerce tag-exprs 'list)
-					      (error "The tag ~s used at '~a' is not a code tag."
-						     expr source-location)))
+				    (if (typep expr 'code-reference)
+					(with-slots (code-tag source-location) expr
+					  (multiple-value-bind (tag-exprs tag-foundp) (tag-table-find-elements code-tags code-tag)
+					    (if tag-foundp
+						(coerce tag-exprs 'list)
+						(error "The tag ~s used at '~a' is not a code tag."
+						       expr source-location))))
 					(list expr)))
 				  code-exprs))
-	  (exprs-string (format nil "~{~a~^~%~%~}" complete-exprs)))
+	  (exprs-string (with-output-to-string (str-stream)
+			  (element-print str-stream "~{~a~^~%~%~}" complete-exprs)))) ; Usar element-print
       (funcall *code-block-writer* stream "Lisp" exprs-string))))
 
 
@@ -198,3 +200,19 @@
 (defmethod element-print ((element verbatim-code-block) stream)
   (with-slots (code-type code-text) element
     (funcall *code-block-writer* stream code-type code-text)))
+
+
+(defclass code-example (element)
+  ((code :initarg :code)
+   (output :initarg :output
+	   :type string)
+   (result :initarg
+	   :type list))
+  (:documentation
+   "Represent a code example element."))
+
+(define-customizable-writer *code-example-writer* define-code-example-writer 4)
+
+(defmethod element-print ((element code-example) stream)
+  (with-slots (code output result) element
+    (funcall *code-example-writer* stream code )))

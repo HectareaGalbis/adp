@@ -49,3 +49,13 @@
   "Represent a function reference element.")
 (define-tag-reference-type type-ref type-tags *type-ref-writer* define-type-ref-writer 3
   "Represent a type reference element.")
+
+
+(defclass code-reference (element)
+  ((code-tag :initarg :code-tag
+	     :type symbol))
+  (:documentation
+   "Represent a code reference element."))
+
+
+

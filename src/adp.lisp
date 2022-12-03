@@ -237,10 +237,27 @@ the code assigned to that tag is printed instead of the symbol."
       (assert (not (null code)) () "Expected at least one expression in a code-block form.")
       (with-gensyms (expr)
 	`(with-special-vars (*project*)
-	   (adppvt:emplace-adp-element :code-block (loop for ,expr in ',code
-							 if (and (symbolp ,expr)
-								 (member ,expr ',tags))
-							   collect (adppvt:create-code-block-tag ,expr *load-truename*)
-							 else
-							   collect ,expr))
+	   (adppvt:project-add-element *project* (make-instance 'code-block
+								:code-elements (loop for ,expr in ',code
+										     if (and (symbolp ,expr)
+											     (member ,expr ',tags))
+										       collect (make-instance 'code-reference :code-tag ,expr)
+										     else
+										       collect ,expr)))
+	   (values))))))
+
+
+(cl:defmacro verbatim-code-block (lang-or-text &optional (text nil textp))
+  "Add a block of text. It can receive up to two arguments. If only one argument is received it must be a string of text that will be printed inside the block.
+If two arguments are received, the text to be printed must be the second one, and the first argument is a string representing the language used for writing
+the text."
+  (with-special-vars (*adp*)
+    (when *adp*
+      (check-type lang-or-text string)
+      (check-type textp (or null string) "a string or NIL")
+      (let ((true-lang (and textp lang-or-text))
+	    (true-text (if textp text lang-or-text)))
+	`(with-special-vars (*project*)
+	   (adppvt:project-add-element  (make-instance 'verbatim-code-element :code-type true-lang
+									      :code-text true-text))
 	   (values))))))
