@@ -5,7 +5,9 @@
 ;; ----- adp parameters -----
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-    (defvar *add-documentation* nil))
+  (defvar *add-documentation* nil))
+
+(defvar *project-root-path* nil)
 
 
 ;; ----- adp files -----
@@ -176,9 +178,9 @@
 ;; ----- source project relative pathname -----
 
 (declaim (ftype (function (pathname pathname) pathname) source-project-relative-pathname))
-(defun source-project-relative-pathname (root-path path)
-  (let ((source-project-level (length (cdr (pathname-directory root-path)))))
-    (make-pathname :directory (cons :relative (nthcdr (pathname-directory path) (1+ source-project-level)))
+(defun source-project-relative-pathname (path)
+  (let ((source-project-level (length (cdr (pathname-directory *project-root-path*)))))
+    (make-pathname :directory (cons :relative (nthcdr (1+ source-project-level) (pathname-directory path)))
 		   :name (pathname-name path)
 		   :type (pathname-type path))))
 
@@ -215,7 +217,7 @@
 (declaim (ftype (function (symbol string pathname) t) add-header-tag))
 (defun add-header-tag (tag str path-definition)
   (when (gethash tag *header-tags*)
-    (error "The header tag ~s used at ~s was already defined at ~s."
+    (error "The header tag ~s used at '~a' was already defined at '~a'."
 	   (source-project-relative-pathname path-definition) (source-project-relative-pathname (caddr (gethash tag *header-tags*)))))
   (when (find-symbol (symbol-name tag))
     (add-never-used-header-tag tag))
@@ -356,17 +358,26 @@
 (declaim (ftype (function (symbol &rest t) t) add-code-tag))
 (defun add-code-tag (tag path-definition &rest list-code)
   (when (not (gethash tag *code-tags*))
-    (setf (gethash tag *code-tags*) (make-array 10 :adjustable t :fill-pointer 0)))
+    (let ((path-definitions (make-array 10 :adjustable t :fill-pointer 0 :element-type 'pathname))
+	  (code-forms       (make-array 10 :adjustable t :fill-pointer 0)))
+      (setf (gethash tag *code-tags*) (list code path-definitions))))
   (add-never-used-code-tag tag)
   (loop for code in list-code
-	do (vector-push-extend code (gethash tag *code-tags*))))
+	do (let* ((code-tag-info    (gethash tag *code-tags*))
+		  (code-forms       (car code-tag-info))
+		  (path-definitions (cadr code-tag-info))
+		  (path-used        (loop for path across path-definitions
+					  thereis (equal path-definition path))))
+	     (when (not used-path)
+	       (vector-push-extend path-definition path-definitions))
+	     (vector-push-extend code code-forms))))
 
 (declaim (ftype (function (symbol) boolean) code-tagp))
 (defun code-tagp (tag)
   (values (gethash tag *code-tags*)))
 
-(declaim (ftype (function (symbol) (or vector null)) get-code-tag))
-(defun get-code-tag (tag)
+(declaim (ftype (function (symbol) (or vector null)) get-code-tag-info))
+(defun get-code-tag-info (tag)
   (values (gethash tag *code-tags*)))
 
 (declaim (ftype (function () t) empty-code-tags))
@@ -923,7 +934,7 @@
       (warn "A space/newline character is found at boundaries from ~a: ~s." from text)))
 
 
-(declaim (ftype (function (&rest t) string) simple-slice-format))
+(declaim (ftype (function (t &rest t) string) simple-slice-format))
 (defun simple-slice-format (from &rest args)
   (let ((sliced-text (with-output-to-string (stream)
 		       (loop for arg in args
@@ -943,7 +954,7 @@
 
 
 (declaim (ftype (function (&rest t) string) slice-format))
-(defun slice-format (root-path &rest args)
+(defun slice-format (&rest args)
   (let ((partial-strings (make-array 10 :adjustable t :fill-pointer 0 :element-type 'string :initial-element ""))
 	(escaped-text (make-array 10 :adjustable t :fill-pointer 0)))
     (loop for arg in args
@@ -978,7 +989,7 @@
 		    (check-space-at-boundaries (symbol-name (car arg)) name)
 		    (funcall *web-link-proc* stream name link)))
 		 ((header-ref-textp arg)
-		  (assert (get-header-tag-info (cadr arg)) ((cadr arg)) "~s is not a header tag. Found at '~s'." (cadr arg) (source-project-relative-pathname root-path (caddr arg))) 
+		  (assert (get-header-tag-info (cadr arg)) ((cadr arg)) "The symbol ~s used at '~a' is not a header tag." (cadr arg) (source-project-relative-pathname *project-root-path* (caddr arg))) 
 		  (let* ((header-tag (cadr arg))
 			 (header-tag-info (get-header-tag-info header-tag))
 			 (header-str (car header-tag-info))
@@ -986,25 +997,25 @@
 		    (remove-never-used-header-tag header-tag)
 		    (funcall *header-ref-proc* stream header-tag header-str header-rel-path)))
 		 ((symbol-ref-textp arg)
-		  (assert (get-symbol-tag-info (cadr arg)) ((cadr arg)) "~s is not a symbol tag. Found at '~s'." (cadr arg) (source-project-relative-pathname root-path (caddr arg)))
+		  (assert (get-symbol-tag-info (cadr arg)) ((cadr arg)) "The symbol ~s used at '~a' is not a symbol tag." (cadr arg) (source-project-relative-pathname *project-root-path* (caddr arg)))
 		  (let* ((symbol-tag (cadr arg))
 			 (symbol-path (get-symbol-tag-info symbol-tag)))
 		    (funcall *symbol-ref-proc* stream symbol-tag symbol-path)))
 		 ((function-ref-textp arg)
-		  (assert (get-function-tag-info (cadr arg)) ((cadr arg)) "~s is not a function tag. Found at '~s'." (cadr arg) (source-project-relative-pathname root-path (caddr arg)))
+		  (assert (get-function-tag-info (cadr arg)) ((cadr arg)) "The symbol ~s used at '~a' is not a function tag." (cadr arg) (source-project-relative-pathname *project-root-path* (caddr arg)))
 		  (let* ((function-tag (cadr arg))
 			 (function-path (get-function-tag-info function-tag)))
 		    (funcall *function-ref-proc* stream function-tag function-path)))
 		 ((type-ref-textp arg)
-		  (assert (get-type-tag-info (cadr arg)) ((cadr arg)) "~s is not a type tag. Found at '~s'." (cadr arg) (source-project-relative-pathname root-path (caddr arg)))
+		  (assert (get-type-tag-info (cadr arg)) ((cadr arg)) "The symbol ~s used at '~a' is not a type tag." (cadr arg) (source-project-relative-pathname *project-root-path* (caddr arg)))
 		  (let* ((type-tag (cadr arg))
 			 (type-path (get-type-tag-info type-tag)))
 		    (funcall *type-ref-proc* stream type-tag type-path)))
 		 (t (princ arg stream)))))))
 
 
-(declaim (ftype (function (stream pathname pathname (vector adp-element)) t) write-file-contents))
-(defun write-file-contents (stream root-path rel-path elements)
+(declaim (ftype (function (stream pathname (vector adp-element)) t) write-file-contents))
+(defun write-file-contents (stream rel-path elements)
   (loop for element across elements
 	do (case (adp-element-key-type element)
 	     (:header (apply *header-proc* stream (adp-element-contents element)))
@@ -1035,8 +1046,10 @@
 				    (:codeblock (let* ((contents (car (adp-element-contents element)))
 						       (processed-contents (mapcan (lambda (code)
 										     (if (code-block-tagp code)
-											 (let ((associated-code (coerce (get-code-tag (cadr code)) 'list)))
-											   (assert associated-code () "~s is not a code-tag. Found at '~s'." (cadr code) (source-project-relative-pathname root-path (caddr arg)))
+											 (let* ((code-tag-info    (get-code-tag-info (cadr code)))
+												(associated-code  (car code-tag-info)))
+											   (assert associated-code () "~s is not a code-tag. Found at '~s'."
+												   (cadr code) (source-project-relative-pathname *project-root-path* (caddr arg)))
 											   (remove-never-used-code-tag (cadr code))
 											   associated-code)
 											 (list code)))
@@ -1068,32 +1081,35 @@
 	     (t (error "Element not recognized: ~s" (adp-element-key-type element))))))
 
 
-(declaim (ftype (function (pathname pathname (vector adp-element)) t) write-file))
-(defun write-file (root-path rel-path elements)
-  (let* ((complete-path (make-pathname :host (pathname-host root-path)
-				       :device (pathname-device root-path)
-				       :directory (append (pathname-directory root-path) (cdr (pathname-directory rel-path)))
-				       :name (pathname-name rel-path)
-				       :type (funcall *get-file-extension-proc*))))
-    (format t "~%Writing file: ~a" complete-path)
-    (ensure-directories-exist complete-path :verbose nil)
-    (with-open-file (stream complete-path :direction :output :if-does-not-exist :create :if-exists :supersede)
-      (when *file-header-proc*
-	(funcall *file-header-proc* stream))
-      (write-file-contents stream root-path rel-path elements)
-      (when *file-foot-proc*
-	(funcall *file-foot-proc* stream)))))
+(declaim (ftype (function (pathname (vector adp-element)) t) write-file))
+(defun write-file (rel-path elements)
+  (format t "~%Writing file: ~a" complete-path)
+  (ensure-directories-exist complete-path :verbose nil)
+  (with-open-file (stream complete-path :direction :output :if-does-not-exist :create :if-exists :supersede)
+    (when *file-header-proc*
+      (funcall *file-header-proc* stream))
+    (write-file-contents stream *project-root-path* rel-path elements)
+    (when *file-foot-proc*
+      (funcall *file-foot-proc* stream))))
 
 
+(declaim (ftype (function (pathname) t) write-system-files))
 (defun write-system-files (root-path)
-  (when *system-files-proc*
-    (funcall *system-files-proc* root-path))
-  (loop for file across *project-adp-files*
-	for rel-path = (adp-file-path file)
-	for file-elements = (adp-file-contents file)
-	do (write-file root-path rel-path file-elements))
-  (loop for never-used-header-tag across *never-used-header-tags*
-	do (let ((tag-path-definition (caddr (get-header-tag-info never-used-header-tag))))
-	     (warn "The header tag ~s defined at '~s' is never used." never-used-header-tag (source-project-relative-pathname root-path tag-path-definition))))
-  (loop for never-used-code-tag across *never-used-code-tags*
-	do (warn "The code tag ~s is defined but never used." never-used-code-tag)))
+  (let ((*project-root-path* (make-pathname :host (pathname-host root-path)
+					    :device (pathname-device root-path)
+					    :directory (append (pathname-directory root-path) (cdr (pathname-directory rel-path)))
+					    :name (pathname-name rel-path)
+					    :type (funcall *get-file-extension-proc*))))
+    (when *system-files-proc*
+      (funcall *system-files-proc* root-path))
+    (loop for file across *project-adp-files*
+	  for rel-path = (adp-file-path file)
+	  for file-elements = (adp-file-contents file)
+	  do (write-file rel-path file-elements))
+    (loop for never-used-header-tag across *never-used-header-tags*
+	  do (let ((tag-path-definition (caddr (get-header-tag-info never-used-header-tag))))
+	       (warn "The header tag ~s defined at '~a' is never used." never-used-header-tag (source-project-relative-pathname root-path tag-path-definition))))
+    (loop for never-used-code-tag across *never-used-code-tags*
+	  do (let* ((code-tag-info (get-code-tag-info never-used-code-tag))
+		    (path-definitions (cadr code-tag-info)))
+	       (warn "The code tag ~s defined at ~{~#[~;'~a'~;'~a' and '~a'~:;'~a', ~]~} is never used." never-used-code-tag (coerce path-definitions 'list))))))
