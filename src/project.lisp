@@ -65,8 +65,12 @@
   
   (:method (project (element element))
     (with-slots (current-file) project
-      (setf (slot-value element 'file-location current-file))
-      (file-push-element current-file element)))
+      (when (not current-file)
+	(error "No file asigned. Use adp:in-file first."))
+      (with-slots (source-location file-location) element
+	(setf file-location current-file)
+      (setf source-location (project-relative-pathname project source-location))
+      (file-push-element current-file element))))
 
   (:method :after (project (element header-type))
     (with-slots (header-tags) project

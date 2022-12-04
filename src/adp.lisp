@@ -2,8 +2,9 @@
 (in-package :adp)
 
 
+;; ----- Context -----
 
-(defmacro special-let (let-bindings &body body)
+(defmacro let-special-vars (let-bindings &body body)
   (let ((vars (mapcar (lambda (binding)
 			(if (symbolp binding)
 			    binding
@@ -19,17 +20,7 @@
      ,@body))
 
 
-
-(cl:defmacro in-file (path)
-  (with-special-vars (*adp*)
-    (when *adp*
-      (check-type path pathname)
-      (let* ((true-path (truename path))
-	     (fixed-true-path (make-pathname :directory (cons :relative (cdr (pathname-directory true-path)))
-					     :name (pathname-name path)
-					     :type (pathname-type path))))
-	`(with-special-vars (*project*)
-	   (project-select-file *project* fixed-true-path))))))
+;; ----- Literature -----
 
 
 (cl:defmacro define-header-macro (name)
@@ -261,3 +252,155 @@ the text."
 	   (adppvt:project-add-element  (make-instance 'verbatim-code-element :code-type true-lang
 									      :code-text true-text))
 	   (values))))))
+
+
+(cl:defmacro code-example (&body code)
+  "Same as code-block, but tags cannot be used and the code is evaluated. The standard output and the last-form's results are also printed."
+  (with-special-vars (*adp*)
+    (when *adp*
+      (assert (not (null code)) () "Expected at least one expression in a code-example form.")
+      (with-gensyms (output result)
+	`(with-special-vars (*project*)
+	   (let* ((,output (make-array 10 :adjustable t :fill-pointer 0 :element-type 'character))
+		  (,result (multiple-value-list (with-output-to-string (*standard-output* ,output)
+						  ,@code))))
+
+	     (adppvt:project-add-element *project* (make-instance 'code-example :code ,code :output ,output :result ,result))
+	     (values)))))))
+
+
+;; ----- API -----
+
+(defmacro define-definition-macro (name tag-extraction-expr docstring)
+  (let ((body (if tag-extarction-expr
+		 (car tag-extraction-expr)
+		 (gensym)))
+	(tag-extraction (if tag-extraction-expr
+			    (cadr tag-extraction-expr)
+			    nil)))
+    `(cl:defmacro ,name (&body ,body)
+       ,docstring
+       `(progn
+	  ,@(with-special-vars (*adp*)
+	      (when *adp*
+		`((with-special-vars (*project*)
+		    (adppvt:project-add-element *project* (make-instance ',',name
+									 :expr '(,',(find-symbol (symbol-name name) "CL") ,@,body)
+									 ,@(when ,tag-extraction-expr `(:tag ,tag-extraction))))))))
+	  (,(find-symbol (symbol-name ',name) "CL") ,@,body)))))
+
+(define-definition-macro defclass (body (car body))
+  "Add a defclass declaration. The macro expands to cl:defclass. Also, the class name is used to create a type-tag.")
+(define-definition-macro defconstant (body (car body))
+  "Add a defconstant declaration. The macro expands to cl:defconstant. Also, the constant name is used to create a symbol-tag.")
+(define-definition-macro defgeneric (body (car body))
+  "Add a defgeneric declaration. The macro expands to cl:defgeneric. Also, the generic function name is used to create a function-tag.")
+(define-definition-macro define-compiler-macro nil
+  "Add a define-compiler-macro declaration. The macro expands to cl:define-compiler-macro.")
+(define-definition-macro define-condition (body (car body))
+  "Add a define-condition declaration. The macro expands to cl:define-condition. Also, the condition name is used to create a type-tag.")
+(define-definition-macro define-method-combination nil
+  "Add a define-method-combination declaration. The macro expands to cl:define-method-combination.")
+(define-definition-macro define-modify-macro (body (car body))
+  "Add a define-modify-macro declaration. The macro expands to cl:define-modify-macro. Also, the macro name is used to create a function-tag.")
+(define-definition-macro define-setf-expander nil
+  "Add a define-setf-expander declaration. The macro expands to cl:define-setf-expander.")
+(define-definition-macro define-symbol-macro (body (car body))
+  "Add a define-symbol-macro declaration. The macro expands to cl:define-symbol-macro. Also, the symbol name is used to create a symbol-tag.")
+(define-definition-macro defmacro (body (car body))
+  "Add a defmacro declaration. The macro expands to cl:defmacro. Also, the macro name is used to create a function-tag.")
+(define-definition-macro defmethod nil
+  "Add a defmethod declaration. The macro expands to cl:defmethod.")
+(define-definition-macro defpackage nil
+  "Add a defpackage declaration. The macro expands to cl:defpackage.")
+(define-definition-macro defparameter (body (car body))
+  "Add a defparameter declaration. The macro expands to cl:defparameter. Also, the parameter name is used to create a symbol-tag.")
+(define-definition-macro defsetf nil
+  "Add a defsetf declaration. The macro expands to cl:defsetf.")
+(define-definition-macro defstruct (body (car body))
+  "Add a defstruct declaration. The macro expands to cl:defstruct. Also, the struct name is used to create a type-tag.")
+(define-definition-macro deftype (body (car body))
+  "Add a deftype declaration. The macro expands to cl:deftype. Also, the type name is used to create a type-tag.")
+(define-definition-macro defun (body (if (symbolp (car body))
+					 (car body)
+					 nil))
+  "Add a defun declaration. The macro expands to cl:defun. Also, the function name is used to create a function-tag.")
+(define-definition-macro defvar (body (car body))
+  "Add a defvar declaration. The macro expands to cl:defvar. Also, the variable name is used to create a symbol-tag.")
+
+
+;; ----- Writers -----
+
+(cl:defmacro in-file (path)
+  (with-special-vars (*adp*)
+    (when *adp*
+      (check-type path pathname)
+      (let* ((true-path (truename path))
+	     (fixed-true-path (make-pathname :directory (cons :relative (cdr (pathname-directory true-path)))
+					     :name (pathname-name path)
+					     :type (pathname-type path))))
+	`(with-special-vars (*project*)
+	   (project-select-file *project* fixed-true-path))))))
+
+
+(uiop:with-upgradability ()
+  (cl:defclass load-doc-source-op (asdf/lisp-action:basic-load-op asdf/action:downward-operation asdf/action:selfward-operation)
+    ((asdf/action:selfward-operation :initform 'asdf:prepare-source-op :allocation :class))
+    (:documentation "Operation for loading a Lisp file as source with ADP documentation.")))
+
+(cl:defvar *doc-system* nil)
+(cl:defvar *already-visited* nil)
+
+(uiop:with-upgradability ()
+  (cl:defmethod asdf:action-description ((o load-doc-source-op) (c asdf:component))
+    (format nil (uiop:compatfmt "~@<Loading source of ~3i~_~A~@:>") c))
+  (cl:defmethod asdf:action-description ((o load-doc-source-op) (c asdf:parent-component))
+    (format nil (uiop:compatfmt "~@<Loaded source of ~3i~_~A~@:>") c))
+  (cl:defun perform-lisp-load-source (o c)
+    "Perform the loading of a Lisp file as associated to specified action (O . C)"
+    (asdf/lisp-action:call-with-around-compile-hook
+     c #'(lambda ()
+           (let ((adppvt:*add-documentation* (equal (asdf:component-system c) *doc-system*)))
+	     (when (not *already-visited*)
+	       (setf *already-visited* t)
+	       (setf *gensym-counter* 0))
+	     (uiop:load* (first (asdf:input-files o c))
+			 :external-format (asdf:component-external-format c))))))
+
+  (cl:defmethod asdf:perform ((o load-doc-source-op) (c asdf:cl-source-file))
+    (perform-lisp-load-source o c))
+  (cl:defmethod asdf:perform ((o load-doc-source-op) (c asdf:static-file))
+    nil))
+
+(cl:defun load-documentation-system (system style &rest style-args)
+  "Load a system with documentation generation activated. The style must be a keyword denoting a valid style.
+Each style will create different files. The style-args are style-dependent. In other words, each style can have its own 
+arguments to let the user customize briefly how documentation is printed."
+  (declare (type symbol style))
+  (assert (asdf:find-system system) (system) "The system ~s was not found." system)
+
+  (adppvt:with-special-writers
+    (let ((style-system (intern (concatenate 'string "ADP/" (symbol-name style)) :keyword)))
+      (assert (asdf:find-system style-system) (style-system) "The style ~s was not found." style-system)
+      (format t "~%Loading the style ~s" style)
+      (asdf:operate 'asdf:load-source-op style-system :force t))
+    (adppvt:check-special-writers)
+    ;;(adppvt:check-style-parameters style-args)
+
+    (let* ((root-path (truename (asdf:system-source-directory system)))
+	   (fixed-root-path (make-pathname :host (pathname-host root-path)
+					   :device (pathname-device root-path)
+					   :directory (pathname-directory root-path))))
+      (let-special-vars ((*project* (make-instance 'project :root-directiory fixed-root-path)))
+	(let ((*gensym-counter* *gensym-counter*))
+	  (format t "~%Loading the system ~s" system)
+	  (let-special-vars ((*adp* t))
+	    (asdf:operate 'load-doc-source-op system :force t)))
+
+	(loop for (name value) in style-args by #'cddr
+	      do (adppvt:set-parameter-value name value))
+
+	(format t "~%Writing documentation")
+	(adppvt:write-system-files fixed-root-path)
+	(format t "~%~a" "Done!"))))
+  (values))

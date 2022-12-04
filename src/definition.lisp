@@ -3,7 +3,7 @@
 
 
 (defclass definition (element)
-  ((code :initarg :code))
+  ((expr :initarg :expr))
   (:documentation
    "Represent a definition element."))
 
@@ -37,7 +37,7 @@
     (with-gensyms (code element stream)
       `(progn
 
-	 (defclass ,name (definition)
+	 (defclass ,name (,super-type)
 	   (:documentation
 	    ,class-documentation))
 
