@@ -3,18 +3,106 @@
 
 
 ;; -----------------------
+;; ----- select-file -----
+;; -----------------------
+
+(defun project-add-file (project file)
+  "Add a file into a project."
+  (declare (type project project) (type file file))
+  (with-slots (files) project
+    (vector-push-extend file files)))
+
+(defun project-find-file (project path)
+  "Return a file whose path is PATH. If there is not a file with path PATH, return NIL."
+  (declare (type project project) (type pathname path))
+  (with-slots (files) project
+    (loop for file across files
+	  if (equal path (slot-value file 'path))
+	    return file
+	  finally (return nil))))
+
+(defun select-file (project path)
+  (let ((file (or (project-find-file project path)
+		  (let ((new-file (make-instance 'file :path path)))
+		    (project-add-file project new-file)
+		    new-file))))
+    (with-slots (current-file) project
+      (setf current-file file))))
+
+
+;; ------------------------
+;; ----- add-code-tag -----
+;; ------------------------
+
+(defun add-code-tag (project tag code)
+  "Associate a tag with a piece of code."
+  (delcare (type project project) (type symbol tag) (type code code))
+  (with-slots (code-tags) project
+    (tag-table-push-element code-tags tag code)))
+
+
+;; -------------------------------------
+;; ----- project-relative-pathname -----
+;; -------------------------------------
+
+(defun relative-truename (project)
+  "Return the *load-truename* path relative to the project root directory."
+  (declare (type project project))
+  (with-slots (root-directory) project
+    (let* ((root-level (length (cdr (pathname-directory root-directory))))
+	   (relative-path (make-pathname :directory (cons :relative (nthcdr (1+ root-level) (pathname-directory *load-truename*)))
+					 :name (pathname-name *load-truename*)
+					 :type (pathname-type *load-truename*))))
+      (values relative-path))))
+
+
+;; -----------------------
 ;; ----- add-element -----
 ;; -----------------------
 
-(defun project-relative-pathname (project path)
-  "Make path to be relative to the project root directory."
-  (declare (type project project) (type pathname path))
-  (with-slots (root-directory) project
-    (let* ((root-level (length (cdr (pathname-directory root-directory))))
-	   (relative-path (make-pathname :directory (cons :relative (nthcdr (1+ root-level) (pathname-directory path)))
-					 :name (pathname-name path)
-					 :type (pathname-type path))))
-      (values relative-path))))
+(defgeneric check-subelements (element)
+  (:documentation
+   "Check the use of subelements."))
+
+(defmethod check-subelements ((element element))
+  (values))
+
+(defmethod check-subelements ((element (or text cell)))
+  (with-slots (text-elements) element
+    (loop for text-element in text-elements
+	  when (and (typep text-element 'element)
+		    (not (typep text-element 'web-link)))
+	    do (if (typep text-element 'text-enrichment)
+		   (check-subelements text-element)
+		   (error 'text-subelement-error :text element :subelement text-element)))))
+
+(defmethod check-subelements ((element text-type))
+  (with-slots (text-elements) element
+    (loop for text-element in text-elements
+	  when (typep text-element 'element)
+	    do (error 'text-subelement-error :text element :subelement text-element))))
+
+(defmethod check-subelements ((element table))
+  (with-slots (rows) element
+    (loop for row in rows
+	  do (loop for cell-element in row
+		   if (typep cell-element 'cell)
+		     do (check-subelements cell-element)
+		   else
+		     do (error 'table-subelement-error :table element :subelement cell-element)))))
+
+(defmethod check-subelements ((element itemize-type))
+  (with-slots ((items elements)) element
+    (when (null items)
+      (error 'null-itemize-error :itemize element))
+    (when (not (typep (car items) 'item))
+      (error 'itemize-first-element-not-item-error :itemize element :subelement (car items)))
+    (loop for item in (cdr items)
+	  if (typep item '(or itemize-type item))
+	    do (check-subelements item)
+	  else
+	    do (error 'itemize-subelement-error :itemize element :subelement item))))
+
 
 (defgeneric add-element (project element)
   (:documentation
@@ -23,25 +111,38 @@
 (defmethod add-element (project (element element))
   (with-slots (current-file) project
     (when (not current-file)
-      ;; Usar condition e interceptar en adp.lisp
-      )
-    (with-slots (source-location file-location) element
-      (setf file-location current-file)
-      (setf source-location (project-relative-pathname project source-location))
-      (file-push-element current-file element))))
+      (error 'file-not-selected-error :first-element element))
+    (check-subelements element)
+    (setf (slot-value element 'file-location) current-file)
+    (file-push-element current-file element)))
 
 (defmethod add-element :after (project (element header-type))
   (with-slots (header-tags) project
     (with-slots (tag (header-location source-location)) element 
       (multiple-value-bind (previous-header foundp) (tag-table-find-elements header-tags tag)
 	(if foundp
-	    ;; Usar condition
+	    (error 'already-defined-tag-error :source-element element :previous-source-element previous-header
+		   :tag tag)
 	    (tag-table-set-element header-tags tag element))))))
+
+
+(defmethod add-element :after (project (element text))
+  (with-slots (header-tags symbol-tags function-tags type-tags) project
+    (with-slots (text-elements) text
+      (loop for text-element in text-elements
+	    do (typecase text-element
+		 (header-ref (setf (slot-value text-element 'header-tags) header-tags))
+		 (symbol-ref (setf (slot-value text-element 'symbol-tags) symbol-tags))
+		 (function-ref (setf (slot-value text-element 'function-tags) function-tags))
+		 (type-ref (setf (slot-value text-element 'type-tags) type-tags)))))))
 
 
 (defmethod add-element :after (project (element code-block))
   (with-slots (code-tags) project
-    (setf (slot-value element 'code-tags) code-tags)))
+    (with-slots (code-elements) element
+      (loop for code-element in code-elements
+	    if (typep code-element code-reference)
+	      do (setf (slot-value code-element 'code-tags) code-tags)))))
 
 
 (defmethod add-element :after (project (element symbol-definition))
@@ -85,33 +186,34 @@
     (funcall *subsubheader-writer* stream title tag)))
 
 ;; text
-(defun text-to-string (text)
+(defun text-type-to-string (text)
   "Turn a text element into a string."
-  (declare (type text text))
-  (let ((processed-elements (mapcar (lambda (text-element)
-				      (if (typep text-element 'element)
-					  (with-output-to-string (str-stream)
-					    (element-print text-element str-stream))
-					  (funcall *escape-text* text-element)))
-				    text-elements)))
-    (apply #'concatenate 'string processed-elements)))
+  (declare (type text-type text))
+  (with-slots (text-elements) text
+    (let ((processed-elements (mapcar (lambda (text-element)
+					(if (typep text-element 'element)
+					    (with-output-to-string (str-stream)
+					      (element-print text-element str-stream))
+					    (funcall *escape-text* text-element)))
+				      text-elements)))
+      (apply #'concatenate 'string processed-elements))))
 
 (defmethod element-print ((element text) stream)
   (let ((text-elements (slot-value element 'text-elements)))
-    (funcall *text-writer* stream (text-to-string element))))
+    (funcall *text-writer* stream (text-type-to-string element))))
 
 ;; text enrichment
 (defmethod element-print ((element bold) stream)
-  (funcall *bold-writer* stream (text-to-string (slot-value element 'text))))
+  (funcall *bold-writer* stream (text-type-to-string element)))
 
 (defmethod element-print ((element italic) stream)
-  (funcall *italic-writer* stream (text-to-string (slot-value element 'text))))
+  (funcall *italic-writer* stream (text-type-to-string element)))
 
 (defmethod element-print ((element bold-italic) stream)
-  (funcall *bold-italic-writer* stream (text-to-string (slot-value element 'text))))
+  (funcall *bold-italic-writer* stream (text-type-to-string element)))
 
 (defmethod element-print ((element code-inline) stream)
-  (funcall *code-inline-writer* stream (text-to-string (slot-value element 'text))))
+  (funcall *code-inline-writer* stream (text-type-to-string element)))
 
 ;; text reference
 (defmethod element-print ((element header-ref) stream)
@@ -120,8 +222,7 @@
       (if element-found-p
 	  (with-slots (file-location title) (aref associated-elements 0)
 	    (funcall *header-ref-writer* stream tag title file-location))
-	  ;; usar condition e interceptarlos en adp.lisp
-	  ))))
+	  (error 'tag-not-defined-error :source-element element :tag tag)))))
 
 (defmethod element-print ((element symbol-ref) stream)
   (with-slots (tag symbol-tags) element
@@ -129,8 +230,7 @@
       (if element-found-p
 	  (with-slots (file-location) (aref associated-elements 0)
 	    (funcall *symbol-ref-writer* stream tag file-location))
-	  ;; usar condition e interceptarlos en adp.lisp
-	  ))))
+	  (error 'tag-not-defined-error :source-element element :tag tag)))))
 
 (defmethod element-print ((element function-ref) stream)
   (with-slots (tag function-tags) element
@@ -138,8 +238,7 @@
       (if element-found-p
 	  (with-slots (file-location) (aref associated-elements 0)
 	    (funcall *function-ref-writer* stream tag file-location))
-	  ;; usar condition e interceptarlos en adp.lisp
-	  ))))
+	  (error 'tag-not-defined-error :source-element element :tag tag)))))
 
 (defmethod element-print ((element type-ref) stream)
   (with-slots (tag type-tags) element
@@ -147,8 +246,7 @@
       (if element-found-p
 	  (with-slots (file-location) (aref associated-elements 0)
 	    (funcall *type-ref-writer* stream tag file-location))
-	  ;; usar condition e interceptarlos en adp.lisp
-	  ))))
+	  (error 'tag-not-defined-error :source-element element :tag tag)))))
 
 ;; web link
 (defmethod element-print ((element web-link) stream)
@@ -162,7 +260,7 @@
 ;; table
 (defmethod element-print ((element table) stream)
   (let ((processed-table (loop for row in rows
-			       collect (mapcar #'text-to-string row))))
+			       collect (mapcar #'text-type-to-string row))))
     (funcall *table-writer* stream processed-table)))
 
 ;; itemize
@@ -171,7 +269,7 @@
    "Turn an itemize element into a style-maker suitable representation.")
 
   (:method ((element item))
-    (list :item (text-to-string (slot-value item 'text))))
+    (list :item (text-type-to-string element)))
 
   (:method ((element itemize))
     (with-slots (elements type) element
@@ -264,8 +362,7 @@
 						  (multiple-value-bind (tag-code-elements tag-foundp) (tag-table-find-elements code-tags tag)
 						    (if tag-foundp
 							(coerce tag-code-elements 'list)
-							;; Usar un condition e interceptarlo en adp.lisp
-							)))
+							(error 'tag-not-defined-error :source-element element :tag tag))))
 						(list code-or-ref)))
 					  code-elements))
 	  (code-string (format nil "~{~a~^~%~%~}" (mapcar #'code-to-string complete-code-elements))))

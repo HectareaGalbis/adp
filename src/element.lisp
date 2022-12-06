@@ -5,9 +5,10 @@
 ;; ----- element -----
 
 (defclass element ()
-  ((source-location :initform *load-truename*
+  ((name :initarg :name)
+   (source-location :initarg :source-location
 		    :type pathname)
-   (file-location :initarg :file-location
+   (file-location :initform nil
 		  :type file))
   (:documentation
    "Represent the most basic unit of documentation."))
@@ -42,34 +43,36 @@
 
 ;; ----- text -----
 
-(defclass text (element)
+(defclass text-type (element)
   ((text-elements :initarg :text-elements
 		  :type list))
+  (:documentation
+   "Represents a text type element."))
+
+(defclass text (element)
   (:documentation
    "Represents a text element."))
 
 
 ;; ----- text enrichment -----
 
-(defclass text-enrichment-type (element)
-  ((text :initarg :text
-	 :type text))
+(defclass text-enrichment (text-type)
   (:documentation
-   "Represent a text enrichment type element."))
+   "Represent a text enrichment element."))
 
-(defclass bold (text-enrichment-type)
+(defclass bold (text-enrichment)
   (:documentation
    "Represent a bold element."))
 
-(defclass italic (text-enrichment-type)
+(defclass italic (text-enrichment)
   (:documentation
    "Represent a italic element."))
 
-(defclass bold-italic (text-enrichment-type)
+(defclass bold-italic (text-enrichment)
   (:documentation
    "Represent a bold and italic element."))
 
-(defclass code-inline (text-enrichment-type)
+(defclass code-inline (text-enrichment)
   (:documentation
    "Represent a code inline element."))
 
@@ -122,6 +125,10 @@
 
 ;; ----- table -----
 
+(defclass cell (text-type)
+  (:documentation
+   "Represent a cell table element."))
+
 (defclass table (element)
   ((rows :initarg :rows
 	 :type list))
@@ -131,9 +138,7 @@
 
 ;; ----- itemize -----
 
-(defclass item (element)
-  ((text :initarg :text
-	 :type text))
+(defclass item (text-type)
   (:documentation
    "Represents an item element."))
 
@@ -159,7 +164,9 @@
    (hide-symbol :initform '#:hide
 		:allocation :class
 		:type symbol)
-   (comment-symbol :initform ))
+   (comment-symbol :initform '#:comment-symbol
+		   :allocation :class
+		   :type symbol))
   (:documentation
    "Represent a code element."))
 
@@ -180,7 +187,7 @@
   (:documentation
    "Represent a code block element."))
 
-(defclass code-reference (tagged-element)
+(defclass code-ref (tagged-element)
   ((code-tags :type tag-table))
   (:documentation
    "Represent a code reference element."))
@@ -192,7 +199,8 @@
    "Represent a verbatim code block element."))
 
 (defclass code-example (element)
-  ((code-elements :initarg :code-elements)
+  ((code-elements :initarg :code-elements
+		  :type list)
    (output :initarg :output
 	   :type string)
    (result :initarg
