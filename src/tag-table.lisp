@@ -2,17 +2,38 @@
 (in-package :adppvt)
 
 
-(defstruct table-element
-  (elements nil :type (vector element))
-  (used nil :type boolean))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+
+  (defstruct table-element
+    (elements nil :type (vector element))
+    (used nil :type boolean))
+
+  (defclass tag-table ()
+    ((table :initform (make-hash-table)
+	    :type hash-table))
+    (:documentation
+     "Relates a tag with an element."))
+
+  (defvar *tag-tables* nil))
 
 
-(defclass tag-table ()
-  ((table :initform (make-hash-table)
-	  :type hash-table))
-  (:documentation
-   "Relates a tag with an element."))
+(defmacro with-tag-tables (&body body)
+  (let ((let-bindings (mapcar (lambda (tag-table)
+				`(,tag-table (make-instance 'tag-table)))
+			      *tag-tables*)))
+    `(let ,let-bindings
+       ,@body)))
 
+(defmacro define-tag-table (name)
+  (push name *tag-tables*)
+  `(defvar ,name nil))
+
+
+(define-tag-table *header-tags*)
+(define-tag-table *symbol-tags*)
+(define-tag-table *function-tags*)
+(define-tag-table *type-tags*)
+(define-tag-table *code-tags*)
 
 (defun tag-table-tag-p (tag-table tag)
   "Check if a tag is present in the tag-table."
@@ -57,9 +78,3 @@ present, return nil."
 	     (setf (table-element-used possible-element) t)
 	     (table-element-eleemnts posible-element))))))
 
-
-(defmacro with-tag-elements ((tag element) tag-table &body body)
-  (with-gensyms (table)
-    `(with-slots ((,table table)) ,tag-table
-       (loop for ,tag being the hash-key in ,table using hash-value ,element
-	     do ,@body))))

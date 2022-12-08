@@ -22,37 +22,38 @@
 	  finally (return nil))))
 
 (defun select-file (project path)
-  (let ((file (or (project-find-file project path)
-		  (let ((new-file (make-instance 'file :path path)))
-		    (project-add-file project new-file)
-		    new-file))))
-    (with-slots (current-file) project
-      (setf current-file file))))
+  (with-slots (root-directory) project
+    (let* ((complete-path (merge-pathnames path root-directory))
+	   (file (or (project-find-file project path)
+		    (let ((new-file (make-instance 'file :path complete-path)))
+		      (project-add-file project new-file)
+		      new-file))))
+      (with-slots (current-file) project
+	(setf current-file file)))))
 
 
 ;; ------------------------
 ;; ----- add-code-tag -----
 ;; ------------------------
 
-(defun add-code-tag (project tag code)
+(defun add-code-tag (tag code)
   "Associate a tag with a piece of code."
-  (delcare (type project project) (type symbol tag) (type code code))
-  (with-slots (code-tags) project
-    (tag-table-push-element code-tags tag code)))
+  (delcare (type symbol tag) (type code code))
+  (tag-table-push-element *code-tags* tag code))
 
 
 ;; -------------------------------------
 ;; ----- project-relative-pathname -----
 ;; -------------------------------------
 
-(defun relative-truename (project)
+(defun relative-truename (project &optional (path *load-truename*))
   "Return the *load-truename* path relative to the project root directory."
   (declare (type project project))
   (with-slots (root-directory) project
     (let* ((root-level (length (cdr (pathname-directory root-directory))))
-	   (relative-path (make-pathname :directory (cons :relative (nthcdr (1+ root-level) (pathname-directory *load-truename*)))
-					 :name (pathname-name *load-truename*)
-					 :type (pathname-type *load-truename*))))
+	   (relative-path (make-pathname :directory (cons :relative (nthcdr (1+ root-level) (pathname-directory path)))
+					 :name (pathname-name path)
+					 :type (pathname-type path))))
       (values relative-path))))
 
 
@@ -104,6 +105,13 @@
 	    do (error 'itemize-subelement-error :itemize element :subelement item))))
 
 
+(defun file-push-element (file element)
+  "Add an element in a file."
+  (declare (type file file) (type element element))
+  (with-slots (elements) file
+    (vector-push-extend element elements)))
+
+
 (defgeneric add-element (project element)
   (:documentation
    "Add an element into a project."))
@@ -117,52 +125,70 @@
     (file-push-element current-file element)))
 
 (defmethod add-element :after (project (element header-type))
-  (with-slots (header-tags) project
-    (with-slots (tag (header-location source-location)) element 
-      (multiple-value-bind (previous-header foundp) (tag-table-find-elements header-tags tag)
-	(if foundp
-	    (error 'already-defined-tag-error :source-element element :previous-source-element previous-header
-		   :tag tag)
-	    (tag-table-set-element header-tags tag element))))))
+  (with-slots (tag (header-location source-location)) element 
+    (multiple-value-bind (previous-header foundp) (tag-table-find-elements *header-tags* tag)
+      (if foundp
+	  (error 'already-defined-tag-error :source-element element :previous-source-element previous-header :tag tag)
+	  (tag-table-set-element *header-tags* tag element)))))
 
 
-(defmethod add-element :after (project (element text))
-  (with-slots (header-tags symbol-tags function-tags type-tags) project
-    (with-slots (text-elements) text
-      (loop for text-element in text-elements
-	    do (typecase text-element
-		 (header-ref (setf (slot-value text-element 'header-tags) header-tags))
-		 (symbol-ref (setf (slot-value text-element 'symbol-tags) symbol-tags))
-		 (function-ref (setf (slot-value text-element 'function-tags) function-tags))
-		 (type-ref (setf (slot-value text-element 'type-tags) type-tags)))))))
+(defmethod add-element :after (project (element table-of-contents))
+  (setf (slot-value element 'project) project))
 
-
-(defmethod add-element :after (project (element code-block))
-  (with-slots (code-tags) project
-    (with-slots (code-elements) element
-      (loop for code-element in code-elements
-	    if (typep code-element code-reference)
-	      do (setf (slot-value code-element 'code-tags) code-tags)))))
+(defmethod add-element :after (project (element file-table-of-contents))
+  (with-slots (current-file) project
+    (setf (slot-value element 'file) current-file)))
 
 
 (defmethod add-element :after (project (element symbol-definition))
-  (with-slots (symbol-tags) project
-    (with-slots (tag) element
-      (tag-table-set-element symbol-tags tag element))))
+  (with-slots (tag) element
+    (tag-table-set-element *symbol-tags* tag element)))
 
 (defmethod add-element :after (project (element function-definition))
-  (with-slots (function-tags) project
-    (with-slots (tag) element
-      (tag-table-set-element function-tags tag element))))
+  (with-slots (tag) element
+    (tag-table-set-element *function-tags* tag element)))
 
 (defmethod add-element :after (project (element type-definition))
-  (with-slots (type-tags) project
-    (with-slots (tag) element
-      (tag-table-set-element type-tags tag element))))
+  (with-slots (tag) element
+    (tag-table-set-element *type-tags* tag element)))
+
+
+;; ----------------------
+;; ----- file-print -----
+;; ----------------------
+
+(defun file-print (file)
+  "Create a documentation file and prints the documentation in it."
+  (declare (type file file))
+  (with-slots (elements path) file
+    (let ((complete-path (merge-pathnames path (make-pathname :type (funcall *file-extension*)))))
+      (ensure-directories-exist complete-path :verbose nil)
+      (with-open-file (stream complete-path :direction :output :if-does-not-exist :create :if-exists :supersede)
+	(when *file-head-writer*
+	  (funcall *file-head-writer* stream))
+	(loop for element in elements
+	      do (element-print element stream))
+	(when *file-foot-writer*
+	  (funcall *file-foot-writer* stream))))))
 
 
 ;; -------------------------
-;; ----- element-print ----- ; Convertir en doc-print y hacer metodos para project y file
+;; ----- project-print -----
+;; -------------------------
+
+(defun project-print (project)
+  "Generate a project documentation."
+  (declare (type project project))
+  (with-slots (files root-directory) project
+    (when *general-files-writer*
+      (funcall *general-files-writer* root-directory))
+    (loop for file across files
+	  do (format "Printing file '~a'.~%" (relative-truename (slot-value file 'path)))
+	     (file-print file))))
+
+
+;; -------------------------
+;; ----- element-print -----
 ;; -------------------------
 
 (defgeneric element-print (element stream)
@@ -194,7 +220,8 @@
 					(if (typep text-element 'element)
 					    (with-output-to-string (str-stream)
 					      (element-print text-element str-stream))
-					    (funcall *escape-text* text-element)))
+					    (when *excape-text*
+					      (funcall *escape-text* text-element))))
 				      text-elements)))
       (apply #'concatenate 'string processed-elements))))
 
@@ -217,32 +244,32 @@
 
 ;; text reference
 (defmethod element-print ((element header-ref) stream)
-  (with-slots (tag header-tags) element
-    (multiple-value-bind (associated-elements element-found-p) (tag-table-find-elements header-tags tag)
+  (with-slots (tag) element
+    (multiple-value-bind (associated-elements element-found-p) (tag-table-find-elements *header-tags* tag)
       (if element-found-p
 	  (with-slots (file-location title) (aref associated-elements 0)
 	    (funcall *header-ref-writer* stream tag title file-location))
 	  (error 'tag-not-defined-error :source-element element :tag tag)))))
 
 (defmethod element-print ((element symbol-ref) stream)
-  (with-slots (tag symbol-tags) element
-    (multiple-value-bind (associated-elements element-found-p) (tag-table-find-elements symbol-tags tag)
+  (with-slots (tag) element
+    (multiple-value-bind (associated-elements element-found-p) (tag-table-find-elements *symbol-tags* tag)
       (if element-found-p
 	  (with-slots (file-location) (aref associated-elements 0)
 	    (funcall *symbol-ref-writer* stream tag file-location))
 	  (error 'tag-not-defined-error :source-element element :tag tag)))))
 
 (defmethod element-print ((element function-ref) stream)
-  (with-slots (tag function-tags) element
-    (multiple-value-bind (associated-elements element-found-p) (tag-table-find-elements function-tags tag)
+  (with-slots (tag) element
+    (multiple-value-bind (associated-elements element-found-p) (tag-table-find-elements *function-tags* tag)
       (if element-found-p
 	  (with-slots (file-location) (aref associated-elements 0)
 	    (funcall *function-ref-writer* stream tag file-location))
 	  (error 'tag-not-defined-error :source-element element :tag tag)))))
 
 (defmethod element-print ((element type-ref) stream)
-  (with-slots (tag type-tags) element
-    (multiple-value-bind (associated-elements element-found-p) (tag-table-find-elements type-tags tag)
+  (with-slots (tag) element
+    (multiple-value-bind (associated-elements element-found-p) (tag-table-find-elements *type-tags* tag)
       (if element-found-p
 	  (with-slots (file-location) (aref associated-elements 0)
 	    (funcall *type-ref-writer* stream tag file-location))
@@ -283,6 +310,196 @@
 
 (defmethod element-print ((element itemize) stream)
   (funcall *itemize-writer* stream (process-itemize element)))
+
+
+;; table-of-contents
+(defun file-headers (file)
+  "Return the header-type elements of a file."
+  (declare (type file file))
+  (let ((headers (make-array 10 :adjustable t :fill-pointer 0 :element-type 'header-type)))
+    (with-slots (elements) file
+      (loop for element across element
+	    when (typep element 'header-type)
+	      do (vector-push-extent element headers)))
+    (values headers)))
+
+(defun project-headers (project)
+  "Return the header-type elements of a project."
+  (declare (type project project))
+  (let ((headers (make-array 10 :adjustable t :fill-pointer 0 :element-type 'header-type)))
+    (with-slots (files) project
+      (loop for file across files
+	    do (let ((file-headers (file-headers file)))
+		 (loop for file-header across file-headers
+		       if (typep file-header '(or header subheader))
+			 do (vector-push-extend file-header headers)))))
+    (values headers)))
+
+(defun header-deep-level (header)
+  "Return the level of deepness of a header."
+  (declare (type header-type header))
+  (typecase header
+    (header 0)
+    (subheader 1)
+    (subsubheader 2)
+    (t (error "The object ~s is not a header-type element." header))))
+
+(defun make-toc-deep-levels (headers)
+  "Return a vector of deepness levels the headers must have in a table of contents."
+  (declare (type (vector element) header))
+  (let ((deep-levels (make-array 100 :adjustable t :fill-pointer 0 :element-type 'unsigned-byte)))
+    (loop for header across headers
+	  for prev-min-deep-level = 2 then next-min-deep-level
+	  for prev-deep-level =     2 then next-deep-level
+	  for (next-min-deep-level next-deep-level) = (let ((header-deep-level (header-deep-level header)))
+							(cond
+							  ((> header-deep-level prev-deep-level)
+							   (let ((next-deep-level (1+ prev-deep-level)))
+							     (list prev-min-deep-level next-deep-level)))
+							  ((< header-deep-level prev-deep-level)
+							   (if (>= header-deep-level prev-min-deep-level)
+							       (list prev-min-deep-level (- header-deep-level prev-min-deep-level))
+							       (list header-deep-level 0)))
+							  (t
+							   (list prev-min-deep-level header-deep-level))))
+	  do (vector-push-extend next-deep-level deep-levels))
+    (values deep-levels)))
+
+(defun make-itemize-toc (source-element headers)
+  (with-slots (source-location) source-element
+    (let* ((deep-levels (create-toc-deep-levels headers))
+	   (total-deep-levels (length deep-levels))
+	   (index 0))
+      (labels ((make-itemize-toc-aux (current-level)
+		 (loop while (< index total-deep-levels)
+		       for header = (aref headers index)
+		       for deep-level = (aref deep-levels index)
+		       until (< deep-level current-level)
+		       if (> deep-level current-level)
+			 collect (make-instance 'itemize
+						:name "itemize"
+						:elements (make-itemize-toc-aux (1+ current-level))
+						:source-location source-location)
+			   into toc-list
+		       else
+			 collect (make-instance 'item
+						:name "item"
+						:text-elements (list (make-instance 'header-ref
+										    :name "header-ref"
+										    :tag (slot-value header 'tag)
+										    :source-location source-location))
+						:source-location source-location)
+			   into toc-list
+			   and do (incf index)
+		       finally (return toc-list))))
+	(make-instance 'itemize
+		       :name "itemize"
+		       :elements (make-itemize-toc-aux 0)
+		       :source-location source-location)))))
+
+(defmethod element-print ((element table-of-contents) stream)
+  (with-slots (project) element
+    (let ((headers (project-headers project)))
+      (funcall *itemize-writer* (process-itemize (make-itemize-toc element headers))))))
+
+(defmethod element-print ((element mini-table-of-contents) stream)
+  (with-slots (file) element
+    (let ((headers (file-headers file)))
+      (funcall *itemize-writer* (process-itemize (make-itemize-toc element headers))))))
+
+
+;; table-of-function/symbols/types
+(defun split-ordered-symbols (symbols)
+  )
+
+(defun make-itemize-tof (source-element)
+  (with-slots (source-location) source-element
+    (let ((functions-list (sort (tag-table-tags *function-tags*) #'string>=))
+	  (temp-list nil)
+	  (items-list nil))
+      (loop for function-tag in functions-list
+	    for prev-letter = (aref (symbol-name function-tag) 0) then current-letter
+	    for current-letter = (aref (symbol-name function-tag) 0)
+	    if (equal prev-letter current-letter)
+	      do (push (make-instance 'item
+				      :name "item"
+				      :text-elements (list (make-instance 'function-ref
+									  :name "function-ref"
+									  :tag function-tag
+									  :source-location source-location))
+				      :source-location source-location)
+		       temp-list)
+	    else
+	      do (push (make-instance 'itemize
+				      :name "itemize"
+				      :elements temp-list
+				      :source-location source-location)
+		       items-list)
+		 (push (make-instance 'item
+				      :name "item"
+				      :text-elements (list prev-letter)
+				      :source-location source-location)
+		       items-list)
+		 (setf temp-list nil)
+		 (push (make-instance 'item
+				      :name "item"
+				      :text-elements (list (make-instance 'function-ref
+									  :name "function-ref"
+									  :tag function-tag
+									  :source-location source-location))
+				      :source-location source-location)
+		       temp-list)
+	    finally (when temp-list
+		      (push (make-instance 'itemize
+					   :name "itemize"
+					   :elements temp-list
+					   :source-location source-location)
+			    items-list)
+		      (push (make-instance 'item
+					   :name "item"
+					   :text-elements (list current-letter)
+					   :source-location source-location)
+			    items-list))
+		    (return (cons :itemize items-list))))))
+
+(defun create-table-of-symbols ()
+  (let ((symbols-list (sort (hash-table-keys *symbol-tags*) #'string>=))
+	(temp-list nil)
+	(items-list nil))
+    (loop for symbol-tag in symbols-list
+	  for prev-letter = (aref (symbol-name symbol-tag) 0) then current-letter
+	  for current-letter = (aref (symbol-name symbol-tag) 0)
+	  if (equal prev-letter current-letter)
+	    do (push `(:item ,(create-symbol-ref-text symbol-tag)) temp-list)
+	  else
+	    do (push `(:itemize ,@temp-list) items-list)
+	    and do (push `(:item ,prev-letter) items-list)
+	    and do (setf temp-list nil)
+	    and do (push `(:item ,(create-symbol-ref-text symbol-tag)) temp-list)
+	  finally (when temp-list
+		    (push `(:itemize ,@temp-list) items-list)
+		    (push `(:item ,current-letter) items-list))
+		  (return (cons :itemize items-list)))))
+
+(defun create-table-of-types ()
+  (let ((types-list (sort (hash-table-keys *type-tags*) #'string>=))
+	(temp-list nil)
+	(items-list nil))
+    (loop for type-tag in types-list
+	  for prev-letter = (aref (symbol-name type-tag) 0) then current-letter
+	  for current-letter = (aref (symbol-name type-tag) 0)
+	  if (equal prev-letter current-letter)
+	    do (push `(:item ,(create-type-ref-text type-tag)) temp-list)
+	  else
+	    do (push `(:itemize ,@temp-list) items-list)
+	    and do (push `(:item ,prev-letter) items-list)
+	    and do (setf temp-list nil)
+	    and do (push `(:item ,(create-type-ref-text type-tag)) temp-list)
+	  finally (when temp-list
+		    (push `(:itemize ,@temp-list) items-list)
+		    (push `(:item ,current-letter) items-list))
+		  (return (cons :itemize items-list)))))
+
 
 ;; code
 (defun shortest-string (strings)
@@ -358,8 +575,8 @@
   (with-slots (code-type code-elements) element
     (let ((complete-code-elements (mapcan (lambda (code-or-ref)
 					    (if (typep code-or-ref 'code-reference)
-						(with-slots (tag code-tags) code-or-ref
-						  (multiple-value-bind (tag-code-elements tag-foundp) (tag-table-find-elements code-tags tag)
+						(with-slots (tag) code-or-ref
+						  (multiple-value-bind (tag-code-elements tag-foundp) (tag-table-find-elements *code-tags* tag)
 						    (if tag-foundp
 							(coerce tag-code-elements 'list)
 							(error 'tag-not-defined-error :source-element element :tag tag))))

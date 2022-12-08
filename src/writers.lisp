@@ -6,38 +6,47 @@
 
   (defstruct writer
     proc
-    definer)
+    definer
+    optional)
   
   (let ((writers nil))
-
+    
     (defmacro with-special-writers (&body body)
       (let ((let-proc-binds (mapcar (lambda (writer)
 				      (list (writer-proc writer) nil))
 				    writers)))
 	`(let ,let-proc-binds
-	   (declare (special ,@writers))
 	   ,@body)))
 
     (defmacro check-special-writers ()
       (let ((unless-exprs (mapcar (lambda (writer)
-				    `(unless ,(writer-proc writer)
-				       (error ,(concatenate 'string "The function " (symbol-name (writer-definer writer)) " is not used in the current style."))))
+				    `(when ,(and (not (writer-optional writer))
+						 (not (writer-proc writer)))
+				       (error ,(concatenate 'string "ADP error: The function " (symbol-name (writer-definer writer)) " is not used in the current style."))))
 				  writers)))
 	`(progn
 	   ,@unless-exprs)))
     
-    (defmacro define-customizable-writer (writer-proc writer-definer num-args)
+    (defmacro define-customizable-writer (writer-proc writer-definer num-args &optional optionalp)
       (check-type name symbol)
       (check-type args unsigned-byte)
       (let ((writer-args (loop repeat num-args do (gensym))))
-	(push (make-writer :proc writer-proc :definer writer-definer) writers)
+	(push (make-writer :proc writer-proc :definer writer-definer :optional optionalp) writers)
 	(with-gensyms (body proc-args)
-	  `(defmacro ,writer-definer (,writer-args &body ,body)
-	     (declare (special ,writer-proc))
-	     (let ((,proc-args (list ,@writer-args)))
-	       `(setf ,',writer-proc (lambda ,@,proc-args
-				       ,@,body)))))))))
+	  `(progn
+	     (defvar ,writer-proc nil)
+	     (defmacro ,writer-definer (,writer-args &body ,body)
+	       (let ((,proc-args (list ,@writer-args)))
+		 `(setf ,',writer-proc (lambda ,@,proc-args
+					 ,@,body))))))))))
 
+;; file
+(define-customizable-writer *file-head-writer* define-file-header-writer 1 t)
+(define-customizable-writer *file-foot-writer* define-file-footer-writer 1 t)
+
+;; project
+(define-customizable-writer *file-extension* define-file-extension 0)
+(define-customizable-writer *general-files-writer* define-general-files-writer 1 t)
 
 ;; header
 (define-customizable-writer *header-writer* define-header-writer 3)
@@ -46,7 +55,7 @@
 
 ;; text
 (define-customizable-writer *text-writer* define-text-writer 2)
-(define-customizable-writer *escape-text* define-escape-text-writer 1)
+(define-customizable-writer *escape-text* define-escape-text 1 t)
 
 ;; text enrichment
 (define-customizable-writer *bold-writer* define-bold-writer 2)

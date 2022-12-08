@@ -157,6 +157,34 @@
    "Represent an enumerate element."))
 
 
+;; ----- table-of-contents -----
+
+(defclass table-of-contents (element)
+  (:documentation
+   "Represent a table of contents element."))
+
+(defclass file-table-of-contents (element)
+  ((file :type file))
+  (:documentation
+   "Represent a file related table of contents element."))
+
+(defclass mini-table-of-contents (file-table-of-contents)
+  (:documentation
+   "Represent a table of contents element."))
+
+(defclass table-of-functions (file-table-of-contents)
+  (:documentation
+   "Represent a table of functions element."))
+
+(defclass table-of-symbols (file-table-of-contents)
+  (:documentation
+   "Represent a table of symbols element."))
+
+(defclass table-of-types (file-table-of-contents)
+  (:documentation
+   "Represent a table of types element."))
+
+
 ;; ----- code -----
 
 (defclass code (element)
