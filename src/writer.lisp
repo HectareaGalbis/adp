@@ -28,8 +28,10 @@
 	   ,@unless-exprs)))
     
     (defmacro define-customizable-writer (writer-proc writer-definer num-args &optional optionalp)
-      (check-type name symbol)
-      (check-type args unsigned-byte)
+      (check-type writer-proc symbol)
+      (check-type writer-definer symbol)
+      (check-type num-args unsigned-byte)
+      (check-type optionalp boolean)
       (let ((writer-args (loop repeat num-args do (gensym))))
 	(push (make-writer :proc writer-proc :definer writer-definer :optional optionalp) writers)
 	(with-gensyms (body proc-args)

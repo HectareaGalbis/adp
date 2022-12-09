@@ -49,30 +49,30 @@
   (:documentation
    "Represents a text type element."))
 
-(defclass text (element)
+(defclass text (element) ()
   (:documentation
    "Represents a text element."))
 
 
 ;; ----- text enrichment -----
 
-(defclass text-enrichment (text-type)
+(defclass text-enrichment (text-type) ()
   (:documentation
    "Represent a text enrichment element."))
 
-(defclass bold (text-enrichment)
+(defclass bold (text-enrichment) ()
   (:documentation
    "Represent a bold element."))
 
-(defclass italic (text-enrichment)
+(defclass italic (text-enrichment) ()
   (:documentation
    "Represent a italic element."))
 
-(defclass bold-italic (text-enrichment)
+(defclass bold-italic (text-enrichment) ()
   (:documentation
    "Represent a bold and italic element."))
 
-(defclass code-inline (text-enrichment)
+(defclass code-inline (text-enrichment) ()
   (:documentation
    "Represent a code inline element."))
 
@@ -125,7 +125,7 @@
 
 ;; ----- table -----
 
-(defclass cell (text-type)
+(defclass cell (text-type) ()
   (:documentation
    "Represent a cell table element."))
 
@@ -138,7 +138,7 @@
 
 ;; ----- itemize -----
 
-(defclass item (text-type)
+(defclass item (text-type) ()
   (:documentation
    "Represents an item element."))
 
@@ -148,18 +148,18 @@
   (:documentation
    "Represents an itemize element."))
 
-(defclass itemize (itemize-type)
+(defclass itemize (itemize-type) ()
   (:documentation
    "Represent an itemize element."))
 
-(defclass enumerate (itemize-type)
+(defclass enumerate (itemize-type) ()
   (:documentation
    "Represent an enumerate element."))
 
 
 ;; ----- table-of-contents -----
 
-(defclass table-of-contents (element)
+(defclass table-of-contents (element) ()
   (:documentation
    "Represent a table of contents element."))
 
@@ -168,19 +168,19 @@
   (:documentation
    "Represent a file related table of contents element."))
 
-(defclass mini-table-of-contents (file-table-of-contents)
+(defclass mini-table-of-contents (file-table-of-contents) ()
   (:documentation
    "Represent a table of contents element."))
 
-(defclass table-of-functions (file-table-of-contents)
+(defclass table-of-functions (file-table-of-contents) ()
   (:documentation
    "Represent a table of functions element."))
 
-(defclass table-of-symbols (file-table-of-contents)
+(defclass table-of-symbols (file-table-of-contents) ()
   (:documentation
    "Represent a table of symbols element."))
 
-(defclass table-of-types (file-table-of-contents)
+(defclass table-of-types (file-table-of-contents) ()
   (:documentation
    "Represent a table of types element."))
 
@@ -198,7 +198,7 @@
   (:documentation
    "Represent a code element."))
 
-(defclass tagged-code (code tagged-element)
+(defclass tagged-code (code tagged-element) ()
   (:documentation
    "Represent a tagged code element."))
 
@@ -231,7 +231,7 @@
 		  :type list)
    (output :initarg :output
 	   :type string)
-   (result :initarg
+   (result :initarg :result
 	   :type list))
   (:documentation
    "Represent a code example element."))
@@ -244,7 +244,7 @@
   (:documentation
    "Represent a definition element."))
 
-(defclass tagged-definition (definition tagged-element)
+(defclass tagged-definition (definition tagged-element) ()
   (:documentation
    "Represent a tagged definition element."))
 
@@ -261,25 +261,25 @@
    "Represent a type tag definition element."))
 
 (defmacro define-definition-class (name super docstring)
-  `(defclass ,name (,super)
+  `(defclass ,name (,super) ()
      (:documentation
       ,docstring)))
 
-(define-definition-class defclass                  type-definition     "Represent a defclass element.")
-(define-definition-class defconstant               symbol-definition   "Represent a defconstant element.")
-(define-definition-class defgeneric                function-definition "Represent a defgeneric element.")
-(define-definition-class define-compiler-macro     defintion           "Represent a define-compiler-macro element.")
-(define-definition-class define-condition          type-definition     "Represent a define-condition element.")
-(define-definition-class define-method-combination definition          "Represent a define-method-combination element.")
-(define-definition-class define-modify-macro       function-definition "Represent a define-modify-macro element.")
-(define-definition-class define-setf-expander      definition          "Represent a define-setf-expander element.")
-(define-definition-class define-symbol-macro       symbol-definition   "Represent a define-symbol-macro element.")
-(define-definition-class defmacro                  function-definition "Represent a defmacro element.")
-(define-definition-class defmethod                 definition          "Represent a defmethod element.")
-(define-definition-class defpackage                definition          "Represent a defpackage element.")
-(define-definition-class defparameter              symbol-definition   "Represent a defparameter element.")
-(define-definition-class defsetf                   definition          "Represent a defsetf element.")
-(define-definition-class defstruct                 type-definition     "Represent a defstruct element.")
-(define-definition-class deftype                   type-definition     "Represent a deftype element.")
-(define-definition-class defun                     function-definition "Represent a defun element.")
-(define-definition-class defvar                    symbol-definition   "Represent a defvar element.")
+(define-definition-class defclass-definition                  type-definition     "Represent a defclass element.")
+(define-definition-class defconstant-definition               symbol-definition   "Represent a defconstant element.")
+(define-definition-class defgeneric-definition                function-definition "Represent a defgeneric element.")
+(define-definition-class define-compiler-macro-definition     defintion           "Represent a define-compiler-macro element.")
+(define-definition-class define-condition-definition          type-definition     "Represent a define-condition element.")
+(define-definition-class define-method-combination-definition definition          "Represent a define-method-combination element.")
+(define-definition-class define-modify-macro-definition       function-definition "Represent a define-modify-macro element.")
+(define-definition-class define-setf-expander-definition      definition          "Represent a define-setf-expander element.")
+(define-definition-class define-symbol-macro-definition       symbol-definition   "Represent a define-symbol-macro element.")
+(define-definition-class defmacro-definition                  function-definition "Represent a defmacro element.")
+(define-definition-class defmethod-definition                 definition          "Represent a defmethod element.")
+(define-definition-class defpackage-definition                definition          "Represent a defpackage element.")
+(define-definition-class defparameter-definition              symbol-definition   "Represent a defparameter element.")
+(define-definition-class defsetf-definition                   definition          "Represent a defsetf element.")
+(define-definition-class defstruct-definition                 type-definition     "Represent a defstruct element.")
+(define-definition-class deftype-definition                   type-definition     "Represent a deftype element.")
+(define-definition-class defun-definition                     function-definition "Represent a defun element.")
+(define-definition-class defvar-definition                    symbol-definition   "Represent a defvar element.")

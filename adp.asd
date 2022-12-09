@@ -2,14 +2,21 @@
 
 (asdf:defsystem #:adp
   :author "Héctor Galbis Sanchis"
-  :description "Add Documentation, Please. A documentation generator."
+  :description "Add Documentation, Please. A Common Lisp literate programming tool."
   :license "The Unlicense"
   :depends-on (:alexandria :hyperspec)
   :components ((:file "package")
-	       (:file "adp-core")
-	       (:file "adp")
-	       (:file "adp-writers")
-	       (:file "helper-style-functions")))
+	       (:module "src"
+		:components ((:file "error")
+			     (:file "element")
+			     (:file "file")
+			     (:file "project")
+			     (:file "tag-table")
+			     (:file "writer")
+			     (:file "parameter")
+			     (:file "core")
+			     (:file "adp")
+			     (:file "helper-style-functions")))))
 
 
 (asdf:defsystem #:adp/doc

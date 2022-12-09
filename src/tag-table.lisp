@@ -65,7 +65,7 @@ present, return nil."
   (with-slots (table) tag-table
     (multiple-value-bind (possible-element foundp) (gethash tag table)
       (and foundp
-	   (values (table-element-elements posible-element) foundp)))))
+	   (values (table-element-elements possible-element) foundp)))))
 
 
 (defun tag-table-element-using-tag (tag-table tag)

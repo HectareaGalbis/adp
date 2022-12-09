@@ -1,5 +1,5 @@
 
-(in-package :addpvt)
+(in-package :adppvt)
 
 
 ;; -----------------------
@@ -409,96 +409,73 @@
 
 
 ;; table-of-function/symbols/types
-(defun split-ordered-symbols (symbols)
-  )
+(defun split-symbols (symbols)
+  (if (null symbols)
+      nil
+      (labels ((take-first-symbols (syms char)
+		 (let ((sym (car syms)))
+		   (cond
+		     ((and (not (null syms))
+			   (char= (aref (symbol-name sym) 0) char))
+		      (multiple-value-bind (rest-first-syms rest) (take-first-symbols (cdr syms) char)
+			(values (cons sym rest-first-syms)
+				rest)))
+		     (t (values nil syms)))))
+	       (split-ordered-symbols-aux (syms)
+		 (if (null syms)
+		     nil
+		     (let ((first-sym (car syms)))
+		       (multiple-value-bind (first-symbols rest-symbols) (take-first-symbols syms (aref (symbol-name first-sym) 0))
+			 (cons first-symbols (split-ordered-symbols-aux rest-symbols)))))))
+	(split-ordered-symbols-aux symbols))))
+
+(defun make-itemize-table (source-element tag-table reftype refname)
+  (with-slots (source-location) source-element
+    (let* ((syms-list (sort (tag-table-tags tag-table) #'string>=))
+	   (split-syms (split-symbols syms-list)))
+      (loop for syms-group in split-syms
+	    collect (let ((char (aref (symbol-name (car syms-group)) 0)))
+		      (make-instance 'item
+				     :name "item"
+				     :text-elements (list char)
+				     :source-location source-location))
+	      into items-list
+	    collect (flet ((make-ref (tag)
+			     (make-instance reftype
+					    :name refname
+					    :tag tag
+					    :source-location source-location)))
+		      (make-instance 'itemize
+				     :name "itemize"
+				     :elements (loop for sym in syms-group
+						     collect (make-instance 'item
+									    :name "item"
+									    :text-elements (list (make-ref sym))
+									    :source-location source-location))
+				     :source-location source-location))
+	      into items-list
+	    finally (return (make-instance 'itemize
+					   :name "itemize"
+					   :elements items-list
+					   :source-location source-location))))))
 
 (defun make-itemize-tof (source-element)
-  (with-slots (source-location) source-element
-    (let ((functions-list (sort (tag-table-tags *function-tags*) #'string>=))
-	  (temp-list nil)
-	  (items-list nil))
-      (loop for function-tag in functions-list
-	    for prev-letter = (aref (symbol-name function-tag) 0) then current-letter
-	    for current-letter = (aref (symbol-name function-tag) 0)
-	    if (equal prev-letter current-letter)
-	      do (push (make-instance 'item
-				      :name "item"
-				      :text-elements (list (make-instance 'function-ref
-									  :name "function-ref"
-									  :tag function-tag
-									  :source-location source-location))
-				      :source-location source-location)
-		       temp-list)
-	    else
-	      do (push (make-instance 'itemize
-				      :name "itemize"
-				      :elements temp-list
-				      :source-location source-location)
-		       items-list)
-		 (push (make-instance 'item
-				      :name "item"
-				      :text-elements (list prev-letter)
-				      :source-location source-location)
-		       items-list)
-		 (setf temp-list nil)
-		 (push (make-instance 'item
-				      :name "item"
-				      :text-elements (list (make-instance 'function-ref
-									  :name "function-ref"
-									  :tag function-tag
-									  :source-location source-location))
-				      :source-location source-location)
-		       temp-list)
-	    finally (when temp-list
-		      (push (make-instance 'itemize
-					   :name "itemize"
-					   :elements temp-list
-					   :source-location source-location)
-			    items-list)
-		      (push (make-instance 'item
-					   :name "item"
-					   :text-elements (list current-letter)
-					   :source-location source-location)
-			    items-list))
-		    (return (cons :itemize items-list))))))
+  (make-itemize-table source-element *function-tags* 'function-ref "function-ref"))
 
-(defun create-table-of-symbols ()
-  (let ((symbols-list (sort (hash-table-keys *symbol-tags*) #'string>=))
-	(temp-list nil)
-	(items-list nil))
-    (loop for symbol-tag in symbols-list
-	  for prev-letter = (aref (symbol-name symbol-tag) 0) then current-letter
-	  for current-letter = (aref (symbol-name symbol-tag) 0)
-	  if (equal prev-letter current-letter)
-	    do (push `(:item ,(create-symbol-ref-text symbol-tag)) temp-list)
-	  else
-	    do (push `(:itemize ,@temp-list) items-list)
-	    and do (push `(:item ,prev-letter) items-list)
-	    and do (setf temp-list nil)
-	    and do (push `(:item ,(create-symbol-ref-text symbol-tag)) temp-list)
-	  finally (when temp-list
-		    (push `(:itemize ,@temp-list) items-list)
-		    (push `(:item ,current-letter) items-list))
-		  (return (cons :itemize items-list)))))
+(defmethod element-print ((element table-of-functions) stream)
+  (funcall *itemize-writer* stream (make-itemize-tof element)))
 
-(defun create-table-of-types ()
-  (let ((types-list (sort (hash-table-keys *type-tags*) #'string>=))
-	(temp-list nil)
-	(items-list nil))
-    (loop for type-tag in types-list
-	  for prev-letter = (aref (symbol-name type-tag) 0) then current-letter
-	  for current-letter = (aref (symbol-name type-tag) 0)
-	  if (equal prev-letter current-letter)
-	    do (push `(:item ,(create-type-ref-text type-tag)) temp-list)
-	  else
-	    do (push `(:itemize ,@temp-list) items-list)
-	    and do (push `(:item ,prev-letter) items-list)
-	    and do (setf temp-list nil)
-	    and do (push `(:item ,(create-type-ref-text type-tag)) temp-list)
-	  finally (when temp-list
-		    (push `(:itemize ,@temp-list) items-list)
-		    (push `(:item ,current-letter) items-list))
-		  (return (cons :itemize items-list)))))
+(defun make-itemize-tos (source-element)
+  (make-itemize-table source-element *symbol-tags* 'symbol-ref "symbol-ref"))
+
+(defmethod element-print ((element table-of-symbols) stream)
+  (funcall *itemize-writer* stream (make-itemize-tos element)))
+
+(defun make-itemize-tot (source-element)
+  (make-itemize-table source-element *type-tags* 'type-ref "type-ref"))
+
+(defmethod element-print ((element table-of-types) stream)
+  (funcall *itemize-writer* stream (make-itemize-tot element)))
 
 
 ;; code
@@ -601,22 +578,22 @@
        (with-slots (,expr) ,element
 	 (funcall ,writer ,stream ,expr)))))
 
-(define-definition-element-print defclass *defclass-writer*)
-(define-definition-element-print defconstant *defconstant-writer*)
-(define-definition-element-print defgeneric *defgeneric-writer*)
-(define-definition-element-print define-compiler-macro *define-compiler-macro-writer*)
-(define-definition-element-print define-condition *define-condition-writer*)
-(define-definition-element-print define-method-combination *define-method-combination-writer*)
-(define-definition-element-print define-modify-macro *define-modify-macro-writer*)
-(define-definition-element-print define-setf-expander *define-setf-expander-writer*)
-(define-definition-element-print define-symbol-macro *define-symbol-macro-writer*)
-(define-definition-element-print defmacro *defmacro-writer*)
-(define-definition-element-print defmethod *defmethod-writer*)
-(define-definition-element-print defpackage *defpackage-writer*)
-(define-definition-element-print defparameter *defparameter-writer*)
-(define-definition-element-print defsetf *defsetf-writer*)
-(define-definition-element-print defstruct *defstruct-writer*)
-(define-definition-element-print deftype *deftype-writer*)
-(define-definition-element-print defun *defun-writer*)
-(define-definition-element-print defvar *defvar-writer*)
+(define-definition-element-print defclass-definition *defclass-writer*)
+(define-definition-element-print defconstant-definition *defconstant-writer*)
+(define-definition-element-print defgeneric-definition *defgeneric-writer*)
+(define-definition-element-print define-compiler-macro-definition *define-compiler-macro-writer*)
+(define-definition-element-print define-condition-definition *define-condition-writer*)
+(define-definition-element-print define-method-combination-definition *define-method-combination-writer*)
+(define-definition-element-print define-modify-macro-definition *define-modify-macro-writer*)
+(define-definition-element-print define-setf-expander-definition *define-setf-expander-writer*)
+(define-definition-element-print define-symbol-macro-definition *define-symbol-macro-writer*)
+(define-definition-element-print defmacro-definition *defmacro-writer*)
+(define-definition-element-print defmethod-definition *defmethod-writer*)
+(define-definition-element-print defpackage-definition *defpackage-writer*)
+(define-definition-element-print defparameter-definition *defparameter-writer*)
+(define-definition-element-print defsetf-definition *defsetf-writer*)
+(define-definition-element-print defstruct-definition *defstruct-writer*)
+(define-definition-element-print deftype-definition *deftype-writer*)
+(define-definition-element-print defun-definition *defun-writer*)
+(define-definition-element-print defvar-definition *defvar-writer*)
 

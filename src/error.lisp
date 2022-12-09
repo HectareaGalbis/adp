@@ -53,12 +53,12 @@
 
 
 (define-condition file-not-selected-error (error)
-  ((first-element :init-arg :first-element
+  ((first-element :initarg :first-element
 		  :type element))
   (:report (lambda (condition stream)
 	     (with-slots (first-element) condition
 	       (format stream "ADP error at '~a': ~a is used before selecting a file. Please, use adp:in-file."
-		       (slot-value first-element 'source-location))))))
+		       (slot-value first-element 'source-location) (slot-value first-element 'name))))))
 
 
 (define-condition already-defined-tag-error (error)

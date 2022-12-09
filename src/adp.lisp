@@ -113,6 +113,57 @@ a nested list is added. A certain symbol will be printed before each element of 
        (values))))
 
 
+(cl:defmacro table-of-contents ()
+  "Add a list of all headers and subheaders used in the system. The headers from different
+files are shown in the same order the files are loaded."
+  (when *adp*
+    '(progn
+      (adppvt:add-element (make-instance 'table-of-contents
+			   :name "table-of-contents"
+			   :source-location (relative-truename *project*)))
+      (values))))
+
+
+(cl:defmacro mini-table-of-contents ()
+  "Add a list of all headers, subheaders and subsubheaders used in the current documentation file."
+  (when *adp*
+    '(progn
+      (adppvt:add-element (make-instance 'mini-table-of-contents
+			   :name "mini-table-of-contents"
+			   :source-location (relative-truename *project*)))
+      (values))))
+
+
+(cl:defmacro table-of-functions ()
+  "Add an ordered list of all functions and macros defined using ADP."
+  (when *adp*
+    '(progn
+      (adppvt:addp-element (make-instance 'table-of-functions
+			    :name "table-of-functions"
+			    :source-location (relative-truename *project*)))
+      (values))))
+
+
+(cl:defmacro table-of-symbols ()
+  "Add an ordered list of all variables defined using ADP."
+  (when *adp*
+    '(progn
+      (adppvt:add-element (make-instance 'table-of-symbols
+			   :name "table-of-symbols"
+			   :source-location (relative-truename *project*)))
+      (values))))
+
+
+(cl:defmacro table-of-types ()
+  "Add an ordered list of all types defined using ADP."
+  (when *adp*
+    '(progn
+      (adppvt:add-element (make-instance 'table-of-types
+			   :name "table-of-types"
+			   :source-location (relative-truename *project*)))
+      (values))))
+
+
 (cl:defmacro image (alt-text path)
   "Add an image with alt-text as the alternative text and path must be the pathname, relative to the system's root directory, 
 where the image is located."
@@ -290,7 +341,7 @@ the text."
 
 ;; ----- API -----
 
-(defmacro define-definition-macro (name tag-extraction-expr docstring)
+(defmacro define-definition-macro (name type tag-extraction-expr docstring)
   (let ((body (if tag-extarction-expr
 		  (car tag-extraction-expr)
 		  (gensym)))
@@ -301,50 +352,50 @@ the text."
        ,docstring
        `(progn
 	  ,@(when *adp*
-	      `((adppvt:add-element *project* (make-instance ',',name
+	      `((adppvt:add-element *project* (make-instance ',',type
 							     :name ,,(string-downcase (symbol-name name))
 							     :expr '(,',(find-symbol (symbol-name name) "CL") ,@,body)
 							     ,@(when ,tag-extraction-expr `(:tag ,tag-extraction))
 							     :source-location (relative-truename *project*)))))
 	  (,(find-symbol (symbol-name ',name) "CL") ,@,body)))))
 
-(define-definition-macro defclass (body (car body))
+(define-definition-macro defclass defclass-definition (body (car body))
   "Add a defclass declaration. The macro expands to cl:defclass. Also, the class name is used to create a type-tag.")
-(define-definition-macro defconstant (body (car body))
+(define-definition-macro defconstant defconstant-definition (body (car body))
   "Add a defconstant declaration. The macro expands to cl:defconstant. Also, the constant name is used to create a symbol-tag.")
-(define-definition-macro defgeneric (body (car body))
+(define-definition-macro defgeneric defgeneric-definition (body (car body))
   "Add a defgeneric declaration. The macro expands to cl:defgeneric. Also, the generic function name is used to create a function-tag.")
-(define-definition-macro define-compiler-macro nil
+(define-definition-macro define-compiler-macro define-compiler-macro-definition nil
   "Add a define-compiler-macro declaration. The macro expands to cl:define-compiler-macro.")
-(define-definition-macro define-condition (body (car body))
+(define-definition-macro define-condition define-condition-definition (body (car body))
   "Add a define-condition declaration. The macro expands to cl:define-condition. Also, the condition name is used to create a type-tag.")
-(define-definition-macro define-method-combination nil
+(define-definition-macro define-method-combination define-method-combination-definition nil
   "Add a define-method-combination declaration. The macro expands to cl:define-method-combination.")
-(define-definition-macro define-modify-macro (body (car body))
+(define-definition-macro define-modify-macro define-modify-macro-definition (body (car body))
   "Add a define-modify-macro declaration. The macro expands to cl:define-modify-macro. Also, the macro name is used to create a function-tag.")
-(define-definition-macro define-setf-expander nil
+(define-definition-macro define-setf-expander define-setf-expander-definition nil
   "Add a define-setf-expander declaration. The macro expands to cl:define-setf-expander.")
-(define-definition-macro define-symbol-macro (body (car body))
+(define-definition-macro define-symbol-macro define-symbol-macro-definition (body (car body))
   "Add a define-symbol-macro declaration. The macro expands to cl:define-symbol-macro. Also, the symbol name is used to create a symbol-tag.")
-(define-definition-macro defmacro (body (car body))
+(define-definition-macro defmacro defmacro-definition (body (car body))
   "Add a defmacro declaration. The macro expands to cl:defmacro. Also, the macro name is used to create a function-tag.")
-(define-definition-macro defmethod nil
+(define-definition-macro defmethod defmethod-definition nil
   "Add a defmethod declaration. The macro expands to cl:defmethod.")
-(define-definition-macro defpackage nil
+(define-definition-macro defpackage defpackage-definition nil
   "Add a defpackage declaration. The macro expands to cl:defpackage.")
-(define-definition-macro defparameter (body (car body))
+(define-definition-macro defparameter defparameter-definition (body (car body))
   "Add a defparameter declaration. The macro expands to cl:defparameter. Also, the parameter name is used to create a symbol-tag.")
-(define-definition-macro defsetf nil
+(define-definition-macro defsetf defsetf-definition nil
   "Add a defsetf declaration. The macro expands to cl:defsetf.")
-(define-definition-macro defstruct (body (car body))
+(define-definition-macro defstruct defstruct-definition (body (car body))
   "Add a defstruct declaration. The macro expands to cl:defstruct. Also, the struct name is used to create a type-tag.")
-(define-definition-macro deftype (body (car body))
+(define-definition-macro deftype deftype-definition (body (car body))
   "Add a deftype declaration. The macro expands to cl:deftype. Also, the type name is used to create a type-tag.")
-(define-definition-macro defun (body (if (symbolp (car body))
+(define-definition-macro defun defun-definition (body (if (symbolp (car body))
 					 (car body)
 					 nil))
   "Add a defun declaration. The macro expands to cl:defun. Also, the function name is used to create a function-tag.")
-(define-definition-macro defvar (body (car body))
+(define-definition-macro defvar defvar-definition (body (car body))
   "Add a defvar declaration. The macro expands to cl:defvar. Also, the variable name is used to create a symbol-tag.")
 
 
@@ -415,20 +466,22 @@ arguments to let the user customize briefly how documentation is printed."
 
   (adppvt:with-special-writers
 
-    (load-style style)
+    (adppvt:with-new-style-parameter-list
+
+      (load-style style)
     
-    (adppvt:check-special-writers)
+      (adppvt:check-special-writers)
     
-    (adppvt:with-style-parameters style-args
+      (adppvt:with-style-parameters style-args
+	
+	(let ((*adp* t) 
+	      (*project* (make-instance 'project :root-directiory fixed-root-path))
+	      (*gensym-counter* 0))
 
-      (let ((*adp* t) 
-	    (*project* (make-instance 'project :root-directiory fixed-root-path))
-	    (*gensym-counter* 0))
+	  (load-project system)
 
-	(load-project system)
-
-	(format t "~%Writing documentation")
-	(adppvt:project-print *project*)
-	(format t "~%~a" "Done!"))))
+	  (format t "~%Writing documentation")
+	  (adppvt:project-print *project*)
+	  (format t "~%~a" "Done!")))))
 
   (values))

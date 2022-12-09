@@ -18,16 +18,7 @@
 (defpackage #:adp-private
   (:use #:cl #:alexandria)
   (:nicknames #:adppvt)
-  (:export #:*add-documentation* #:current-style #:*file-adp-elements* #:*header-tags* #:*symbol-tags*
-	   #:*function-tags* #:*type-tags* #:push-file-tag #:add-header-tag #:add-symbol-tag
-	   #:add-function-tag #:add-type-tag #:empty-header-tags #:empty-symbol-tags
-	   #:empty-function-tags #:empty-type-tags #:emplace-adp-element #:push-adp-file #:empty-adp-elements
-	   #:check-style-parameters #:set-parameter-value #:write-system-files #:add-code-tag #:get-code-tag
-	   #:process-code-tag #:remove-code-tag-exprs #:remove-own-code-tag-exprs #:remove-current-data
-	   #:remove-current-procs #:check-current-procs #:hide-symbolp #:create-bold-text #:create-italic-text
-	   #:create-bold-italic-text #:create-code-inline-text #:create-web-link-text #:create-file-ref-text
-	   #:create-header-ref-text #:create-symbol-ref-text #:create-function-ref-text #:create-type-ref-text
-	   #:create-code-block-tag
+  (:export 
 
 	   #:def-style-parameter #:def-header-writer #:def-subheader-writer #:def-subsubheader-writer
 	   #:def-escape-text-writer #:def-text-writer #:def-table-writer #:def-itemize-writer #:def-image-writer
