@@ -8,8 +8,7 @@
   ((name :initarg :name)
    (source-location :initarg :source-location
 		    :type pathname)
-   (file-location :initform nil
-		  :type file))
+   (file-location :type file))
   (:documentation
    "Represent the most basic unit of documentation."))
 
@@ -192,15 +191,26 @@
 ;; ----- code -----
 
 (defclass code (element)
-  ((expr :initarg :expr)
-   (hide-symbol :initarg :hide-symbol
-		:allocation :class
-		:type symbol)
-   (comment-symbol :initarg :comment-symbol
-		   :allocation :class
-		   :type symbol))
+  ((expr :initarg :expr))
   (:documentation
    "Represent a code element."))
+
+(defclass code-hide () ()
+  (:documentation
+   "Represent a code hide symbol."))
+
+(defmethod print-object ((object code-hide) stream)
+  (princ "..." stream))
+
+(defclass code-comment ()
+  ((comment :initarg :comment
+	    :type string))
+  (:documentation
+   "Represent a code hide symbol."))
+
+(defmethod print-object ((object code-comment) stream)
+  (format stream ";; ~a" (slot-value object 'comment))
+  (pprint-newline :mandatory stream))
 
 (defclass tagged-code (code tagged-element) ()
   (:documentation

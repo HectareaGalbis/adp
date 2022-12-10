@@ -32,19 +32,19 @@
       (check-type writer-definer symbol)
       (check-type num-args unsigned-byte)
       (check-type optionalp boolean)
-      (let ((writer-args (loop repeat num-args do (gensym))))
+      (let ((writer-args (loop repeat num-args collect (gensym))))
 	(push (make-writer :proc writer-proc :definer writer-definer :optional optionalp) writers)
 	(with-gensyms (body proc-args)
 	  `(progn
 	     (defvar ,writer-proc nil)
 	     (defmacro ,writer-definer (,writer-args &body ,body)
 	       (let ((,proc-args (list ,@writer-args)))
-		 `(setf ,',writer-proc (lambda ,@,proc-args
+		 `(setf ,',writer-proc (lambda ,,proc-args
 					 ,@,body))))))))))
 
 ;; file
-(define-customizable-writer *file-head-writer* define-file-header-writer 1 t)
-(define-customizable-writer *file-foot-writer* define-file-footer-writer 1 t)
+(define-customizable-writer *file-head-writer* define-file-head-writer 1 t)
+(define-customizable-writer *file-foot-writer* define-file-foot-writer 1 t)
 
 ;; project
 (define-customizable-writer *file-extension* define-file-extension 0)
@@ -75,7 +75,7 @@
 (define-customizable-writer *web-link-writer* define-web-link-writer 3)
 
 ;; image
-(define-customizable-writer *image-writer* define-image-writer 2)
+(define-customizable-writer *image-writer* define-image-writer 3)
 
 ;; table
 (define-customizable-writer *table-writer* define-table-writer 2)
@@ -88,21 +88,21 @@
 (define-customizable-writer *code-example-writer* define-code-example-writer 4)
 
 ;; definition
-(define-customizable-writer *defclass-writer* define-defclass-writer 2)
-(define-customizable-writer *defconstant-writer* define-defconstant-writer 2)
-(define-customizable-writer *defgeneric-writer* define-defgeneric-writer 2)
+(define-customizable-writer *defclass-writer* define-defclass-writer 3)
+(define-customizable-writer *defconstant-writer* define-defconstant-writer 3)
+(define-customizable-writer *defgeneric-writer* define-defgeneric-writer 3)
 (define-customizable-writer *define-compiler-macro-writer* define-define-compiler-macro-writer 2)
-(define-customizable-writer *define-condition-writer* define-define-condition-writer 2)
+(define-customizable-writer *define-condition-writer* define-define-condition-writer 3)
 (define-customizable-writer *define-method-combination-writer* define-define-method-combination-writer 2)
-(define-customizable-writer *define-modify-macro-writer* define-define-modify-macro-writer 2)
+(define-customizable-writer *define-modify-macro-writer* define-define-modify-macro-writer 3)
 (define-customizable-writer *define-setf-expander-writer* define-define-setf-expander-writer 2)
-(define-customizable-writer *define-symbol-macro-writer* define-define-symbol-macro-writer 2)
-(define-customizable-writer *defmacro-writer* define-defmacro-writer 2)
+(define-customizable-writer *define-symbol-macro-writer* define-define-symbol-macro-writer 3)
+(define-customizable-writer *defmacro-writer* define-defmacro-writer 3)
 (define-customizable-writer *defmethod-writer* define-defmethod-writer 2)
 (define-customizable-writer *defpackage-writer* define-defpackage-writer 2)
-(define-customizable-writer *defparameter-writer* define-defparameter-writer 2)
+(define-customizable-writer *defparameter-writer* define-defparameter-writer 3)
 (define-customizable-writer *defsetf-writer* define-defsetf-writer 2)
-(define-customizable-writer *defstruct-writer* define-defstruct-writer 2)
-(define-customizable-writer *deftype-writer* define-deftype-writer 2)
-(define-customizable-writer *defun-writer* define-defun-writer 2)
-(define-customizable-writer *defvar-writer* define-defvar-writer 2)
+(define-customizable-writer *defstruct-writer* define-defstruct-writer 3)
+(define-customizable-writer *deftype-writer* define-deftype-writer 3)
+(define-customizable-writer *defun-writer* define-defun-writer 3)
+(define-customizable-writer *defvar-writer* define-defvar-writer 3)

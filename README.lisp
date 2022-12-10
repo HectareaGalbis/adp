@@ -1,7 +1,7 @@
 
 (in-package :adp)
 
-(write-in-file #P"README")
+(in-file #P"README")
 
 (header "Add Documentation, Please")
 

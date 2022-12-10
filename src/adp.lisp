@@ -4,17 +4,87 @@
 
 ;; ----- special variables -----
 
-(cl:defvar *adp* nil)
-(cl:defvar *project* nil)
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (cl:defvar *adp* nil)
+  (cl:defvar *project* nil))
+
+
+;; ----- advanced adp macros -----
+
+(cl:defmacro adv-header (str &optional tag)
+  (when *adp*
+    (check-type str string "a string")
+    (check-type tag (or null symbol) "a symbol or nil")
+    (let ((fixed-tag (or tag (gensym))))
+      `(progn
+	 (adppvt:add-element *project* (make-instance 'adppvt:header
+						      :name "header"
+						      :tag ,fixed-tag
+						      :source-location (relative-truename *project*)))
+	 (values)))))
+
+
+(cl:defmacro adv-subheader (str &optional tag)
+  (when *adp*
+    (check-type str string "a string")
+    (check-type tag (or null symbol) "a symbol or nil")
+    (let ((fixed-tag (or tag (gensym))))
+      `(progn
+	 (adppvt:add-element *project* (make-instance 'adppvt:subheader
+						      :name "header"
+						      :tag ,fixed-tag
+						      :source-location (relative-truename *project*)))
+	 (values)))))
+
+
+(cl:defmacro adv-defmacro (&body defmacro-body)
+  `(progn
+     ,@(when *adp*
+	 `((adppvt:add-element *project* (make-instance 'adppvt:defmacro-definition
+							:name "defmacro"
+							:expr '(cl:defmacro ,@defmacro-body)
+							:tag ',(car defmacro-body)
+							:source-location (relative-truename *project*)))))
+     (cl:defmacro ,@defmacro-body)))
+
+
+(cl:defmacro adv-defun (&body defun-body)
+  `(progn
+     ,@(when *adp*
+	 `((adppvt:add-element *project* (make-instance 'adppvt:defun-definition
+							:name "defun"
+							:expr '(cl:defun ,@defun-body)
+							:tag ',(car defun-body)
+							:source-location (relative-truename *project*)))))
+     (cl:defun ,@defun-body)))
+
+
+(cl:defmacro adv-in-file (path)
+  (when *adp*
+    (check-type path pathname)
+    (let* ((true-path (truename path))
+	   (fixed-true-path (make-pathname :directory (cons :relative (cdr (pathname-directory true-path)))
+					   :name (pathname-name path)
+					   :type (pathname-type path))))
+      `(select-file *project* ,fixed-true-path))))
+
+
+;; ----- ADP interface -----
+
+(adv-in-file #P"docs/user-api")
+
+(adv-header "ADP User Interface" user-api-header)
 
 
 ;; ----- Literature -----
+
+(adv-subheader "Literate programming functions")
 
 (cl:defmacro define-header-macro (name)
   (let ((macro-doc (format nil "Add a ~a with name str. Also, if tag is not nil but a symbol, a new header-tag is created."
 			   (string-downcase (symbol-name name)))))
     (with-gensyms (str tag fixed-tag)
-      `(cl:defmacro ,name (,str &optional ,tag)
+      `(adv-defmacro ,name (,str &optional ,tag)
 	 ,macro-doc
 	 (when *adp*
 	   (check-type ,str string "a string")
@@ -24,6 +94,7 @@
 		(adppvt:add-element *project* (make-instance ',',name
 							     :name ,,(string-downcase (symbol-name name))
 							     :tag ,,fixed-tag
+							     :title ,,str
 							     :source-location (relative-truename *project*)))
 		(values))))))))
 
@@ -32,29 +103,29 @@
 (define-header-macro subsubheader)
 
 
-(cl:defmacro text (&rest objects)
+(adv-defmacro text (&rest objects)
   "Add plain text. The arguments in objects can be any lisp object. They will be princ-ed and concatenated into a single string.
 You can use the following macros to enrich your text: bold, italic, bold-italic, code-inline, web-link, header-ref, symbol-ref, function-ref and type-ref."
   (when *adp*
     `(progn
-       (adppvt:add-element *project* (make-instance 'text
+       (adppvt:add-element *project* (make-instance 'adppvt:text
 						    :name "text"
 						    :text-elements (list ,@objects)
 						    :source-location (relative-truename *project*)))
        (values))))
 
 
-(cl:defmacro cell (&rest objects)
+(adv-defmacro cell (&rest objects)
   "Create a cell to place into a table. The arguments in objects can be any lisp object. They will be princ-ed and concatenated into a single string.
 You can use the following macros to enrich your cell text: bold, italic, bold-italic, code-inline, web-link, header-ref, symbol-ref, function-ref and type-ref."
   (when *adp*
-    `(make-instance 'cell
+    `(make-instance 'adppvt:cell
 		    :name "cell"
 		    :text-element (list ,@objects)
 		    :source-location (relative-truename *project*))))
 
 
-(cl:defmacro table (&rest rows)
+(adv-defmacro table (&rest rows)
   "Add a table. Each argument must be a list of text macro calls."
   (when *adp*
     (loop with row-length = (length (car rows))
@@ -62,7 +133,7 @@ You can use the following macros to enrich your cell text: bold, italic, bold-it
 	  do (check-type row list "a list")
 	     (assert (= row-length (length row)) () "Each row must have the same length."))
     `(progn
-       (adppvt:add-element *project* (make-instance 'table
+       (adppvt:add-element *project* (make-instance 'adppvt:table
 						    :name "table"
 						    :rows ,@(loop for row in rows
 								  collect (cons 'list row))
@@ -70,11 +141,11 @@ You can use the following macros to enrich your cell text: bold, italic, bold-it
        (values))))
 
 
-(cl:defmacro item (&rest items)
+(adv-defmacro item (&rest items)
   "Create an item to be placed into a iterate/enumerate form. The arguments in objects can be any lisp object. They will be princ-ed and concatenated into a single string.
 You can use the following macros to enrich your cell text: bold, italic, bold-italic, code-inline, web-link, header-ref, symbol-ref, function-ref and type-ref."
   (when *adp*
-    `(make-instance 'item
+    `(make-instance 'adppvt:item
 		    :name "item"
 		    :text-elements (list ,@items)
 		    :source-location (relative-truename *project*))))
@@ -84,17 +155,17 @@ You can use the following macros to enrich your cell text: bold, italic, bold-it
 
   (cl:defun process-itemize (itemize-form)
     (case (car itemize-form)
-      (itemize   `(make-instance 'itemize
+      (itemize   `(make-instance 'adppvt:itemize
 				 :name "itemize"
 				 :elements (list ,@(mapcar #'process-itemize (cdr itemize-form)))
 				 :source-location (relative-truename *project*)))
-      (enumerate `(make-instance 'enumerate
+      (enumerate `(make-instance 'adppvt:enumerate
 				 :name "enumerate"
 				 :elements (list ,@(mapcar #'process-itemize (cdr itemize-form)))
 				 :source-location (relative-truename *project*))))))
 
 
-(cl:defmacro itemize (&whole itemize-form)
+(adv-defmacro itemize (&whole itemize-form)
   "Add a list of items. Each argument must be a list. Each list must start with the symbol item, itemize or enumerate. If 
 item is used, the rest of the elements in that list will be treated as if using the macro text. If itemize or enumerate is used the rest 
 of elements must be lists that must start with item, itemize or enumerate. In other words, when itemize or enumerate is used 
@@ -105,7 +176,7 @@ a nested list is added. A certain symbol will be printed before each element of 
        (values))))
 
 
-(cl:defmacro enumerate (&whole enumerate-form)
+(adv-defmacro enumerate (&whole enumerate-form)
   "Same as itemize, but a number is printed before each element."
   (when *adp*
     `(progn
@@ -113,133 +184,130 @@ a nested list is added. A certain symbol will be printed before each element of 
        (values))))
 
 
-(cl:defmacro table-of-contents ()
+(adv-defmacro table-of-contents ()
   "Add a list of all headers and subheaders used in the system. The headers from different
 files are shown in the same order the files are loaded."
   (when *adp*
-    '(progn
-      (adppvt:add-element (make-instance 'table-of-contents
-			   :name "table-of-contents"
-			   :source-location (relative-truename *project*)))
-      (values))))
+    `(progn
+       (adppvt:add-element (make-instance 'adppvt:table-of-contents
+					  :name "table-of-contents"
+					  :source-location (relative-truename *project*)))
+       (values))))
 
 
-(cl:defmacro mini-table-of-contents ()
+(adv-defmacro mini-table-of-contents ()
   "Add a list of all headers, subheaders and subsubheaders used in the current documentation file."
   (when *adp*
-    '(progn
-      (adppvt:add-element (make-instance 'mini-table-of-contents
-			   :name "mini-table-of-contents"
-			   :source-location (relative-truename *project*)))
-      (values))))
+    `(progn
+       (adppvt:add-element (make-instance 'adppvt:mini-table-of-contents
+					  :name "mini-table-of-contents"
+					  :source-location (relative-truename *project*)))
+       (values))))
 
 
-(cl:defmacro table-of-functions ()
+(adv-defmacro table-of-functions ()
   "Add an ordered list of all functions and macros defined using ADP."
   (when *adp*
-    '(progn
-      (adppvt:add-element (make-instance 'table-of-functions
-			    :name "table-of-functions"
-			    :source-location (relative-truename *project*)))
-      (values))))
+    `(progn
+       (adppvt:add-element (make-instance 'adppvt:table-of-functions
+					  :name "table-of-functions"
+					  :source-location (relative-truename *project*)))
+       (values))))
 
 
-(cl:defmacro table-of-symbols ()
+(adv-defmacro table-of-symbols ()
   "Add an ordered list of all variables defined using ADP."
   (when *adp*
-    '(progn
-      (adppvt:add-element (make-instance 'table-of-symbols
-			   :name "table-of-symbols"
-			   :source-location (relative-truename *project*)))
-      (values))))
+    `(progn
+       (adppvt:add-element (make-instance 'adppvt:table-of-symbols
+					  :name "table-of-symbols"
+					  :source-location (relative-truename *project*)))
+       (values))))
 
 
-(cl:defmacro table-of-types ()
+(adv-defmacro table-of-types ()
   "Add an ordered list of all types defined using ADP."
   (when *adp*
-    '(progn
-      (adppvt:add-element (make-instance 'table-of-types
-			   :name "table-of-types"
-			   :source-location (relative-truename *project*)))
-      (values))))
+    `(progn
+       (adppvt:add-element (make-instance 'adppvt:table-of-types
+					  :name "table-of-types"
+					  :source-location (relative-truename *project*)))
+       (values))))
 
 
-(cl:defmacro image (alt-text path)
+(adv-defmacro image (alt-text path)
   "Add an image with alt-text as the alternative text and path must be the pathname, relative to the system's root directory, 
 where the image is located."
   (when *adp*
     (check-type alt-text string "a string")
     (check-type path pathname "a pathname")
     `(progn
-       (adppvt:add-element *project* (make-instance 'image
+       (adppvt:add-element *project* (make-instance 'adppvt:image
 						    :name "image"
 						    :path ,path
 						    :source-location (relative-truename *project*)))
        (values))))
 
 
-(cl:defmacro define-text-enrichment-macro (name docstring)
+(cl:defmacro define-text-enrichment-macro (name type docstring)
   (with-gensyms (args)
-    `(cl:defmacro ,name (&rest ,args)
+    `(adv-defmacro ,name (&rest ,args)
        ,docstring
        (when *adp*
-	 `(make-instance ',',name
+	 `(make-instance ',',type
 			 :name ,(string-downcase ,(symbol-name name))
 			 :text-elements (list ,@,args)
 			 :source-location (relative-truename *project*))))))
 
-(define-text-enrichment-macro bold
+(define-text-enrichment-macro bold adppvt:bold
   "Add bold style to text. Each argument is princ-ed and concatenated into a string.")
-(define-text-enrichment-macro italic
+(define-text-enrichment-macro italic adppvt:italic
   "Add italic style to text. Each argument is princ-ed and concatenated into a string.")
-(define-text-enrichment-macro bold-italic
+(define-text-enrichment-macro bold-italic adppvt:bold-italic
   "Add bold and italic style to text. Each argument is princ-ed and concatenated into a string.")
-(define-text-enrichment-macro code-inline
+(define-text-enrichment-macro code-inline adppvt:code-inline
   "Add inlined style to text. Each argument is princ-ed and concatenated into a string.")
 
 
-(cl:defmacro web-link (name link)
+(adv-defmacro web-link (name link)
   "Add a hyperlink. The text showed is name and link must be a valid web URL. Both arguments must be strings."
   (when *adp*
     (check-type name string "a string")
     (check-type link string "a string")
-    `(make-instance 'web-link
+    `(make-instance 'adppvt:web-link
 		    :name "web-link"
 		    :text ,name
 		    :address ,link
 		    :source-location (relative-truename *project*))))
 
 
-(cl:defmacro define-reference-macro (name docstring)
+(cl:defmacro define-reference-macro (name type docstring)
   (with-gensyms (tag)
-    `(cl:defmacro ,name (,tag)
+    `(adv-defmacro ,name (,tag)
        ,docstring
        (when *adp*
 	 (check-type ,tag symbol "a symbol")
-	 `(make-instance ',',name
+	 `(make-instance ',',type
 			 :name ,,(string-downcase (symbol-name name))
 			 :tag ,,tag
 			 :source-location (relative-truename *project*))))))
 
-(define-reference-macro header-ref
+(define-reference-macro header-ref adppvt:header-ref
   "Add a reference to a header when using the macros text, table or itemize. The argument is a symbol denoting a header-tag.
 Only the symbols used with the macros header, subheader and subsubheader are valid.")
 
-(define-reference-macro symbol-ref
+(define-reference-macro symbol-ref adppvt:symbol-ref
   "Add a reference to a variable when using the macros text, table or itemize. The argument is a symbol denoting a variable
 defined with adp:deconstant, adp:define-symbol-macro, adp:defparameter or adp:defvar.")
 
-(define-reference-macro function-ref
+(define-reference-macro function-ref adppvt:function-ref
   "Add a reference to a function symbol when using the macros text, table or itemize. The argument is a symbol denoting a function
 defined with adp:defgeneric, adp:define-modify-macro, adp:defmacro or adp:defun.")
 
-(define-reference-macro type-ref
+(define-reference-macro type-ref adppvt:type-ref
   "Add a reference to a type symbol when using the macros text, table or itemize. The argument is a symbol denoting a type
 defined with adp:defclass, adp:define-condition, adp:defstruct or adp:deftype.")
 
-
-(cl:defvar *hide-symbol* '#:hide)
-(cl:defvar *comment-symbol* '#:comment)
 
 (cl:defun plistp (code)
   "Check if an expression is a proper list."
@@ -277,7 +345,7 @@ defined with adp:defclass, adp:define-condition, adp:defstruct or adp:deftype.")
 		 (cond
 		   ((eq (car code) 'code-hide)
 		    (if (valid-tag-p tag (cadr code))
-			(list *hide-symbol*)
+			(list (make-instance 'adppvt:code-hide))
 			(loop for expr in (cddr code)
 			      append (process-aux tag expr))))
 		   ((eq (car code) 'code-remove)
@@ -289,7 +357,7 @@ defined with adp:defclass, adp:define-condition, adp:defstruct or adp:deftype.")
 		    (loop for expr in (cdr code)
 			  append (process-aux tag expr)))
 		   ((eq (car code) 'code-comment)
-		    (list `(,*comment-symbol* ,(caddr code))))
+		    (list (make-instance 'adppvt:code-comment :comment (cadr code))))
 		   ((eq (car code) 'code-tag)
 		    (loop for expr in (cddr code)
 			  append (process-aux tag expr)))
@@ -299,7 +367,7 @@ defined with adp:defclass, adp:define-condition, adp:defstruct or adp:deftype.")
 		 (list code))))
     (car (process-aux tag code))))
 
-(cl:defmacro code-tag (tags &body exprs)
+(adv-defmacro code-tag (tags &body exprs)
   "Assign several tags to several forms. The forms are placed into a progn form. The argument tags must be a list
 of symbols. If no tags are provided, an error is raised. Each symbol in tags will be a code-tag assigned to code.
 The same tag can be used several times in different calls to code-tag.  Inside the code-tag form it is correct to use
@@ -309,10 +377,8 @@ the next forms: code-hide, code-remove, code-show and code-comment.
                If the list of tags in code-hide is empty, the forms will be hidden for every tag used in code-tag.
                Hidding the code means printing \"...\" instead of the forms.
   - code-remove: Same as code-hide, but removes the code instead of printing \"...\"
-  - code-quote: It has the same syntax as code-hide and code-remove. The forms in code-quote are never evaluated, but will be
-                shown when using code-block if some tag from code-tag is used in code-quote. Otherwise it won't print anything.
-  - code-comment: It has the systax (code-comment (&rest tags) comment). The comment will be printed when using code-block as
-                  a comment using \";;\" if some tag from code-tag is used in code-comment. Otherwise, it won't print anything."
+  - code-quote: Every expression placed inside code-quote will have its evaluation disabled.
+  - code-comment: Receive a string. This string will be printed as a comment (printing ';;')."
   `(progn
      ,@(when *adp*
 	 (check-type tags list "a list")
@@ -322,16 +388,14 @@ the next forms: code-hide, code-remove, code-show and code-comment.
 	 (with-gensyms (tag expr)
 	   `((loop for ,tag in ',tags
 		   do (loop for ,expr in ',exprs
-			    do (apply #'adppvt:add-code-tag *project* ,tag (make-instance 'tagged-code
+			    do (apply #'adppvt:add-code-tag *project* ,tag (make-instance 'adppvt:tagged-code
 											  :name "tagged-code"
-											  :hide-symbol *hide-symbol*
-											  :comment-symbol *comment-symbol*
 											  :tag tag
 											  :expr (process-code-tag ,expr))))))))
      ,@(remove-code-tag exprs)))
 
 
-(cl:defmacro code-block ((&rest tags) &body code)
+(adv-defmacro code-block ((&rest tags) &body code)
   "Add a block of code. Each element of code will be prin1-ed but not evaluated. If a symbol is used and that symbol appears as a tag in tags, then 
 the code assigned to that tag is printed instead of the symbol."
   (when *adp*
@@ -342,25 +406,25 @@ the code assigned to that tag is printed instead of the symbol."
     (assert (not (null code)) () "Expected at least one expression in a code-block form.")
     (with-gensyms (expr)
       `(progn
-	 (adppvt:add-element *project* (make-instance 'code-block
+	 (adppvt:add-element *project* (make-instance 'adppvt:code-block
 						      :name "code-block"
 						      :code-type "Lisp"
 						      :code-elements (loop for ,expr in ',code
 									   if (and (symbolp ,expr)
 										   (member ,expr ',tags))
-									     collect (make-instance 'code-ref
+									     collect (make-instance 'adppvt:code-ref
 												    :name "code-ref"
 												    :tag ,expr
 												    :source-location (relative-truename *project*))
 									   else
-									     collect (make-instance 'code
+									     collect (make-instance 'adppvt:code
 												    :name "code"
 												    :expr ,expr
 												    :source-location (relative-truename *project*)))))
 	 (values)))))
 
 
-(cl:defmacro verbatim-code-block (lang-or-text &optional (text nil textp))
+(adv-defmacro verbatim-code-block (lang-or-text &optional (text nil textp))
   "Add a block of text. It can receive up to two arguments. If only one argument is received it must be a string of text that will be printed inside the block.
 If two arguments are received, the text to be printed must be the second one, and the first argument is a string representing the language used for writing
 the text."
@@ -370,7 +434,7 @@ the text."
     (let ((true-lang (and textp lang-or-text))
 	  (true-text (if textp text lang-or-text)))
       `(progn
-	 (adppvt:add-element *project* (make-instance 'verbatim-code-block
+	 (adppvt:add-element *project* (make-instance 'adppvt:verbatim-code-block
 						      :name "verbatim-code-block"
 						      :code-type ,true-lang
 						      :code-text ,true-text
@@ -378,7 +442,7 @@ the text."
 	 (values)))))
 
 
-(cl:defmacro code-example (&body code)
+(adv-defmacro code-example (&body code)
   "Same as code-block, but tags cannot be used and the code is evaluated. The standard output and the last-form's results are also printed."
   (when *adp*
       (assert (not (null code)) () "Expected at least one expression in a code-example form.")
@@ -387,10 +451,10 @@ the text."
 		(,result (multiple-value-list (with-output-to-string (*standard-output* ,output)
 						,@code))))
 
-	   (adppvt:add-element *project* (make-instance 'code-example
+	   (adppvt:add-element *project* (make-instance 'adppvt:code-example
 							:name "code-example"
 							:code-elements (mapcar (lambda (,expr)
-										 (make-instance 'code
+										 (make-instance 'adppvt:code
 												:name "code"
 												:expr ,expr
 												:source-location (relative-truename *project*)))
@@ -403,6 +467,8 @@ the text."
 
 ;; ----- API -----
 
+(adv-subheader "API reference functions" api-subheader)
+
 (cl:defmacro define-definition-macro (name type tag-extraction-expr docstring)
   (let ((body (if tag-extraction-expr
 		  (car tag-extraction-expr)
@@ -410,7 +476,7 @@ the text."
 	(tag-extraction (if tag-extraction-expr
 			    (cadr tag-extraction-expr)
 			    nil)))
-    `(cl:defmacro ,name (&body ,body)
+    `(adv-defmacro ,name (&body ,body)
        ,docstring
        `(progn
 	  ,@(when *adp*
@@ -422,49 +488,51 @@ the text."
 							     :source-location (relative-truename *project*)))))
 	  (,(find-symbol (symbol-name ',name) "CL") ,@,body)))))
 
-(define-definition-macro defclass defclass-definition (body (car body))
+(define-definition-macro defclass adppvt:defclass-definition (body (car body))
   "Add a defclass declaration. The macro expands to cl:defclass. Also, the class name is used to create a type-tag.")
-(define-definition-macro defconstant defconstant-definition (body (car body))
+(define-definition-macro defconstant adppvt:defconstant-definition (body (car body))
   "Add a defconstant declaration. The macro expands to cl:defconstant. Also, the constant name is used to create a symbol-tag.")
-(define-definition-macro defgeneric defgeneric-definition (body (car body))
+(define-definition-macro defgeneric adppvt:defgeneric-definition (body (car body))
   "Add a defgeneric declaration. The macro expands to cl:defgeneric. Also, the generic function name is used to create a function-tag.")
-(define-definition-macro define-compiler-macro define-compiler-macro-definition nil
+(define-definition-macro define-compiler-macro adppvt:define-compiler-macro-definition nil
   "Add a define-compiler-macro declaration. The macro expands to cl:define-compiler-macro.")
-(define-definition-macro define-condition define-condition-definition (body (car body))
+(define-definition-macro define-condition adppvt:define-condition-definition (body (car body))
   "Add a define-condition declaration. The macro expands to cl:define-condition. Also, the condition name is used to create a type-tag.")
-(define-definition-macro define-method-combination define-method-combination-definition nil
+(define-definition-macro define-method-combination adppvt:define-method-combination-definition nil
   "Add a define-method-combination declaration. The macro expands to cl:define-method-combination.")
-(define-definition-macro define-modify-macro define-modify-macro-definition (body (car body))
+(define-definition-macro define-modify-macro adppvt:define-modify-macro-definition (body (car body))
   "Add a define-modify-macro declaration. The macro expands to cl:define-modify-macro. Also, the macro name is used to create a function-tag.")
-(define-definition-macro define-setf-expander define-setf-expander-definition nil
+(define-definition-macro define-setf-expander adppvt:define-setf-expander-definition nil
   "Add a define-setf-expander declaration. The macro expands to cl:define-setf-expander.")
-(define-definition-macro define-symbol-macro define-symbol-macro-definition (body (car body))
+(define-definition-macro define-symbol-macro adppvt:define-symbol-macro-definition (body (car body))
   "Add a define-symbol-macro declaration. The macro expands to cl:define-symbol-macro. Also, the symbol name is used to create a symbol-tag.")
-(define-definition-macro defmacro defmacro-definition (body (car body))
+(define-definition-macro defmacro adppvt:defmacro-definition (body (car body))
   "Add a defmacro declaration. The macro expands to cl:defmacro. Also, the macro name is used to create a function-tag.")
-(define-definition-macro defmethod defmethod-definition nil
+(define-definition-macro defmethod adppvt:defmethod-definition nil
   "Add a defmethod declaration. The macro expands to cl:defmethod.")
-(define-definition-macro defpackage defpackage-definition nil
+(define-definition-macro defpackage adppvt:defpackage-definition nil
   "Add a defpackage declaration. The macro expands to cl:defpackage.")
-(define-definition-macro defparameter defparameter-definition (body (car body))
+(define-definition-macro defparameter adppvt:defparameter-definition (body (car body))
   "Add a defparameter declaration. The macro expands to cl:defparameter. Also, the parameter name is used to create a symbol-tag.")
-(define-definition-macro defsetf defsetf-definition nil
+(define-definition-macro defsetf adppvt:defsetf-definition nil
   "Add a defsetf declaration. The macro expands to cl:defsetf.")
-(define-definition-macro defstruct defstruct-definition (body (car body))
+(define-definition-macro defstruct adppvt:defstruct-definition (body (car body))
   "Add a defstruct declaration. The macro expands to cl:defstruct. Also, the struct name is used to create a type-tag.")
-(define-definition-macro deftype deftype-definition (body (car body))
+(define-definition-macro deftype adppvt:deftype-definition (body (car body))
   "Add a deftype declaration. The macro expands to cl:deftype. Also, the type name is used to create a type-tag.")
-(define-definition-macro defun defun-definition (body (if (symbolp (car body))
+(define-definition-macro defun adppvt:defun-definition (body (if (symbolp (car body))
 					 (car body)
 					 nil))
   "Add a defun declaration. The macro expands to cl:defun. Also, the function name is used to create a function-tag.")
-(define-definition-macro defvar defvar-definition (body (car body))
+(define-definition-macro defvar adppvt:defvar-definition (body (car body))
   "Add a defvar declaration. The macro expands to cl:defvar. Also, the variable name is used to create a symbol-tag.")
 
 
 ;; ----- Writers -----
 
-(cl:defmacro in-file (path)
+(adv-subheader "Writer functions")
+
+(adv-defmacro in-file (path)
   (when *adp*
     (check-type path pathname)
     (let* ((true-path (truename path))
@@ -504,7 +572,7 @@ the text."
     nil))
 
 
-(cl:defun load-style (style)
+(adv-defun load-style (style)
   "Load an adp style."
   (declare (type symbol style))
   (let ((style-system (intern (concatenate 'string "ADP/" (symbol-name style)) :keyword)))
@@ -538,7 +606,7 @@ arguments to let the user customize briefly how documentation is printed."
 	       (fixed-root-path (make-pathname :host (pathname-host root-path)
 					       :device (pathname-device root-path)
 					       :directory (pathname-directory root-path)))
-	       (*project* (make-instance 'project :root-directiory fixed-root-path))
+	       (*project* (make-instance 'adppvt:project :root-directory fixed-root-path))
 	       (*gensym-counter* 0))
 
 	  (load-project system)
@@ -548,3 +616,71 @@ arguments to let the user customize briefly how documentation is printed."
 	  (format t "~%~a" "Done!")))))
 
   (values))
+
+
+;; ----- Additional features -----
+
+(subheader "Additional functions" additional-functions-subheader)
+
+
+(defmacro eval-when-adp (&body body)
+  "The body forms will be placed into a progn form only when documentation generation is activated.
+Otherwise, this macro expands to NIL."
+  (when *adp*
+    `(progn
+       ,@body)))
+
+
+(defmacro cl-ref (sym)
+  "Add a reference to a Common Lisp symbol when using the macros text, cell or item."
+  (let ((result (hyperspec:lookup sym)))
+    (assert result () "The symbol ~s is not a valid Common Lisp symbol." sym)
+    `(web-link ,(prin1-to-string sym) ,result)))
+
+
+;; ----- Macro characters -----
+
+(subheader "Macro characters")
+
+(text "The next table shows which macro characters can be used and what they expand to:")
+
+(table ((cell "Character") (cell "Macro") (cell "Example"))
+       ((cell "@b") (cell (function-ref bold))          (cell (code-inline "@b(\"This text is bold\")")))
+       ((cell "@i") (cell (function-ref italic))        (cell (code-inline "@i(\"This text is italic\")")))
+       ((cell "@e") (cell (function-ref bold-italic))   (cell (code-inline "@e(\"This text is emphasized\")")))
+       ((cell "@c") (cell (function-ref code-inline))   (cell (code-inline "@c(\"This text is inlined\")")))
+       ((cell "@w") (cell (function-ref web-link))      (cell (code-inline "@w(\"Name of link\" \"www.example.com\")")))
+       ((cell "@h") (cell (function-ref header-ref))    (cell (code-inline "@h(header)")))
+       ((cell "@f") (cell (function-ref function-ref))  (cell (code-inline "@f(function)")))
+       ((cell "@s") (cell (function-ref symbol-ref))    (cell (code-inline "@s(variable)")))
+       ((cell "@t") (cell (function-ref type-ref))      (cell (code-inline "@t(type)")))
+       ((cell "@l") (cell (function-ref cl-ref))        (cell (code-inline "@l(princ)")))
+       ((cell "@'") (cell (code-inline "code-quote"))   (cell (code-inline "@'((code (not evaluated)))")))
+       ((cell "@;") (cell (code-inline "code-comment")) (cell (code-inline "@;(\"This is a comment\")")))
+       ((cell "@_") (cell (code-inline "code-remove"))  (cell (code-inline "@_((tag1 tag2) (code (to be (removed))))")))
+       ((cell "@.") (cell (code-inline "code-hide"))    (cell (code-inline "@.((tag1 tag2) (code (to be (hidden))))"))))
+
+(make-dispatch-macro-character #\@ t)
+
+(cl:defun adp-reader-macro-dispatch (stream char num-arg)
+  (declare (ignore num-arg))
+  (let ((list (read stream))
+	(macro (ecase char
+		 (#\B 'bold)
+		 (#\I 'italic)
+		 (#\E 'bold-italic)
+		 (#\C 'code-inline)
+		 (#\W 'web-link)
+		 (#\H 'header-ref)
+		 (#\F 'function-ref)
+		 (#\S 'symbol-ref)
+		 (#\T 'type-ref)
+		 (#\L 'cl-ref)
+		 (#\' 'code-quote)
+		 (#\; 'code-comment)
+		 (#\_ 'code-remove)
+		 (#\. 'code-hide))))
+    (cons macro list)))
+
+(loop for char in '(#\b #\i #\e #\c #\w #\h #\f #\s #\t #\p #\l #\' #\; #\_ #\.)
+      do (set-dispatch-macro-character #\@ char #'adp-reader-macro-dispatch))

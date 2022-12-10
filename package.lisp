@@ -7,7 +7,7 @@
 	   #:defmacro #:defmethod #:defpackage #:defparameter #:defsetf #:defstruct #:deftype #:defun #:defvar)
   (:export #:header #:subheader #:subsubheader #:text #:table #:cell #:itemize #:enumerate #:item
 	   #:table-of-contents #:mini-table-of-contents #:table-of-functions #:table-of-symbols #:table-of-types
-	   #:image #:bold #:italic #:bold-italic #:code-inline #:web-link #:file-ref #:header-ref #:symbol-ref
+	   #:image #:bold #:italic #:bold-italic #:code-inline #:web-link #:header-ref #:symbol-ref
 	   #:function-ref #:type-ref #:code-tag #:code-quote #:code-comment #:code-hide #:code-remove
 	   #:code-block #:verbatim-code-block #:code-example #:defclass #:defconstant #:defgeneric
 	   #:define-compiler-macro #:define-condition #:define-method-combination #:define-modify-macro
@@ -18,23 +18,34 @@
 (defpackage #:adp-private
   (:use #:cl #:alexandria)
   (:nicknames #:adppvt)
-  (:export #:add-element #:project-print #:add-code-tag #:with-special-writers #:check-special-writers
-	   #:with-new-style-parameter-list #:with-style-parameters 
-	   
+  (:export #:add-element #:project-print #:add-code-tag #:*adp-pprint-dispatch* #:with-special-writers
+	   #:check-special-writers #:with-new-style-parameter-list #:with-style-parameters
 
-	   #:def-style-parameter #:def-header-writer #:def-subheader-writer #:def-subsubheader-writer
-	   #:def-escape-text-writer #:def-text-writer #:def-table-writer #:def-itemize-writer #:def-image-writer
-	   #:def-bold-writer #:def-italic-writer #:def-bold-italic-writer #:def-code-inline-writer
-	   #:def-web-link-writer #:def-file-ref-writer #:def-header-ref-writer #:def-symbol-ref-writer
-	   #:def-function-ref-writer #:def-type-ref-writer #:def-code-block-writer #:def-code-example-writer
-	   #:def-defclass-writer #:def-defconstant-writer #:def-defgeneric-writer
-	   #:def-define-compiler-macro-writer #:def-define-condition-writer
-	   #:def-define-method-combination-writer #:def-define-modify-macro-writer
-	   #:def-define-setf-expander-writer #:def-define-symbol-macro-writer #:def-defmacro-writer
-	   #:def-defmethod-writer #:def-defpackage-writer #:def-defparameter-writer #:def-defsetf-writer
-	   #:def-defstruct-writer #:def-deftype-writer #:def-defun-writer #:def-defvar-writer
-	   #:def-get-file-extension-writer #:def-file-header-writer #:def-file-foot-writer
-	   #:def-system-files-writer #:style-maker-api-header #:style-maker-helper-header
+	   #:header #:subheader #:subsubheader #:text #:table #:cell #:itemize #:enumerate #:item
+	   #:table-of-contents #:mini-table-of-contents #:table-of-functions #:table-of-symbols #:table-of-types
+	   #:image #:bold #:italic #:bold-italic #:code-inline #:web-link #:header-ref #:symbol-ref
+	   #:function-ref #:type-ref #:tagged-code #:code-ref #:code-comment #:code-hide #:code-block #:code
+	   #:verbatim-code-block #:code-example #:defclass-definition #:defconstant-definition
+	   #:defgeneric-definition #:define-compiler-macro-definition #:define-condition-definition
+	   #:define-method-combination-definition #:define-modify-macro-definition
+	   #:define-setf-expander-definition #:define-symbol-macro-definition #:defmacro-definition
+	   #:defmethod-definition #:defpackage-definition #:defparameter-definition #:defsetf-definition
+	   #:defstruct-definition #:deftype-definition #:defun-definition #:defvar-definition #:project
+
+	   #:define-style-parameter #:define-header-writer #:define-subheader-writer #:define-subsubheader-writer
+	   #:define-escape-text #:define-text-writer #:define-table-writer #:define-itemize-writer
+	   #:define-image-writer #:define-bold-writer #:define-italic-writer #:define-bold-italic-writer
+	   #:define-code-inline-writer #:define-web-link-writer #:define-file-ref-writer
+	   #:define-header-ref-writer #:define-symbol-ref-writer #:define-function-ref-writer
+	   #:define-type-ref-writer #:define-code-block-writer #:define-code-example-writer
+	   #:define-defclass-writer #:define-defconstant-writer #:define-defgeneric-writer
+	   #:define-define-compiler-macro-writer #:define-define-condition-writer
+	   #:define-define-method-combination-writer #:define-define-modify-macro-writer
+	   #:define-define-setf-expander-writer #:define-define-symbol-macro-writer #:define-defmacro-writer
+	   #:define-defmethod-writer #:define-defpackage-writer #:define-defparameter-writer
+	   #:define-defsetf-writer #:define-defstruct-writer #:define-deftype-writer #:define-defun-writer
+	   #:define-defvar-writer #:define-file-extension #:def-file-head-writer #:define-file-foot-writer
+	   #:def-system-files-writer
 
 	   #:defclass-class-name #:defclass-superclass-names #:defclass-slot-specifiers #:defclass-slot-names
 	   #:defclass-slot-options #:defclass-reader-function-names #:defclass-writer-function-names
@@ -94,5 +105,4 @@
 	   #:with-define-setf-expander-components #:with-define-symbol-macro-components
 	   #:with-defmacro-components #:with-defmethod-components #:with-defpackage-components
 	   #:with-defparameter-components #:with-defsetf-components #:with-defstruct-components
-	   #:with-deftype-components #:with-defun-components #:with-defvar-components #:custom-prin1
-	   #:*custom-pprint-dispatch*))
+	   #:with-deftype-components #:with-defun-components #:with-defvar-components))

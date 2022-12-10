@@ -12,6 +12,7 @@
 			     (:file "file")
 			     (:file "project")
 			     (:file "tag-table")
+			     (:file "pprint-dispatch")
 			     (:file "writer")
 			     (:file "parameter")
 			     (:file "core")
@@ -25,14 +26,21 @@
   :license "The Unlicense"
   :depends-on (:alexandria :hyperspec)
   :components ((:file "package")
-	       (:file "adp-core")
-	       (:file "adp")
-	       (:file "adp-writers")
-	       (:file "helper-style-functions")
-	       (:file "readme")
+	       (:module "src"
+		:components ((:file "error")
+			     (:file "element")
+			     (:file "file")
+			     (:file "project")
+			     (:file "tag-table")
+			     (:file "pprint-dispatch")
+			     (:file "writer")
+			     (:file "parameter")
+			     (:file "core")
+			     (:file "adp")
+			     (:file "helper-style-functions")))
+	       (:file "README")
 	       (:module "guides"
-		:components ((:file "user-guide")
-			     (:file "style-maker-guide")))))
+		:components ((:file "user-guide")))))
 
 
 ;; ----- ADP styles -----

@@ -500,77 +500,13 @@
 
 
 ;; code
-(defun shortest-string (strings)
-  (loop for str in strings
-	for shortest = str then (if (< (length str) (length shortest))
-				    str
-				    shortest)
-	finally (return shortest)))
-
-(defun make-custom-symbol-pprint-function (hide-symbol hide-str)
-  "Return a custom pprint function to print symbols."
-  (declare (type symbol hide-symbol) (type string hide-str))
-  (lambda (stream sym)
-    (if (eq sym hide-symbol)
-	(format stream hide-str)
-	(let* ((sym-package (symbol-package sym))
-	       (nickname (and sym-package
-			      (shortest-string (package-nicknames sym-package))))
-	       (print-package-mode (and sym-package
-					(not (equal sym-package (find-package "CL")))
-					(case (nth-value 1 (find-symbol (symbol-name sym) sym-package))
-					  (:external :external)
-					  (:internal (if (or (boundp sym) (fboundp sym))
-							 :internal
-							 nil))
-					  (t nil))))
-	       (package-to-print (and print-package-mode
-				      (or nickname
-					  (and (keywordp sym) "")
-					  (package-name sym-package))))
-	       (*print-escape* nil))
-	  (case print-package-mode
-	    (:external (format stream "~a:~a" package-to-print (symbol-name sym)))
-	    (:internal (format stream "~a::~a" package-to-print (symbol-name sym)))
-	    (t (format stream "~a" (symbol-name sym))))))))
-
-(defun comment-pprint (stream code-comment)
-  "Custom pprint function to print code comments."
-  (declare (type stream stream))
-  (format stream ";; ~a" (cadr code-comment)))
-
-(defun make-custom-pprint-dispatch (hide-symbol hide-str comment-symbol)
-  (let ((custom-pprint-dispatch (copy-pprint-dispatch)))    
-    (set-pprint-dispatch '(cons (member adp:defclass)) (pprint-dispatch '(defclass)) 0 custom-pprint-dispatch)
-    (set-pprint-dispatch '(cons (member adp:defconstant)) (pprint-dispatch '(defconstant)) 0 custom-pprint-dispatch)
-    (set-pprint-dispatch '(cons (member adp:defgeneric)) (pprint-dispatch '(defgeneric)) 0 custom-pprint-dispatch)
-    (set-pprint-dispatch '(cons (member adp:define-compiler-macro)) (pprint-dispatch '(define-compiler-macro)) 0 custom-pprint-dispatch)
-    (set-pprint-dispatch '(cons (member adp:define-condition)) (pprint-dispatch '(define-condition)) 0 custom-pprint-dispatch)
-    (set-pprint-dispatch '(cons (member adp:define-method-combination)) (pprint-dispatch '(define-method-combination)) 0 custom-pprint-dispatch)
-    (set-pprint-dispatch '(cons (member adp:define-modify-macro)) (pprint-dispatch '(define-modify-macro)) 0 custom-pprint-dispatch)
-    (set-pprint-dispatch '(cons (member adp:define-setf-expander)) (pprint-dispatch '(define-setf-expander)) 0 custom-pprint-dispatch)
-    (set-pprint-dispatch '(cons (member adp:define-symbol-macro)) (pprint-dispatch '(define-symbol-macro)) 0 custom-pprint-dispatch)
-    (set-pprint-dispatch '(cons (member adp:defmacro)) (pprint-dispatch '(defmacro)) 0 custom-pprint-dispatch)
-    (set-pprint-dispatch '(cons (member adp:defmethod)) (pprint-dispatch '(defmethod)) 0 custom-pprint-dispatch)
-    (set-pprint-dispatch '(cons (member adp:defpackage)) (pprint-dispatch '(defpackage)) 0 custom-pprint-dispatch)
-    (set-pprint-dispatch '(cons (member adp:defparameter)) (pprint-dispatch '(defparameter)) 0 custom-pprint-dispatch)
-    (set-pprint-dispatch '(cons (member adp:defsetf)) (pprint-dispatch '(defsetf)) 0 custom-pprint-dispatch)
-    (set-pprint-dispatch '(cons (member adp:defstruct)) (pprint-dispatch '(defstruct)) 0 custom-pprint-dispatch)
-    (set-pprint-dispatch '(cons (member adp:deftype)) (pprint-dispatch '(deftype)) 0 custom-pprint-dispatch)
-    (set-pprint-dispatch '(cons (member adp:defun)) (pprint-dispatch '(defun)) 0 custom-pprint-dispatch)
-    (set-pprint-dispatch '(cons (member adp:defvar)) (pprint-dispatch '(defvar)) 0 custom-pprint-dispatch)
-    (set-pprint-dispatch 'symbol (make-custom-symbol-pprint-function hide-symbol hide-str) 0 custom-pprint-dispatch)
-    (set-pprint-dispatch `(cons (member ,comment-symbol)) #'comment-pprint 0 custom-pprint-dispatch)
-    (values custom-pprint-dispatch)))
-
 (defun code-to-string (code)
   "Turn a code element into a string."
   (declare (type code code))
-  (with-slots (expr hide-symbol comment-symbol) code
-    (let ((custom-pprint-dispatch (make-custom-pprint-dispatch hide-symbol "..." comment-symbol)))
-      (let ((*print-pprint-dispatch* custom-pprint-dispatch))
-	(with-output-to-string (stream)
-	  (prin1 expr stream))))))
+  (with-slots (expr) code
+    (let ((*print-pprint-dispatch* *adp-pprint-dispatch*))
+      (with-output-to-string (stream)
+	(prin1 expr stream)))))
 
 (defmethod element-print ((element code-block) stream)
   (with-slots (code-type code-elements) element
