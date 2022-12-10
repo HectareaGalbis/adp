@@ -38,7 +38,7 @@
 
 (defun add-code-tag (tag code)
   "Associate a tag with a piece of code."
-  (delcare (type symbol tag) (type code code))
+  (declare (type symbol tag) (type code code))
   (tag-table-push-element *code-tags* tag code))
 
 
@@ -68,20 +68,21 @@
 (defmethod check-subelements ((element element))
   (values))
 
-(defmethod check-subelements ((element (or text cell)))
-  (with-slots (text-elements) element
-    (loop for text-element in text-elements
-	  when (and (typep text-element 'element)
-		    (not (typep text-element 'web-link)))
-	    do (if (typep text-element 'text-enrichment)
-		   (check-subelements text-element)
-		   (error 'text-subelement-error :text element :subelement text-element)))))
 
-(defmethod check-subelements ((element text-type))
+
+(defmethod check-subelements ((element text-subelement))
   (with-slots (text-elements) element
-    (loop for text-element in text-elements
-	  when (typep text-element 'element)
-	    do (error 'text-subelement-error :text element :subelement text-element))))
+    (loop for text-subelement in text-elements
+	  when (typep text-subelement 'element)
+	    do (error 'text-subelement-error :text element :subelement text-subelement))))
+
+(defmethod check-subelements ((element text-element))
+  (with-slots (text-elements) element
+    (loop for text-subelement in text-elements
+	  when (typep text-subelement 'element)
+	    do (if (typep text-subelement 'text-subelement)
+		   (check-subelements text-subelement)
+		   (error 'text-subelement-error :text element :subelement text-subelement)))))
 
 (defmethod check-subelements ((element table))
   (with-slots (rows) element
@@ -176,6 +177,24 @@
 ;; ----- project-print -----
 ;; -------------------------
 
+(defun warn-unused-header-tags ()
+  (let ((unused-headers (tag-table-unused-elements *header-tags*)))
+    (loop for unused-header in unused-headers
+	  do (with-slots (tag source-location) (aref unused-header 0)
+	       (warn "ADP warning: The header tag ~s defined at '~a' is never used."
+		     tag source-location)))))
+
+(defun warn-unused-code-tags ()
+  (let ((unused-code-elements (tag-table-unused-elements *code-tags*)))
+    (loop for unused-code-elements in unused-code-elements
+	  do (let* ((unused-elements-list (coerce unused-code-elements 'list))
+		    (unused-elements-paths (remove-duplicates (mapcar (lambda (code-element)
+									(slot-value code-element 'source-location))
+								      unused-elements-list))))
+	       (with-slots (tag) (aref unused-code-elements 0)
+		 (warn "ADP warning: The code tag ~s defined at ~{~#[~;'~a'~;'~a' and '~a'~:;'~a', ~]~} is never used."
+		       tag unused-elements-paths))))))
+
 (defun project-print (project)
   "Generate a project documentation."
   (declare (type project project))
@@ -183,8 +202,10 @@
     (when *general-files-writer*
       (funcall *general-files-writer* root-directory))
     (loop for file across files
-	  do (format "Printing file '~a'.~%" (relative-truename (slot-value file 'path)))
-	     (file-print file))))
+	  do (format t "Printing file '~a'.~%" (relative-truename (slot-value file 'path)))
+	     (file-print file)))
+  (warn-unused-header-tags)
+  (warn-unused-code-tags))
 
 
 ;; -------------------------
@@ -220,14 +241,13 @@
 					(if (typep text-element 'element)
 					    (with-output-to-string (str-stream)
 					      (element-print text-element str-stream))
-					    (when *excape-text*
+					    (when *escape-text*
 					      (funcall *escape-text* text-element))))
 				      text-elements)))
       (apply #'concatenate 'string processed-elements))))
 
 (defmethod element-print ((element text) stream)
-  (let ((text-elements (slot-value element 'text-elements)))
-    (funcall *text-writer* stream (text-type-to-string element))))
+  (funcall *text-writer* stream (text-type-to-string element)))
 
 ;; text enrichment
 (defmethod element-print ((element bold) stream)
@@ -245,7 +265,7 @@
 ;; text reference
 (defmethod element-print ((element header-ref) stream)
   (with-slots (tag) element
-    (multiple-value-bind (associated-elements element-found-p) (tag-table-find-elements *header-tags* tag)
+    (multiple-value-bind (associated-elements element-found-p) (tag-table-find-elements-using-tag *header-tags* tag)
       (if element-found-p
 	  (with-slots (file-location title) (aref associated-elements 0)
 	    (funcall *header-ref-writer* stream tag title file-location))
@@ -286,9 +306,10 @@
 
 ;; table
 (defmethod element-print ((element table) stream)
-  (let ((processed-table (loop for row in rows
-			       collect (mapcar #'text-type-to-string row))))
-    (funcall *table-writer* stream processed-table)))
+  (with-slots (rows) element
+    (let ((processed-table (loop for row in rows
+				 collect (mapcar #'text-type-to-string row))))
+      (funcall *table-writer* stream processed-table))))
 
 ;; itemize
 (defgeneric process-itemize (element)
@@ -316,17 +337,17 @@
 (defun file-headers (file)
   "Return the header-type elements of a file."
   (declare (type file file))
-  (let ((headers (make-array 10 :adjustable t :fill-pointer 0 :element-type 'header-type)))
+  (let ((headers (make-array 10 :adjustable t :fill-pointer 0)))
     (with-slots (elements) file
-      (loop for element across element
+      (loop for element across elements
 	    when (typep element 'header-type)
-	      do (vector-push-extent element headers)))
+	      do (vector-push-extend element headers)))
     (values headers)))
 
 (defun project-headers (project)
   "Return the header-type elements of a project."
   (declare (type project project))
-  (let ((headers (make-array 10 :adjustable t :fill-pointer 0 :element-type 'header-type)))
+  (let ((headers (make-array 10 :adjustable t :fill-pointer 0)))
     (with-slots (files) project
       (loop for file across files
 	    do (let ((file-headers (file-headers file)))
@@ -346,7 +367,7 @@
 
 (defun make-toc-deep-levels (headers)
   "Return a vector of deepness levels the headers must have in a table of contents."
-  (declare (type (vector element) header))
+  (declare (type (vector element) headers))
   (let ((deep-levels (make-array 100 :adjustable t :fill-pointer 0 :element-type 'unsigned-byte)))
     (loop for header across headers
 	  for prev-min-deep-level = 2 then next-min-deep-level
@@ -367,7 +388,7 @@
 
 (defun make-itemize-toc (source-element headers)
   (with-slots (source-location) source-element
-    (let* ((deep-levels (create-toc-deep-levels headers))
+    (let* ((deep-levels (make-toc-deep-levels headers))
 	   (total-deep-levels (length deep-levels))
 	   (index 0))
       (labels ((make-itemize-toc-aux (current-level)
@@ -487,6 +508,8 @@
 	finally (return shortest)))
 
 (defun make-custom-symbol-pprint-function (hide-symbol hide-str)
+  "Return a custom pprint function to print symbols."
+  (declare (type symbol hide-symbol) (type string hide-str))
   (lambda (stream sym)
     (if (eq sym hide-symbol)
 	(format stream hide-str)
@@ -505,19 +528,19 @@
 				      (or nickname
 					  (and (keywordp sym) "")
 					  (package-name sym-package))))
-	       (*print-escape* nil)
-	       (*print-pprint-dispatch* normal-pprint-dispatch))
+	       (*print-escape* nil))
 	  (case print-package-mode
 	    (:external (format stream "~a:~a" package-to-print (symbol-name sym)))
 	    (:internal (format stream "~a::~a" package-to-print (symbol-name sym)))
 	    (t (format stream "~a" (symbol-name sym))))))))
 
 (defun comment-pprint (stream code-comment)
+  "Custom pprint function to print code comments."
+  (declare (type stream stream))
   (format stream ";; ~a" (cadr code-comment)))
 
 (defun make-custom-pprint-dispatch (hide-symbol hide-str comment-symbol)
-  (let ((normal-pprint-dispatch *print-pprint-dispatch*)
-	(custom-pprint-dispatch (copy-pprint-dispatch)))    
+  (let ((custom-pprint-dispatch (copy-pprint-dispatch)))    
     (set-pprint-dispatch '(cons (member adp:defclass)) (pprint-dispatch '(defclass)) 0 custom-pprint-dispatch)
     (set-pprint-dispatch '(cons (member adp:defconstant)) (pprint-dispatch '(defconstant)) 0 custom-pprint-dispatch)
     (set-pprint-dispatch '(cons (member adp:defgeneric)) (pprint-dispatch '(defgeneric)) 0 custom-pprint-dispatch)
@@ -537,29 +560,30 @@
     (set-pprint-dispatch '(cons (member adp:defun)) (pprint-dispatch '(defun)) 0 custom-pprint-dispatch)
     (set-pprint-dispatch '(cons (member adp:defvar)) (pprint-dispatch '(defvar)) 0 custom-pprint-dispatch)
     (set-pprint-dispatch 'symbol (make-custom-symbol-pprint-function hide-symbol hide-str) 0 custom-pprint-dispatch)
-    (set-pprint-dispatch `(cons (member ,comment-symbol)) #'comment-pprint 0 custom-pprint-dispatch)))
+    (set-pprint-dispatch `(cons (member ,comment-symbol)) #'comment-pprint 0 custom-pprint-dispatch)
+    (values custom-pprint-dispatch)))
 
 (defun code-to-string (code)
   "Turn a code element into a string."
   (declare (type code code))
   (with-slots (expr hide-symbol comment-symbol) code
-    (let ((custom-pprint-dispatch (make-custom-pprint-dispatch hide-symbol hide-str comment-symbol)))
+    (let ((custom-pprint-dispatch (make-custom-pprint-dispatch hide-symbol "..." comment-symbol)))
       (let ((*print-pprint-dispatch* custom-pprint-dispatch))
 	(with-output-to-string (stream)
 	  (prin1 expr stream))))))
 
 (defmethod element-print ((element code-block) stream)
   (with-slots (code-type code-elements) element
-    (let ((complete-code-elements (mapcan (lambda (code-or-ref)
-					    (if (typep code-or-ref 'code-reference)
-						(with-slots (tag) code-or-ref
-						  (multiple-value-bind (tag-code-elements tag-foundp) (tag-table-find-elements *code-tags* tag)
-						    (if tag-foundp
-							(coerce tag-code-elements 'list)
-							(error 'tag-not-defined-error :source-element element :tag tag))))
-						(list code-or-ref)))
-					  code-elements))
-	  (code-string (format nil "~{~a~^~%~%~}" (mapcar #'code-to-string complete-code-elements))))
+    (let* ((complete-code-elements (mapcan (lambda (code-or-ref)
+					     (if (typep code-or-ref 'code-ref)
+						 (with-slots (tag) code-or-ref
+						   (multiple-value-bind (tag-code-elements tag-foundp) (tag-table-find-elements-using-tag *code-tags* tag)
+						     (if tag-foundp
+							 (coerce tag-code-elements 'list)
+							 (error 'tag-not-defined-error :source-element element :tag tag))))
+						 (list code-or-ref)))
+					   code-elements))
+	   (code-string (format nil "~{~a~^~%~%~}" (mapcar #'code-to-string complete-code-elements))))
       (funcall *code-block-writer* stream code-type code-string))))
 
 (defmethod element-print ((element verbatim-code-block) stream)
@@ -567,9 +591,9 @@
     (funcall *code-block-writer* stream code-type code-text)))
 
 (defmethod element-print ((element code-example) stream)
-  (with-slots (code output result) element
+  (with-slots (code-elements output result) element
     (let ((code-string (format nil "~{~a~^~%~%~}" (mapcar #'code-to-string code-elements))))
-      (funcall *code-example-writer* stream code output result))))
+      (funcall *code-example-writer* stream code-string output result))))
 
 ;; definition
 (defmacro define-definition-element-print (type writer)

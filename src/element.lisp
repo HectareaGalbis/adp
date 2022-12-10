@@ -49,55 +49,59 @@
   (:documentation
    "Represents a text type element."))
 
-(defclass text (element) ()
+(defclass text-subelement (text-type) ()
+  (:documentation
+   "Represent a text subelement."))
+
+(defclass text-element (text-type) ()
+  (:documentation
+   "Represent a top level text element."))
+
+(defclass text (text-element) ()
   (:documentation
    "Represents a text element."))
 
 
 ;; ----- text enrichment -----
 
-(defclass text-enrichment (text-type) ()
-  (:documentation
-   "Represent a text enrichment element."))
-
-(defclass bold (text-enrichment) ()
+(defclass bold (text-subelement) ()
   (:documentation
    "Represent a bold element."))
 
-(defclass italic (text-enrichment) ()
+(defclass italic (text-subelement) ()
   (:documentation
    "Represent a italic element."))
 
-(defclass bold-italic (text-enrichment) ()
+(defclass bold-italic (text-subelement) ()
   (:documentation
    "Represent a bold and italic element."))
 
-(defclass code-inline (text-enrichment) ()
+(defclass code-inline (text-subelement) ()
   (:documentation
    "Represent a code inline element."))
 
 
 ;; ----- text reference -----
 
-(defclass header-ref (tagged-element)
+(defclass header-ref (tagged-element text-subelement)
   ((header-tags :type tag-table))
   (:documentation
    "Represent a header reference element."))
 
 
-(defclass symbol-ref (tagged-element)
+(defclass symbol-ref (tagged-element text-subelement)
   ((symbol-tags :type tag-table))
   (:documentation
    "Represent a symbol reference element."))
 
 
-(defclass function-ref (tagged-element)
+(defclass function-ref (tagged-element text-subelement)
   ((function-tags :type tag-table))
   (:documentation
    "Represent a function reference element."))
 
 
-(defclass type-ref (tagged-element)
+(defclass type-ref (tagged-element text-subelement)
   ((type-tags :type tag-table))
   (:documentation
    "Represent a type reference element."))
@@ -105,7 +109,7 @@
 
 ;; ----- web link -----
 
-(defclass web-link (element)
+(defclass web-link (text-subelement)
   ((text :initarg :text
 	 :type string)
    (address :initarg :address
@@ -125,7 +129,7 @@
 
 ;; ----- table -----
 
-(defclass cell (text-type) ()
+(defclass cell (text-element) ()
   (:documentation
    "Represent a cell table element."))
 
@@ -138,7 +142,7 @@
 
 ;; ----- itemize -----
 
-(defclass item (text-type) ()
+(defclass item (text-element) ()
   (:documentation
    "Represents an item element."))
 
@@ -189,10 +193,10 @@
 
 (defclass code (element)
   ((expr :initarg :expr)
-   (hide-symbol :initform '#:hide
+   (hide-symbol :initarg :hide-symbol
 		:allocation :class
 		:type symbol)
-   (comment-symbol :initform '#:comment-symbol
+   (comment-symbol :initarg :comment-symbol
 		   :allocation :class
 		   :type symbol))
   (:documentation

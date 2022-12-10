@@ -13,8 +13,8 @@
 (cl:defmacro define-header-macro (name)
   (let ((macro-doc (format nil "Add a ~a with name str. Also, if tag is not nil but a symbol, a new header-tag is created."
 			   (string-downcase (symbol-name name)))))
-    (with-gensyms (str tag fixed-tag current-file)
-      `(cl:defmacro ,name (,str &option ,tag)
+    (with-gensyms (str tag fixed-tag)
+      `(cl:defmacro ,name (,str &optional ,tag)
 	 ,macro-doc
 	 (when *adp*
 	   (check-type ,str string "a string")
@@ -80,7 +80,7 @@ You can use the following macros to enrich your cell text: bold, italic, bold-it
 		    :source-location (relative-truename *project*))))
 
 
-(eval-when (:compile-toplevel :eval-toplevel :execute)
+(eval-when (:compile-toplevel :load-toplevel :execute)
 
   (cl:defun process-itemize (itemize-form)
     (case (car itemize-form)
@@ -94,7 +94,7 @@ You can use the following macros to enrich your cell text: bold, italic, bold-it
 				 :source-location (relative-truename *project*))))))
 
 
-(cl:defmacro itemize (&whole itemize-form &rest items)
+(cl:defmacro itemize (&whole itemize-form)
   "Add a list of items. Each argument must be a list. Each list must start with the symbol item, itemize or enumerate. If 
 item is used, the rest of the elements in that list will be treated as if using the macro text. If itemize or enumerate is used the rest 
 of elements must be lists that must start with item, itemize or enumerate. In other words, when itemize or enumerate is used 
@@ -105,7 +105,7 @@ a nested list is added. A certain symbol will be printed before each element of 
        (values))))
 
 
-(cl:defmacro enumerate (&whole enumerate-form &rest items)
+(cl:defmacro enumerate (&whole enumerate-form)
   "Same as itemize, but a number is printed before each element."
   (when *adp*
     `(progn
@@ -138,7 +138,7 @@ files are shown in the same order the files are loaded."
   "Add an ordered list of all functions and macros defined using ADP."
   (when *adp*
     '(progn
-      (adppvt:addp-element (make-instance 'table-of-functions
+      (adppvt:add-element (make-instance 'table-of-functions
 			    :name "table-of-functions"
 			    :source-location (relative-truename *project*)))
       (values))))
@@ -184,7 +184,7 @@ where the image is located."
        ,docstring
        (when *adp*
 	 `(make-instance ',',name
-			 :name ,(string-downcase (symbol-name name))
+			 :name ,(string-downcase ,(symbol-name name))
 			 :text-elements (list ,@,args)
 			 :source-location (relative-truename *project*))))))
 
@@ -210,17 +210,16 @@ where the image is located."
 		    :source-location (relative-truename *project*))))
 
 
-(defmacro define-reference-macro (name docstring)
-  (with-gensyms (tag header-tags)
-    (let ((tag-table-key (intern (symbol-name name) "KEYWORD")))
-      `(cl:defmacro ,name (,tag)
-	 ,docstring
-	 (when *adp*
-	   (check-type ,tag symbol "a symbol")
-	   `(make-instance ',',name
-			   :name ,,(string-downcase (symbol-name name))
-			   :tag ,,tag
-			   :source-location (relative-truename *project*)))))))
+(cl:defmacro define-reference-macro (name docstring)
+  (with-gensyms (tag)
+    `(cl:defmacro ,name (,tag)
+       ,docstring
+       (when *adp*
+	 (check-type ,tag symbol "a symbol")
+	 `(make-instance ',',name
+			 :name ,,(string-downcase (symbol-name name))
+			 :tag ,,tag
+			 :source-location (relative-truename *project*))))))
 
 (define-reference-macro header-ref
   "Add a reference to a header when using the macros text, table or itemize. The argument is a symbol denoting a header-tag.
@@ -238,6 +237,67 @@ defined with adp:defgeneric, adp:define-modify-macro, adp:defmacro or adp:defun.
   "Add a reference to a type symbol when using the macros text, table or itemize. The argument is a symbol denoting a type
 defined with adp:defclass, adp:define-condition, adp:defstruct or adp:deftype.")
 
+
+(cl:defvar *hide-symbol* '#:hide)
+(cl:defvar *comment-symbol* '#:comment)
+
+(cl:defun plistp (code)
+  "Check if an expression is a proper list."
+  (or (null code)
+      (and (consp code)
+	   (plistp (cdr code)))))
+
+(cl:defun remove-code-tag (expr)
+  "Remove the forms recognized by code-tag."
+  (labels ((remove-code-tag-exprs-aux (code)
+	     (if (plistp code)
+		 (cond
+		   ((member (car code) '(code-hide code-remove))
+		    (mapcan #'remove-code-tag-exprs-aux (cddr code)))
+		   ((eq (car code) 'code-tag)
+		    (list code))
+		   ((member (car code) '(code-quote code-comment))
+		    nil)
+		   (t
+		    (list (mapcan #'remove-code-tag-exprs-aux code))))
+		 (list code))))
+    (car (remove-code-tag-exprs-aux expr))))
+
+(cl:defun valid-tag-p (tag tags)
+  "Check if a tag is accepted by a list of tags."
+  (declare (type symbol tag) (type list tags))
+  (or (null tags)
+      (member tag tags)))
+
+(cl:defun process-code-tag (tag code)
+  "Process the forms recognized by code-tag."
+  (declare (type symbol tag))
+  (labels ((process-aux (tag code)
+	     (if (plistp code)
+		 (cond
+		   ((eq (car code) 'code-hide)
+		    (if (valid-tag-p tag (cadr code))
+			(list *hide-symbol*)
+			(loop for expr in (cddr code)
+			      append (process-aux tag expr))))
+		   ((eq (car code) 'code-remove)
+		    (if (valid-tag-p tag (cadr code))
+			nil
+			(loop for expr in (cddr code)
+			      append (process-aux tag expr))))
+		   ((eq (car code) 'code-quote)
+		    (loop for expr in (cdr code)
+			  append (process-aux tag expr)))
+		   ((eq (car code) 'code-comment)
+		    (list `(,*comment-symbol* ,(caddr code))))
+		   ((eq (car code) 'code-tag)
+		    (loop for expr in (cddr code)
+			  append (process-aux tag expr)))
+		   (t
+		    (list (loop for expr in code
+				append (process-aux tag expr)))))
+		 (list code))))
+    (car (process-aux tag code))))
 
 (cl:defmacro code-tag (tags &body exprs)
   "Assign several tags to several forms. The forms are placed into a progn form. The argument tags must be a list
@@ -264,9 +324,11 @@ the next forms: code-hide, code-remove, code-show and code-comment.
 		   do (loop for ,expr in ',exprs
 			    do (apply #'adppvt:add-code-tag *project* ,tag (make-instance 'tagged-code
 											  :name "tagged-code"
+											  :hide-symbol *hide-symbol*
+											  :comment-symbol *comment-symbol*
 											  :tag tag
-											  :expr ,expr)))))))
-     ,@(adppvt:expr-remove-own-tag-exprs exprs)))
+											  :expr (process-code-tag ,expr))))))))
+     ,@(remove-code-tag exprs)))
 
 
 (cl:defmacro code-block ((&rest tags) &body code)
@@ -341,8 +403,8 @@ the text."
 
 ;; ----- API -----
 
-(defmacro define-definition-macro (name type tag-extraction-expr docstring)
-  (let ((body (if tag-extarction-expr
+(cl:defmacro define-definition-macro (name type tag-extraction-expr docstring)
+  (let ((body (if tag-extraction-expr
 		  (car tag-extraction-expr)
 		  (gensym)))
 	(tag-extraction (if tag-extraction-expr
@@ -355,7 +417,8 @@ the text."
 	      `((adppvt:add-element *project* (make-instance ',',type
 							     :name ,,(string-downcase (symbol-name name))
 							     :expr '(,',(find-symbol (symbol-name name) "CL") ,@,body)
-							     ,@(when ,tag-extraction-expr `(:tag ,tag-extraction))
+							     ,@,(when tag-extraction-expr
+								  `'(:tag ,tag-extraction))
 							     :source-location (relative-truename *project*)))))
 	  (,(find-symbol (symbol-name ',name) "CL") ,@,body)))))
 
@@ -408,7 +471,7 @@ the text."
 	   (fixed-true-path (make-pathname :directory (cons :relative (cdr (pathname-directory true-path)))
 					   :name (pathname-name path)
 					   :type (pathname-type path))))
-      `(select-file *project* fixed-true-path))))
+      `(select-file *project* ,fixed-true-path))))
 
 
 (uiop:with-upgradability ()
@@ -428,7 +491,7 @@ the text."
     "Perform the loading of a Lisp file as associated to specified action (O . C)"
     (asdf/lisp-action:call-with-around-compile-hook
      c #'(lambda ()
-           (let ((adppvt:*add-documentation* (equal (asdf:component-system c) *doc-system*)))
+           (let ((*adp* (equal (asdf:component-system c) *doc-system*)))
 	     (when (not *already-visited*)
 	       (setf *already-visited* t)
 	       (setf *gensym-counter* 0))
@@ -450,12 +513,8 @@ the text."
     (asdf:operate 'asdf:load-source-op style-system :force t)))
 
 (cl:defun load-project (system)
-  (let* ((root-path (truename (asdf:system-source-directory system)))
-	 (fixed-root-path (make-pathname :host (pathname-host root-path)
-					 :device (pathname-device root-path)
-					 :directory (pathname-directory root-path))))
-    (format t "~%Loading the system ~s" system)
-    (asdf:operate 'load-doc-source-op system :force t)))
+  (format t "~%Loading the system ~s" system)
+  (asdf:operate 'load-doc-source-op system :force t))
 
 (cl:defun load-system (system style &rest style-args)
   "Load a system with documentation generation activated. The style must be a keyword denoting a valid style.
@@ -474,9 +533,13 @@ arguments to let the user customize briefly how documentation is printed."
     
       (adppvt:with-style-parameters style-args
 	
-	(let ((*adp* t) 
-	      (*project* (make-instance 'project :root-directiory fixed-root-path))
-	      (*gensym-counter* 0))
+	(let* ((*adp* t)
+	       (root-path (truename (asdf:system-source-directory system)))
+	       (fixed-root-path (make-pathname :host (pathname-host root-path)
+					       :device (pathname-device root-path)
+					       :directory (pathname-directory root-path)))
+	       (*project* (make-instance 'project :root-directiory fixed-root-path))
+	       (*gensym-counter* 0))
 
 	  (load-project system)
 

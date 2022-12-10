@@ -2,44 +2,60 @@
 (in-package :adppvt)
 
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
+(defstruct parameter
+  keyword
+  symbol
+  optional
+  value)
 
-  (defstruct parameter
-    keyword
-    symbol
-    optional
-    value)
+(defvar *style-parameters* nil)
 
-  (defvar *style-parameters* nil))
+(defun check-style-parameters (keys)
+  "Check if all the required keywords arguments are present. Also check if every keyword
+is supported."
+  (loop for param in *style-parameters*
+	do (when (and (not (parameter-optional param))
+		      (not (member (parameter-keyword param) keys)))
+	     (error "ADP error: The current style must receive the key argument ~s."
+		    (parameter-keyword param))))
+  (loop for key in keys
+	do (when (not (member key *style-parameters* :key #'parameter-keyword))
+	     (error "ADP error: The keyword parameter ~s is not supported by this style."
+		    key))))
 
-(defun check-style-parameters (args)
-  (let* ((not-found-sym '#:not-found))
-    (loop for param in *style-parameters*
-	  do (when (and (not (parameter-optional param))
-			(eq (getf args (parameter-keyword param) not-found-sym) not-found-sym))
-	       (error "ADP error: The current style must receive the key argument ~s."
-		      (parameter-keyword param))))))
+(defun set-style-parameter-values (args)
+  (loop for parameter in *style-parameters*
+	do (setf (symbol-value (parameter-symbol parameter))
+		 (getf args (parameter-keyword parameter) (parameter-value parameter)))))
+
+(defun unset-style-parameter-values ()
+  (loop for parameter in *style-parameters*
+	do (setf (symbol-value (parameter-symbol parameter)) (parameter-value parameter))))
 
 (defmacro with-new-style-parameter-list (&body body)
   `(let ((*style-parameters* nil))
      ,@body))
 
 (defmacro with-style-parameters (args &body body)
-  (let ((let-parameter-bindings (mapcar (lambda (param)
-					  `(,(parameter-symbol param) (getf ,args ,(paramter-keyword param) ,(parameter-value param))))
-					*style-parameters*))
-	(param-symbols (mapcar #'parameter-symbol *style-parameters*)))
-    `(let ,let-parameter-bindings
-       (check-style-parameters ',param-symbols)
-       ,@body)))
+  (with-gensyms (keys key)
+    `(let ((,keys (loop for ,key in ,args by #'cddr
+			collect ,key)))
+       (unwind-protect
+	    (progn
+	      (check-style-parameters ,keys)
+	      (set-style-parameter-values ,args)
+	      ,@body)
+	 (unset-style-parameter-values)))))
 
 (defmacro define-style-parameter (name &key (value nil) (key nil) (required nil))
   (check-type name symbol "a symbol")
   (check-type key (or null keyword) "a keyword")
   (check-type required boolean)
-  (push (make-parameter :keyword (or key (intern (symbol-name name) "KEYWORD"))
-			:symbol name
-			:value value
-			:optional (not required))
-	*style-parameters*)
-  `(defparameter ,name ,value))
+  
+  `(progn
+     (push (make-parameter :keyword (or key (intern (symbol-name name) "KEYWORD"))
+			   :symbol name
+			   :value value
+			   :optional (not required))
+	   *style-parameters*)
+     (defparameter ,name ,value)))

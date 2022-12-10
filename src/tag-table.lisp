@@ -35,6 +35,24 @@
 (define-tag-table *type-tags*)
 (define-tag-table *code-tags*)
 
+
+(defun tag-table-tags (tag-table)
+  "Return the list of tags from a tag-table."
+  (declare (type tag-table tag-table))
+  (with-slots (table) tag-table
+    (loop for tag being the hash-key of table
+	  collect tag)))
+
+
+(defun tag-table-unused-elements (tag-table)
+  "Return the list of unused elements."
+  (declare (type tag-table tag-table))
+  (with-slots (table) tag-table
+    (loop for element being the hash-value of table
+	  if (not (table-element-used element))
+	    collect (table-element-elements element))))
+
+
 (defun tag-table-tag-p (tag-table tag)
   "Check if a tag is present in the tag-table."
   (declare (type tag-table tag-table) (type symbol tag))
@@ -68,7 +86,7 @@ present, return nil."
 	   (values (table-element-elements possible-element) foundp)))))
 
 
-(defun tag-table-element-using-tag (tag-table tag)
+(defun tag-table-find-elements-using-tag (tag-table tag)
   "Retrieve the elements associated with a tag and mark the tag as used. If the tag is not present, return nil."
   (declare (type tag-table tag-table) (type symbol tag))
   (with-slots (table) tag-table
@@ -76,5 +94,5 @@ present, return nil."
       (and foundp
 	   (progn
 	     (setf (table-element-used possible-element) t)
-	     (table-element-eleemnts posible-element))))))
+	     (values (table-element-elements possible-element) foundp))))))
 

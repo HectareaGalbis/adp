@@ -5,20 +5,22 @@
   (:shadow #:defclass #:defconstant #:defgeneric #:define-compiler-macro #:define-condition
 	   #:define-method-combination #:define-modify-macro #:define-setf-expander #:define-symbol-macro
 	   #:defmacro #:defmethod #:defpackage #:defparameter #:defsetf #:defstruct #:deftype #:defun #:defvar)
-  (:export #:header #:subheader #:subsubheader #:text #:table #:cell #:itemize #:enumerate #:item #:image #:bold
-	   #:italic #:bold-italic #:code-inline #:web-link #:file-ref #:header-ref #:symbol-ref #:function-ref
-	   #:type-ref #:code-tag #:code-block #:verbatim-code-block #:code-example #:defclass #:defconstant
-	   #:defgeneric #:define-compiler-macro #:define-condition #:define-method-combination
-	   #:define-modify-macro #:define-setf-expander #:define-symbol-macro #:defmacro #:defmethod
-	   #:defpackage #:defparameter #:defsetf #:defstruct #:deftype #:defun #:defvar #:write-in-file
-	   #:load-documentation-system #:cl-ref #:table-of-contents #:mini-table-of-contents #:table-of-functions
-	   #:table-of-symbols #:table-of-types))
+  (:export #:header #:subheader #:subsubheader #:text #:table #:cell #:itemize #:enumerate #:item
+	   #:table-of-contents #:mini-table-of-contents #:table-of-functions #:table-of-symbols #:table-of-types
+	   #:image #:bold #:italic #:bold-italic #:code-inline #:web-link #:file-ref #:header-ref #:symbol-ref
+	   #:function-ref #:type-ref #:code-tag #:code-quote #:code-comment #:code-hide #:code-remove
+	   #:code-block #:verbatim-code-block #:code-example #:defclass #:defconstant #:defgeneric
+	   #:define-compiler-macro #:define-condition #:define-method-combination #:define-modify-macro
+	   #:define-setf-expander #:define-symbol-macro #:defmacro #:defmethod #:defpackage #:defparameter
+	   #:defsetf #:defstruct #:deftype #:defun #:defvar #:in-file #:load-system #:cl-ref))
 
 
 (defpackage #:adp-private
   (:use #:cl #:alexandria)
   (:nicknames #:adppvt)
-  (:export 
+  (:export #:add-element #:project-print #:add-code-tag #:with-special-writers #:check-special-writers
+	   #:with-new-style-parameter-list #:with-style-parameters 
+	   
 
 	   #:def-style-parameter #:def-header-writer #:def-subheader-writer #:def-subsubheader-writer
 	   #:def-escape-text-writer #:def-text-writer #:def-table-writer #:def-itemize-writer #:def-image-writer
