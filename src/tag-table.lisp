@@ -25,7 +25,8 @@
        ,@body)))
 
 (defmacro define-tag-table (name)
-  (push name *tag-tables*)
+  (when (not (boundp name))
+    (push name *tag-tables*))
   `(defvar ,name nil))
 
 

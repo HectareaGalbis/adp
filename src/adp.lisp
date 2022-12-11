@@ -19,8 +19,8 @@
       `(progn
 	 (adppvt:add-element *project* (make-instance 'adppvt:header
 						      :name "header"
-						      :tag ,fixed-tag
-						      :source-location (relative-truename *project*)))
+						      :tag ',fixed-tag
+						      :source-location (adppvt:relative-truename *project*)))
 	 (values)))))
 
 
@@ -32,8 +32,8 @@
       `(progn
 	 (adppvt:add-element *project* (make-instance 'adppvt:subheader
 						      :name "header"
-						      :tag ,fixed-tag
-						      :source-location (relative-truename *project*)))
+						      :tag ',fixed-tag
+						      :source-location (adppvt:relative-truename *project*)))
 	 (values)))))
 
 
@@ -44,7 +44,7 @@
 							:name "defmacro"
 							:expr '(cl:defmacro ,@defmacro-body)
 							:tag ',(car defmacro-body)
-							:source-location (relative-truename *project*)))))
+							:source-location (adppvt:relative-truename *project*)))))
      (cl:defmacro ,@defmacro-body)))
 
 
@@ -55,18 +55,17 @@
 							:name "defun"
 							:expr '(cl:defun ,@defun-body)
 							:tag ',(car defun-body)
-							:source-location (relative-truename *project*)))))
+							:source-location (adppvt:relative-truename *project*)))))
      (cl:defun ,@defun-body)))
 
 
 (cl:defmacro adv-in-file (path)
   (when *adp*
     (check-type path pathname)
-    (let* ((true-path (truename path))
-	   (fixed-true-path (make-pathname :directory (cons :relative (cdr (pathname-directory true-path)))
+    (let* ((fixed-path (make-pathname :directory (cons :relative (cdr (pathname-directory path)))
 					   :name (pathname-name path)
 					   :type (pathname-type path))))
-      `(select-file *project* ,fixed-true-path))))
+      `(adppvt:select-file *project* ,fixed-path))))
 
 
 ;; ----- ADP interface -----
@@ -80,7 +79,7 @@
 
 (adv-subheader "Literate programming functions")
 
-(cl:defmacro define-header-macro (name)
+(cl:defmacro define-header-macro (name type)
   (let ((macro-doc (format nil "Add a ~a with name str. Also, if tag is not nil but a symbol, a new header-tag is created."
 			   (string-downcase (symbol-name name)))))
     (with-gensyms (str tag fixed-tag)
@@ -91,16 +90,16 @@
 	   (check-type ,tag (or null symbol) "a symbol or nil")
 	   (let ((,fixed-tag (or ,tag (gensym))))
 	     `(progn
-		(adppvt:add-element *project* (make-instance ',',name
+		(adppvt:add-element *project* (make-instance ',',type
 							     :name ,,(string-downcase (symbol-name name))
-							     :tag ,,fixed-tag
+							     :tag ',,fixed-tag
 							     :title ,,str
-							     :source-location (relative-truename *project*)))
+							     :source-location (adppvt:relative-truename *project*)))
 		(values))))))))
 
-(define-header-macro header)
-(define-header-macro subheader)
-(define-header-macro subsubheader)
+(define-header-macro header adppvt:header)
+(define-header-macro subheader adppvt:subheader)
+(define-header-macro subsubheader adppvt:subsubheader)
 
 
 (adv-defmacro text (&rest objects)
@@ -111,7 +110,7 @@ You can use the following macros to enrich your text: bold, italic, bold-italic,
        (adppvt:add-element *project* (make-instance 'adppvt:text
 						    :name "text"
 						    :text-elements (list ,@objects)
-						    :source-location (relative-truename *project*)))
+						    :source-location (adppvt:relative-truename *project*)))
        (values))))
 
 
@@ -121,8 +120,8 @@ You can use the following macros to enrich your cell text: bold, italic, bold-it
   (when *adp*
     `(make-instance 'adppvt:cell
 		    :name "cell"
-		    :text-element (list ,@objects)
-		    :source-location (relative-truename *project*))))
+		    :text-elements (list ,@objects)
+		    :source-location (adppvt:relative-truename *project*))))
 
 
 (adv-defmacro table (&rest rows)
@@ -135,9 +134,9 @@ You can use the following macros to enrich your cell text: bold, italic, bold-it
     `(progn
        (adppvt:add-element *project* (make-instance 'adppvt:table
 						    :name "table"
-						    :rows ,@(loop for row in rows
-								  collect (cons 'list row))
-						    :source-location (relative-truename *project*)))
+						    :rows (list ,@(loop for row in rows
+									collect (cons 'list row)))
+						    :source-location (adppvt:relative-truename *project*)))
        (values))))
 
 
@@ -148,7 +147,7 @@ You can use the following macros to enrich your cell text: bold, italic, bold-it
     `(make-instance 'adppvt:item
 		    :name "item"
 		    :text-elements (list ,@items)
-		    :source-location (relative-truename *project*))))
+		    :source-location (adppvt:relative-truename *project*))))
 
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -158,14 +157,15 @@ You can use the following macros to enrich your cell text: bold, italic, bold-it
       (itemize   `(make-instance 'adppvt:itemize
 				 :name "itemize"
 				 :elements (list ,@(mapcar #'process-itemize (cdr itemize-form)))
-				 :source-location (relative-truename *project*)))
+				 :source-location (adppvt:relative-truename *project*)))
       (enumerate `(make-instance 'adppvt:enumerate
 				 :name "enumerate"
 				 :elements (list ,@(mapcar #'process-itemize (cdr itemize-form)))
-				 :source-location (relative-truename *project*))))))
+				 :source-location (adppvt:relative-truename *project*))))))
 
 
-(adv-defmacro itemize (&whole itemize-form)
+(adv-defmacro itemize (&whole itemize-form &rest items)
+  (declare (ignore items))
   "Add a list of items. Each argument must be a list. Each list must start with the symbol item, itemize or enumerate. If 
 item is used, the rest of the elements in that list will be treated as if using the macro text. If itemize or enumerate is used the rest 
 of elements must be lists that must start with item, itemize or enumerate. In other words, when itemize or enumerate is used 
@@ -176,7 +176,8 @@ a nested list is added. A certain symbol will be printed before each element of 
        (values))))
 
 
-(adv-defmacro enumerate (&whole enumerate-form)
+(adv-defmacro enumerate (&whole enumerate-form &rest items)
+  (declare (ignore items))
   "Same as itemize, but a number is printed before each element."
   (when *adp*
     `(progn
@@ -191,7 +192,7 @@ files are shown in the same order the files are loaded."
     `(progn
        (adppvt:add-element (make-instance 'adppvt:table-of-contents
 					  :name "table-of-contents"
-					  :source-location (relative-truename *project*)))
+					  :source-location (adppvt:relative-truename *project*)))
        (values))))
 
 
@@ -201,7 +202,7 @@ files are shown in the same order the files are loaded."
     `(progn
        (adppvt:add-element (make-instance 'adppvt:mini-table-of-contents
 					  :name "mini-table-of-contents"
-					  :source-location (relative-truename *project*)))
+					  :source-location (adppvt:relative-truename *project*)))
        (values))))
 
 
@@ -211,7 +212,7 @@ files are shown in the same order the files are loaded."
     `(progn
        (adppvt:add-element (make-instance 'adppvt:table-of-functions
 					  :name "table-of-functions"
-					  :source-location (relative-truename *project*)))
+					  :source-location (adppvt:relative-truename *project*)))
        (values))))
 
 
@@ -221,7 +222,7 @@ files are shown in the same order the files are loaded."
     `(progn
        (adppvt:add-element (make-instance 'adppvt:table-of-symbols
 					  :name "table-of-symbols"
-					  :source-location (relative-truename *project*)))
+					  :source-location (adppvt:relative-truename *project*)))
        (values))))
 
 
@@ -231,7 +232,7 @@ files are shown in the same order the files are loaded."
     `(progn
        (adppvt:add-element (make-instance 'adppvt:table-of-types
 					  :name "table-of-types"
-					  :source-location (relative-truename *project*)))
+					  :source-location (adppvt:relative-truename *project*)))
        (values))))
 
 
@@ -245,7 +246,7 @@ where the image is located."
        (adppvt:add-element *project* (make-instance 'adppvt:image
 						    :name "image"
 						    :path ,path
-						    :source-location (relative-truename *project*)))
+						    :source-location (adppvt:relative-truename *project*)))
        (values))))
 
 
@@ -257,7 +258,7 @@ where the image is located."
 	 `(make-instance ',',type
 			 :name ,(string-downcase ,(symbol-name name))
 			 :text-elements (list ,@,args)
-			 :source-location (relative-truename *project*))))))
+			 :source-location (adppvt:relative-truename *project*))))))
 
 (define-text-enrichment-macro bold adppvt:bold
   "Add bold style to text. Each argument is princ-ed and concatenated into a string.")
@@ -278,7 +279,7 @@ where the image is located."
 		    :name "web-link"
 		    :text ,name
 		    :address ,link
-		    :source-location (relative-truename *project*))))
+		    :source-location (adppvt:relative-truename *project*))))
 
 
 (cl:defmacro define-reference-macro (name type docstring)
@@ -289,8 +290,8 @@ where the image is located."
 	 (check-type ,tag symbol "a symbol")
 	 `(make-instance ',',type
 			 :name ,,(string-downcase (symbol-name name))
-			 :tag ,,tag
-			 :source-location (relative-truename *project*))))))
+			 :tag ',,tag
+			 :source-location (adppvt:relative-truename *project*))))))
 
 (define-reference-macro header-ref adppvt:header-ref
   "Add a reference to a header when using the macros text, table or itemize. The argument is a symbol denoting a header-tag.
@@ -415,12 +416,12 @@ the code assigned to that tag is printed instead of the symbol."
 									     collect (make-instance 'adppvt:code-ref
 												    :name "code-ref"
 												    :tag ,expr
-												    :source-location (relative-truename *project*))
+												    :source-location (adppvt:relative-truename *project*))
 									   else
 									     collect (make-instance 'adppvt:code
 												    :name "code"
 												    :expr ,expr
-												    :source-location (relative-truename *project*)))))
+												    :source-location (adppvt:relative-truename *project*)))))
 	 (values)))))
 
 
@@ -438,7 +439,7 @@ the text."
 						      :name "verbatim-code-block"
 						      :code-type ,true-lang
 						      :code-text ,true-text
-						      :source-location (relative-truename *project*)))
+						      :source-location (adppvt:relative-truename *project*)))
 	 (values)))))
 
 
@@ -457,11 +458,11 @@ the text."
 										 (make-instance 'adppvt:code
 												:name "code"
 												:expr ,expr
-												:source-location (relative-truename *project*)))
+												:source-location (adppvt:relative-truename *project*)))
 									       ,code)
 							:output ,output
 							:result ,result
-							:source-location (relative-truename *project*)))
+							:source-location (adppvt:relative-truename *project*)))
 	   (values)))))
 
 
@@ -484,8 +485,8 @@ the text."
 							     :name ,,(string-downcase (symbol-name name))
 							     :expr '(,',(find-symbol (symbol-name name) "CL") ,@,body)
 							     ,@,(when tag-extraction-expr
-								  `'(:tag ,tag-extraction))
-							     :source-location (relative-truename *project*)))))
+								  ``(:tag ',,tag-extraction))
+							     :source-location (adppvt:relative-truename *project*)))))
 	  (,(find-symbol (symbol-name ',name) "CL") ,@,body)))))
 
 (define-definition-macro defclass adppvt:defclass-definition (body (car body))
@@ -534,12 +535,12 @@ the text."
 
 (adv-defmacro in-file (path)
   (when *adp*
+    (print "Hola adp")
     (check-type path pathname)
-    (let* ((true-path (truename path))
-	   (fixed-true-path (make-pathname :directory (cons :relative (cdr (pathname-directory true-path)))
+    (let* ((fixed-path (make-pathname :directory (cons :relative (cdr (pathname-directory path)))
 					   :name (pathname-name path)
 					   :type (pathname-type path))))
-      `(select-file *project* ,fixed-true-path))))
+      `(adppvt:select-file *project* ,fixed-path))))
 
 
 (uiop:with-upgradability ()
@@ -559,7 +560,7 @@ the text."
     "Perform the loading of a Lisp file as associated to specified action (O . C)"
     (asdf/lisp-action:call-with-around-compile-hook
      c #'(lambda ()
-           (let ((*adp* (equal (asdf:component-system c) *doc-system*)))
+           (let ((*adp* t))
 	     (when (not *already-visited*)
 	       (setf *already-visited* t)
 	       (setf *gensym-counter* 0))
@@ -601,19 +602,21 @@ arguments to let the user customize briefly how documentation is printed."
     
       (adppvt:with-style-parameters style-args
 	
-	(let* ((*adp* t)
-	       (root-path (truename (asdf:system-source-directory system)))
-	       (fixed-root-path (make-pathname :host (pathname-host root-path)
-					       :device (pathname-device root-path)
-					       :directory (pathname-directory root-path)))
-	       (*project* (make-instance 'adppvt:project :root-directory fixed-root-path))
-	       (*gensym-counter* 0))
+	(adppvt:with-tag-tables
 
-	  (load-project system)
+	  (let* ((*adp* t)
+		 (root-path (truename (asdf:system-source-directory system)))
+		 (fixed-root-path (make-pathname :host (pathname-host root-path)
+						 :device (pathname-device root-path)
+						 :directory (pathname-directory root-path)))
+		 (*project* (make-instance 'adppvt:project :root-directory fixed-root-path))
+		 (*gensym-counter* 0))
 
-	  (format t "~%Writing documentation")
-	  (adppvt:project-print *project*)
-	  (format t "~%~a" "Done!")))))
+	    (load-project system)
+
+	    (format t "~%Writing documentation")
+	    (adppvt:project-print *project*)
+	    (format t "~%~a" "Done!"))))))
 
   (values))
 

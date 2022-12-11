@@ -41,14 +41,13 @@
 
 (subheader "Documentation")
 
-(itemize (:item "The ADP guide: " (header-ref user-guide-header))
-	 (:item "The ADP api: " (header-ref user-api-header))
-	 (:item "The Style-Maker guide: " (header-ref style-maker-guide-header))
-	 (:item "The Style-Maker api: " (header-ref adppvt:style-maker-api-header))
-	 (:item "Style-maker helper functions: " (header-ref adppvt:style-maker-helper-header)))
+(itemize (item "The ADP guide: " (header-ref user-guide-header))
+	 (item "The ADP api: " (header-ref user-api-header))
+	 (item "The Style-Maker guide: " (header-ref style-maker-guide-header))
+	 (item "The Style-Maker api: " (header-ref adpsm:style-maker-api-header)))
 
 
 (subheader "Available styles")
 
-(table ((:cell "Keyword name") (:cell "File type") (:cell "Extra dependencies") (:cell "Authors"))
-       ((:cell ":github-md") (:cell (code-inline "md")) (:cell nil) (:cell (web-link "Héctor Galbis Sanchis" "https://github.com/Hectarea1996"))))
+(table ((cell "Keyword name") (cell "File type")        (cell "Extra dependencies") (cell "Authors"))
+       ((cell ":github-md")   (cell (code-inline "md")) (cell nil)                  (cell (web-link "Héctor Galbis Sanchis" "https://github.com/Hectarea1996"))))

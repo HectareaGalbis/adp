@@ -24,10 +24,10 @@
 (defun select-file (project path)
   (with-slots (root-directory) project
     (let* ((complete-path (merge-pathnames path root-directory))
-	   (file (or (project-find-file project path)
-		    (let ((new-file (make-instance 'file :path complete-path)))
-		      (project-add-file project new-file)
-		      new-file))))
+	   (file (or (print (project-find-file project path))
+		     (let ((new-file (make-instance 'file :path complete-path)))
+		       (project-add-file project new-file)
+		       new-file))))
       (with-slots (current-file) project
 	(setf current-file file)))))
 
@@ -165,12 +165,12 @@
     (let ((complete-path (merge-pathnames path (make-pathname :type (funcall *file-extension*)))))
       (ensure-directories-exist complete-path :verbose nil)
       (with-open-file (stream complete-path :direction :output :if-does-not-exist :create :if-exists :supersede)
-	(when *file-head-writer*
-	  (funcall *file-head-writer* stream))
+	(when *begin-file-writer*
+	  (funcall *begin-file-writer* stream))
 	(loop for element in elements
 	      do (element-print element stream))
-	(when *file-foot-writer*
-	  (funcall *file-foot-writer* stream))))))
+	(when *end-file-writer*
+	  (funcall *end-file-writer* stream))))))
 
 
 ;; -------------------------
@@ -199,11 +199,14 @@
   "Generate a project documentation."
   (declare (type project project))
   (with-slots (files root-directory) project
-    (when *general-files-writer*
-      (funcall *general-files-writer* root-directory))
+    (when *begin-project-writer*
+      (funcall *begin-project-writer* root-directory))
+    (print files)
     (loop for file across files
-	  do (format t "Printing file '~a'.~%" (relative-truename (slot-value file 'path)))
-	     (file-print file)))
+	  do (format t "Printing file '~a'.~%" (relative-truename project (slot-value file 'path)))
+	     (file-print file))
+    (when *end-project-writer*
+      (funcall *end-project-writer* root-directory)))
   (warn-unused-header-tags)
   (warn-unused-code-tags))
 

@@ -17,7 +17,7 @@
 			     (:file "parameter")
 			     (:file "core")
 			     (:file "adp")
-			     (:file "helper-style-functions")))))
+			     (:file "style-maker")))))
 
 
 (asdf:defsystem #:adp/doc
@@ -37,7 +37,7 @@
 			     (:file "parameter")
 			     (:file "core")
 			     (:file "adp")
-			     (:file "helper-style-functions")))
+			     (:file "style-maker")))
 	       (:file "README")
 	       (:module "guides"
 		:components ((:file "user-guide")))))

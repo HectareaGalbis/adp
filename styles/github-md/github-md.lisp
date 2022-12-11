@@ -40,30 +40,30 @@
 
 ;; ----- guide functions -----
 
-(adppvt:define-header-writer (stream text tag)
+(adpsm:define-header-writer (stream text tag)
   (declare (ignore tag))
   (format stream "# ~a~%~%" (escape-characters text)))
 
-(adppvt:define-subheader-writer (stream text tag)
+(adpsm:define-subheader-writer (stream text tag)
   (declare (ignore tag))
   (format stream "## ~a~%~%" (escape-characters text)))
 
-(adppvt:define-subsubheader-writer (stream text tag)
+(adpsm:define-subsubheader-writer (stream text tag)
   (declare (ignore tag))
   (format stream "### ~a~%~%" (escape-characters text)))
 
-(adppvt:define-escape-text (text)
+(adpsm:define-escape-text (text)
   (escape-characters text))
 
-(adppvt:define-text-writer (stream text)
+(adpsm:define-text-writer (stream text)
   (format stream "~a~%~%" text))
 
-(adppvt:define-table-writer (stream table)
+(adpsm:define-table-writer (stream table)
   (format stream "~{| ~a ~}|~%" (car table))
   (format stream "~v@{| --- ~}|~%" (length (car table)) nil)
   (format stream "~{~{| ~a ~}|~%~}~%~%" (cdr table)))
 
-(adppvt:define-itemize-writer (stream items)
+(adpsm:define-itemize-writer (stream items)
   (labels ((digits (n)
 	     (if (< n 10)
 		 1
@@ -80,30 +80,30 @@
 												      (+ indent-space 2))))))))
     (itemize-aux (cdr items) (eq (car items) :enumerate) 0)))
 
-(adppvt:define-image-writer (stream alt-text rel-image-path)
+(adpsm:define-image-writer (stream alt-text rel-image-path)
   (format stream "![~a](/~a)~%~%" (escape-characters alt-text) rel-image-path))
 
-(adppvt:define-bold-writer (stream text)
+(adpsm:define-bold-writer (stream text)
   (format stream "**~a**" (escape-characters text)))
 
-(adppvt:define-italic-writer (stream text)
+(adpsm:define-italic-writer (stream text)
   (format stream "_~a_" (escape-characters text)))
 
-(adppvt:define-bold-italic-writer (stream text)
+(adpsm:define-bold-italic-writer (stream text)
   (format stream "***~a***" (escape-characters text)))
 
-(adppvt:define-code-inline-writer (stream text)
+(adpsm:define-code-inline-writer (stream text)
   (let ((*print-pretty* nil))
     (format stream "`~a`" (escape-characters text))))
 
-(adppvt:define-web-link-writer (stream name link)
+(adpsm:define-web-link-writer (stream name link)
   (format stream "[~a](~a)" (escape-characters name) link))
 
-(adppvt:define-header-ref-writer (stream tag header-text file-path)
+(adpsm:define-header-ref-writer (stream tag header-text file-path)
   (declare (ignore tag))
   (format stream "[~a](/~a.md#~a)" (escape-characters header-text) file-path (convert-to-github-header-anchor header-text)))
 
-(adppvt:define-symbol-ref-writer (stream tag file-path)
+(adpsm:define-symbol-ref-writer (stream tag file-path)
   (let* ((symbol-header (cond
 			  ((symbol-macro-p tag)
 			   (format nil "Symbol macro: ~a" (escape-characters (princ-to-string tag))))
@@ -111,10 +111,10 @@
 			   (format nil "Constant: ~a" (escape-characters (princ-to-string tag))))
 			  (t (format nil "Variable: ~a" (escape-characters (princ-to-string tag))))))
 	 (symbol-anchor (convert-to-github-header-anchor symbol-header))
-	 (*print-pprint-dispatch* adppvt:*adp-pprint-dispatch*))
+	 (*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
     (format stream "[~a](/~a.md#~a)" (escape-characters (prin1-to-string tag)) file-path symbol-anchor)))
 
-(adppvt:define-function-ref-writer (stream tag file-path)
+(adpsm:define-function-ref-writer (stream tag file-path)
   (let* ((function-header (cond
 			    ((macro-function tag)
 			     (format nil "Macro: ~a" (escape-characters (princ-to-string tag))))
@@ -122,10 +122,10 @@
 			     (format nil "Generic function: ~a" (escape-characters (princ-to-string tag))))
 			    (t (format nil "Function: ~a" (escape-characters (princ-to-string tag))))))
 	 (function-anchor (convert-to-github-header-anchor function-header))
-	 (*print-pprint-dispatch* adppvt:*adp-pprint-dispatch*))
+	 (*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
     (format stream "[~a](/~a.md#~a)" (escape-characters (prin1-to-string tag)) file-path function-anchor)))
 
-(adppvt:define-type-ref-writer (stream tag file-path)
+(adpsm:define-type-ref-writer (stream tag file-path)
   (let* ((type-header (cond
 			((subtypep tag 'condition)
 			 (format nil "Condition: ~a" (escape-characters (princ-to-string tag))))
@@ -135,172 +135,160 @@
 			 (format nil "Class: ~a" (escape-characters (princ-to-string tag))))
 			(t (format nil "Type: ~a" (escape-characters (princ-to-string tag))))))
 	 (type-anchor (convert-to-github-header-anchor type-header))
-	 (*print-pprint-dispatch* adppvt:*adp-pprint-dispatch*))
+	 (*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
     (format stream "[~a](/~a.md#~a)" (escape-characters (prin1-to-string tag)) file-path type-anchor)))
 
-(adppvt:define-code-block-writer (stream lang text-code)
+(adpsm:define-code-block-writer (stream lang text-code)
   (format stream "```~@[~a~]~%~a~%```~%~%" lang text-code))
 
-(adppvt:define-code-example-writer (stream text-code output results)
+(adpsm:define-code-example-writer (stream text-code output results)
   (format stream "```Lisp~%~a~%~a~{~%~s~}~%```~%~%" text-code output results))
 
 
 ;; ----- api functions -----
 
-(adppvt:define-defclass-writer (stream source tag)
-  (declare (ignore tag))
-  (adppvt:with-defclass-components ((class-name superclass-names slot-specifiers documentation default-initargs metaclass) source)
+(adpsm:define-defclass-writer (stream source)
+  (adpsm:with-defclass-components ((class-name superclass-names slot-specifiers documentation default-initargs metaclass) source)
     (format stream "#### Class: ~a~%~%" (escape-characters (princ-to-string class-name)))
-    (let ((*print-pprint-dispatch* adppvt:*adp-pprint-dispatch*))
+    (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defclass ~s ~s~%  ~s~@[~%  (:default-initargs~{ ~s~})~]~[~%  (:metaclass ~s)~])~%```~%~%"
 	      class-name superclass-names slot-specifiers default-initargs metaclass documentation))
     (when documentation
       (format stream "````~%~a~%````~%~%" (escape-characters documentation)))))
 
-(adppvt:define-defconstant-writer (stream source tag)
-  (declare (ignore tag))
-  (adppvt:with-defconstant-components ((name initial-value documentation) source)
+(adpsm:define-defconstant-writer (stream source)
+  (adpsm:with-defconstant-components ((name initial-value documentation) source)
     (format stream "#### Constant: ~a~%~%" (escape-characters (princ-to-string name)))
-    (let ((*print-pprint-dispatch* adppvt:*adp-pprint-dispatch*))
+    (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defconstant ~s ~s)~%```~%~%" name initial-value))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adppvt:define-defgeneric-writer (stream source tag)
-  (declare (ignore tag))
-  (adppvt:with-defgeneric-components ((function-name gf-lambda-list documentation) source)
+(adpsm:define-defgeneric-writer (stream source)
+  (adpsm:with-defgeneric-components ((function-name gf-lambda-list documentation) source)
     (format stream "#### Generic function: ~a~%~%" (escape-characters (princ-to-string function-name)))
-    (let ((*print-pprint-dispatch* adppvt:*adp-pprint-dispatch*))
+    (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defgeneric ~s ~s~%  ...)~%```~%~%" function-name gf-lambda-list))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adppvt:define-define-compiler-macro-writer (stream source)
-  (adppvt:with-define-compiler-macro-components ((name documentation) source)
+(adpsm:define-define-compiler-macro-writer (stream source)
+  (adpsm:with-define-compiler-macro-components ((name documentation) source)
     (format stream "#### Compiler macro: ~a~%~%" (escape-characters (princ-to-string name)))
-    (let ((*print-pprint-dispatch* adppvt:*adp-pprint-dispatch*))
+    (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(define-compiler-macro ~s~%  ...)~%```~%~%" name))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adppvt:define-define-condition-writer (stream source tag)
-  (declare (ignore tag))
-  (adppvt:with-define-condition-components ((name parent-types slot-specs default-initargs report-name documentation) source)
+(adpsm:define-define-condition-writer (stream source)
+  (adpsm:with-define-condition-components ((name parent-types slot-specs default-initargs report-name documentation) source)
     (format stream "#### Condition: ~a~%~%" (escape-characters (princ-to-string name)))
-    (let ((*print-pprint-dispatch* adppvt:*adp-pprint-dispatch*))
+    (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defcondition ~s ~s~%  ~s~@[~%  (:default-initargs~{ ~s~})~]~@[~%  (:report ~s)~])~%```~%~%"
 	      name parent-types slot-specs default-initargs report-name))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adppvt:define-define-method-combination-writer (stream source)
-  (adppvt:with-define-method-combination-components ((name documentation) source)
+(adpsm:define-define-method-combination-writer (stream source)
+  (adpsm:with-define-method-combination-components ((name documentation) source)
     (format stream "#### Method combination: ~a~%~%" (escape-characters (princ-to-string name)))
-    (let ((*print-pprint-dispatch* adppvt:*adp-pprint-dispatch*))
+    (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(define-method-combination ~s~%  ...)~%```~%~%" name))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adppvt:define-define-modify-macro-writer (stream source tag)
-  (declare (ignore tag))
-  (adppvt:with-define-modify-macro-components ((name lambda-list function documentation) source)
+(adpsm:define-define-modify-macro-writer (stream source)
+  (adpsm:with-define-modify-macro-components ((name lambda-list function documentation) source)
     (format stream "#### Macro: ~a~%~%" (escape-characters (princ-to-string name)))
-    (let ((*print-pprint-dispatch* adppvt:*adp-pprint-dispatch*))
+    (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(define-modify-macro ~s ~s ~s)~%```~%~%" name lambda-list function))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adppvt:define-define-setf-expander-writer (stream source)
-  (adppvt:with-define-setf-expander-components ((access-fn lambda-list documentation) source)
+(adpsm:define-define-setf-expander-writer (stream source)
+  (adpsm:with-define-setf-expander-components ((access-fn lambda-list documentation) source)
     (format stream "#### Setf expander: ~a~%~%" (escape-characters (princ-to-string access-fn)))
-    (let ((*print-pprint-dispatch* adppvt:*adp-pprint-dispatch*))
+    (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(define-setf-expander ~s ~s~%  ...)~%```~%~%" access-fn lambda-list))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adppvt:define-define-symbol-macro-writer (stream source tag)
-  (declare (ignore tag))
-  (adppvt:with-define-symbol-macro-components ((symbol expansion) source)
+(adpsm:define-define-symbol-macro-writer (stream source)
+  (adpsm:with-define-symbol-macro-components ((symbol expansion) source)
     (format stream "#### Symbol macro: ~a~%~%" (escape-characters (princ-to-string symbol)))
-    (let ((*print-pprint-dispatch* adppvt:*adp-pprint-dispatch*))
+    (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(define-symbol-macro ~s ~s)~%```~%~%" symbol expansion))))
 
-(adppvt:define-defmacro-writer (stream source tag)
-  (declare (ignore tag))
-  (adppvt:with-defmacro-components ((name lambda-list documentation) source)
+(adpsm:define-defmacro-writer (stream source)
+  (adpsm:with-defmacro-components ((name lambda-list documentation) source)
     (format stream "#### Macro: ~a~%~%" (escape-characters (princ-to-string name)))
-    (let ((*print-pprint-dispatch* adppvt:*adp-pprint-dispatch*))
+    (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defmacro ~s ~s~%  ...)~%```~%~%" name lambda-list))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adppvt:define-defmethod-writer (stream source)
-  (adppvt:with-defmethod-components ((function-name method-qualifiers specialized-lambda-list documentation) source)
+(adpsm:define-defmethod-writer (stream source)
+  (adpsm:with-defmethod-components ((function-name method-qualifiers specialized-lambda-list documentation) source)
     (format stream "#### Method: ~a~%~%" (escape-characters (princ-to-string function-name)))
-    (let ((*print-pprint-dispatch* adppvt:*adp-pprint-dispatch*))
+    (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defmethod ~s~{ ~s~} ~s~%  ...)~%```~%~%" function-name method-qualifiers specialized-lambda-list))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adppvt:define-defpackage-writer (stream source)
-  (adppvt:with-defpackage-components ((defined-package-name nicknames use-package-names documentation) source)
+(adpsm:define-defpackage-writer (stream source)
+  (adpsm:with-defpackage-components ((defined-package-name nicknames use-package-names documentation) source)
     (format stream "#### Package: ~a~%~%" (escape-characters (princ-to-string defined-package-name)))
-    (let ((*print-pprint-dispatch* adppvt:*adp-pprint-dispatch*))
+    (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defpackage ~s~@[~%  (:nicknames~{ ~s~})~]~@[~%  (:use~{ ~s~})~]~%  ...)~%```~%~%"
 	      defined-package-name nicknames use-package-names))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adppvt:define-defparameter-writer (stream source tag)
-  (declare (ignore tag))
-  (adppvt:with-defparameter-components ((name initial-value documentation) source)
+(adpsm:define-defparameter-writer (stream source)
+  (adpsm:with-defparameter-components ((name initial-value documentation) source)
     (format stream "#### Variable: ~a~%~%" (escape-characters (princ-to-string name)))
-    (let ((*print-pprint-dispatch* adppvt:*adp-pprint-dispatch*))
+    (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defparameter ~s ~s)~%```~%~%"
 	      name initial-value))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adppvt:define-defsetf-writer (stream source)
-  (adppvt:with-defsetf-components ((access-fn update-fn documentation) source)
+(adpsm:define-defsetf-writer (stream source)
+  (adpsm:with-defsetf-components ((access-fn update-fn documentation) source)
     (format stream "#### Defsetf: ~a~%~%" (escape-characters (princ-to-string access-fn)))
-    (let ((*print-pprint-dispatch* adppvt:*adp-pprint-dispatch*))
+    (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defsetf ~s ~s)" access-fn update-fn))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adppvt:define-defstruct-writer (stream source tag)
-  (declare (ignore tag))
-  (adppvt:with-defstruct-components ((structure-name name-and-options slot-descriptions documentation) source)
+(adpsm:define-defstruct-writer (stream source)
+  (adpsm:with-defstruct-components ((structure-name name-and-options slot-descriptions documentation) source)
     (format stream "#### Struct: ~a~%~%" (escape-characters (princ-to-string structure-name)))
-    (let ((*print-pprint-dispatch* adppvt:*adp-pprint-dispatch*))
+    (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defstruct ~s~%  ~s)~%```~%~%" name-and-options slot-descriptions))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adppvt:define-deftype-writer (stream source tag)
-  (declare (ignore tag))
-  (adppvt:with-deftype-components ((name lambda-list documentation) source)
+(adpsm:define-deftype-writer (stream source)
+  (adpsm:with-deftype-components ((name lambda-list documentation) source)
     (format stream "#### Type: ~a~%~%" (escape-characters (princ-to-string name)))
-    (let ((*print-pprint-dispatch* adppvt:*adp-pprint-dispatch*))
+    (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(deftype ~s ~s~%  ...)~%```~%~%" name lambda-list))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adppvt:define-defun-writer (stream source tag)
-  (declare (ignore tag))
-  (adppvt:with-defun-components ((function-name lambda-list documentation) source)
+(adpsm:define-defun-writer (stream source)
+  (adpsm:with-defun-components ((function-name lambda-list documentation) source)
     (format stream "#### Function: ~a~%~%" (escape-characters (princ-to-string function-name)))
-    (let ((*print-pprint-dispatch* adppvt:*adp-pprint-dispatch*))
+    (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defun ~s ~s~%  ...)~%```~%~%" function-name lambda-list))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adppvt:define-defvar-writer (stream source tag)
-  (declare (ignore tag))
-  (adppvt:with-defvar-components ((name initial-value documentation) source)
+(adpsm:define-defvar-writer (stream source)
+  (adpsm:with-defvar-components ((name initial-value documentation) source)
     (format stream "#### Variable: ~a~%~%" (escape-characters (princ-to-string name)))
-    (let ((*print-pprint-dispatch* adppvt:*adp-pprint-dispatch*))
+    (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defvar ~s~@[ ~s~])~%```~%~%" name initial-value))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
@@ -308,5 +296,5 @@
 
 ;; ----- file functions -----
 
-(adppvt:define-file-extension ()
+(adpsm:define-file-extension ()
   "md")

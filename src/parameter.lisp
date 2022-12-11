@@ -50,12 +50,11 @@ is supported."
 (defmacro define-style-parameter (name &key (value nil) (key nil) (required nil))
   (check-type name symbol "a symbol")
   (check-type key (or null keyword) "a keyword")
-  (check-type required boolean)
-  
+  (check-type required boolean)  
   `(progn
-     (push (make-parameter :keyword (or key (intern (symbol-name name) "KEYWORD"))
-			   :symbol name
-			   :value value
-			   :optional (not required))
+     (push (make-parameter :keyword ,(or key (intern (symbol-name name) "KEYWORD"))
+			   :symbol ,name
+			   :value ,value
+			   :optional ,(not required))
 	   *style-parameters*)
      (defparameter ,name ,value)))

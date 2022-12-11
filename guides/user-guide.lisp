@@ -1,7 +1,7 @@
 
 (in-package :adp)
 
-(write-in-file #P"docs/user-guide")
+(in-file #P"docs/user-guide")
 
 (code-tag (code-user-guide-header)
   (header "The ADP User Guide" user-guide-header))
@@ -134,10 +134,10 @@
 (text "And you will see this:")
 
 (code-tag (table-example)
-  (table ((:cell "Age") (:cell "Name") (:cell "Salary"))
-	 ((:cell (get-age peter-info)) (:cell (get-name peter-info)) (:cell (get-salary peter-info) "€"))
-	 ((:cell (get-age maria-info)) (:cell (get-name maria-info)) (:cell (get-salary maria-info) "€"))
-	 ((:cell (get-age laura-info)) (:cell (get-name laura-info)) (:cell (get-salary laura-info) "€"))))
+  (table ((cell "Age") (cell "Name") (cell "Salary"))
+	 ((cell (get-age peter-info)) (cell (get-name peter-info)) (cell (get-salary peter-info) "€"))
+	 ((cell (get-age maria-info)) (cell (get-name maria-info)) (cell (get-salary maria-info) "€"))
+	 ((cell (get-age laura-info)) (cell (get-name laura-info)) (cell (get-salary laura-info) "€"))))
 
 (text "Note that in the " (italic "Salary") " column we used multiple values in each cell. Each cell can accept multiple values and they are treated as if they are in the " (function-ref text) " macro. In other words, each element in a cell is " (cl-ref princ) "-ed and the results are concatenated.")
 
@@ -152,14 +152,14 @@
 (text "You will see this:")
 
 (code-tag (list-example)
-  (itemize (:item "Vegetables:")
-	   (:itemize (:item 3 " peppers:")
-		     (:itemize (:item 1 " green pepper")
-			       (:item (- 3 1) " red pepper"))
-		     (:item 0.25 "Kg of carrots"))
-	   (:item "Fruits:")
-	   (:itemize (:item 0.5 "Kg of apples")
-		     (:item 6 " oranges"))))
+  (itemize (item "Vegetables:")
+	   (itemize (item 3 " peppers:")
+		     (itemize (item 1 " green pepper")
+			       (item (- 3 1) " red pepper"))
+		     (item 0.25 "Kg of carrots"))
+	   (item "Fruits:")
+	   (itemize (item 0.5 "Kg of apples")
+		     (item 6 " oranges"))))
 
 (text "Note that each item inside " (function-ref itemize) " is a list starting with " (code-inline :item) " or " (code-inline :itemize) ". When you use " (code-inline :item) " every object will be " (cl-ref princ) "-ed and then concatenated. In other words, it works the same as " (function-ref text) " or " (function-ref table) ". On the other hand, when using " (code-inline :itemize) " you are indicating that you want a sublist of items.")
 
@@ -246,7 +246,7 @@
 (text "I did this as well to generate the ADP documentation. If you take a look at the file " (code-inline "adp.asd") " you will see a system named " (code-inline "adp/doc") ". That system loads every file that is needed to generate all the ADP documentation. And I did that using this expression:")
 
 (code-block ()
-  (adp:load-documentation-system :adp/doc :github-md))
+  (adp:load-system :adp/doc :github-md))
 
 (text "And that's all! The documentation is ready to be read.")
 
@@ -280,21 +280,21 @@
 
 (text "These tags are symbols associated with a function, a variable or a type respectively. More specifically, the macros used to define things like " (function-ref defun) ", " (function-ref defparameter) " or " (function-ref defstruct) " can create automatically a function-tag, a symbol-tag or a type-tag respectively. The tag created is the symbol of the name of the function, variable or type defined respectively. ADP defines three types of tags because the same symbol can refer to a function, a variable and a type simultaneously. The next list shows what type of tags are defined by which macros:")
 
-(itemize (:item "Function-tags:")
-	 (:itemize (:item (function-ref defgeneric))
-		   (:item (function-ref define-modify-macro))
-		   (:item (function-ref defmacro))
-		   (:item (function-ref defun)))
-	 (:item "Symbol-tags:")
-	 (:itemize (:item (function-ref defconstant))
-		   (:item (function-ref define-symbol-macro))
-		   (:item (function-ref defparameter))
-		   (:item (function-ref defvar)))
-	 (:item "Type-tags:")
-	 (:itemize (:item (function-ref defclass))
-		   (:item (function-ref define-condition))
-		   (:item (function-ref defstruct))
-		   (:item (function-ref deftype))))
+(itemize (item "Function-tags:")
+	 (itemize (item (function-ref defgeneric))
+		   (item (function-ref define-modify-macro))
+		   (item (function-ref defmacro))
+		   (item (function-ref defun)))
+	 (item "Symbol-tags:")
+	 (itemize (item (function-ref defconstant))
+		   (item (function-ref define-symbol-macro))
+		   (item (function-ref defparameter))
+		   (item (function-ref defvar)))
+	 (item "Type-tags:")
+	 (itemize (item (function-ref defclass))
+		   (item (function-ref define-condition))
+		   (item (function-ref defstruct))
+		   (item (function-ref deftype))))
 
 (text "Same as with header-tags, we can make reference to functions, variables and types with " (function-ref function-ref) ", " (function-ref symbol-ref) " and " (function-ref type-ref) ". For example, to make a reference to an ADP macro:")
 
@@ -487,11 +487,11 @@
 
 (text "I hope this guide is useful. I usually see Common Lisp projects that looks awesome but they lack guides or even documentation. That's why I started to document all my projects and then I realized that I needed some tool to make it easier. I know that there are already other documentation generators, but none of them suits my needs. Luckily, Common Lisp makes doing this kind of tools relatively easy compared to other languages. Lastly, I want to give you some tips or ways to use ADP that I ended up doing myself.")
 
-(itemize (:item (bold-italic "Use a different system for documentation generation") ": I recommend to use a different system to indicate all the files you need to load to generate the documentation. So, if you have a system named " (code-inline :my-system) " then create another system named " (code-inline :my-system/docs) ". Although ADP will not execute anything unless you use the function " (function-ref load-documentation-system) ", I think this should make your projects cleaner. And, let's be honest, I'm still learning the language and I don't want to break other people's code. I did this separation for ADP, so you can see an example in the file " (code-inline "adp.asd") ".")
-	 (:item (bold-italic "Handling error messages") ": I tried to make informative error messages but sometimes this cannot be possible. Or, at least, I can't do it better. The most common errors I have had when using ADP were undefined variable errors. Remember that " (function-ref code-inline) " works the same as " (function-ref text) ". You can't write " (code-inline "(code-inline name-of-function)") ", you must write this instead " (code-inline "(code-inline \"name-of-function\")") " or " (code-inline "(code-inline 'name-of-function)") ". Also, be careful when using " (function-ref function-ref) " or similars. If you don't write correctly the macro, some implementations will treat that call as a function call and will treat the argument as a variable. That's not a variable that ADP or you have defined and it is sure that it will raise an undefined variable error.")
-	 (:item (bold-italic "Tags belong to a package!") ": Note that almost all the tags are actually symbols, and symbols belong to a package. If you define a tag and you want to make a reference to it from another package, remember to add the package extension to the symbol name. For example, suppose that you define the symbol-tag " (code-inline 'my-tag) " in the package " (code-inline :my-pkg) ". Then, in another package you must write " (code-inline "(symbol-ref my-pkg:my-tag)") ", or " (code-inline "(symbol-ref my-pkg::my-tag)") " if the symbol is not exported. And yes, you should export the tags you want to use in other packages.")
-	 (:item (bold-italic "Read the API") ": Maybe reading " (header-ref user-api-header) " can make you understand better how some macros work (or not). At least, you may be interested in seeing the section " (header-ref additional-functions-subheader) ".")
-	 (:item (bold-italic "That's all! Enjoy using ADP.") " I leave you with " (symbol-ref a-parameter-defined-at-the-end-of-the-file) " and " (type-ref also-a-type?) " again."))
+(itemize (item (bold-italic "Use a different system for documentation generation") ": I recommend to use a different system to indicate all the files you need to load to generate the documentation. So, if you have a system named " (code-inline :my-system) " then create another system named " (code-inline :my-system/docs) ". Although ADP will not execute anything unless you use the function " (function-ref load-documentation-system) ", I think this should make your projects cleaner. And, let's be honest, I'm still learning the language and I don't want to break other people's code. I did this separation for ADP, so you can see an example in the file " (code-inline "adp.asd") ".")
+	 (item (bold-italic "Handling error messages") ": I tried to make informative error messages but sometimes this cannot be possible. Or, at least, I can't do it better. The most common errors I have had when using ADP were undefined variable errors. Remember that " (function-ref code-inline) " works the same as " (function-ref text) ". You can't write " (code-inline "(code-inline name-of-function)") ", you must write this instead " (code-inline "(code-inline \"name-of-function\")") " or " (code-inline "(code-inline 'name-of-function)") ". Also, be careful when using " (function-ref function-ref) " or similars. If you don't write correctly the macro, some implementations will treat that call as a function call and will treat the argument as a variable. That's not a variable that ADP or you have defined and it is sure that it will raise an undefined variable error.")
+	 (item (bold-italic "Tags belong to a package!") ": Note that almost all the tags are actually symbols, and symbols belong to a package. If you define a tag and you want to make a reference to it from another package, remember to add the package extension to the symbol name. For example, suppose that you define the symbol-tag " (code-inline 'my-tag) " in the package " (code-inline :my-pkg) ". Then, in another package you must write " (code-inline "(symbol-ref my-pkg:my-tag)") ", or " (code-inline "(symbol-ref my-pkg::my-tag)") " if the symbol is not exported. And yes, you should export the tags you want to use in other packages.")
+	 (item (bold-italic "Read the API") ": Maybe reading " (header-ref user-api-header) " can make you understand better how some macros work (or not). At least, you may be interested in seeing the section " (header-ref additional-functions-subheader) ".")
+	 (item (bold-italic "That's all! Enjoy using ADP.") " I leave you with " (symbol-ref a-parameter-defined-at-the-end-of-the-file) " and " (type-ref also-a-type?) " again."))
 
 
 
