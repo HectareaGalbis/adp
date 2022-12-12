@@ -23,9 +23,8 @@
 
 (defun select-file (project path)
   (with-slots (root-directory) project
-    (let* ((complete-path (merge-pathnames path root-directory))
-	   (file (or (project-find-file project path)
-		     (let ((new-file (make-instance 'file :path complete-path)))
+    (let* ((file (or (project-find-file project path)
+		     (let ((new-file (make-instance 'file :path path)))
 		       (project-add-file project new-file)
 		       new-file))))
       (with-slots (current-file) project
@@ -156,19 +155,16 @@
 ;; ----- file-print -----
 ;; ----------------------
 
-(defun file-print (file)
+(defun file-print (file stream)
   "Create a documentation file and prints the documentation in it."
   (declare (type file file))
   (with-slots (elements path) file
-    (let ((complete-path (merge-pathnames path (make-pathname :type (funcall *file-extension*)))))
-      (ensure-directories-exist complete-path :verbose nil)
-      (with-open-file (stream complete-path :direction :output :if-does-not-exist :create :if-exists :supersede)
-	(when *begin-file-writer*
-	  (funcall *begin-file-writer* stream))
-	(loop for element across elements
-	      do (element-print element stream))
-	(when *end-file-writer*
-	  (funcall *end-file-writer* stream))))))
+    (when *begin-file-writer*
+      (funcall *begin-file-writer* stream))
+    (loop for element across elements
+	  do (element-print element stream))
+    (when *end-file-writer*
+      (funcall *end-file-writer* stream))))
 
 
 ;; -------------------------
@@ -201,8 +197,13 @@
     (when *begin-project-writer*
       (funcall *begin-project-writer* root-directory))
     (loop for file across files
-	  do (format t "Printing file '~a'.~%" (relative-truename project (slot-value file 'path)))
-	     (file-print file))
+	  do (with-slots (path) file
+	       (let ((complete-path (merge-pathnames path (make-pathname :directory (pathname-directory root-directory)
+									 :type (funcall *file-extension*)))))
+		 (ensure-directories-exist complete-path :verbose nil)
+		 (format t "Printing file '~a'.~%" path)
+		 (with-open-file (stream complete-path :direction :output :if-does-not-exist :create :if-exists :supersede)
+		   (file-print file stream)))))
     (when *end-project-writer*
       (funcall *end-project-writer* root-directory)))
   (warn-unused-header-tags)

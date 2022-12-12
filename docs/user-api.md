@@ -599,16 +599,16 @@ The next table shows which macro characters can be used and what they expand to\
 
 | Character | Macro | Example |
 | --- | --- | --- |
-| \@b | [ADP\:BOLD](//home/hectarea/quicklisp/local-projects/adp/docs/user-api.md#macro-bold) | `\\\@b\\\(\\\"This text is bold\\\"\\\)` |
-| \@i | [ADP\:ITALIC](//home/hectarea/quicklisp/local-projects/adp/docs/user-api.md#macro-italic) | `\\\@i\\\(\\\"This text is italic\\\"\\\)` |
-| \@e | [ADP\:EMPHASIS](//home/hectarea/quicklisp/local-projects/adp/docs/user-api.md#macro-emphasis) | `\\\@e\\\(\\\"This text is emphasized\\\"\\\)` |
-| \@c | [ADP\:INLINE\-CODE](//home/hectarea/quicklisp/local-projects/adp/docs/user-api.md#macro-inline-code) | `\\\@c\\\(\\\"This text is inlined\\\"\\\)` |
-| \@w | [ADP\:WEB\-LINK](//home/hectarea/quicklisp/local-projects/adp/docs/user-api.md#macro-web-link) | `\\\@w\\\(\\\"Name of link\\\" \\\"www\\\.example\\\.com\\\"\\\)` |
-| \@h | [ADP\:HEADER\-REF](//home/hectarea/quicklisp/local-projects/adp/docs/user-api.md#macro-header-ref) | `\\\@h\\\(header\\\)` |
-| \@f | [ADP\:FUNCTION\-REF](//home/hectarea/quicklisp/local-projects/adp/docs/user-api.md#macro-function-ref) | `\\\@f\\\(function\\\)` |
-| \@s | [ADP\:SYMBOL\-REF](//home/hectarea/quicklisp/local-projects/adp/docs/user-api.md#macro-symbol-ref) | `\\\@s\\\(variable\\\)` |
-| \@t | [ADP\:TYPE\-REF](//home/hectarea/quicklisp/local-projects/adp/docs/user-api.md#macro-type-ref) | `\\\@t\\\(type\\\)` |
-| \@l | [ADP\:CL\-REF](//home/hectarea/quicklisp/local-projects/adp/docs/user-api.md#macro-cl-ref) | `\\\@l\\\(princ\\\)` |
+| \@b | [ADP\:BOLD](/docs/user-api.md#macro-bold) | `\\\@b\\\(\\\"This text is bold\\\"\\\)` |
+| \@i | [ADP\:ITALIC](/docs/user-api.md#macro-italic) | `\\\@i\\\(\\\"This text is italic\\\"\\\)` |
+| \@e | [ADP\:EMPHASIS](/docs/user-api.md#macro-emphasis) | `\\\@e\\\(\\\"This text is emphasized\\\"\\\)` |
+| \@c | [ADP\:INLINE\-CODE](/docs/user-api.md#macro-inline-code) | `\\\@c\\\(\\\"This text is inlined\\\"\\\)` |
+| \@w | [ADP\:WEB\-LINK](/docs/user-api.md#macro-web-link) | `\\\@w\\\(\\\"Name of link\\\" \\\"www\\\.example\\\.com\\\"\\\)` |
+| \@h | [ADP\:HEADER\-REF](/docs/user-api.md#macro-header-ref) | `\\\@h\\\(header\\\)` |
+| \@f | [ADP\:FUNCTION\-REF](/docs/user-api.md#macro-function-ref) | `\\\@f\\\(function\\\)` |
+| \@s | [ADP\:SYMBOL\-REF](/docs/user-api.md#macro-symbol-ref) | `\\\@s\\\(variable\\\)` |
+| \@t | [ADP\:TYPE\-REF](/docs/user-api.md#macro-type-ref) | `\\\@t\\\(type\\\)` |
+| \@l | [ADP\:CL\-REF](/docs/user-api.md#macro-cl-ref) | `\\\@l\\\(princ\\\)` |
 | \@\' | `code\\\-quote` | `\\\@\\\'\\\(\\\(code \\\(not evaluated\\\)\\\)\\\)` |
 | \@\; | `code\\\-comment` | `\\\@\\\;\\\(\\\"This is a comment\\\"\\\)` |
 | \@\_ | `code\\\-remove` | `\\\@\\\_\\\(\\\(tag1 tag2\\\) \\\(code \\\(to be \\\(removed\\\)\\\)\\\)\\\)` |
