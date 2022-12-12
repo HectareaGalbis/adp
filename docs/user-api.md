@@ -5,7 +5,7 @@
 #### Macro: HEADER
 
 ```Lisp
-(defmacro ADP:HEADER (STR143 &OPTIONAL TAG144)
+(defmacro ADP:HEADER (STR145 &OPTIONAL TAG146)
   ...)
 ```
 
@@ -16,7 +16,7 @@ Add a header with name str. Also, if tag is not nil but a symbol, a new header-t
 #### Macro: SUBHEADER
 
 ```Lisp
-(defmacro ADP:SUBHEADER (STR147 &OPTIONAL TAG148)
+(defmacro ADP:SUBHEADER (STR149 &OPTIONAL TAG150)
   ...)
 ```
 
@@ -27,7 +27,7 @@ Add a subheader with name str. Also, if tag is not nil but a symbol, a new heade
 #### Macro: SUBSUBHEADER
 
 ```Lisp
-(defmacro ADP:SUBSUBHEADER (STR151 &OPTIONAL TAG152)
+(defmacro ADP:SUBSUBHEADER (STR153 &OPTIONAL TAG154)
   ...)
 ```
 
@@ -178,7 +178,7 @@ where the image is located.
 #### Macro: BOLD
 
 ```Lisp
-(defmacro ADP:BOLD (&REST ARGS155)
+(defmacro ADP:BOLD (&REST ARGS157)
   ...)
 ```
 
@@ -189,7 +189,7 @@ Add bold style to text. Each argument is princ-ed and concatenated into a string
 #### Macro: ITALIC
 
 ```Lisp
-(defmacro ADP:ITALIC (&REST ARGS156)
+(defmacro ADP:ITALIC (&REST ARGS158)
   ...)
 ```
 
@@ -200,7 +200,7 @@ Add italic style to text. Each argument is princ-ed and concatenated into a stri
 #### Macro: EMPHASIS
 
 ```Lisp
-(defmacro ADP:EMPHASIS (&REST ARGS157)
+(defmacro ADP:EMPHASIS (&REST ARGS159)
   ...)
 ```
 
@@ -211,7 +211,7 @@ Add bold and italic style to text. Each argument is princ-ed and concatenated in
 #### Macro: INLINE\-CODE
 
 ```Lisp
-(defmacro ADP:INLINE-CODE (&REST ARGS158)
+(defmacro ADP:INLINE-CODE (&REST ARGS160)
   ...)
 ```
 
@@ -233,7 +233,7 @@ Add a hyperlink. The text showed is name and link must be a valid web URL. Both 
 #### Macro: HEADER\-REF
 
 ```Lisp
-(defmacro ADP:HEADER-REF (TAG159)
+(defmacro ADP:HEADER-REF (TAG161)
   ...)
 ```
 
@@ -245,7 +245,7 @@ Only the symbols used with the macros header, subheader and subsubheader are val
 #### Macro: SYMBOL\-REF
 
 ```Lisp
-(defmacro ADP:SYMBOL-REF (TAG160)
+(defmacro ADP:SYMBOL-REF (TAG162)
   ...)
 ```
 
@@ -257,7 +257,7 @@ defined with adp:deconstant, adp:define-symbol-macro, adp:defparameter or adp:de
 #### Macro: FUNCTION\-REF
 
 ```Lisp
-(defmacro ADP:FUNCTION-REF (TAG161)
+(defmacro ADP:FUNCTION-REF (TAG163)
   ...)
 ```
 
@@ -269,7 +269,7 @@ defined with adp:defgeneric, adp:define-modify-macro, adp:defmacro or adp:defun.
 #### Macro: TYPE\-REF
 
 ```Lisp
-(defmacro ADP:TYPE-REF (TAG162)
+(defmacro ADP:TYPE-REF (TAG164)
   ...)
 ```
 
@@ -373,7 +373,7 @@ Add a defgeneric declaration. The macro expands to cl:defgeneric. Also, the gene
 #### Macro: DEFINE\-COMPILER\-MACRO
 
 ```Lisp
-(defmacro ADP:DEFINE-COMPILER-MACRO (&BODY G163)
+(defmacro ADP:DEFINE-COMPILER-MACRO (&BODY G165)
   ...)
 ```
 
@@ -395,7 +395,7 @@ Add a define-condition declaration. The macro expands to cl:define-condition. Al
 #### Macro: DEFINE\-METHOD\-COMBINATION
 
 ```Lisp
-(defmacro ADP:DEFINE-METHOD-COMBINATION (&BODY G164)
+(defmacro ADP:DEFINE-METHOD-COMBINATION (&BODY G166)
   ...)
 ```
 
@@ -417,7 +417,7 @@ Add a define-modify-macro declaration. The macro expands to cl:define-modify-mac
 #### Macro: DEFINE\-SETF\-EXPANDER
 
 ```Lisp
-(defmacro ADP:DEFINE-SETF-EXPANDER (&BODY G165)
+(defmacro ADP:DEFINE-SETF-EXPANDER (&BODY G167)
   ...)
 ```
 
@@ -450,7 +450,7 @@ Add a defmacro declaration. The macro expands to cl:defmacro. Also, the macro na
 #### Macro: DEFMETHOD
 
 ```Lisp
-(defmacro ADP:DEFMETHOD (&BODY G166)
+(defmacro ADP:DEFMETHOD (&BODY G168)
   ...)
 ```
 
@@ -461,7 +461,7 @@ Add a defmethod declaration. The macro expands to cl:defmethod.
 #### Macro: DEFPACKAGE
 
 ```Lisp
-(defmacro ADP:DEFPACKAGE (&BODY G167)
+(defmacro ADP:DEFPACKAGE (&BODY G169)
   ...)
 ```
 
@@ -483,7 +483,7 @@ Add a defparameter declaration. The macro expands to cl:defparameter. Also, the 
 #### Macro: DEFSETF
 
 ```Lisp
-(defmacro ADP:DEFSETF (&BODY G168)
+(defmacro ADP:DEFSETF (&BODY G170)
   ...)
 ```
 
@@ -599,19 +599,19 @@ The next table shows which macro characters can be used and what they expand to\
 
 | Character | Macro | Example |
 | --- | --- | --- |
-| \@b | [ADP\:BOLD](/docs/user-api.md#macro-bold) | `\\\@b\\\(\\\"This text is bold\\\"\\\)` |
-| \@i | [ADP\:ITALIC](/docs/user-api.md#macro-italic) | `\\\@i\\\(\\\"This text is italic\\\"\\\)` |
-| \@e | [ADP\:EMPHASIS](/docs/user-api.md#macro-emphasis) | `\\\@e\\\(\\\"This text is emphasized\\\"\\\)` |
-| \@c | [ADP\:INLINE\-CODE](/docs/user-api.md#macro-inline-code) | `\\\@c\\\(\\\"This text is inlined\\\"\\\)` |
-| \@w | [ADP\:WEB\-LINK](/docs/user-api.md#macro-web-link) | `\\\@w\\\(\\\"Name of link\\\" \\\"www\\\.example\\\.com\\\"\\\)` |
-| \@h | [ADP\:HEADER\-REF](/docs/user-api.md#macro-header-ref) | `\\\@h\\\(header\\\)` |
-| \@f | [ADP\:FUNCTION\-REF](/docs/user-api.md#macro-function-ref) | `\\\@f\\\(function\\\)` |
-| \@s | [ADP\:SYMBOL\-REF](/docs/user-api.md#macro-symbol-ref) | `\\\@s\\\(variable\\\)` |
-| \@t | [ADP\:TYPE\-REF](/docs/user-api.md#macro-type-ref) | `\\\@t\\\(type\\\)` |
-| \@l | [ADP\:CL\-REF](/docs/user-api.md#macro-cl-ref) | `\\\@l\\\(princ\\\)` |
-| \@\' | `code\\\-quote` | `\\\@\\\'\\\(\\\(code \\\(not evaluated\\\)\\\)\\\)` |
-| \@\; | `code\\\-comment` | `\\\@\\\;\\\(\\\"This is a comment\\\"\\\)` |
-| \@\_ | `code\\\-remove` | `\\\@\\\_\\\(\\\(tag1 tag2\\\) \\\(code \\\(to be \\\(removed\\\)\\\)\\\)\\\)` |
-| \@\. | `code\\\-hide` | `\\\@\\\.\\\(\\\(tag1 tag2\\\) \\\(code \\\(to be \\\(hidden\\\)\\\)\\\)\\\)` |
+| \@b | [ADP\:BOLD](/docs/user-api.md#macro-bold) | `\@b\(\"This text is bold\"\)` |
+| \@i | [ADP\:ITALIC](/docs/user-api.md#macro-italic) | `\@i\(\"This text is italic\"\)` |
+| \@e | [ADP\:EMPHASIS](/docs/user-api.md#macro-emphasis) | `\@e\(\"This text is emphasized\"\)` |
+| \@c | [ADP\:INLINE\-CODE](/docs/user-api.md#macro-inline-code) | `\@c\(\"This text is inlined\"\)` |
+| \@w | [ADP\:WEB\-LINK](/docs/user-api.md#macro-web-link) | `\@w\(\"Name of link\" \"www\.example\.com\"\)` |
+| \@h | [ADP\:HEADER\-REF](/docs/user-api.md#macro-header-ref) | `\@h\(header\)` |
+| \@f | [ADP\:FUNCTION\-REF](/docs/user-api.md#macro-function-ref) | `\@f\(function\)` |
+| \@s | [ADP\:SYMBOL\-REF](/docs/user-api.md#macro-symbol-ref) | `\@s\(variable\)` |
+| \@t | [ADP\:TYPE\-REF](/docs/user-api.md#macro-type-ref) | `\@t\(type\)` |
+| \@l | [ADP\:CL\-REF](/docs/user-api.md#macro-cl-ref) | `\@l\(princ\)` |
+| \@\' | `code\-quote` | `\@\'\(\(code \(not evaluated\)\)\)` |
+| \@\; | `code\-comment` | `\@\;\(\"This is a comment\"\)` |
+| \@\_ | `code\-remove` | `\@\_\(\(tag1 tag2\) \(code \(to be \(removed\)\)\)\)` |
+| \@\. | `code\-hide` | `\@\.\(\(tag1 tag2\) \(code \(to be \(hidden\)\)\)\)` |
 
 

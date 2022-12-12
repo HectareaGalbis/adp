@@ -214,8 +214,8 @@
    "Represent a code hide symbol."))
 
 (defmethod print-object ((object code-comment) stream)
-  (format stream ";; ~a" (slot-value object 'comment))
-  (pprint-newline :mandatory stream))
+  (pprint-newline :mandatory stream)
+  (format stream ";; ~a" (slot-value object 'comment)))
 
 (defclass tagged-code (code tagged-element) ()
   (:documentation

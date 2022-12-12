@@ -235,12 +235,14 @@
     (funcall *subsubheader-writer* stream title tag)))
 
 ;; text
-(defun text-type-to-string (text)
-  "Turn a text element into a string."
-  (declare (type text-type text))
+(defgeneric text-type-to-string (text)
+  (:documentation
+   "Turn a text element into a string."))
+
+(defmethod text-type-to-string ((text text-element))
   (with-slots (text-elements) text
     (let ((processed-elements (mapcar (lambda (text-element)
-					(if (typep text-element 'element)
+					(if (typep text-element 'text-subelement-type)
 					    (with-output-to-string (str-stream)
 					      (element-print text-element str-stream))
 					    (let ((princed-element (princ-to-string text-element)))
@@ -248,6 +250,11 @@
 						  (funcall *escape-text* princed-element)
 						  princed-element))))
 				      text-elements)))
+      (apply #'concatenate 'string processed-elements))))
+
+(defmethod text-type-to-string ((text text-subelement))
+  (with-slots (text-elements) text
+    (let ((processed-elements (mapcar #'princ-to-string text-elements)))
       (apply #'concatenate 'string processed-elements))))
 
 (defmethod element-print ((element text) stream)
