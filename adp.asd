@@ -40,7 +40,8 @@
 			     (:file "style-maker")))
 	       (:file "README")
 	       (:module "guides"
-		:components ((:file "user-guide")))))
+		:components ((:file "user-guide")
+			     (:file "style-maker-guide")))))
 
 
 ;; ----- ADP styles -----

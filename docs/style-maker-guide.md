@@ -1,2 +1,2 @@
-# The Style-maker Guide
+# The Style\-maker Guide
 

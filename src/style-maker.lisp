@@ -74,9 +74,9 @@ special characters that will be used with bold, italic, header-ref, web-link, et
 the text.")
 (define-writer-definer adppvt:*italic-writer* define-italic-writer 2
   "Same as define-bold-writer, but with an italic style.")
-(define-writer-definer adppvt:*bold-italic-writer* define-bold-italic-writer 2
+(define-writer-definer adppvt:*emphasis-writer* define-emphasis-writer 2
   "Same as define-bold-writer, but with both bold and italic style.")
-(define-writer-definer adppvt:*code-inline-writer* define-code-inline-writer 2
+(define-writer-definer adppvt:*inline-code-writer* define-inline-code-writer 2
   "Same as define-bold-writer, but with a code-inline style.")
 
 ;; text reference

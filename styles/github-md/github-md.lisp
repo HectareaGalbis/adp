@@ -89,10 +89,10 @@
 (adpsm:define-italic-writer (stream text)
   (format stream "_~a_" (escape-characters text)))
 
-(adpsm:define-bold-italic-writer (stream text)
+(adpsm:define-emphasis-writer (stream text)
   (format stream "***~a***" (escape-characters text)))
 
-(adpsm:define-code-inline-writer (stream text)
+(adpsm:define-inline-code-writer (stream text)
   (let ((*print-pretty* nil))
     (format stream "`~a`" (escape-characters text))))
 

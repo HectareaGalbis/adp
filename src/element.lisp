@@ -23,7 +23,9 @@
 
 (defclass header-type (tagged-element)
   ((title :initarg :title
-	  :type string))
+	  :type string)
+   (user-tag-p :initarg :user-tag-p
+	       :type boolean))
   (:documentation
    "Represents a header type element."))
 
@@ -48,9 +50,9 @@
   (:documentation
    "Represents a text type element."))
 
-(defclass text-subelement (text-type) ()
+(defclass text-subelement-type (element) ()
   (:documentation
-   "Represent a text subelement."))
+   "Repreents a text subelement type."))
 
 (defclass text-element (text-type) ()
   (:documentation
@@ -59,6 +61,10 @@
 (defclass text (text-element) ()
   (:documentation
    "Represents a text element."))
+
+(defclass text-subelement (text-subelement-type text-type) ()
+  (:documentation
+   "Represent a text subelement type element."))
 
 
 ;; ----- text enrichment -----
@@ -71,44 +77,41 @@
   (:documentation
    "Represent a italic element."))
 
-(defclass bold-italic (text-subelement) ()
+(defclass emphasis (text-subelement) ()
   (:documentation
    "Represent a bold and italic element."))
 
-(defclass code-inline (text-subelement) ()
+(defclass inline-code (text-subelement) ()
   (:documentation
-   "Represent a code inline element."))
+   "Represent an inline code element."))
 
 
 ;; ----- text reference -----
 
-(defclass header-ref (tagged-element text-subelement)
-  ((header-tags :type tag-table))
+(defclass text-reference (tagged-element text-subelement-type) ()
+  (:documentation
+   "Represent a text reference element."))
+
+(defclass header-ref (text-reference) ()
   (:documentation
    "Represent a header reference element."))
 
-
-(defclass symbol-ref (tagged-element text-subelement)
-  ((symbol-tags :type tag-table))
+(defclass symbol-ref (text-reference) ()
   (:documentation
    "Represent a symbol reference element."))
 
-
-(defclass function-ref (tagged-element text-subelement)
-  ((function-tags :type tag-table))
+(defclass function-ref (text-reference) ()
   (:documentation
    "Represent a function reference element."))
 
-
-(defclass type-ref (tagged-element text-subelement)
-  ((type-tags :type tag-table))
+(defclass type-ref (text-reference) ()
   (:documentation
    "Represent a type reference element."))
 
 
 ;; ----- web link -----
 
-(defclass web-link (text-subelement)
+(defclass web-link (text-subelement-type)
   ((text :initarg :text
 	 :type string)
    (address :initarg :address
@@ -120,7 +123,9 @@
 ;; ----- image -----
 
 (defclass image (element)
-  ((path :initarg :path
+  ((alt-text :initarg :alt-text
+	     :type string)
+   (path :initarg :path
 	 :type pathname))
   (:documentation
    "Represent an image element."))

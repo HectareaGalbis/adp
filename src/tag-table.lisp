@@ -65,7 +65,9 @@
   "Associate an element with a tag. Multiple elements can be associated with the same tag."
   (declare (type tag-table tag-table) (type symbol tag) (type element element))
   (with-slots (table) tag-table
-    (setf (gethash tag table) (make-table-element :elements (vector element)))))
+    (let ((new-array (make-array 1 :adjustable t :fill-pointer 0)))
+      (vector-push-extend element new-array)
+      (setf (gethash tag table) (make-table-element :elements new-array)))))
 
 
 (defun tag-table-push-element (tag-table tag element)
@@ -74,7 +76,9 @@
   (with-slots (table) tag-table
     (if (tag-table-tag-p tag-table tag)
 	(vector-push-extend element (table-element-elements (gethash tag table)))
-	(setf (gethash tag table) (make-table-element :elements (vector element))))))
+	(let ((new-array (make-array 1 :adjustable t :fill-pointer 0)))
+	  (vector-push-extend element new-array)
+	  (setf (gethash tag table) (make-table-element :elements new-array))))))
 
 
 (defun tag-table-find-elements (tag-table tag)

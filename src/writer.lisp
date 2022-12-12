@@ -54,8 +54,8 @@
 ;; text enrichment
 (define-customizable-writer *bold-writer*)
 (define-customizable-writer *italic-writer*)
-(define-customizable-writer *bold-italic-writer*)
-(define-customizable-writer *code-inline-writer*)
+(define-customizable-writer *emphasis-writer*)
+(define-customizable-writer *inline-code-writer*)
 
 ;; text reference
 (define-customizable-writer *header-ref-writer*)

@@ -7,7 +7,7 @@
 	   #:defmacro #:defmethod #:defpackage #:defparameter #:defsetf #:defstruct #:deftype #:defun #:defvar)
   (:export #:header #:subheader #:subsubheader #:text #:table #:cell #:itemize #:enumerate #:item
 	   #:table-of-contents #:mini-table-of-contents #:table-of-functions #:table-of-symbols #:table-of-types
-	   #:image #:bold #:italic #:bold-italic #:code-inline #:web-link #:header-ref #:symbol-ref
+	   #:image #:bold #:italic #:emphasis #:inline-code #:web-link #:header-ref #:symbol-ref
 	   #:function-ref #:type-ref #:code-tag #:code-quote #:code-comment #:code-hide #:code-remove
 	   #:code-block #:verbatim-code-block #:code-example #:defclass #:defconstant #:defgeneric
 	   #:define-compiler-macro #:define-condition #:define-method-combination #:define-modify-macro
@@ -24,7 +24,7 @@
 
 	   #:header #:subheader #:subsubheader #:text #:table #:cell #:itemize #:enumerate #:item
 	   #:table-of-contents #:mini-table-of-contents #:table-of-functions #:table-of-symbols #:table-of-types
-	   #:image #:bold #:italic #:bold-italic #:code-inline #:web-link #:header-ref #:symbol-ref
+	   #:image #:bold #:italic #:emphasis #:inline-code #:web-link #:header-ref #:symbol-ref
 	   #:function-ref #:type-ref #:tagged-code #:code-ref #:code-comment #:code-hide #:code-block #:code
 	   #:verbatim-code-block #:code-example #:defclass-definition #:defconstant-definition
 	   #:defgeneric-definition #:define-compiler-macro-definition #:define-condition-definition
@@ -35,7 +35,7 @@
 
 	   #:*begin-file-writer* #:*end-file-writer* #:*file-extension* #:*begin-project-writer*
 	   #:*end-project-writer* #:*header-writer* #:*subheader-writer* #:*subsubheader-writer* #:*text-writer*
-	   #:*escape-text* #:*bold-writer* #:*italic-writer* #:*bold-italic-writer* #:*code-inline-writer*
+	   #:*escape-text* #:*bold-writer* #:*italic-writer* #:*emphasis-writer* #:*inline-code-writer*
 	   #:*header-ref-writer* #:*symbol-ref-writer* #:*function-ref-writer* #:*type-ref-writer*
 	   #:*web-link-writer* #:*image-writer* #:*table-writer* #:*itemize-writer* #:*code-block-writer*
 	   #:*code-example-writer* #:*defclass-writer* #:*defconstant-writer* #:*defgeneric-writer*
@@ -51,7 +51,7 @@
   (:export #:*adp-pprint-dispatch* #:define-style-parameter #:define-header-writer #:define-subheader-writer
 	   #:define-subsubheader-writer #:define-escape-text #:define-text-writer #:define-table-writer
 	   #:define-itemize-writer #:define-image-writer #:define-bold-writer #:define-italic-writer
-	   #:define-bold-italic-writer #:define-code-inline-writer #:define-web-link-writer
+	   #:define-emphasis-writer #:define-inline-code-writer #:define-web-link-writer
 	   #:define-file-ref-writer #:define-header-ref-writer #:define-symbol-ref-writer
 	   #:define-function-ref-writer #:define-type-ref-writer #:define-code-block-writer
 	   #:define-code-example-writer #:define-defclass-writer #:define-defconstant-writer

@@ -24,7 +24,7 @@
 (defun select-file (project path)
   (with-slots (root-directory) project
     (let* ((complete-path (merge-pathnames path root-directory))
-	   (file (or (print (project-find-file project path))
+	   (file (or (project-find-file project path)
 		     (let ((new-file (make-instance 'file :path complete-path)))
 		       (project-add-file project new-file)
 		       new-file))))
@@ -38,7 +38,7 @@
 
 (defun add-code-tag (tag code)
   "Associate a tag with a piece of code."
-  (declare (type symbol tag) (type code code))
+  (declare (type symbol tag) (type tagged-code code))
   (tag-table-push-element *code-tags* tag code))
 
 
@@ -63,10 +63,10 @@
 
 (defgeneric check-subelements (element)
   (:documentation
-   "Check the use of subelements."))
+   "Check the use of subelements.")
 
-(defmethod check-subelements ((element element))
-  (values))
+  (:method ((element element))
+    (values)))
 
 
 
@@ -79,19 +79,18 @@
 (defmethod check-subelements ((element text-element))
   (with-slots (text-elements) element
     (loop for text-subelement in text-elements
-	  when (typep text-subelement 'element)
-	    do (if (typep text-subelement 'text-subelement)
-		   (check-subelements text-subelement)
-		   (error 'text-subelement-error :text element :subelement text-subelement)))))
+	  do (typecase text-subelement
+	       (text-subelement (check-subelements text-subelement))
+	       (text-subelement-type (values))
+	       (element (error 'text-subelement-error :text element :subelement text-subelement))))))
 
 (defmethod check-subelements ((element table))
   (with-slots (rows) element
     (loop for row in rows
 	  do (loop for cell-element in row
-		   if (typep cell-element 'cell)
-		     do (check-subelements cell-element)
-		   else
-		     do (error 'table-subelement-error :table element :subelement cell-element)))))
+		   do (if (typep cell-element 'cell)
+			  (check-subelements cell-element)
+			  (error 'table-subelement-error :table element :subelement cell-element))))))
 
 (defmethod check-subelements ((element itemize-type))
   (with-slots ((items elements)) element
@@ -100,10 +99,9 @@
     (when (not (typep (car items) 'item))
       (error 'itemize-first-element-not-item-error :itemize element :subelement (car items)))
     (loop for item in (cdr items)
-	  if (typep item '(or itemize-type item))
-	    do (check-subelements item)
-	  else
-	    do (error 'itemize-subelement-error :itemize element :subelement item))))
+	  do (if (typep item '(or itemize-type item))
+		 (check-subelements item)
+		 (error 'itemize-subelement-error :itemize element :subelement item)))))
 
 
 (defun file-push-element (file element)
@@ -126,7 +124,7 @@
     (file-push-element current-file element)))
 
 (defmethod add-element :after (project (element header-type))
-  (with-slots (tag (header-location source-location)) element 
+  (with-slots (tag (header-location source-location)) element
     (multiple-value-bind (previous-header foundp) (tag-table-find-elements *header-tags* tag)
       (if foundp
 	  (error 'already-defined-tag-error :source-element element :previous-source-element previous-header :tag tag)
@@ -167,7 +165,7 @@
       (with-open-file (stream complete-path :direction :output :if-does-not-exist :create :if-exists :supersede)
 	(when *begin-file-writer*
 	  (funcall *begin-file-writer* stream))
-	(loop for element in elements
+	(loop for element across elements
 	      do (element-print element stream))
 	(when *end-file-writer*
 	  (funcall *end-file-writer* stream))))))
@@ -180,9 +178,10 @@
 (defun warn-unused-header-tags ()
   (let ((unused-headers (tag-table-unused-elements *header-tags*)))
     (loop for unused-header in unused-headers
-	  do (with-slots (tag source-location) (aref unused-header 0)
-	       (warn "ADP warning: The header tag ~s defined at '~a' is never used."
-		     tag source-location)))))
+	  do (with-slots (tag user-tag-p source-location) (aref unused-header 0)
+	       (when user-tag-p
+		 (warn "ADP warning: The header tag ~s defined at '~a' is never used."
+		       tag source-location))))))
 
 (defun warn-unused-code-tags ()
   (let ((unused-code-elements (tag-table-unused-elements *code-tags*)))
@@ -201,7 +200,6 @@
   (with-slots (files root-directory) project
     (when *begin-project-writer*
       (funcall *begin-project-writer* root-directory))
-    (print files)
     (loop for file across files
 	  do (format t "Printing file '~a'.~%" (relative-truename project (slot-value file 'path)))
 	     (file-print file))
@@ -244,8 +242,10 @@
 					(if (typep text-element 'element)
 					    (with-output-to-string (str-stream)
 					      (element-print text-element str-stream))
-					    (when *escape-text*
-					      (funcall *escape-text* text-element))))
+					    (let ((princed-element (princ-to-string text-element)))
+					      (if *escape-text*
+						  (funcall *escape-text* princed-element)
+						  princed-element))))
 				      text-elements)))
       (apply #'concatenate 'string processed-elements))))
 
@@ -259,11 +259,11 @@
 (defmethod element-print ((element italic) stream)
   (funcall *italic-writer* stream (text-type-to-string element)))
 
-(defmethod element-print ((element bold-italic) stream)
-  (funcall *bold-italic-writer* stream (text-type-to-string element)))
+(defmethod element-print ((element emphasis) stream)
+  (funcall *emphasis-writer* stream (text-type-to-string element)))
 
-(defmethod element-print ((element code-inline) stream)
-  (funcall *code-inline-writer* stream (text-type-to-string element)))
+(defmethod element-print ((element inline-code) stream)
+  (funcall *inline-code-writer* stream (text-type-to-string element)))
 
 ;; text reference
 (defmethod element-print ((element header-ref) stream)
@@ -305,7 +305,8 @@
 
 ;; image
 (defmethod element-print ((element image) stream)
-  (funcall *image-writer* stream (slot-value element 'path)))
+  (with-slots (alt-text path) element
+    (funcall *image-writer* stream alt-text (slot-value element 'path))))
 
 ;; table
 (defmethod element-print ((element table) stream)
@@ -429,7 +430,7 @@
 (defmethod element-print ((element mini-table-of-contents) stream)
   (with-slots (file) element
     (let ((headers (file-headers file)))
-      (funcall *itemize-writer* (process-itemize (make-itemize-toc element headers))))))
+      (funcall *itemize-writer* stream (process-itemize (make-itemize-toc element headers))))))
 
 
 ;; table-of-function/symbols/types
@@ -538,7 +539,7 @@
 (defmacro define-definition-element-print (type writer)
   (with-gensyms (element stream expr)
     `(defmethod element-print ((,element ,type) ,stream)
-       (with-slots (,expr) ,element
+       (with-slots ((,expr expr)) ,element
 	 (funcall ,writer ,stream ,expr)))))
 
 (define-definition-element-print defclass-definition *defclass-writer*)
