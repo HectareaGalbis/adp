@@ -120,7 +120,7 @@
     (when (not current-file)
       (error 'file-not-selected-error :first-element element))
     (check-subelements element)
-    (setf (slot-value element 'file-location) current-file)
+    (setf (slot-value element 'file-location) (slot-value current-file 'path))
     (file-push-element current-file element)))
 
 (defmethod add-element :after (project (element header-type))

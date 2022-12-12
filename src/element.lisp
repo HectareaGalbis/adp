@@ -8,7 +8,7 @@
   ((name :initarg :name)
    (source-location :initarg :source-location
 		    :type pathname)
-   (file-location :type file))
+   (file-location :type pathname))
   (:documentation
    "Represent the most basic unit of documentation."))
 
