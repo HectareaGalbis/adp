@@ -396,7 +396,7 @@
 
   (code-tag (end-type-code)
     (deftype also-a-type? ()
-      nil)))
+      'vector)))
 
 (text "So, if I write this:")
 

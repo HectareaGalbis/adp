@@ -470,7 +470,7 @@ Let\'s see a live example\. Do you remember the symbol [ADP\:\:A\-PARAMETER\-DEF
   (ADP:DEFPARAMETER ADP::A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE T))
 
 (ADP:CODE-TAG (END-TYPE-CODE)
-  (ADP:DEFTYPE ALSO-A-TYPE? () NIL))
+  (ADP:DEFTYPE ALSO-A-TYPE? () 'VECTOR))
 `````
 
 So\, if I write this\:
