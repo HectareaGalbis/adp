@@ -36,6 +36,7 @@ ADP is available on Quicklisp\! So\, just eval ``` (ql:quickload :adp) ```\. It 
 * The ADP api\: [ADP User Interface](/docs/user-api.md#adp-user-interface)
 * The Style\-Maker guide\: [The Style\-maker Guide](/docs/style-maker-guide.md#the-style-maker-guide)
 * The Style\-Maker api\: [Style\-maker API](/docs/style-maker-api.md#style-maker-api)
+
 ## Available styles
 
 | Keyword name | File type | Extra dependencies | Authors |

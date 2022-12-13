@@ -78,7 +78,8 @@
 			((:itemize :enumerate) (itemize-aux (cdr item) (eq (car item) :enumerate) (if numbersp
 												      (+ indent-space (digits index) 2)
 												      (+ indent-space 2))))))))
-    (itemize-aux (cdr items) (eq (car items) :enumerate) 0)))
+    (itemize-aux (cdr items) (eq (car items) :enumerate) 0))
+  (terpri stream))
 
 (adpsm:define-image-writer (stream alt-text rel-image-path)
   (format stream "![~a](/~a)~%~%" (escape-characters alt-text) rel-image-path))

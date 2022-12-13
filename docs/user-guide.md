@@ -26,6 +26,7 @@ I will try to do my best explaining how to use ADP\. If this is not sufficient\,
     * [Code\-tags](/docs/user-guide.md#code-tags)
     * [Quoting\, commenting\, hiding and removing your code](/docs/user-guide.md#quoting-commenting-hiding-and-removing-your-code)
   * [Tips and final comments](/docs/user-guide.md#tips-and-final-comments)
+
 ## Setting up ADP
 
 After installing ADP\, you must add it as a dependency in your project\, like you have been doing for every project you want to use\. For example\, if you have a system like this\:
@@ -201,6 +202,7 @@ You will see this\:
 * Fruits\:
   * 0\.5Kg of apples
   * 6 oranges
+
 Note that each item inside [ADP\:ITEMIZE](/docs/user-api.md#macro-itemize) is a list starting with ``` ITEM ``` or ``` ITEMIZE ```\. When you use ``` ITEM ``` every object will be [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)\-ed and then concatenated\. In other words\, it works the same as [ADP\:TEXT](/docs/user-api.md#macro-text) or [ADP\:TABLE](/docs/user-api.md#macro-table)\. On the other hand\, when using ``` ITEMIZE ``` you are indicating that you want a sublist of items\.
 
 ### Text enrichment
@@ -388,6 +390,7 @@ These tags are symbols associated with a function\, a variable or a type respect
   * [ADP\:DEFINE\-CONDITION](/docs/user-api.md#macro-define-condition)
   * [ADP\:DEFSTRUCT](/docs/user-api.md#macro-defstruct)
   * [ADP\:DEFTYPE](/docs/user-api.md#macro-deftype)
+
 Same as with header\-tags\, we can make reference to functions\, variables and types with [ADP\:FUNCTION\-REF](/docs/user-api.md#macro-function-ref)\, [ADP\:SYMBOL\-REF](/docs/user-api.md#macro-symbol-ref) and [ADP\:TYPE\-REF](/docs/user-api.md#macro-type-ref)\. For example\, to make a reference to an ADP macro\:
 
 `````Lisp
@@ -668,6 +671,7 @@ I hope this guide is useful\. I usually see Common Lisp projects that looks awes
 * ***Tags belong to a package\!***\: Note that almost all the tags are actually symbols\, and symbols belong to a package\. If you define a tag and you want to make a reference to it from another package\, remember to add the package extension to the symbol name\. For example\, suppose that you define the symbol\-tag ``` MY-TAG ``` in the package ``` MY-PKG ```\. Then\, in another package you must write ``` (symbol-ref my-pkg:my-tag) ```\, or ``` (symbol-ref my-pkg::my-tag) ``` if the symbol is not exported\. And yes\, you should export the tags you want to use in other packages\.
 * ***Read the API***\: Maybe reading [ADP User Interface](/docs/user-api.md#adp-user-interface) can make you understand better how some macros work \(or not\)\. At least\, you may be interested in seeing the section [Additional functions](/docs/user-api.md#additional-functions)\.
 * ***That\'s all\! Enjoy using ADP\.*** I leave you with [ADP\:\:A\-PARAMETER\-DEFINED\-AT\-THE\-END\-OF\-THE\-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file) and [ALSO\-A\-TYPE\?](/docs/user-guide.md#type-also-a-type) again\.
+
 #### Variable: A\-PARAMETER\-DEFINED\-AT\-THE\-END\-OF\-THE\-FILE
 
 ```Lisp
