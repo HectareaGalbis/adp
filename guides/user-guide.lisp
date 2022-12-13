@@ -344,7 +344,7 @@
 (code-tag (symbol-ref-example)
   (text "In the future, we will define the symbol " (symbol-ref a-parameter-defined-at-the-end-of-the-file) "."))
 
-(text "Finally, an example using a type-tag:")
+(text "Lastly, an example using a type-tag:")
 
 (code-block (type-ref-example)
   type-ref-example)

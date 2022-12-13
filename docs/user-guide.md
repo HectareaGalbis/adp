@@ -412,7 +412,7 @@ A cool thing about cross references is that you can make a reference to somethin
 
 In the future\, we will define the symbol [ADP\:\:A\-PARAMETER\-DEFINED\-AT\-THE\-END\-OF\-THE\-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file)\.
 
-Finally\, an example using a type\-tag\:
+Lastly\, an example using a type\-tag\:
 
 `````Lisp
 (ADP:TEXT "Using a type tag: " (ADP:TYPE-REF ALSO-A-TYPE?))
