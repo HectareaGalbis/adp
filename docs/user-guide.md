@@ -527,7 +527,7 @@ you will see this\:
 
 `````Lisp
 (LET ((X 5))
-  #||We print the number 5||#
+  ;; We print the number 5
   (PRINT X))
 `````
 
@@ -651,9 +651,9 @@ You can also remove the code using the form ``` code-remove ```\. It works the s
 And you will see this\:
 
 `````Lisp
-(DEFUN ADP::PRINT-5-6 () #||We print 5||# (PRINT 5))
+(DEFUN ADP::PRINT-5-6 () ;; We print 5 (PRINT 5))
 
-(DEFUN ADP::PRINT-5-6 () ... #||And we print 6||# (PRINT 6))
+(DEFUN ADP::PRINT-5-6 () ... ;; And we print 6 (PRINT 6))
 `````
 
 ## Tips and final comments
