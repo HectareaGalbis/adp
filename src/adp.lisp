@@ -112,7 +112,7 @@
 
 (adv-defmacro text (&rest objects)
   "Add plain text. The arguments in objects can be any lisp object. They will be princ-ed and concatenated into a single string.
-You can use the following macros to enrich your text: bold, italic, bold-italic, code-inline, web-link, header-ref, symbol-ref, function-ref and type-ref."
+You can use the following macros to enrich your text: bold, italic, emphasis, inline-code, web-link, header-ref, symbol-ref, function-ref and type-ref."
   (when *adp*
     `(progn
        (adppvt:add-element *project* (make-instance 'adppvt:text

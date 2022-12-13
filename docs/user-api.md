@@ -44,7 +44,7 @@ Add a subsubheader with name str. Also, if tag is not nil but a symbol, a new he
 
 ````
 Add plain text. The arguments in objects can be any lisp object. They will be princ-ed and concatenated into a single string.
-You can use the following macros to enrich your text: bold, italic, bold-italic, code-inline, web-link, header-ref, symbol-ref, function-ref and type-ref.
+You can use the following macros to enrich your text: bold, italic, emphasis, inline-code, web-link, header-ref, symbol-ref, function-ref and type-ref.
 ````
 
 #### Macro: CELL
