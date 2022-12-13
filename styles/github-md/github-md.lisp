@@ -94,7 +94,7 @@
 
 (adpsm:define-inline-code-writer (stream text)
   (let ((*print-pretty* nil))
-    (format stream "`~a`" (escape-characters text))))
+    (format stream "``` ~a ```" text)))
 
 (adpsm:define-web-link-writer (stream name link)
   (format stream "[~a](~a)" (escape-characters name) link))
@@ -139,7 +139,7 @@
     (format stream "[~a](/~a.md#~a)" (escape-characters (prin1-to-string tag)) file-path type-anchor)))
 
 (adpsm:define-code-block-writer (stream lang text-code)
-  (format stream "```~@[~a~]~%~a~%```~%~%" lang text-code))
+  (format stream "`````~@[~a~]~%~a~%`````~%~%" lang text-code))
 
 (adpsm:define-code-example-writer (stream text-code output results)
   (format stream "```Lisp~%~a~%~a~{~%~s~}~%```~%~%" text-code output results))
