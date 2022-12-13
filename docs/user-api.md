@@ -610,7 +610,7 @@ The next table shows which macro characters can be used and what they expand to\
 | \@t | [ADP\:TYPE\-REF](/docs/user-api.md#macro-type-ref) | ``` @t(type) ``` |
 | \@l | [ADP\:CL\-REF](/docs/user-api.md#macro-cl-ref) | ``` @l(princ) ``` |
 | \@\' | ``` code-quote ``` | ``` @'((code (not evaluated))) ``` |
-| \@\; | ``` code-comment ``` | ``` @;("This is a comment") ``` |
+| \@\; | ``` code-comment ``` | ``` @;("This is a comment" expr) ``` |
 | \@\_ | ``` code-remove ``` | ``` @_((tag1 tag2) (code (to be (removed)))) ``` |
 | \@\. | ``` code-hide ``` | ``` @.((tag1 tag2) (code (to be (hidden)))) ``` |
 
