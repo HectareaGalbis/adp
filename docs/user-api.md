@@ -278,6 +278,53 @@ Add a reference to a type symbol when using the macros text, table or itemize. T
 defined with adp:defclass, adp:define-condition, adp:defstruct or adp:deftype.
 ````
 
+#### Macro: CODE\-QUOTE
+
+```Lisp
+(defmacro ADP:CODE-QUOTE (&BODY BODY)
+  ...)
+```
+
+````
+Form recognized by code-tag that prevents the expressions from being evaluated.
+````
+
+#### Macro: CODE\-COMMENT
+
+```Lisp
+(defmacro ADP:CODE-COMMENT (COMMENT &BODY BODY)
+  ...)
+```
+
+````
+Form recognized by code-tag that prints a comment before the body expressions when using the tag defined by
+code-tag inside a code-block.
+````
+
+#### Macro: CODE\-HIDE
+
+```Lisp
+(defmacro ADP:CODE-HIDE ((&REST TAGS) &BODY BODY)
+  ...)
+```
+
+````
+Form recognized by code-tag that will hide the code printing '...'. The printing will be done when using the
+tag defined by code-tag inside a code-block.
+````
+
+#### Macro: CODE\-REMOVE
+
+```Lisp
+(defmacro ADP:CODE-REMOVE ((&REST TAGS) &BODY BODY)
+  ...)
+```
+
+````
+Form recognized by code-tag that will remove the code printing. This will be done when using the tag defined
+by code-tag inside a code-block.
+````
+
 #### Macro: CODE\-TAG
 
 ```Lisp

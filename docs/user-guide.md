@@ -498,7 +498,8 @@ Code tags are great but [ADP\:CODE\-TAG](/docs/user-api.md#macro-code-tag) will 
   QUOTED-CODE)
 
 (ADP:CODE-TAG (QUOTED-CODE)
-  (ADP:CODE-QUOTE (THIS IS A (FORM I (DONT WANT) TO EVALUATE))))
+  (ADP:CODE-QUOTE
+    (THIS IS A (FORM I (DONT WANT) TO EVALUATE))))
 `````
 
 And you will see this\:
@@ -515,8 +516,9 @@ Comments are ignored when Lisp is reading an expression\, so you cannot place a 
 
 (ADP:CODE-TAG (COMMENTED-CODE)
   (ADP:CODE-QUOTE
-   (LET ((X 5))
-     (ADP:CODE-COMMENT "We print the number 5" (PRINT X)))))
+    (LET ((X 5))
+      (ADP:CODE-COMMENT "We print the number 5"
+        (PRINT X)))))
 `````
 
 you will see this\:
@@ -535,9 +537,9 @@ When explaining some piece of code you should focus on the important parts\. Or\
 
 (ADP:CODE-TAG (HIDDEN-CODE)
   (ADP:CODE-QUOTE
-   (LET ((ADP:CODE-HIDE NIL (X 5) (Y 6)))
-     (DOING STUFF)
-     (DOING MORE STUFF))))
+    (LET ((ADP:CODE-HIDE NIL (X 5) (Y 6)))
+      (DOING STUFF)
+      (DOING MORE STUFF))))
 `````
 
 You will see this\:
@@ -569,13 +571,26 @@ The example can be large and hard to read as well\. This piece of code uses the 
           (ADP:CODE-HIDE (X-TAG Z-TAG) (POST-Y (1+ Y)))
           (ADP:CODE-HIDE (X-TAG Y-TAG) (POST-Z (1+ Z))))
       (LOOP FOR I FROM 0 BELOW 10
-            COLLECT (ADP:CODE-HIDE (Y-TAG Z-TAG) POST-X INTO X-LIST)
-            COLLECT (ADP:CODE-HIDE (X-TAG Z-TAG) POST-Y INTO Y-LIST)
-            COLLECT (ADP:CODE-HIDE (X-TAG) (CONS POST-Y POST-Z) INTO YZ-LIST)
+            COLLECT (ADP:CODE-HIDE (Y-TAG Z-TAG)
+                      POST-X
+                      INTO
+                      X-LIST)
+            COLLECT (ADP:CODE-HIDE (X-TAG Z-TAG)
+                      POST-Y
+                      INTO
+                      Y-LIST)
+            COLLECT (ADP:CODE-HIDE (X-TAG)
+                      (CONS POST-Y POST-Z)
+                      INTO
+                      YZ-LIST)
             FINALLY (RETURN
-                     (VALUES (ADP:CODE-HIDE (Y-TAG Z-TAG) X-LIST)
-                             (ADP:CODE-HIDE (X-TAG Z-TAG) Y-LIST)
-                             (ADP:CODE-HIDE (X-TAG) YZ-LIST)))))))
+                     (VALUES
+                      (ADP:CODE-HIDE (Y-TAG Z-TAG)
+                        X-LIST)
+                      (ADP:CODE-HIDE (X-TAG Z-TAG)
+                        Y-LIST)
+                      (ADP:CODE-HIDE (X-TAG)
+                        YZ-LIST)))))))
 `````
 
 Note that we are using three tags here\. Also\, we are indicating when a piece of code must be hidden using the corresponding tags\. If I write this\:
@@ -640,10 +655,12 @@ You can also remove the code using the form ``` code-remove ```\. It works the s
 
 (ADP:CODE-TAG (MAKING-FUNCTION-1 MAKING-FUNCTION-2)
   (DEFUN PRINT-5-6 ()
-    (ADP:CODE-HIDE (MAKING-FUNCTION-2) (ADP:CODE-COMMENT "We print 5")
-     (PRINT 5))
-    (ADP:CODE-REMOVE (MAKING-FUNCTION-1) (ADP:CODE-COMMENT "And we print 6")
-     (PRINT 6))))
+    (ADP:CODE-HIDE (MAKING-FUNCTION-2)
+      (ADP:CODE-COMMENT "We print 5")
+      (PRINT 5))
+    (ADP:CODE-REMOVE (MAKING-FUNCTION-1)
+      (ADP:CODE-COMMENT "And we print 6")
+      (PRINT 6))))
 `````
 
 And you will see this\:

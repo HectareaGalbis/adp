@@ -320,6 +320,29 @@ defined with adp:defgeneric, adp:define-modify-macro, adp:defmacro or adp:defun.
 defined with adp:defclass, adp:define-condition, adp:defstruct or adp:deftype.")
 
 
+(adv-defmacro code-quote (&body body)
+  "Form recognized by code-tag that prevents the expressions from being evaluated."
+  (declare (ignore body))
+  nil)
+
+(adv-defmacro code-comment (comment &body body)
+  "Form recognized by code-tag that prints a comment before the body expressions when using the tag defined by
+code-tag inside a code-block."
+  (declare (ignore comment body))
+  nil)
+
+(adv-defmacro code-hide ((&rest tags) &body body)
+  "Form recognized by code-tag that will hide the code printing '...'. The printing will be done when using the
+tag defined by code-tag inside a code-block."
+  (declare (ignore tags body))
+  nil)
+
+(adv-defmacro code-remove ((&rest tags) &body body)
+  "Form recognized by code-tag that will remove the code printing. This will be done when using the tag defined
+by code-tag inside a code-block."
+  (declare (ignore tags body))
+  nil)
+
 (cl:defun plistp (code)
   "Check if an expression is a proper list."
   (or (null code)
@@ -350,6 +373,28 @@ defined with adp:defclass, adp:define-condition, adp:defstruct or adp:deftype.")
   (or (null tags)
       (member tag tags)))
 
+(cl:defun check-code-hide (expr)
+  (unless (and (>= (length expr) 2)
+	       (plistp (cadr expr))
+	       (every #'symbolp (cadr expr)))
+    (error "ADP error: Bad syntax of code-hide at '~a'. Expected a list of symbols but ~s was found."
+	   (adppvt:relative-truename *project*) (cadr expr))))
+
+(cl:defun check-code-remove (expr)
+  (unless (and (>= (length expr) 2)
+	       (plistp (cadr expr))
+	       (every #'symbolp (cadr expr)))
+    (error "ADP error: Bad syntax of code-remove at '~a'. Expected a list of symbols but ~s was found."
+	   (adppvt:relative-truename *project*) (cadr expr))))
+
+(cl:defun check-code-comment (expr)
+  (unless (>= (length expr) 3)
+    (error "ADP error: Bad syntax of code-comment at '~a'. Expected at least 2 arguments but ~s was used."
+	   (adppvt:relative-truename *project*) (length (cdr expr))))
+  (unless (stringp (cadr expr))
+    (error "ADP error: Bad use of code-comment at '~a'. Expected a string as first argument but ~s was used."
+	   (adppvt:relative-truename *project*) (cadr expr))))
+
 (cl:defun process-code-tag (tag code)
   "Process the forms recognized by code-tag."
   (declare (type symbol tag))
@@ -357,11 +402,13 @@ defined with adp:defclass, adp:define-condition, adp:defstruct or adp:deftype.")
 	     (if (plistp code)
 		 (cond
 		   ((eq (car code) 'code-hide)
+		    (check-code-hide code)
 		    (if (valid-tag-p tag (cadr code))
 			(list (make-instance 'adppvt:code-hide))
 			(loop for expr in (cddr code)
 			      append (process-aux tag expr))))
 		   ((eq (car code) 'code-remove)
+		    (check-code-remove code)
 		    (if (valid-tag-p tag (cadr code))
 			nil
 			(loop for expr in (cddr code)
@@ -370,6 +417,7 @@ defined with adp:defclass, adp:define-condition, adp:defstruct or adp:deftype.")
 		    (loop for expr in (cdr code)
 			  append (process-aux tag expr)))
 		   ((eq (car code) 'code-comment)
+		    (check-code-comment code)
 		    (list (make-instance 'adppvt:code-comment :comment (cadr code)
 							      :expr (caddr code))))
 		   ((eq (car code) 'code-tag)
