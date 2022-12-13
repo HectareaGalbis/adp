@@ -68,13 +68,13 @@ We need to pass a pathname to [ADP\:IN\-FILE](/docs/user-api.md#macro-in-file)\.
 I\'m sure your code defines a lot of things like functions\, macros and symbols\. In order to do that you have had to use define macros like [DEFUN](http://www.lispworks.com/reference/HyperSpec/Body/m_defun.htm)\, [DEFMACRO](http://www.lispworks.com/reference/HyperSpec/Body/m_defmac.htm) or [DEFPARAMETER](http://www.lispworks.com/reference/HyperSpec/Body/m_defpar.htm)\. Print some documentation of this definitions is very easy with ADP\. For example\, consider this function definition\:
 
 `````Lisp
-(DEFUN ADP::FOO (A B C) "Multiply a by the sum of b and c." (* A (+ B C)))
+(DEFUN FOO (A B C) "Multiply a by the sum of b and c." (* A (+ B C)))
 `````
 
 If you want to generate documentation of this definition you only need to use the macro [ADP\:DEFUN](/docs/user-api.md#macro-defun) instead of [DEFUN](http://www.lispworks.com/reference/HyperSpec/Body/m_defun.htm)\.
 
 `````Lisp
-(ADP:DEFUN ADP::FOO (A B C) "Multiply a by the sum of b and c." (* A (+ B C)))
+(ADP:DEFUN FOO (A B C) "Multiply a by the sum of b and c." (* A (+ B C)))
 `````
 
 And you will see something like this\:
@@ -82,7 +82,7 @@ And you will see something like this\:
 #### Function: FOO
 
 ```Lisp
-(defun ADP::FOO (A B C)
+(defun FOO (A B C)
   ...)
 ```
 
@@ -138,32 +138,29 @@ This is the text macro\. The result of 3\+4 is 7\. As we will see later you can 
 You can add tables using the macro [ADP\:TABLE](/docs/user-api.md#macro-table)\. The best way to see how to use it is an example\. Imagine we want to show some data stored in some variables\.
 
 `````Lisp
-(DEFPARAMETER ADP::PETER-INFO '(34 "Peter Garcia" 1435))
+(DEFPARAMETER PETER-INFO '(34 "Peter Garcia" 1435))
 
-(DEFPARAMETER ADP::MARIA-INFO '(27 "Maria Martinez" 1765))
+(DEFPARAMETER MARIA-INFO '(27 "Maria Martinez" 1765))
 
-(DEFPARAMETER ADP::LAURA-INFO '(53 "Laura Beneyto" 1543))
+(DEFPARAMETER LAURA-INFO '(53 "Laura Beneyto" 1543))
 
-(DEFUN ADP::GET-AGE (INFO) (FIRST INFO))
+(DEFUN GET-AGE (INFO) (FIRST INFO))
 
-(DEFUN ADP::GET-NAME (INFO) (SECOND INFO))
+(DEFUN GET-NAME (INFO) (SECOND INFO))
 
-(DEFUN ADP::GET-SALARY (INFO) (THIRD INFO))
+(DEFUN GET-SALARY (INFO) (THIRD INFO))
 `````
 
 Now we can create a table like this\:
 
 `````Lisp
 (ADP:TABLE ((ADP:CELL "Age") (ADP:CELL "Name") (ADP:CELL "Salary"))
-           ((ADP:CELL (ADP::GET-AGE ADP::PETER-INFO))
-            (ADP:CELL (ADP::GET-NAME ADP::PETER-INFO))
-            (ADP:CELL (ADP::GET-SALARY ADP::PETER-INFO) "€"))
-           ((ADP:CELL (ADP::GET-AGE ADP::MARIA-INFO))
-            (ADP:CELL (ADP::GET-NAME ADP::MARIA-INFO))
-            (ADP:CELL (ADP::GET-SALARY ADP::MARIA-INFO) "€"))
-           ((ADP:CELL (ADP::GET-AGE ADP::LAURA-INFO))
-            (ADP:CELL (ADP::GET-NAME ADP::LAURA-INFO))
-            (ADP:CELL (ADP::GET-SALARY ADP::LAURA-INFO) "€")))
+           ((ADP:CELL (GET-AGE PETER-INFO)) (ADP:CELL (GET-NAME PETER-INFO))
+            (ADP:CELL (GET-SALARY PETER-INFO) "€"))
+           ((ADP:CELL (GET-AGE MARIA-INFO)) (ADP:CELL (GET-NAME MARIA-INFO))
+            (ADP:CELL (GET-SALARY MARIA-INFO) "€"))
+           ((ADP:CELL (GET-AGE LAURA-INFO)) (ADP:CELL (GET-NAME LAURA-INFO))
+            (ADP:CELL (GET-SALARY LAURA-INFO) "€")))
 `````
 
 And you will see this\:
@@ -407,10 +404,10 @@ A cool thing about cross references is that you can make a reference to somethin
 
 `````Lisp
 (ADP:TEXT "In the future, we will define the symbol "
-          (ADP:SYMBOL-REF ADP::A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE) ".")
+          (ADP:SYMBOL-REF A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE) ".")
 `````
 
-In the future\, we will define the symbol [ADP\:\:A\-PARAMETER\-DEFINED\-AT\-THE\-END\-OF\-THE\-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file)\.
+In the future\, we will define the symbol [A\-PARAMETER\-DEFINED\-AT\-THE\-END\-OF\-THE\-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file)\.
 
 Lastly\, an example using a type\-tag\:
 
@@ -463,11 +460,11 @@ A code\-tag named ``` sum-list-example ``` is created and you can now use it in 
 
 First we indicate in the list after ``` code-block ``` that we will use the code tag named ``` sum-list-example ```\. Then\, we use it\. Now\, each time you change the call to ``` sum-list ``` in your test code the tutorial will be automatically changed\. You can specify as many tags as you want in both [ADP\:CODE\-TAG](/docs/user-api.md#macro-code-tag) and [ADP\:CODE\-BLOCK](/docs/user-api.md#macro-code-block) macros\.
 
-Let\'s see a live example\. Do you remember the symbol [ADP\:\:A\-PARAMETER\-DEFINED\-AT\-THE\-END\-OF\-THE\-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file) and the type [ALSO\-A\-TYPE\?](/docs/user-guide.md#type-also-a-type)\?\. In the source file I have written this\:
+Let\'s see a live example\. Do you remember the symbol [A\-PARAMETER\-DEFINED\-AT\-THE\-END\-OF\-THE\-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file) and the type [ALSO\-A\-TYPE\?](/docs/user-guide.md#type-also-a-type)\?\. In the source file I have written this\:
 
 `````Lisp
 (ADP:CODE-TAG (END-PARAMETER-CODE)
-  (ADP:DEFPARAMETER ADP::A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE T))
+  (ADP:DEFPARAMETER A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE T))
 
 (ADP:CODE-TAG (END-TYPE-CODE)
   (ADP:DEFTYPE ALSO-A-TYPE? () 'VECTOR))
@@ -489,7 +486,7 @@ You will see this\:
 
 (SOME-CODE-IN (THE-MIDDLE))
 
-(ADP:DEFPARAMETER ADP::A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE T)
+(ADP:DEFPARAMETER A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE T)
 `````
 
 ### Quoting\, commenting\, hiding and removing your code
@@ -554,7 +551,7 @@ You will see this\:
 Note that the hidden code is shown as three dots \(\'\.\.\.\'\)\. This form receives as first argument a list of tags\. If the list is empty\, the hide of the code will take effect always\, but you can specify when to hide or remove your code specifing a tag\. Imagine you have the following piece of code in your project\:
 
 `````Lisp
-(DEFUN ADP::SOME-LARGE-FUNCTION (X Y Z)
+(DEFUN SOME-LARGE-FUNCTION (X Y Z)
   (LET ((POST-X (1+ X)) (POST-Y (1+ Y)) (POST-Z (1+ Z)))
     (LOOP FOR I FROM 0 BELOW 10
           COLLECT POST-X INTO X-LIST
@@ -567,7 +564,7 @@ The example can be large and hard to read as well\. This piece of code uses the 
 
 `````Lisp
 (ADP:CODE-TAG (X-TAG Y-TAG Z-TAG)
-  (DEFUN ADP::SOME-LARGE-FUNCTION (X Y Z)
+  (DEFUN SOME-LARGE-FUNCTION (X Y Z)
     (LET ((ADP:CODE-HIDE (Y-TAG Z-TAG) (POST-X (1+ X)))
           (ADP:CODE-HIDE (X-TAG Z-TAG) (POST-Y (1+ Y)))
           (ADP:CODE-HIDE (X-TAG Y-TAG) (POST-Z (1+ Z))))
@@ -591,7 +588,7 @@ Note that we are using three tags here\. Also\, we are indicating when a piece o
 You will see this\:
 
 `````Lisp
-(DEFUN ADP::SOME-LARGE-FUNCTION (X Y Z)
+(DEFUN SOME-LARGE-FUNCTION (X Y Z)
   (LET ((POST-X (1+ X)) ... ...)
     (LOOP FOR I FROM 0 BELOW 10
           COLLECT POST-X INTO X-LIST
@@ -613,7 +610,7 @@ Same occurs if I use ``` Y-TAG ``` and ``` Z-TAG ```\. If I write this\:
 You will see this\:
 
 `````Lisp
-(DEFUN ADP::SOME-LARGE-FUNCTION (X Y Z)
+(DEFUN SOME-LARGE-FUNCTION (X Y Z)
   (LET (... (POST-Y (1+ Y)) ...)
     (LOOP FOR I FROM 0 BELOW 10
           COLLECT ...
@@ -623,7 +620,7 @@ You will see this\:
 `````
 
 `````Lisp
-(DEFUN ADP::SOME-LARGE-FUNCTION (X Y Z)
+(DEFUN SOME-LARGE-FUNCTION (X Y Z)
   (LET (... ... (POST-Z (1+ Z)))
     (LOOP FOR I FROM 0 BELOW 10
           COLLECT ...
@@ -642,7 +639,7 @@ You can also remove the code using the form ``` code-remove ```\. It works the s
   MAKING-FUNCTION-2)
 
 (ADP:CODE-TAG (MAKING-FUNCTION-1 MAKING-FUNCTION-2)
-  (DEFUN ADP::PRINT-5-6 ()
+  (DEFUN PRINT-5-6 ()
     (ADP:CODE-HIDE (MAKING-FUNCTION-2) (ADP:CODE-COMMENT "We print 5")
      (PRINT 5))
     (ADP:CODE-REMOVE (MAKING-FUNCTION-1) (ADP:CODE-COMMENT "And we print 6")
@@ -652,13 +649,13 @@ You can also remove the code using the form ``` code-remove ```\. It works the s
 And you will see this\:
 
 `````Lisp
-(DEFUN ADP::PRINT-5-6 ()
+(DEFUN PRINT-5-6 ()
   ;; First we print 5
   (PRINT 5))
 `````
 
 `````Lisp
-(DEFUN ADP::PRINT-5-6 ()
+(DEFUN PRINT-5-6 ()
   ...
   ;; And then we print 6
   (PRINT 6))
@@ -672,12 +669,12 @@ I hope this guide is useful\. I usually see Common Lisp projects that looks awes
 * ***Handling error messages***\: I tried to make informative error messages but sometimes this cannot be possible\. Or\, at least\, I can\'t do it better\. The most common errors I have had when using ADP were undefined variable errors\. Remember that [ADP\:INLINE\-CODE](/docs/user-api.md#macro-inline-code) works the same as [ADP\:TEXT](/docs/user-api.md#macro-text)\. You can\'t write ``` (inline-code name-of-function) ```\, you must write this instead ``` (inline-code "name-of-function") ``` or ``` (inline-code 'name-of-function) ```\. Also\, be careful when using [ADP\:FUNCTION\-REF](/docs/user-api.md#macro-function-ref) or similars\. If you don\'t write correctly the macro\, some implementations will treat that call as a function call and will treat the argument as a variable\. That\'s not a variable that ADP or you have defined and it is sure that it will raise an undefined variable error\.
 * ***Tags belong to a package\!***\: Note that tags are actually symbols\, and symbols belong to a package\. If you define a tag and you want to make a reference to it from another package\, remember to add the package extension to the symbol name\. For example\, suppose that you define the symbol\-tag ``` MY-TAG ``` in the package ``` MY-PKG ```\. Then\, in another package you must write ``` (symbol-ref my-pkg:my-tag) ```\, or ``` (symbol-ref my-pkg::my-tag) ``` if the symbol is not exported\. And yes\, you should export the tags you want to use in other packages\.
 * ***Read the API***\: Maybe reading [ADP User Interface](/docs/user-api.md#adp-user-interface) can make you understand better how some macros work \(or not\)\. At least\, you may be interested in seeing the section [Additional functions](/docs/user-api.md#additional-functions) or [Macro characters](/docs/user-api.md#macro-characters)\.
-* ***That\'s all\! Enjoy using ADP\.*** I leave you with [ADP\:\:A\-PARAMETER\-DEFINED\-AT\-THE\-END\-OF\-THE\-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file) and [ALSO\-A\-TYPE\?](/docs/user-guide.md#type-also-a-type) again\.
+* ***That\'s all\! Enjoy using ADP\.*** I leave you with [A\-PARAMETER\-DEFINED\-AT\-THE\-END\-OF\-THE\-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file) and [ALSO\-A\-TYPE\?](/docs/user-guide.md#type-also-a-type) again\.
 
 #### Variable: A\-PARAMETER\-DEFINED\-AT\-THE\-END\-OF\-THE\-FILE
 
 ```Lisp
-(defparameter ADP::A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE T)
+(defparameter A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE T)
 ```
 
 #### Type: ALSO\-A\-TYPE\?

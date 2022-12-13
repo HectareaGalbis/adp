@@ -547,7 +547,7 @@ Add a defvar declaration. The macro expands to cl:defvar. Also, the variable nam
 #### Function: LOAD\-STYLE
 
 ```Lisp
-(defun ADP::LOAD-STYLE (STYLE)
+(defun LOAD-STYLE (STYLE)
   ...)
 ```
 
@@ -573,7 +573,7 @@ arguments to let the user customize briefly how documentation is printed.
 #### Macro: EVAL\-WHEN\-ADP
 
 ```Lisp
-(defmacro ADP::EVAL-WHEN-ADP (&BODY BODY)
+(defmacro EVAL-WHEN-ADP (&BODY BODY)
   ...)
 ```
 

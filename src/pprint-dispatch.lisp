@@ -18,14 +18,7 @@
 			(shortest-string (package-nicknames sym-package))))
 	 (print-package-mode (and sym-package
 				  (not (equal sym-package (find-package "CL")))
-				  (case (nth-value 1 (find-symbol (symbol-name sym) sym-package))
-				    (:external :external)
-				    (:internal (if (or (boundp sym)
-						       (fboundp sym)
-						       (subtypep sym '(or standard-class built-in-class structure-class)))
-						   :internal
-						   nil))
-				    (t nil))))
+				  (nth-value 1 (find-symbol (symbol-name sym) sym-package))))
 	 (package-to-print (and print-package-mode
 				(or nickname
 				    (and (keywordp sym) "")
@@ -33,7 +26,6 @@
 	 (*print-escape* nil))
     (case print-package-mode
       (:external (format stream "~a:~a" package-to-print (symbol-name sym)))
-      (:internal (format stream "~a::~a" package-to-print (symbol-name sym)))
       (t (format stream "~a" (symbol-name sym))))))
 
 (defun make-custom-pprint-dispatch ()

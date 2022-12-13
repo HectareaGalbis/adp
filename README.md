@@ -11,13 +11,13 @@ _Add Documentation\, Please_ is a library for literate programming and semi\-aut
 Generating the API documentation is also easy\. Suppose that you have the following function definition\:
 
 `````Lisp
-(DEFUN ADP::FOO () "A function that does nothing." (VALUES))
+(DEFUN FOO () "A function that does nothing." (VALUES))
 `````
 
 ADP redefines the macro [DEFUN](http://www.lispworks.com/reference/HyperSpec/Body/m_defun.htm)\. To generate the documentation for this function you just need to tell Common Lisp that the macro [ADP\:DEFUN](/docs/user-api.md#macro-defun) used is the one from the package ``` adp ```\:
 
 `````Lisp
-(ADP:DEFUN ADP::FOO () "A function that does nothing" (VALUES))
+(ADP:DEFUN FOO () "A function that does nothing" (VALUES))
 `````
 
 That\'s all\! And the same occurs with every Common Lisp macro that defines something\, like [ADP\:DEFPACKAGE](/docs/user-api.md#macro-defpackage) or [ADP\:DEFINE\-METHOD\-COMBINATION](/docs/user-api.md#macro-define-method-combination)\.

@@ -9,7 +9,7 @@
 #### Macro: DEFINE\-BEGIN\-FILE\-WRITER
 
 ```Lisp
-(defmacro ADPSM::DEFINE-BEGIN-FILE-WRITER ((G176) &BODY BODY177)
+(defmacro DEFINE-BEGIN-FILE-WRITER ((G176) &BODY BODY177)
   ...)
 ```
 
@@ -21,7 +21,7 @@ associated with said file.
 #### Macro: DEFINE\-END\-FILE\-WRITER
 
 ```Lisp
-(defmacro ADPSM::DEFINE-END-FILE-WRITER ((G179) &BODY BODY180)
+(defmacro DEFINE-END-FILE-WRITER ((G179) &BODY BODY180)
   ...)
 ```
 
@@ -44,7 +44,7 @@ Define a function that must return a string indicating the extension of the file
 #### Macro: DEFINE\-BEGIN\-PROJECT\-WRITER
 
 ```Lisp
-(defmacro ADPSM::DEFINE-BEGIN-PROJECT-WRITER ((G184) &BODY BODY185)
+(defmacro DEFINE-BEGIN-PROJECT-WRITER ((G184) &BODY BODY185)
   ...)
 ```
 
@@ -56,7 +56,7 @@ receives the pathname of the project root directory.
 #### Macro: DEFINE\-END\-PROJECT\-WRITER
 
 ```Lisp
-(defmacro ADPSM::DEFINE-END-PROJECT-WRITER ((G187) &BODY BODY188)
+(defmacro DEFINE-END-PROJECT-WRITER ((G187) &BODY BODY188)
   ...)
 ```
 
