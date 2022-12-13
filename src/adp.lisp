@@ -658,8 +658,7 @@ arguments to let the user customize briefly how documentation is printed."
 	
 	(adppvt:with-tag-tables
 
-	  (let* ((*adp* t)
-		 (root-path (truename (asdf:system-source-directory system)))
+	  (let* ((root-path (truename (asdf:system-source-directory system)))
 		 (fixed-root-path (make-pathname :host (pathname-host root-path)
 						 :device (pathname-device root-path)
 						 :directory (pathname-directory root-path)))
