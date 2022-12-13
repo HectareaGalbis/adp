@@ -402,7 +402,8 @@ the next forms: code-hide, code-remove, code-show and code-comment.
 			    do (adppvt:add-code-tag ,tag (make-instance 'adppvt:tagged-code
 									:name "tagged-code"
 									:tag ,tag
-									:expr (process-code-tag ,tag ,expr))))))))
+									:expr (process-code-tag ,tag ,expr)
+									:source-location (adppvt:relative-truename *project*))))))))
      ,@(remove-code-tag exprs)))
 
 
@@ -435,20 +436,19 @@ the code assigned to that tag is printed instead of the symbol."
 	 (values)))))
 
 
-(adv-defmacro verbatim-code-block (lang-or-text &optional (text nil textp))
-  "Add a block of text. It can receive up to two arguments. If only one argument is received it must be a string of text that will be printed inside the block.
-If two arguments are received, the text to be printed must be the second one, and the first argument is a string representing the language used for writing
-the text."
+(adv-defmacro verbatim-code-block (lang text)
+  "Add a block of text. It receives two arguments. The first argument must be a string or NIL and it should
+denote the programming language that will be used. The second argument must be a string with the text that will
+be printed."
   (when *adp*
-    (check-type lang-or-text string)
-    (check-type textp (or null string) "a string or NIL")
-    (let ((true-lang (and textp lang-or-text))
-	  (true-text (if textp text lang-or-text)))
+    (check-type lang (or string null) "a string or NIL")
+    (check-type text string)
+    (let ((true-lang (or lang "")))
       `(progn
 	 (adppvt:add-element *project* (make-instance 'adppvt:verbatim-code-block
 						      :name "verbatim-code-block"
 						      :code-type ,true-lang
-						      :code-text ,true-text
+						      :code-text ,text
 						      :source-location (adppvt:relative-truename *project*)))
 	 (values)))))
 

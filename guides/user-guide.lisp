@@ -209,14 +209,14 @@
 
 (subsubheader "Code blocks")
 
-(text "A good Lisp tutorial must include Lisp code examples. ADP defines two macros to print code blocks: " (function-ref code-block) " and " (function-ref code-example) ". The main difference is that the former does not evaluate the code to be printed. So, for example:")
+(text "A good Lisp tutorial must include Lisp code examples. ADP defines some macros to print code blocks: " (function-ref code-block) ", " (function-ref verbatim-code-block) " and " (function-ref code-example) ". The first macro does not evaluate the code. So, for example if you write this:")
 
 (code-block ()
   (code-block ()
     (this is not (valid code))
     (but it (is (ok)))))
 
-(text "And you will see:")
+(text "You will see:")
 
 (code-block ()
   (this is not (valid code))
@@ -224,20 +224,38 @@
 
 (text "Note that " (inline-code 'nil) " or, equivalently, " (inline-code "()") " is used after " (inline-code "code-block") ". This is because we can pass some symbols to " (function-ref code-block) " in order to change a bit how it works. But, we will see that in later sections.")
 
-(text "On the other hand, " (function-ref code-example) " do evaluate the code. And what is more, it prints the standard output as well as the returned values. For example:")
+(text "The macro " (function-ref verbatim-code-block) " allows you to write non-Lisp code. It must receive two strings denoting the programming language to be used and the code itself. For example, writing this:")
+
+(code-block (verbatim-example)
+  verbatim-example)
+
+(code-tag (verbatim-example)
+  (verbatim-code-block "C++"
+      "int main (){
+
+  // We initialize some vars
+  int n = 5;
+  int m = 10;
+ 
+  // We print hello world
+  std::count << \"Hello world\" << std::endl;
+
+  return 0;
+
+}"))
+
+(text "Lastly, " (function-ref code-example) " evaluate the Lisp code you write on it. And what is more, it prints the standard output as well as the returned values. For example, writing this:")
 
 (code-block (code-example-example)
   code-example-example)
 
-(text "And you will see:")
+(text "You will see:")
 
 (code-tag (code-example-example)
   (code-example
     (loop for i from 0 below 10
 	  do (print i))
     (values "Hello" "world")))
-
-(text "Both with " (function-ref code-block) " and with " (function-ref code-example) " you can write multiple expressions.")
 
 
 (subheader "Generating the documentation")

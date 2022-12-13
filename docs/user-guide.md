@@ -242,7 +242,7 @@ The first argument is the alternative text of the image\. If for some reason the
 
 ### Code blocks
 
-A good Lisp tutorial must include Lisp code examples\. ADP defines two macros to print code blocks\: [ADP\:CODE\-BLOCK](/docs/user-api.md#macro-code-block) and [ADP\:CODE\-EXAMPLE](/docs/user-api.md#macro-code-example)\. The main difference is that the former does not evaluate the code to be printed\. So\, for example\:
+A good Lisp tutorial must include Lisp code examples\. ADP defines some macros to print code blocks\: [ADP\:CODE\-BLOCK](/docs/user-api.md#macro-code-block)\, [ADP\:VERBATIM\-CODE\-BLOCK](/docs/user-api.md#macro-verbatim-code-block) and [ADP\:CODE\-EXAMPLE](/docs/user-api.md#macro-code-example)\. The first macro does not evaluate the code\. So\, for example if you write this\:
 
 `````Lisp
 (ADP:CODE-BLOCK NIL
@@ -250,7 +250,7 @@ A good Lisp tutorial must include Lisp code examples\. ADP defines two macros to
   (BUT IT (IS (OK))))
 `````
 
-And you will see\:
+You will see\:
 
 `````Lisp
 (THIS IS NOT (VALID CODE))
@@ -260,7 +260,39 @@ And you will see\:
 
 Note that ``` NIL ``` or\, equivalently\, ``` () ``` is used after ``` code-block ```\. This is because we can pass some symbols to [ADP\:CODE\-BLOCK](/docs/user-api.md#macro-code-block) in order to change a bit how it works\. But\, we will see that in later sections\.
 
-On the other hand\, [ADP\:CODE\-EXAMPLE](/docs/user-api.md#macro-code-example) do evaluate the code\. And what is more\, it prints the standard output as well as the returned values\. For example\:
+The macro [ADP\:VERBATIM\-CODE\-BLOCK](/docs/user-api.md#macro-verbatim-code-block) allows you to write non\-Lisp code\. It must receive two strings denoting the programming language to be used and the code itself\. For example\, writing this\:
+
+`````Lisp
+(ADP:VERBATIM-CODE-BLOCK "C++" "int main (){
+
+  // We initialize some vars
+  int n = 5;
+  int m = 10;
+ 
+  // We print hello world
+  std::count << \"Hello world\" << std::endl;
+
+  return 0;
+
+}")
+`````
+
+`````C++
+int main (){
+
+  // We initialize some vars
+  int n = 5;
+  int m = 10;
+ 
+  // We print hello world
+  std::count << "Hello world" << std::endl;
+
+  return 0;
+
+}
+`````
+
+Lastly\, [ADP\:CODE\-EXAMPLE](/docs/user-api.md#macro-code-example) evaluate the Lisp code you write on it\. And what is more\, it prints the standard output as well as the returned values\. For example\, writing this\:
 
 `````Lisp
 (ADP:CODE-EXAMPLE
@@ -269,7 +301,7 @@ On the other hand\, [ADP\:CODE\-EXAMPLE](/docs/user-api.md#macro-code-example) d
   (VALUES "Hello" "world"))
 `````
 
-And you will see\:
+You will see\:
 
 ```Lisp
 (LOOP FOR I FROM 0 BELOW 10
@@ -290,8 +322,6 @@ And you will see\:
 "Hello"
 "world"
 ```
-
-Both with [ADP\:CODE\-BLOCK](/docs/user-api.md#macro-code-block) and with [ADP\:CODE\-EXAMPLE](/docs/user-api.md#macro-code-example) you can write multiple expressions\.
 
 ## Generating the documentation
 
