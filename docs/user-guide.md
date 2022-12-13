@@ -401,7 +401,7 @@ You will see this\:
 
 A reference to an ADP macro\: [ADP\:HEADER](/docs/user-api.md#macro-header)
 
-Note again that [ADP\:FUNCTION\-REF](/docs/user-api.md#macro-function-ref) only can be used inside [ADP\:TEXT](/docs/user-api.md#macro-text)\, [ADP\:TABLE](/docs/user-api.md#macro-table) or [ADP\:ITEMIZE](/docs/user-api.md#macro-itemize)\. The same goes to [ADP\:SYMBOL\-REF](/docs/user-api.md#macro-symbol-ref) and [ADP\:TYPE\-REF](/docs/user-api.md#macro-type-ref)\.
+Note again that [ADP\:FUNCTION\-REF](/docs/user-api.md#macro-function-ref) only can be used inside [ADP\:TEXT](/docs/user-api.md#macro-text)\, [ADP\:CELL](/docs/user-api.md#macro-cell) or [ADP\:ITEM](/docs/user-api.md#macro-item)\. The same goes to [ADP\:SYMBOL\-REF](/docs/user-api.md#macro-symbol-ref) and [ADP\:TYPE\-REF](/docs/user-api.md#macro-type-ref)\.
 
 A cool thing about cross references is that you can make a reference to something that is not currently defined but will be\. For example\, a variable will be defined at the end of this file but we can make a reference now\. I\'m writing the next expression\:
 

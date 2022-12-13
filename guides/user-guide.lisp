@@ -334,7 +334,7 @@
 (code-tag (function-tag-example)
   (text "A reference to an ADP macro: " (function-ref header)))
 
-(text "Note again that " (function-ref function-ref) " only can be used inside " (function-ref text) ", " (function-ref table) " or " (function-ref itemize) ". The same goes to " (function-ref symbol-ref) " and " (function-ref type-ref) ".")
+(text "Note again that " (function-ref function-ref) " only can be used inside " (function-ref text) ", " (function-ref cell) " or " (function-ref item) ". The same goes to " (function-ref symbol-ref) " and " (function-ref type-ref) ".")
 
 (text "A cool thing about cross references is that you can make a reference to something that is not currently defined but will be. For example, a variable will be defined at the end of this file but we can make a reference now. I'm writing the next expression:")
 
