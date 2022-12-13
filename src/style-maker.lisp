@@ -26,11 +26,14 @@
   (check-type writer-definer symbol)
   (check-type writer-args list)
   (check-type docstring string)
-  (let ((body (make-symbol "BODY")))
+  (let ((body (make-symbol "BODY"))
+	(uninterned-writer-args (mapcar (lambda (sym)
+					  (make-symbol (symbol-name sym)))
+					writer-args)))
     (with-gensyms (proc-args)
-	`(adp:defmacro ,writer-definer (,writer-args &body ,body)
+	`(adp:defmacro ,writer-definer (,uninterned-writer-args &body ,body)
        ,docstring
-       (let ((,proc-args (list ,@writer-args)))
+       (let ((,proc-args (list ,@uninterned-writer-args)))
 	 `(setf ,',writer-proc (lambda ,,proc-args
 				 ,@,body)))))))
 
