@@ -21,93 +21,95 @@
 
 (adp:subheader "Writers")
 
-(defmacro define-writer-definer (writer-proc writer-definer num-args docstring)
+(defmacro define-writer-definer (writer-proc writer-definer writer-args docstring)
+  (check-type writer-proc symbol)
   (check-type writer-definer symbol)
-  (check-type num-args unsigned-byte)
-  (let ((writer-args (loop repeat num-args collect (gensym))))
-    (with-gensyms (body proc-args)
-      `(adp:defmacro ,writer-definer (,writer-args &body ,body)
-	 ,docstring
-	 (let ((,proc-args (list ,@writer-args)))
-	   `(setf ,',writer-proc (lambda ,,proc-args
-				   ,@,body)))))))
+  (check-type writer-args list)
+  (check-type docstring string)
+  (let ((body (make-symbol "BODY")))
+    (with-gensyms (proc-args)
+	`(adp:defmacro ,writer-definer (,writer-args &body ,body)
+       ,docstring
+       (let ((,proc-args (list ,@writer-args)))
+	 `(setf ,',writer-proc (lambda ,,proc-args
+				 ,@,body)))))))
 
 
 ;; file
-(define-writer-definer adppvt:*begin-file-writer* define-begin-file-writer 1
+(define-writer-definer adppvt:*begin-file-writer* define-begin-file-writer (stream)
   "Define a function that will be called when the file is about to be written in. The function receives a stream 
 associated with said file.")
-(define-writer-definer adppvt:*end-file-writer* define-end-file-writer 1
+(define-writer-definer adppvt:*end-file-writer* define-end-file-writer (stream)
   "Define a function that will be called after a file has finished of being written in. The function receives a
 stream associated with said file.")
-(define-writer-definer adppvt:*file-extension* define-file-extension 0
+(define-writer-definer adppvt:*file-extension* define-file-extension ()
   "Define a function that must return a string indicating the extension of the files that ADP will create.")
 
 ;; project
-(define-writer-definer adppvt:*begin-project-writer* define-begin-project-writer 1
+(define-writer-definer adppvt:*begin-project-writer* define-begin-project-writer (root-directory)
   "Define a function that will be called before the documentation of a project begins to generate. The function 
 receives the pathname of the project root directory.")
-(define-writer-definer adppvt:*end-project-writer* define-end-project-writer 1
+(define-writer-definer adppvt:*end-project-writer* define-end-project-writer (root-directory)
   "Define a function that will be called after the documentation of a project has been generated. The function
 receives the pathname of the project root directory.")
 
 ;; header
-(define-writer-definer adppvt:*header-writer* define-header-writer 3
+(define-writer-definer adppvt:*header-writer* define-header-writer (stream title tag)
   "Define a function that must print a header element. The function receives the stream to be written in, the
 header name and the tag associated to it.")
-(define-writer-definer adppvt:*subheader-writer* define-subheader-writer 3
+(define-writer-definer adppvt:*subheader-writer* define-subheader-writer (stream title tag)
   "Same as define-header-writer but it must print a subheader element.")
-(define-writer-definer adppvt:*subsubheader-writer* define-subsubheader-writer 3
+(define-writer-definer adppvt:*subsubheader-writer* define-subsubheader-writer (stream title tag)
   "Same as define-header-writer but it must print a subsubheader element.")
 
 ;; text
-(define-writer-definer adppvt:*text-writer* define-text-writer 2
+(define-writer-definer adppvt:*text-writer* define-text-writer (stream text)
   "Define a function that must print a text element. It receives the stream to be written in, and a string with
 the text.")
-(define-writer-definer adppvt:*escape-text* define-escape-text 1
+(define-writer-definer adppvt:*escape-text* define-escape-text (text)
   "Define a function that receives a string of text and must return another string. You want this to escape
 special characters that will be used with bold, italic, header-ref, web-link, etc.")
 
 ;; text enrichment
-(define-writer-definer adppvt:*bold-writer* define-bold-writer 2
+(define-writer-definer adppvt:*bold-writer* define-bold-writer (stream text)
   "Define a function to print a bold text element. It receives the stream to be written in, and a string with
 the text.")
-(define-writer-definer adppvt:*italic-writer* define-italic-writer 2
+(define-writer-definer adppvt:*italic-writer* define-italic-writer (stream text)
   "Same as define-bold-writer, but with an italic style.")
-(define-writer-definer adppvt:*emphasis-writer* define-emphasis-writer 2
+(define-writer-definer adppvt:*emphasis-writer* define-emphasis-writer (stream text)
   "Same as define-bold-writer, but with both bold and italic style.")
-(define-writer-definer adppvt:*inline-code-writer* define-inline-code-writer 2
+(define-writer-definer adppvt:*inline-code-writer* define-inline-code-writer (stream text)
   "Same as define-bold-writer, but with a code-inline style.")
 
 ;; text reference
-(define-writer-definer adppvt:*header-ref-writer* define-header-ref-writer 4
+(define-writer-definer adppvt:*header-ref-writer* define-header-ref-writer (stream tag title source-relative-path)
   "Define a function to print a header reference element. It receives the stream to be written in, the tag
 associated to a header element, the text of said header element, and the relative path to the place where the
 header element is in.")
-(define-writer-definer adppvt:*symbol-ref-writer* define-symbol-ref-writer 3
+(define-writer-definer adppvt:*symbol-ref-writer* define-symbol-ref-writer (stream tag source-relative-path)
   "Same as define-header-ref-writer, but it prints a symbol reference. Also, it receives the stream, the tag
 associated with the symbol, and the relative path to the place where the symbol definition is in.")
-(define-writer-definer adppvt:*function-ref-writer* define-function-ref-writer 3
+(define-writer-definer adppvt:*function-ref-writer* define-function-ref-writer (stream tag source-relative-path)
   "Same as define-symbol-ref-writer, but it prints a function reference.")
-(define-writer-definer adppvt:*type-ref-writer* define-type-ref-writer 3
+(define-writer-definer adppvt:*type-ref-writer* define-type-ref-writer (stream tag source-relative-path)
   "Sama as define-symbol-ref-writer, but it prints a type reference.")
 
 ;; web link
-(define-writer-definer adppvt:*web-link-writer* define-web-link-writer 3
+(define-writer-definer adppvt:*web-link-writer* define-web-link-writer (stream text address)
   "Define a function to print a web link element. It receives the stream, the link text as a string, and the link address as a string.")
 
 ;; image
-(define-writer-definer adppvt:*image-writer* define-image-writer 3
+(define-writer-definer adppvt:*image-writer* define-image-writer (stream alt-text image-relative-path)
   "Define a function to print an image element. It receives the stream, the alternative text as a string, and a
 relative pathname to the image.")
 
 ;; table
-(define-writer-definer adppvt:*table-writer* define-table-writer 2
+(define-writer-definer adppvt:*table-writer* define-table-writer (stream rows)
   "Define a function to print a table element. It receives the stream, and a list of lists of strings. Each
 inner list is a row of the table, and each string is an element of the table.")
 
 ;; itemize
-(define-writer-definer adppvt:*itemize-writer* define-itemize-writer 2
+(define-writer-definer adppvt:*itemize-writer* define-itemize-writer (stream itemize)
   "Define a function to print an itemize element. It receives the stream and a list. The first element of the
 list can be :iterate or :enumerate indicating if you should use numbers. Each element of the rest of the list can be an item or a nested list element. The item has the form (:item string). A nested list element is a list starting with :itemize or :enumerate and the rest of elements are again items or nested list elements.
   For example, you could receive something like:
@@ -116,49 +118,49 @@ list can be :iterate or :enumerate indicating if you should use numbers. Each el
                           (:item \"Cat\")))")
 
 ;; code
-(define-writer-definer adppvt:*code-block-writer* define-code-block-writer 3
+(define-writer-definer adppvt:*code-block-writer* define-code-block-writer (stream lang text)
   "Define a function to print a code block element. It receives the stream, a string with the used programming 
 language, and another string with the text to be placed in the block of code.")
-(define-writer-definer adppvt:*code-example-writer* define-code-example-writer 4
+(define-writer-definer adppvt:*code-example-writer* define-code-example-writer (stream text output results)
   "Define a function to print an example block. It receives the stream, a string with the code to be placed in 
 a block of code, a string with the standard output of the code, and a list of elements returned by the code.")
 
 ;; definition
-(define-writer-definer adppvt:*defclass-writer* define-defclass-writer 2
+(define-writer-definer adppvt:*defclass-writer* define-defclass-writer (stream expr)
   "Define a function to print a defclass definition. It receives the stream, and the definition expression.")
-(define-writer-definer adppvt:*defconstant-writer* define-defconstant-writer 2
+(define-writer-definer adppvt:*defconstant-writer* define-defconstant-writer (stream expr)
   "Define a function to print a defconstant definition. It receives the stream, and the definition expression.")
-(define-writer-definer adppvt:*defgeneric-writer* define-defgeneric-writer 2
+(define-writer-definer adppvt:*defgeneric-writer* define-defgeneric-writer (stream expr)
   "Define a function to print a defgeneric definition. It receives the stream, and the definition expression.")
-(define-writer-definer adppvt:*define-compiler-macro-writer* define-define-compiler-macro-writer 2
+(define-writer-definer adppvt:*define-compiler-macro-writer* define-define-compiler-macro-writer (stream expr)
   "Define a function to print a define-compiler-macro definition. It receives the stream, and the definition expression.")
-(define-writer-definer adppvt:*define-condition-writer* define-define-condition-writer 2
+(define-writer-definer adppvt:*define-condition-writer* define-define-condition-writer (stream expr)
   "Define a function to print a define-condition definition. It receives the stream, and the definition expression.")
-(define-writer-definer adppvt:*define-method-combination-writer* define-define-method-combination-writer 2
+(define-writer-definer adppvt:*define-method-combination-writer* define-define-method-combination-writer (stream expr)
   "Define a function to print a define-method-combination definition. It receives the stream, and the definition expression.")
-(define-writer-definer adppvt:*define-modify-macro-writer* define-define-modify-macro-writer 2
+(define-writer-definer adppvt:*define-modify-macro-writer* define-define-modify-macro-writer (stream expr)
   "Define a function to print a define-modify-macro definition. It receives the stream, and the definition expression.")
-(define-writer-definer adppvt:*define-setf-expander-writer* define-define-setf-expander-writer 2
+(define-writer-definer adppvt:*define-setf-expander-writer* define-define-setf-expander-writer (stream expr)
   "Define a function to print a define-setf-expander definition. It receives the stream, and the definition expression.")
-(define-writer-definer adppvt:*define-symbol-macro-writer* define-define-symbol-macro-writer 2
+(define-writer-definer adppvt:*define-symbol-macro-writer* define-define-symbol-macro-writer (stream expr)
   "Define a function to print a define-symbol-macro definition. It receives the stream, and the definition expression.")
-(define-writer-definer adppvt:*defmacro-writer* define-defmacro-writer 2
+(define-writer-definer adppvt:*defmacro-writer* define-defmacro-writer (stream expr)
   "Define a function to print a defmacro definition. It receives the stream, and the definition expression.")
-(define-writer-definer adppvt:*defmethod-writer* define-defmethod-writer 2
+(define-writer-definer adppvt:*defmethod-writer* define-defmethod-writer (stream expr)
   "Define a function to print a defmethod definition. It receives the stream, and the definition expression.")
-(define-writer-definer adppvt:*defpackage-writer* define-defpackage-writer 2
+(define-writer-definer adppvt:*defpackage-writer* define-defpackage-writer (stream expr)
   "Define a function to print a defpackage definition. It receives the stream, and the definition expression.")
-(define-writer-definer adppvt:*defparameter-writer* define-defparameter-writer 2
+(define-writer-definer adppvt:*defparameter-writer* define-defparameter-writer (stream expr)
   "Define a function to print a defparameter definition. It receives the stream, and the definition expression.")
-(define-writer-definer adppvt:*defsetf-writer* define-defsetf-writer 2
+(define-writer-definer adppvt:*defsetf-writer* define-defsetf-writer (stream expr)
   "Define a function to print a defsetf definition. It receives the stream, and the definition expression.")
-(define-writer-definer adppvt:*defstruct-writer* define-defstruct-writer 2
+(define-writer-definer adppvt:*defstruct-writer* define-defstruct-writer (stream expr)
   "Define a function to print a defstruct definition. It receives the stream, and the definition expression.")
-(define-writer-definer adppvt:*deftype-writer* define-deftype-writer 2
+(define-writer-definer adppvt:*deftype-writer* define-deftype-writer (stream expr)
   "Define a function to print a deftype definition. It receives the stream, and the definition expression.")
-(define-writer-definer adppvt:*defun-writer* define-defun-writer 2
+(define-writer-definer adppvt:*defun-writer* define-defun-writer (stream expr)
   "Define a function to print a defun definition. It receives the stream, and the definition expression.")
-(define-writer-definer adppvt:*defvar-writer* define-defvar-writer 2
+(define-writer-definer adppvt:*defvar-writer* define-defvar-writer (stream expr)
   "Define a function to print a defvar definition. It receives the stream, and the definition expression.")
 
 
@@ -179,8 +181,11 @@ a block of code, a string with the standard output of the code, and a list of el
 	     (error "Expected one of the following symbols: ~s~%Found: ~s" components sym))))
 
 (defmacro def-with-components (name &rest components)
-  (let ((name-arg (intern (concatenate 'string "WITH-" (symbol-name name) "-COMPONENTS"))))
-    (with-gensyms (component-rest-args function-body-arg body-arg function-body-value-var let-bindings-var lambda-var)
+  (let ((name-arg (intern (concatenate 'string "WITH-" (symbol-name name) "-COMPONENTS")))
+	(component-rest-args (make-symbol "COMPONENT-REST-ARGS"))
+	(function-body-arg (make-symbol "FUNCTION-BODY-ARG"))
+	(body-arg (make-symbol "BODY-ARG")))
+    (with-gensyms (function-body-value-var let-bindings-var lambda-var)
       `(adp:defmacro ,name-arg (((&rest ,component-rest-args) ,function-body-arg) &body ,body-arg)
 	 (check-component-symbols ,component-rest-args ',components)
 	 (let* ((,function-body-value-var (gensym))

@@ -9,7 +9,7 @@
 #### Macro: DEFINE\-BEGIN\-FILE\-WRITER
 
 ```Lisp
-(defmacro DEFINE-BEGIN-FILE-WRITER ((G3) &BODY BODY4)
+(defmacro DEFINE-BEGIN-FILE-WRITER ((STREAM) &BODY BODY)
   ...)
 ```
 
@@ -21,7 +21,7 @@ associated with said file.
 #### Macro: DEFINE\-END\-FILE\-WRITER
 
 ```Lisp
-(defmacro DEFINE-END-FILE-WRITER ((G6) &BODY BODY7)
+(defmacro DEFINE-END-FILE-WRITER ((STREAM) &BODY BODY)
   ...)
 ```
 
@@ -33,7 +33,7 @@ stream associated with said file.
 #### Macro: DEFINE\-FILE\-EXTENSION
 
 ```Lisp
-(defmacro ADPSM:DEFINE-FILE-EXTENSION (NIL &BODY BODY9)
+(defmacro ADPSM:DEFINE-FILE-EXTENSION (NIL &BODY BODY)
   ...)
 ```
 
@@ -44,7 +44,7 @@ Define a function that must return a string indicating the extension of the file
 #### Macro: DEFINE\-BEGIN\-PROJECT\-WRITER
 
 ```Lisp
-(defmacro DEFINE-BEGIN-PROJECT-WRITER ((G11) &BODY BODY12)
+(defmacro DEFINE-BEGIN-PROJECT-WRITER ((ROOT-DIRECTORY) &BODY BODY)
   ...)
 ```
 
@@ -56,7 +56,7 @@ receives the pathname of the project root directory.
 #### Macro: DEFINE\-END\-PROJECT\-WRITER
 
 ```Lisp
-(defmacro DEFINE-END-PROJECT-WRITER ((G14) &BODY BODY15)
+(defmacro DEFINE-END-PROJECT-WRITER ((ROOT-DIRECTORY) &BODY BODY)
   ...)
 ```
 
@@ -68,7 +68,7 @@ receives the pathname of the project root directory.
 #### Macro: DEFINE\-HEADER\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-HEADER-WRITER ((G17 G18 G19) &BODY BODY20)
+(defmacro ADPSM:DEFINE-HEADER-WRITER ((STREAM TITLE TAG) &BODY BODY)
   ...)
 ```
 
@@ -80,7 +80,7 @@ header name and the tag associated to it.
 #### Macro: DEFINE\-SUBHEADER\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-SUBHEADER-WRITER ((G22 G23 G24) &BODY BODY25)
+(defmacro ADPSM:DEFINE-SUBHEADER-WRITER ((STREAM TITLE TAG) &BODY BODY)
   ...)
 ```
 
@@ -91,7 +91,7 @@ Same as define-header-writer but it must print a subheader element.
 #### Macro: DEFINE\-SUBSUBHEADER\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-SUBSUBHEADER-WRITER ((G27 G28 G29) &BODY BODY30)
+(defmacro ADPSM:DEFINE-SUBSUBHEADER-WRITER ((STREAM TITLE TAG) &BODY BODY)
   ...)
 ```
 
@@ -102,7 +102,7 @@ Same as define-header-writer but it must print a subsubheader element.
 #### Macro: DEFINE\-TEXT\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-TEXT-WRITER ((G32 G33) &BODY BODY34)
+(defmacro ADPSM:DEFINE-TEXT-WRITER ((STREAM TEXT) &BODY BODY)
   ...)
 ```
 
@@ -114,7 +114,7 @@ the text.
 #### Macro: DEFINE\-ESCAPE\-TEXT
 
 ```Lisp
-(defmacro ADPSM:DEFINE-ESCAPE-TEXT ((G36) &BODY BODY37)
+(defmacro ADPSM:DEFINE-ESCAPE-TEXT ((TEXT) &BODY BODY)
   ...)
 ```
 
@@ -126,7 +126,7 @@ special characters that will be used with bold, italic, header-ref, web-link, et
 #### Macro: DEFINE\-BOLD\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-BOLD-WRITER ((G39 G40) &BODY BODY41)
+(defmacro ADPSM:DEFINE-BOLD-WRITER ((STREAM TEXT) &BODY BODY)
   ...)
 ```
 
@@ -138,7 +138,7 @@ the text.
 #### Macro: DEFINE\-ITALIC\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-ITALIC-WRITER ((G43 G44) &BODY BODY45)
+(defmacro ADPSM:DEFINE-ITALIC-WRITER ((STREAM TEXT) &BODY BODY)
   ...)
 ```
 
@@ -149,7 +149,7 @@ Same as define-bold-writer, but with an italic style.
 #### Macro: DEFINE\-EMPHASIS\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-EMPHASIS-WRITER ((G47 G48) &BODY BODY49)
+(defmacro ADPSM:DEFINE-EMPHASIS-WRITER ((STREAM TEXT) &BODY BODY)
   ...)
 ```
 
@@ -160,7 +160,7 @@ Same as define-bold-writer, but with both bold and italic style.
 #### Macro: DEFINE\-INLINE\-CODE\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-INLINE-CODE-WRITER ((G51 G52) &BODY BODY53)
+(defmacro ADPSM:DEFINE-INLINE-CODE-WRITER ((STREAM TEXT) &BODY BODY)
   ...)
 ```
 
@@ -171,7 +171,9 @@ Same as define-bold-writer, but with a code-inline style.
 #### Macro: DEFINE\-HEADER\-REF\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-HEADER-REF-WRITER ((G55 G56 G57 G58) &BODY BODY59)
+(defmacro ADPSM:DEFINE-HEADER-REF-WRITER ((STREAM TAG TITLE
+                                           SOURCE-RELATIVE-PATH)
+                                          &BODY BODY)
   ...)
 ```
 
@@ -184,7 +186,8 @@ header element is in.
 #### Macro: DEFINE\-SYMBOL\-REF\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-SYMBOL-REF-WRITER ((G61 G62 G63) &BODY BODY64)
+(defmacro ADPSM:DEFINE-SYMBOL-REF-WRITER ((STREAM TAG SOURCE-RELATIVE-PATH)
+                                          &BODY BODY)
   ...)
 ```
 
@@ -196,7 +199,8 @@ associated with the symbol, and the relative path to the place where the symbol 
 #### Macro: DEFINE\-FUNCTION\-REF\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-FUNCTION-REF-WRITER ((G66 G67 G68) &BODY BODY69)
+(defmacro ADPSM:DEFINE-FUNCTION-REF-WRITER ((STREAM TAG SOURCE-RELATIVE-PATH)
+                                            &BODY BODY)
   ...)
 ```
 
@@ -207,7 +211,8 @@ Same as define-symbol-ref-writer, but it prints a function reference.
 #### Macro: DEFINE\-TYPE\-REF\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-TYPE-REF-WRITER ((G71 G72 G73) &BODY BODY74)
+(defmacro ADPSM:DEFINE-TYPE-REF-WRITER ((STREAM TAG SOURCE-RELATIVE-PATH) &BODY
+                                        BODY)
   ...)
 ```
 
@@ -218,7 +223,7 @@ Sama as define-symbol-ref-writer, but it prints a type reference.
 #### Macro: DEFINE\-WEB\-LINK\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-WEB-LINK-WRITER ((G76 G77 G78) &BODY BODY79)
+(defmacro ADPSM:DEFINE-WEB-LINK-WRITER ((STREAM TEXT ADDRESS) &BODY BODY)
   ...)
 ```
 
@@ -229,7 +234,8 @@ Define a function to print a web link element. It receives the stream, the link 
 #### Macro: DEFINE\-IMAGE\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-IMAGE-WRITER ((G81 G82 G83) &BODY BODY84)
+(defmacro ADPSM:DEFINE-IMAGE-WRITER ((STREAM ALT-TEXT IMAGE-RELATIVE-PATH)
+                                     &BODY BODY)
   ...)
 ```
 
@@ -241,7 +247,7 @@ relative pathname to the image.
 #### Macro: DEFINE\-TABLE\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-TABLE-WRITER ((G86 G87) &BODY BODY88)
+(defmacro ADPSM:DEFINE-TABLE-WRITER ((STREAM ROWS) &BODY BODY)
   ...)
 ```
 
@@ -253,7 +259,7 @@ inner list is a row of the table, and each string is an element of the table.
 #### Macro: DEFINE\-ITEMIZE\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-ITEMIZE-WRITER ((G90 G91) &BODY BODY92)
+(defmacro ADPSM:DEFINE-ITEMIZE-WRITER ((STREAM ITEMIZE) &BODY BODY)
   ...)
 ```
 
@@ -269,7 +275,7 @@ list can be :iterate or :enumerate indicating if you should use numbers. Each el
 #### Macro: DEFINE\-CODE\-BLOCK\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-CODE-BLOCK-WRITER ((G94 G95 G96) &BODY BODY97)
+(defmacro ADPSM:DEFINE-CODE-BLOCK-WRITER ((STREAM LANG TEXT) &BODY BODY)
   ...)
 ```
 
@@ -281,7 +287,8 @@ language, and another string with the text to be placed in the block of code.
 #### Macro: DEFINE\-CODE\-EXAMPLE\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-CODE-EXAMPLE-WRITER ((G99 G100 G101 G102) &BODY BODY103)
+(defmacro ADPSM:DEFINE-CODE-EXAMPLE-WRITER ((STREAM TEXT OUTPUT RESULTS) &BODY
+                                            BODY)
   ...)
 ```
 
@@ -293,7 +300,7 @@ a block of code, a string with the standard output of the code, and a list of el
 #### Macro: DEFINE\-DEFCLASS\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-DEFCLASS-WRITER ((G105 G106) &BODY BODY107)
+(defmacro ADPSM:DEFINE-DEFCLASS-WRITER ((STREAM EXPR) &BODY BODY)
   ...)
 ```
 
@@ -304,7 +311,7 @@ Define a function to print a defclass definition. It receives the stream, and th
 #### Macro: DEFINE\-DEFCONSTANT\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-DEFCONSTANT-WRITER ((G109 G110) &BODY BODY111)
+(defmacro ADPSM:DEFINE-DEFCONSTANT-WRITER ((STREAM EXPR) &BODY BODY)
   ...)
 ```
 
@@ -315,7 +322,7 @@ Define a function to print a defconstant definition. It receives the stream, and
 #### Macro: DEFINE\-DEFGENERIC\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-DEFGENERIC-WRITER ((G113 G114) &BODY BODY115)
+(defmacro ADPSM:DEFINE-DEFGENERIC-WRITER ((STREAM EXPR) &BODY BODY)
   ...)
 ```
 
@@ -326,7 +333,7 @@ Define a function to print a defgeneric definition. It receives the stream, and 
 #### Macro: DEFINE\-DEFINE\-COMPILER\-MACRO\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-DEFINE-COMPILER-MACRO-WRITER ((G117 G118) &BODY BODY119)
+(defmacro ADPSM:DEFINE-DEFINE-COMPILER-MACRO-WRITER ((STREAM EXPR) &BODY BODY)
   ...)
 ```
 
@@ -337,7 +344,7 @@ Define a function to print a define-compiler-macro definition. It receives the s
 #### Macro: DEFINE\-DEFINE\-CONDITION\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-DEFINE-CONDITION-WRITER ((G121 G122) &BODY BODY123)
+(defmacro ADPSM:DEFINE-DEFINE-CONDITION-WRITER ((STREAM EXPR) &BODY BODY)
   ...)
 ```
 
@@ -348,8 +355,8 @@ Define a function to print a define-condition definition. It receives the stream
 #### Macro: DEFINE\-DEFINE\-METHOD\-COMBINATION\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-DEFINE-METHOD-COMBINATION-WRITER ((G125 G126) &BODY
-                                                         BODY127)
+(defmacro ADPSM:DEFINE-DEFINE-METHOD-COMBINATION-WRITER ((STREAM EXPR) &BODY
+                                                         BODY)
   ...)
 ```
 
@@ -360,7 +367,7 @@ Define a function to print a define-method-combination definition. It receives t
 #### Macro: DEFINE\-DEFINE\-MODIFY\-MACRO\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-DEFINE-MODIFY-MACRO-WRITER ((G129 G130) &BODY BODY131)
+(defmacro ADPSM:DEFINE-DEFINE-MODIFY-MACRO-WRITER ((STREAM EXPR) &BODY BODY)
   ...)
 ```
 
@@ -371,7 +378,7 @@ Define a function to print a define-modify-macro definition. It receives the str
 #### Macro: DEFINE\-DEFINE\-SETF\-EXPANDER\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-DEFINE-SETF-EXPANDER-WRITER ((G133 G134) &BODY BODY135)
+(defmacro ADPSM:DEFINE-DEFINE-SETF-EXPANDER-WRITER ((STREAM EXPR) &BODY BODY)
   ...)
 ```
 
@@ -382,7 +389,7 @@ Define a function to print a define-setf-expander definition. It receives the st
 #### Macro: DEFINE\-DEFINE\-SYMBOL\-MACRO\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-DEFINE-SYMBOL-MACRO-WRITER ((G137 G138) &BODY BODY139)
+(defmacro ADPSM:DEFINE-DEFINE-SYMBOL-MACRO-WRITER ((STREAM EXPR) &BODY BODY)
   ...)
 ```
 
@@ -393,7 +400,7 @@ Define a function to print a define-symbol-macro definition. It receives the str
 #### Macro: DEFINE\-DEFMACRO\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-DEFMACRO-WRITER ((G141 G142) &BODY BODY143)
+(defmacro ADPSM:DEFINE-DEFMACRO-WRITER ((STREAM EXPR) &BODY BODY)
   ...)
 ```
 
@@ -404,7 +411,7 @@ Define a function to print a defmacro definition. It receives the stream, and th
 #### Macro: DEFINE\-DEFMETHOD\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-DEFMETHOD-WRITER ((G145 G146) &BODY BODY147)
+(defmacro ADPSM:DEFINE-DEFMETHOD-WRITER ((STREAM EXPR) &BODY BODY)
   ...)
 ```
 
@@ -415,7 +422,7 @@ Define a function to print a defmethod definition. It receives the stream, and t
 #### Macro: DEFINE\-DEFPACKAGE\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-DEFPACKAGE-WRITER ((G149 G150) &BODY BODY151)
+(defmacro ADPSM:DEFINE-DEFPACKAGE-WRITER ((STREAM EXPR) &BODY BODY)
   ...)
 ```
 
@@ -426,7 +433,7 @@ Define a function to print a defpackage definition. It receives the stream, and 
 #### Macro: DEFINE\-DEFPARAMETER\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-DEFPARAMETER-WRITER ((G153 G154) &BODY BODY155)
+(defmacro ADPSM:DEFINE-DEFPARAMETER-WRITER ((STREAM EXPR) &BODY BODY)
   ...)
 ```
 
@@ -437,7 +444,7 @@ Define a function to print a defparameter definition. It receives the stream, an
 #### Macro: DEFINE\-DEFSETF\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-DEFSETF-WRITER ((G157 G158) &BODY BODY159)
+(defmacro ADPSM:DEFINE-DEFSETF-WRITER ((STREAM EXPR) &BODY BODY)
   ...)
 ```
 
@@ -448,7 +455,7 @@ Define a function to print a defsetf definition. It receives the stream, and the
 #### Macro: DEFINE\-DEFSTRUCT\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-DEFSTRUCT-WRITER ((G161 G162) &BODY BODY163)
+(defmacro ADPSM:DEFINE-DEFSTRUCT-WRITER ((STREAM EXPR) &BODY BODY)
   ...)
 ```
 
@@ -459,7 +466,7 @@ Define a function to print a defstruct definition. It receives the stream, and t
 #### Macro: DEFINE\-DEFTYPE\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-DEFTYPE-WRITER ((G165 G166) &BODY BODY167)
+(defmacro ADPSM:DEFINE-DEFTYPE-WRITER ((STREAM EXPR) &BODY BODY)
   ...)
 ```
 
@@ -470,7 +477,7 @@ Define a function to print a deftype definition. It receives the stream, and the
 #### Macro: DEFINE\-DEFUN\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-DEFUN-WRITER ((G169 G170) &BODY BODY171)
+(defmacro ADPSM:DEFINE-DEFUN-WRITER ((STREAM EXPR) &BODY BODY)
   ...)
 ```
 
@@ -481,7 +488,7 @@ Define a function to print a defun definition. It receives the stream, and the d
 #### Macro: DEFINE\-DEFVAR\-WRITER
 
 ```Lisp
-(defmacro ADPSM:DEFINE-DEFVAR-WRITER ((G173 G174) &BODY BODY175)
+(defmacro ADPSM:DEFINE-DEFVAR-WRITER ((STREAM EXPR) &BODY BODY)
   ...)
 ```
 
@@ -496,9 +503,9 @@ Define a function to print a defvar definition. It receives the stream, and the 
 #### Macro: WITH\-DEFCLASS\-COMPONENTS
 
 ```Lisp
-(defmacro ADPSM:WITH-DEFCLASS-COMPONENTS (((&REST COMPONENT-REST-ARGS179)
-                                           FUNCTION-BODY-ARG180)
-                                          &BODY BODY-ARG181)
+(defmacro ADPSM:WITH-DEFCLASS-COMPONENTS (((&REST COMPONENT-REST-ARGS)
+                                           FUNCTION-BODY-ARG)
+                                          &BODY BODY-ARG)
   ...)
 ```
 
@@ -507,9 +514,9 @@ Define a function to print a defvar definition. It receives the stream, and the 
 #### Macro: WITH\-DEFCONSTANT\-COMPONENTS
 
 ```Lisp
-(defmacro ADPSM:WITH-DEFCONSTANT-COMPONENTS (((&REST COMPONENT-REST-ARGS186)
-                                              FUNCTION-BODY-ARG187)
-                                             &BODY BODY-ARG188)
+(defmacro ADPSM:WITH-DEFCONSTANT-COMPONENTS (((&REST COMPONENT-REST-ARGS)
+                                              FUNCTION-BODY-ARG)
+                                             &BODY BODY-ARG)
   ...)
 ```
 
@@ -518,9 +525,9 @@ Define a function to print a defvar definition. It receives the stream, and the 
 #### Macro: WITH\-DEFGENERIC\-COMPONENTS
 
 ```Lisp
-(defmacro ADPSM:WITH-DEFGENERIC-COMPONENTS (((&REST COMPONENT-REST-ARGS193)
-                                             FUNCTION-BODY-ARG194)
-                                            &BODY BODY-ARG195)
+(defmacro ADPSM:WITH-DEFGENERIC-COMPONENTS (((&REST COMPONENT-REST-ARGS)
+                                             FUNCTION-BODY-ARG)
+                                            &BODY BODY-ARG)
   ...)
 ```
 
@@ -530,9 +537,9 @@ Define a function to print a defvar definition. It receives the stream, and the 
 
 ```Lisp
 (defmacro ADPSM:WITH-DEFINE-COMPILER-MACRO-COMPONENTS (((&REST
-                                                         COMPONENT-REST-ARGS200)
-                                                        FUNCTION-BODY-ARG201)
-                                                       &BODY BODY-ARG202)
+                                                         COMPONENT-REST-ARGS)
+                                                        FUNCTION-BODY-ARG)
+                                                       &BODY BODY-ARG)
   ...)
 ```
 
@@ -541,10 +548,9 @@ Define a function to print a defvar definition. It receives the stream, and the 
 #### Macro: WITH\-DEFINE\-CONDITION\-COMPONENTS
 
 ```Lisp
-(defmacro ADPSM:WITH-DEFINE-CONDITION-COMPONENTS (((&REST
-                                                    COMPONENT-REST-ARGS207)
-                                                   FUNCTION-BODY-ARG208)
-                                                  &BODY BODY-ARG209)
+(defmacro ADPSM:WITH-DEFINE-CONDITION-COMPONENTS (((&REST COMPONENT-REST-ARGS)
+                                                   FUNCTION-BODY-ARG)
+                                                  &BODY BODY-ARG)
   ...)
 ```
 
@@ -554,9 +560,9 @@ Define a function to print a defvar definition. It receives the stream, and the 
 
 ```Lisp
 (defmacro ADPSM:WITH-DEFINE-METHOD-COMBINATION-COMPONENTS (((&REST
-                                                             COMPONENT-REST-ARGS214)
-                                                            FUNCTION-BODY-ARG215)
-                                                           &BODY BODY-ARG216)
+                                                             COMPONENT-REST-ARGS)
+                                                            FUNCTION-BODY-ARG)
+                                                           &BODY BODY-ARG)
   ...)
 ```
 
@@ -566,9 +572,9 @@ Define a function to print a defvar definition. It receives the stream, and the 
 
 ```Lisp
 (defmacro ADPSM:WITH-DEFINE-MODIFY-MACRO-COMPONENTS (((&REST
-                                                       COMPONENT-REST-ARGS221)
-                                                      FUNCTION-BODY-ARG222)
-                                                     &BODY BODY-ARG223)
+                                                       COMPONENT-REST-ARGS)
+                                                      FUNCTION-BODY-ARG)
+                                                     &BODY BODY-ARG)
   ...)
 ```
 
@@ -578,9 +584,9 @@ Define a function to print a defvar definition. It receives the stream, and the 
 
 ```Lisp
 (defmacro ADPSM:WITH-DEFINE-SETF-EXPANDER-COMPONENTS (((&REST
-                                                        COMPONENT-REST-ARGS228)
-                                                       FUNCTION-BODY-ARG229)
-                                                      &BODY BODY-ARG230)
+                                                        COMPONENT-REST-ARGS)
+                                                       FUNCTION-BODY-ARG)
+                                                      &BODY BODY-ARG)
   ...)
 ```
 
@@ -590,9 +596,9 @@ Define a function to print a defvar definition. It receives the stream, and the 
 
 ```Lisp
 (defmacro ADPSM:WITH-DEFINE-SYMBOL-MACRO-COMPONENTS (((&REST
-                                                       COMPONENT-REST-ARGS235)
-                                                      FUNCTION-BODY-ARG236)
-                                                     &BODY BODY-ARG237)
+                                                       COMPONENT-REST-ARGS)
+                                                      FUNCTION-BODY-ARG)
+                                                     &BODY BODY-ARG)
   ...)
 ```
 
@@ -601,9 +607,9 @@ Define a function to print a defvar definition. It receives the stream, and the 
 #### Macro: WITH\-DEFMACRO\-COMPONENTS
 
 ```Lisp
-(defmacro ADPSM:WITH-DEFMACRO-COMPONENTS (((&REST COMPONENT-REST-ARGS242)
-                                           FUNCTION-BODY-ARG243)
-                                          &BODY BODY-ARG244)
+(defmacro ADPSM:WITH-DEFMACRO-COMPONENTS (((&REST COMPONENT-REST-ARGS)
+                                           FUNCTION-BODY-ARG)
+                                          &BODY BODY-ARG)
   ...)
 ```
 
@@ -612,9 +618,9 @@ Define a function to print a defvar definition. It receives the stream, and the 
 #### Macro: WITH\-DEFMETHOD\-COMPONENTS
 
 ```Lisp
-(defmacro ADPSM:WITH-DEFMETHOD-COMPONENTS (((&REST COMPONENT-REST-ARGS249)
-                                            FUNCTION-BODY-ARG250)
-                                           &BODY BODY-ARG251)
+(defmacro ADPSM:WITH-DEFMETHOD-COMPONENTS (((&REST COMPONENT-REST-ARGS)
+                                            FUNCTION-BODY-ARG)
+                                           &BODY BODY-ARG)
   ...)
 ```
 
@@ -623,9 +629,9 @@ Define a function to print a defvar definition. It receives the stream, and the 
 #### Macro: WITH\-DEFPACKAGE\-COMPONENTS
 
 ```Lisp
-(defmacro ADPSM:WITH-DEFPACKAGE-COMPONENTS (((&REST COMPONENT-REST-ARGS256)
-                                             FUNCTION-BODY-ARG257)
-                                            &BODY BODY-ARG258)
+(defmacro ADPSM:WITH-DEFPACKAGE-COMPONENTS (((&REST COMPONENT-REST-ARGS)
+                                             FUNCTION-BODY-ARG)
+                                            &BODY BODY-ARG)
   ...)
 ```
 
@@ -634,9 +640,9 @@ Define a function to print a defvar definition. It receives the stream, and the 
 #### Macro: WITH\-DEFPARAMETER\-COMPONENTS
 
 ```Lisp
-(defmacro ADPSM:WITH-DEFPARAMETER-COMPONENTS (((&REST COMPONENT-REST-ARGS263)
-                                               FUNCTION-BODY-ARG264)
-                                              &BODY BODY-ARG265)
+(defmacro ADPSM:WITH-DEFPARAMETER-COMPONENTS (((&REST COMPONENT-REST-ARGS)
+                                               FUNCTION-BODY-ARG)
+                                              &BODY BODY-ARG)
   ...)
 ```
 
@@ -645,9 +651,9 @@ Define a function to print a defvar definition. It receives the stream, and the 
 #### Macro: WITH\-DEFSETF\-COMPONENTS
 
 ```Lisp
-(defmacro ADPSM:WITH-DEFSETF-COMPONENTS (((&REST COMPONENT-REST-ARGS270)
-                                          FUNCTION-BODY-ARG271)
-                                         &BODY BODY-ARG272)
+(defmacro ADPSM:WITH-DEFSETF-COMPONENTS (((&REST COMPONENT-REST-ARGS)
+                                          FUNCTION-BODY-ARG)
+                                         &BODY BODY-ARG)
   ...)
 ```
 
@@ -656,9 +662,9 @@ Define a function to print a defvar definition. It receives the stream, and the 
 #### Macro: WITH\-DEFSTRUCT\-COMPONENTS
 
 ```Lisp
-(defmacro ADPSM:WITH-DEFSTRUCT-COMPONENTS (((&REST COMPONENT-REST-ARGS277)
-                                            FUNCTION-BODY-ARG278)
-                                           &BODY BODY-ARG279)
+(defmacro ADPSM:WITH-DEFSTRUCT-COMPONENTS (((&REST COMPONENT-REST-ARGS)
+                                            FUNCTION-BODY-ARG)
+                                           &BODY BODY-ARG)
   ...)
 ```
 
@@ -667,9 +673,9 @@ Define a function to print a defvar definition. It receives the stream, and the 
 #### Macro: WITH\-DEFTYPE\-COMPONENTS
 
 ```Lisp
-(defmacro ADPSM:WITH-DEFTYPE-COMPONENTS (((&REST COMPONENT-REST-ARGS284)
-                                          FUNCTION-BODY-ARG285)
-                                         &BODY BODY-ARG286)
+(defmacro ADPSM:WITH-DEFTYPE-COMPONENTS (((&REST COMPONENT-REST-ARGS)
+                                          FUNCTION-BODY-ARG)
+                                         &BODY BODY-ARG)
   ...)
 ```
 
@@ -678,9 +684,9 @@ Define a function to print a defvar definition. It receives the stream, and the 
 #### Macro: WITH\-DEFUN\-COMPONENTS
 
 ```Lisp
-(defmacro ADPSM:WITH-DEFUN-COMPONENTS (((&REST COMPONENT-REST-ARGS291)
-                                        FUNCTION-BODY-ARG292)
-                                       &BODY BODY-ARG293)
+(defmacro ADPSM:WITH-DEFUN-COMPONENTS (((&REST COMPONENT-REST-ARGS)
+                                        FUNCTION-BODY-ARG)
+                                       &BODY BODY-ARG)
   ...)
 ```
 
@@ -689,9 +695,9 @@ Define a function to print a defvar definition. It receives the stream, and the 
 #### Macro: WITH\-DEFVAR\-COMPONENTS
 
 ```Lisp
-(defmacro ADPSM:WITH-DEFVAR-COMPONENTS (((&REST COMPONENT-REST-ARGS298)
-                                         FUNCTION-BODY-ARG299)
-                                        &BODY BODY-ARG300)
+(defmacro ADPSM:WITH-DEFVAR-COMPONENTS (((&REST COMPONENT-REST-ARGS)
+                                         FUNCTION-BODY-ARG)
+                                        &BODY BODY-ARG)
   ...)
 ```
 
