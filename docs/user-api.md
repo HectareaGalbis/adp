@@ -5,7 +5,7 @@
 #### Macro: HEADER
 
 ```Lisp
-(defmacro ADP:HEADER (STR9 &OPTIONAL TAG10)
+(defmacro ADP:HEADER (STR &OPTIONAL TAG)
   ...)
 ```
 
@@ -16,7 +16,7 @@ Add a header with name str. Also, if tag is not nil but a symbol, a new header-t
 #### Macro: SUBHEADER
 
 ```Lisp
-(defmacro ADP:SUBHEADER (STR13 &OPTIONAL TAG14)
+(defmacro ADP:SUBHEADER (STR &OPTIONAL TAG)
   ...)
 ```
 
@@ -27,7 +27,7 @@ Add a subheader with name str. Also, if tag is not nil but a symbol, a new heade
 #### Macro: SUBSUBHEADER
 
 ```Lisp
-(defmacro ADP:SUBSUBHEADER (STR17 &OPTIONAL TAG18)
+(defmacro ADP:SUBSUBHEADER (STR &OPTIONAL TAG)
   ...)
 ```
 
@@ -178,7 +178,7 @@ where the image is located.
 #### Macro: BOLD
 
 ```Lisp
-(defmacro ADP:BOLD (&REST ARGS21)
+(defmacro ADP:BOLD (&REST ARGS)
   ...)
 ```
 
@@ -189,7 +189,7 @@ Add bold style to text. Each argument is princ-ed and concatenated into a string
 #### Macro: ITALIC
 
 ```Lisp
-(defmacro ADP:ITALIC (&REST ARGS22)
+(defmacro ADP:ITALIC (&REST ARGS)
   ...)
 ```
 
@@ -200,7 +200,7 @@ Add italic style to text. Each argument is princ-ed and concatenated into a stri
 #### Macro: EMPHASIS
 
 ```Lisp
-(defmacro ADP:EMPHASIS (&REST ARGS23)
+(defmacro ADP:EMPHASIS (&REST ARGS)
   ...)
 ```
 
@@ -211,7 +211,7 @@ Add bold and italic style to text. Each argument is princ-ed and concatenated in
 #### Macro: INLINE\-CODE
 
 ```Lisp
-(defmacro ADP:INLINE-CODE (&REST ARGS24)
+(defmacro ADP:INLINE-CODE (&REST ARGS)
   ...)
 ```
 
@@ -233,7 +233,7 @@ Add a hyperlink. The text showed is name and link must be a valid web URL. Both 
 #### Macro: HEADER\-REF
 
 ```Lisp
-(defmacro ADP:HEADER-REF (TAG25)
+(defmacro ADP:HEADER-REF (TAG)
   ...)
 ```
 
@@ -245,7 +245,7 @@ Only the symbols used with the macros header, subheader and subsubheader are val
 #### Macro: SYMBOL\-REF
 
 ```Lisp
-(defmacro ADP:SYMBOL-REF (TAG26)
+(defmacro ADP:SYMBOL-REF (TAG)
   ...)
 ```
 
@@ -257,7 +257,7 @@ defined with adp:deconstant, adp:define-symbol-macro, adp:defparameter or adp:de
 #### Macro: FUNCTION\-REF
 
 ```Lisp
-(defmacro ADP:FUNCTION-REF (TAG27)
+(defmacro ADP:FUNCTION-REF (TAG)
   ...)
 ```
 
@@ -269,7 +269,7 @@ defined with adp:defgeneric, adp:define-modify-macro, adp:defmacro or adp:defun.
 #### Macro: TYPE\-REF
 
 ```Lisp
-(defmacro ADP:TYPE-REF (TAG28)
+(defmacro ADP:TYPE-REF (TAG)
   ...)
 ```
 
@@ -420,7 +420,7 @@ Add a defgeneric declaration. The macro expands to cl:defgeneric. Also, the gene
 #### Macro: DEFINE\-COMPILER\-MACRO
 
 ```Lisp
-(defmacro ADP:DEFINE-COMPILER-MACRO (&BODY G29)
+(defmacro ADP:DEFINE-COMPILER-MACRO (&BODY BODY)
   ...)
 ```
 
@@ -442,7 +442,7 @@ Add a define-condition declaration. The macro expands to cl:define-condition. Al
 #### Macro: DEFINE\-METHOD\-COMBINATION
 
 ```Lisp
-(defmacro ADP:DEFINE-METHOD-COMBINATION (&BODY G30)
+(defmacro ADP:DEFINE-METHOD-COMBINATION (&BODY BODY)
   ...)
 ```
 
@@ -464,7 +464,7 @@ Add a define-modify-macro declaration. The macro expands to cl:define-modify-mac
 #### Macro: DEFINE\-SETF\-EXPANDER
 
 ```Lisp
-(defmacro ADP:DEFINE-SETF-EXPANDER (&BODY G31)
+(defmacro ADP:DEFINE-SETF-EXPANDER (&BODY BODY)
   ...)
 ```
 
@@ -497,7 +497,7 @@ Add a defmacro declaration. The macro expands to cl:defmacro. Also, the macro na
 #### Macro: DEFMETHOD
 
 ```Lisp
-(defmacro ADP:DEFMETHOD (&BODY G32)
+(defmacro ADP:DEFMETHOD (&BODY BODY)
   ...)
 ```
 
@@ -508,7 +508,7 @@ Add a defmethod declaration. The macro expands to cl:defmethod.
 #### Macro: DEFPACKAGE
 
 ```Lisp
-(defmacro ADP:DEFPACKAGE (&BODY G33)
+(defmacro ADP:DEFPACKAGE (&BODY BODY)
   ...)
 ```
 
@@ -530,7 +530,7 @@ Add a defparameter declaration. The macro expands to cl:defparameter. Also, the 
 #### Macro: DEFSETF
 
 ```Lisp
-(defmacro ADP:DEFSETF (&BODY G34)
+(defmacro ADP:DEFSETF (&BODY BODY)
   ...)
 ```
 

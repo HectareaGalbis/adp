@@ -87,8 +87,10 @@
 
 (cl:defmacro define-header-macro (name type)
   (let ((macro-doc (format nil "Add a ~a with name str. Also, if tag is not nil but a symbol, a new header-tag is created."
-			   (string-downcase (symbol-name name)))))
-    (with-gensyms (str tag user-tag-p fixed-tag)
+			   (string-downcase (symbol-name name))))
+	(str (make-symbol "STR"))
+	(tag (make-symbol "TAG")))
+    (with-gensyms (user-tag-p fixed-tag)
       `(adv-defmacro ,name (,str &optional ,tag)
 	 ,macro-doc
 	 (when *adp*
@@ -261,7 +263,7 @@ where the image is located."
 
 
 (cl:defmacro define-text-enrichment-macro (name type docstring)
-  (with-gensyms (args)
+  (let ((args (make-symbol "ARGS")))
     `(adv-defmacro ,name (&rest ,args)
        ,docstring
        (when *adp*
@@ -293,7 +295,7 @@ where the image is located."
 
 
 (cl:defmacro define-reference-macro (name type docstring)
-  (with-gensyms (tag)
+  (let ((tag (make-symbol "TAG")))
     `(adv-defmacro ,name (,tag)
        ,docstring
        (when *adp*
@@ -534,7 +536,7 @@ be printed."
 (cl:defmacro define-definition-macro (name type tag-extraction-expr docstring)
   (let ((body (if tag-extraction-expr
 		  (car tag-extraction-expr)
-		  (gensym)))
+		  (make-symbol "BODY")))
 	(tag-extraction (if tag-extraction-expr
 			    (cadr tag-extraction-expr)
 			    nil)))
