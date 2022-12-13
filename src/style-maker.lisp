@@ -10,12 +10,19 @@
 
 (adp:subheader "ADP pprint dispatch")
 
-(defvar *adp-pprint-dispatch* adppvt:*adp-pprint-dispatch*)
+(adp:defvar *adp-pprint-dispatch* adppvt:*adp-pprint-dispatch*
+  "ADP custom pprint dispatch table to make the code printing look better. The main difference is when the
+package extension of a symbol is printed. It will only print the extension package when a symbol is exported.")
 
 
 (adp:subheader "Style parameters")
 
-(defmacro define-style-parameter (name &key (value nil) (key nil) (required nil))
+(adp:defmacro define-style-parameter (name &key (value nil) (key nil) (required nil))
+  "Define a style parameter. A new parameter is defined (using defparameter) and also a style parameter is added.
+A style parameter is a keyword parameter added to ADP:LOAD-SYSTEM. NAME is the name of the parameter. VALUE is
+the default value. KEY is the keyword of the style parameter. If KEY is not specified, the keyword is obtained
+using the symbol name of NAME. If REQUIRED is non-NIL, the user must use this parameter when using
+ADP:LOAD-SYSTEM."
   `(adppvt:define-style-parameter ,name :value ,value :key ,key :required ,required))
 
 

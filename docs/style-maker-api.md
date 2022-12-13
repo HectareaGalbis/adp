@@ -2,7 +2,34 @@
 
 ## ADP pprint dispatch
 
+#### Variable: \*ADP\-PPRINT\-DISPATCH\*
+
+```Lisp
+(defvar ADPSM:*ADP-PPRINT-DISPATCH* ADPPVT:*ADP-PPRINT-DISPATCH*)
+```
+
+````
+ADP custom pprint dispatch table to make the code printing look better. The main difference is when the
+package extension of a symbol is printed. It will only print the extension package when a symbol is exported.
+````
+
 ## Style parameters
+
+#### Macro: DEFINE\-STYLE\-PARAMETER
+
+```Lisp
+(defmacro ADPSM:DEFINE-STYLE-PARAMETER (NAME &KEY (VALUE NIL) (KEY NIL)
+                                        (REQUIRED NIL))
+  ...)
+```
+
+````
+Define a style parameter. A new parameter is defined (using defparameter) and also a style parameter is added.
+A style parameter is a keyword parameter added to ADP:LOAD-SYSTEM. NAME is the name of the parameter. VALUE is
+the default value. KEY is the keyword of the style parameter. If KEY is not specified, the keyword is obtained
+using the symbol name of NAME. If REQUIRED is non-NIL, the user must use this parameter when using
+ADP:LOAD-SYSTEM.
+````
 
 ## Writers
 
