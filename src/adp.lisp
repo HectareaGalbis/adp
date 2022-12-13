@@ -124,7 +124,7 @@ You can use the following macros to enrich your text: bold, italic, bold-italic,
 
 (adv-defmacro cell (&rest objects)
   "Create a cell to place into a table. The arguments in objects can be any lisp object. They will be princ-ed and concatenated into a single string.
-You can use the following macros to enrich your cell text: bold, italic, bold-italic, code-inline, web-link, header-ref, symbol-ref, function-ref and type-ref."
+You can use the following macros to enrich your cell text: bold, italic, emphasis, inline-code, web-link, header-ref, symbol-ref, function-ref and type-ref."
   (when *adp*
     `(make-instance 'adppvt:cell
 		    :name "cell"
@@ -150,7 +150,7 @@ You can use the following macros to enrich your cell text: bold, italic, bold-it
 
 (adv-defmacro item (&rest items)
   "Create an item to be placed into a iterate/enumerate form. The arguments in objects can be any lisp object. They will be princ-ed and concatenated into a single string.
-You can use the following macros to enrich your cell text: bold, italic, bold-italic, code-inline, web-link, header-ref, symbol-ref, function-ref and type-ref."
+You can use the following macros to enrich your cell text: bold, italic, emphasis, inline-code, web-link, header-ref, symbol-ref, function-ref and type-ref."
   (when *adp*
     `(make-instance 'adppvt:item
 		    :name "item"
