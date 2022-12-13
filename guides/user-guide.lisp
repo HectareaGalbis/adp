@@ -442,8 +442,8 @@
   (code-tag (commented-code)
     (code-quote
      (let ((x 5))
-       (code-comment "We print the number 5")
-       (print x)))))
+       (code-comment "We print the number 5"
+		     (print x))))))
 
 (text "you will see this:")
 
@@ -453,8 +453,8 @@
 (code-tag (commented-code)
   (code-quote
    (let ((x 5))
-     (code-comment "We print the number 5")
-     (print x))))
+     (code-comment "We print the number 5"
+		   (print x)))))
 
 (text "When explaining some piece of code you should focus on the important parts. Or, equivalently, you should hide the irrelevant ones. You can do that using the form " (inline-code "code-hide") ". For example, if I write this:")
 
@@ -563,11 +563,11 @@
 (code-tag (making-function-1 making-function-2)
   (cl:defun print-5-6 ()
     (code-hide (making-function-2)
-	       (code-comment "We print 5")
-	       (print 5))
+	       (code-comment "We print 5"
+			     (print 5)))
     (code-remove (making-function-1)
-		 (code-comment "And we print 6")
-		 (print 6))))
+		 (code-comment "And we print 6"
+			       (print 6)))))
 
 
 (subheader "Tips and final comments")

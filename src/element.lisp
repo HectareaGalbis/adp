@@ -209,12 +209,17 @@
 
 (defclass code-comment ()
   ((comment :initarg :comment
-	    :type string))
+	    :type string)
+   (expr :initarg :expr))
   (:documentation
    "Represent a code hide symbol."))
 
 (defmethod print-object ((object code-comment) stream)
-  (format stream ";; ~a" (slot-value object 'comment)))
+  (with-slots (comment expr) object
+    (pprint-logical-block (stream nil)
+      (format stream ";; ~a" comment)
+      (pprint-newline :mandatory stream)
+      (write expr :stream stream))))
 
 (defclass tagged-code (code tagged-element) ()
   (:documentation
