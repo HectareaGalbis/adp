@@ -541,8 +541,10 @@
 (text "You can also remove the code using the form " (inline-code "code-remove") ". It works the same as " (inline-code "code-hide") ". For example, you can create a making-function explanation:")
 
 (code-block ()
-  (code-block (making-function-1 making-function-2)
-    making-function-1
+  (code-block (making-function-1)
+    making-function-1)
+
+  (code-block (making-function-2)
     making-function-2)
   
   (code-tag (making-function-1 making-function-2)

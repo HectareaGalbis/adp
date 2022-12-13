@@ -635,8 +635,10 @@ You will see this\:
 You can also remove the code using the form ``` code-remove ```\. It works the same as ``` code-hide ```\. For example\, you can create a making\-function explanation\:
 
 `````Lisp
-(ADP:CODE-BLOCK (MAKING-FUNCTION-1 MAKING-FUNCTION-2)
-  MAKING-FUNCTION-1
+(ADP:CODE-BLOCK (MAKING-FUNCTION-1)
+  MAKING-FUNCTION-1)
+
+(ADP:CODE-BLOCK (MAKING-FUNCTION-2)
   MAKING-FUNCTION-2)
 
 (ADP:CODE-TAG (MAKING-FUNCTION-1 MAKING-FUNCTION-2)
