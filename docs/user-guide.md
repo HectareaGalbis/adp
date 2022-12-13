@@ -441,14 +441,15 @@ And you write in your tutorial that the function ``` sum-list ``` can be used th
   (SUM-LIST '(1 2 3)))
 `````
 
-But now you decide to use vectors rather than lists\. You didn\'t use code\-tags so you must change your code in two different places\. Let\'s create now a code\-tag using the macro [ADP\:CODE\-TAG](/docs/user-api.md#macro-code-tag)\. Unfortunately\, the macro [ADP\:CODE\-TAG](/docs/user-api.md#macro-code-tag) cannot be printed inside code\-block\. So\, I will use ``` code-lag ``` instead\:
+But now you decide to use vectors rather than lists\. You didn\'t use code\-tags so you must change your code in two different places\. Let\'s create now a code\-tag using the macro [ADP\:CODE\-TAG](/docs/user-api.md#macro-code-tag)\:
 
 `````Lisp
 (ADP:DEFUN SUM-LIST (INT-LIST)
   (LOOP FOR NUM IN INT-LIST
         SUM NUM))
 
-(CODE-LAG (SUM-LIST-EXAMPLE) (SUM-LIST '(1 2 3)))
+(ADP:CODE-TAG (SUM-LIST-EXAMPLE)
+  (SUM-LIST '(1 2 3)))
 `````
 
 A code\-tag named ``` sum-list-example ``` is created and you can now use it in the tutorial\:
@@ -465,10 +466,11 @@ First we indicate in the list after ``` code-block ``` that we will use the code
 Let\'s see a live example\. Do you remember the symbol [ADP\:\:A\-PARAMETER\-DEFINED\-AT\-THE\-END\-OF\-THE\-FILE](/docs/user-guide.md#variable-a-parameter-defined-at-the-end-of-the-file) and the type [ALSO\-A\-TYPE\?](/docs/user-guide.md#type-also-a-type)\?\. In the source file I have written this\:
 
 `````Lisp
-(CODE-LAG (END-PARAMETER-CODE)
- (ADP:DEFPARAMETER ADP::A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE T))
+(ADP:CODE-TAG (END-PARAMETER-CODE)
+  (ADP:DEFPARAMETER ADP::A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE T))
 
-(CODE-LAG (END-TYPE-CODE) (ADP:DEFTYPE ALSO-A-TYPE? () NIL))
+(ADP:CODE-TAG (END-TYPE-CODE)
+  (ADP:DEFTYPE ALSO-A-TYPE? () NIL))
 `````
 
 So\, if I write this\:

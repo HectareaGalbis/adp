@@ -370,13 +370,13 @@
   (code-block ()
     (sum-list '(1 2 3))))
 
-(text "But now you decide to use vectors rather than lists. You didn't use code-tags so you must change your code in two different places. Let's create now a code-tag using the macro " (function-ref code-tag) ". Unfortunately, the macro " (function-ref code-tag) " cannot be printed inside code-block. So, I will use " (inline-code "code-lag") " instead:")
+(text "But now you decide to use vectors rather than lists. You didn't use code-tags so you must change your code in two different places. Let's create now a code-tag using the macro " (function-ref code-tag) ":")
 
 (code-block ()
   (defun sum-list (int-list)
     (loop for num in int-list
 	  sum num))
-  (code-lag (sum-list-example)
+  (code-tag (sum-list-example)
     (sum-list '(1 2 3))))
 
 (text "A code-tag named " (inline-code "sum-list-example") " is created and you can now use it in the tutorial:")
@@ -391,10 +391,10 @@
 (text "Let's see a live example. Do you remember the symbol " (symbol-ref a-parameter-defined-at-the-end-of-the-file) " and the type " (type-ref also-a-type?) "?. In the source file I have written this:")
 
 (code-block ()
-  (code-lag (end-parameter-code)
+  (code-tag (end-parameter-code)
     (defparameter a-parameter-defined-at-the-end-of-the-file t))
 
-  (code-lag (end-type-code)
+  (code-tag (end-type-code)
     (deftype also-a-type? ()
       nil)))
 
