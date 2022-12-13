@@ -605,7 +605,7 @@ be printed."
 
 (uiop:with-upgradability ()
   (cl:defclass load-doc-source-op (asdf/lisp-action:basic-load-op asdf/action:downward-operation asdf/action:selfward-operation)
-    ((asdf/action:selfward-operation :initform 'asdf:prepare-source-op :allocation :class))
+    ((asdf/action:selfward-operation :initform 'asdf:prepare-op :allocation :class))
     (:documentation "Operation for loading a Lisp file as source with ADP documentation.")))
 
 (uiop:with-upgradability ()
@@ -617,7 +617,8 @@ be printed."
     "Perform the loading of a Lisp file as associated to specified action (O . C)"
     (asdf/lisp-action:call-with-around-compile-hook
      c #'(lambda ()
-           (let ((*adp* t))
+           (let ((*adp* t)
+		 (*gensym-counter* 0))
 	     (uiop:load* (first (asdf:input-files o c))
 			 :external-format (asdf:component-external-format c))))))
 
@@ -662,8 +663,7 @@ arguments to let the user customize briefly how documentation is printed."
 		 (fixed-root-path (make-pathname :host (pathname-host root-path)
 						 :device (pathname-device root-path)
 						 :directory (pathname-directory root-path)))
-		 (*project* (make-instance 'adppvt:project :root-directory fixed-root-path))
-		 (*gensym-counter* 0))
+		 (*project* (make-instance 'adppvt:project :root-directory fixed-root-path)))
 
 	    (load-project system)
 
