@@ -557,9 +557,6 @@ be printed."
     ((asdf/action:selfward-operation :initform 'asdf:prepare-source-op :allocation :class))
     (:documentation "Operation for loading a Lisp file as source with ADP documentation.")))
 
-(cl:defvar *doc-system* nil)
-(cl:defvar *already-visited* nil)
-
 (uiop:with-upgradability ()
   (cl:defmethod asdf:action-description ((o load-doc-source-op) (c asdf:component))
     (format nil (uiop:compatfmt "~@<Loading source of ~3i~_~A~@:>") c))
@@ -570,9 +567,6 @@ be printed."
     (asdf/lisp-action:call-with-around-compile-hook
      c #'(lambda ()
            (let ((*adp* t))
-	     (when (not *already-visited*)
-	       (setf *already-visited* t)
-	       (setf *gensym-counter* 0))
 	     (uiop:load* (first (asdf:input-files o c))
 			 :external-format (asdf:component-external-format c))))))
 
