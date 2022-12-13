@@ -584,11 +584,11 @@ be printed."
   (declare (type symbol style))
   (let ((style-system (intern (concatenate 'string "ADP/" (symbol-name style)) :keyword)))
     (assert (asdf:find-system style-system) (style-system) "ADP error: The style ~s was not found." style-system)
-    (format t "~%Loading the style ~s" style)
+    (format t "Loading the style ~s~%" style)
     (asdf:operate 'asdf:load-source-op style-system :force t)))
 
 (cl:defun load-project (system)
-  (format t "~%Loading the system ~s" system)
+  (format t "Loading the system ~s~%" system)
   (asdf:operate 'load-doc-source-op system :force t))
 
 (adv-defun load-system (system style &rest style-args)
@@ -620,9 +620,9 @@ arguments to let the user customize briefly how documentation is printed."
 
 	    (load-project system)
 
-	    (format t "~%Writing documentation")
+	    (format t "Writing documentation~%")
 	    (adppvt:project-print *project*)
-	    (format t "~%~a" "Done!"))))))
+	    (format t "Done!~%"))))))
 
   (values))
 
@@ -649,7 +649,7 @@ Otherwise, this macro expands to NIL."
 
 ;; ----- Macro characters -----
 
-(subheader "Macro characters")
+(subheader "Macro characters" macro-characters-subheader)
 
 (text "The next table shows which macro characters can be used and what they expand to:")
 
