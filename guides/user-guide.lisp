@@ -229,6 +229,8 @@
 (code-block (verbatim-example)
   verbatim-example)
 
+(text "You will see this:")
+
 (code-tag (verbatim-example)
   (verbatim-code-block "C++"
       "int main (){

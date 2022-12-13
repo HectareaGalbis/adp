@@ -277,6 +277,8 @@ The macro [ADP\:VERBATIM\-CODE\-BLOCK](/docs/user-api.md#macro-verbatim-code-blo
 }")
 `````
 
+You will see this\:
+
 `````C++
 int main (){
 
