@@ -556,17 +556,19 @@
 
 (text "And you will see this:")
 
-(code-block (making-function-1 making-function-2)
-  making-function-1
+(code-block (making-function-1)
+  making-function-1)
+
+(code-block (making-function-2)
   making-function-2)
 
 (code-tag (making-function-1 making-function-2)
   (cl:defun print-5-6 ()
     (code-hide (making-function-2)
-	       (code-comment "We print 5"
+	       (code-comment "First we print 5"
 			     (print 5)))
     (code-remove (making-function-1)
-		 (code-comment "And we print 6"
+		 (code-comment "And then we print 6"
 			       (print 6)))))
 
 

@@ -651,12 +651,14 @@ And you will see this\:
 
 `````Lisp
 (DEFUN ADP::PRINT-5-6 ()
-  ;; We print 5
+  ;; First we print 5
   (PRINT 5))
+`````
 
+`````Lisp
 (DEFUN ADP::PRINT-5-6 ()
   ...
-  ;; And we print 6
+  ;; And then we print 6
   (PRINT 6))
 `````
 
