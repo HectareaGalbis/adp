@@ -167,7 +167,8 @@
 
 ;; ----- table-of-contents -----
 
-(defclass table-of-contents (element) ()
+(defclass table-of-contents (element)
+  ((project :type project))
   (:documentation
    "Represent a table of contents element."))
 

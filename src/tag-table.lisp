@@ -2,22 +2,21 @@
 (in-package :adppvt)
 
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
+(defstruct table-element
+  (elements nil :type (vector element))
+  (used nil :type boolean))
 
-  (defstruct table-element
-    (elements nil :type (vector element))
-    (used nil :type boolean))
+(defclass tag-table ()
+  ((table :initform (make-hash-table)
+	  :type hash-table))
+  (:documentation
+   "Relates a tag with an element."))
 
-  (defclass tag-table ()
-    ((table :initform (make-hash-table)
-	    :type hash-table))
-    (:documentation
-     "Relates a tag with an element."))
-
-  (defvar *tag-tables* nil))
+(defvar *tag-tables* nil)
 
 
 (defmacro with-tag-tables (&body body)
+  ; ARREGLAR: Ponerlo todo con (setf (symbol-value ...) ...) antes y despues de body.
   (let ((let-bindings (mapcar (lambda (tag-table)
 				`(,tag-table (make-instance 'tag-table)))
 			      *tag-tables*)))
