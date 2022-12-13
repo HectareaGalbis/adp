@@ -712,10 +712,10 @@ Otherwise, this macro expands to NIL."
        ((cell "@s") (cell (function-ref symbol-ref))    (cell (inline-code "@s(variable)")))
        ((cell "@t") (cell (function-ref type-ref))      (cell (inline-code "@t(type)")))
        ((cell "@l") (cell (function-ref cl-ref))        (cell (inline-code "@l(princ)")))
-       ((cell "@'") (cell (inline-code "code-quote"))   (cell (inline-code "@'((code (not evaluated)))")))
-       ((cell "@;") (cell (inline-code "code-comment")) (cell (inline-code "@;(\"This is a comment\" expr)")))
-       ((cell "@_") (cell (inline-code "code-remove"))  (cell (inline-code "@_((tag1 tag2) (code (to be (removed))))")))
-       ((cell "@.") (cell (inline-code "code-hide"))    (cell (inline-code "@.((tag1 tag2) (code (to be (hidden))))"))))
+       ((cell "@'") (cell (function-ref code-quote))    (cell (inline-code "@'((code (not evaluated)))")))
+       ((cell "@;") (cell (function-ref code-comment))  (cell (inline-code "@;(\"This is a comment\" expr)")))
+       ((cell "@_") (cell (function-ref code-remove))   (cell (inline-code "@_((tag1 tag2) (code (to be (removed))))")))
+       ((cell "@.") (cell (function-ref code-hide))     (cell (inline-code "@.((tag1 tag2) (code (to be (hidden))))"))))
 
 (make-dispatch-macro-character #\@ t)
 

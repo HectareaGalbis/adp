@@ -656,9 +656,9 @@ The next table shows which macro characters can be used and what they expand to\
 | \@s | [ADP\:SYMBOL\-REF](/docs/user-api.md#macro-symbol-ref) | ``` @s(variable) ``` |
 | \@t | [ADP\:TYPE\-REF](/docs/user-api.md#macro-type-ref) | ``` @t(type) ``` |
 | \@l | [ADP\:CL\-REF](/docs/user-api.md#macro-cl-ref) | ``` @l(princ) ``` |
-| \@\' | ``` code-quote ``` | ``` @'((code (not evaluated))) ``` |
-| \@\; | ``` code-comment ``` | ``` @;("This is a comment" expr) ``` |
-| \@\_ | ``` code-remove ``` | ``` @_((tag1 tag2) (code (to be (removed)))) ``` |
-| \@\. | ``` code-hide ``` | ``` @.((tag1 tag2) (code (to be (hidden)))) ``` |
+| \@\' | [ADP\:CODE\-QUOTE](/docs/user-api.md#macro-code-quote) | ``` @'((code (not evaluated))) ``` |
+| \@\; | [ADP\:CODE\-COMMENT](/docs/user-api.md#macro-code-comment) | ``` @;("This is a comment" expr) ``` |
+| \@\_ | [ADP\:CODE\-REMOVE](/docs/user-api.md#macro-code-remove) | ``` @_((tag1 tag2) (code (to be (removed)))) ``` |
+| \@\. | [ADP\:CODE\-HIDE](/docs/user-api.md#macro-code-hide) | ``` @.((tag1 tag2) (code (to be (hidden)))) ``` |
 
 

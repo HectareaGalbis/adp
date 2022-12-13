@@ -491,7 +491,7 @@ You will see this\:
 
 ### Quoting\, commenting\, hiding and removing your code
 
-Code tags are great but [ADP\:CODE\-TAG](/docs/user-api.md#macro-code-tag) will expand to the code you write\. Sometimes you will want to create a tag to some piece of code but not to evaluate it\. In that case we can quote the code using the form ``` code-quote ```\. For example\, you can write this\:
+Code tags are great but [ADP\:CODE\-TAG](/docs/user-api.md#macro-code-tag) will expand to the code you write\. Sometimes you will want to create a tag to some piece of code but not to evaluate it\. In that case we can quote the code using the form [ADP\:CODE\-QUOTE](/docs/user-api.md#macro-code-quote)\. For example\, you can write this\:
 
 `````Lisp
 (ADP:CODE-BLOCK (QUOTED-CODE)
@@ -508,7 +508,7 @@ And you will see this\:
 (THIS IS A (FORM I (DONT WANT) TO EVALUATE))
 `````
 
-Comments are ignored when Lisp is reading an expression\, so you cannot place a regular comment inside a [ADP\:CODE\-BLOCK](/docs/user-api.md#macro-code-block) form and expect to see it printed\. If you want to print a comment you need to use the form ``` code-comment ``` inside [ADP\:CODE\-TAG](/docs/user-api.md#macro-code-tag)\. It receives a string and an expression\. For example\, if I write this\:
+Comments are ignored when Lisp is reading an expression\, so you cannot place a regular comment inside a [ADP\:CODE\-BLOCK](/docs/user-api.md#macro-code-block) form and expect to see it printed\. If you want to print a comment you need to use the form [ADP\:CODE\-COMMENT](/docs/user-api.md#macro-code-comment) inside [ADP\:CODE\-TAG](/docs/user-api.md#macro-code-tag)\. It receives a string and an expression\. For example\, if I write this\:
 
 `````Lisp
 (ADP:CODE-BLOCK (COMMENTED-CODE)
@@ -529,7 +529,7 @@ you will see this\:
   (PRINT X))
 `````
 
-When explaining some piece of code you should focus on the important parts\. Or\, equivalently\, you should hide the irrelevant ones\. You can do that using the form ``` code-hide ```\. For example\, if I write this\:
+When explaining some piece of code you should focus on the important parts\. Or\, equivalently\, you should hide the irrelevant ones\. You can do that using the form [ADP\:CODE\-HIDE](/docs/user-api.md#macro-code-hide)\. For example\, if I write this\:
 
 `````Lisp
 (ADP:CODE-BLOCK (HIDDEN-CODE)
@@ -644,7 +644,7 @@ You will see this\:
           FINALLY (RETURN (VALUES ... ... YZ-LIST)))))
 `````
 
-You can also remove the code using the form ``` code-remove ```\. It works the same as ``` code-hide ```\. For example\, you can create a making\-function explanation\:
+You can also remove the code using the form [ADP\:CODE\-REMOVE](/docs/user-api.md#macro-code-remove)\. It works the same as [ADP\:CODE\-HIDE](/docs/user-api.md#macro-code-hide)\. For example\, you can create a making\-function explanation\:
 
 `````Lisp
 (ADP:CODE-BLOCK (MAKING-FUNCTION-1)

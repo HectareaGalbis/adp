@@ -414,7 +414,7 @@
 
 (subsubheader "Quoting, commenting, hiding and removing your code")
 
-(text "Code tags are great but " (function-ref code-tag) " will expand to the code you write. Sometimes you will want to create a tag to some piece of code but not to evaluate it. In that case we can quote the code using the form " (inline-code "code-quote") ". For example, you can write this:")
+(text "Code tags are great but " (function-ref code-tag) " will expand to the code you write. Sometimes you will want to create a tag to some piece of code but not to evaluate it. In that case we can quote the code using the form " (function-ref code-quote) ". For example, you can write this:")
 
 (code-block ()
   (code-block (quoted-code)
@@ -433,7 +433,7 @@
   (code-quote
    (this is a (form i (dont want) to evaluate))))
 
-(text "Comments are ignored when Lisp is reading an expression, so you cannot place a regular comment inside a " (function-ref code-block) " form and expect to see it printed. If you want to print a comment you need to use the form " (inline-code "code-comment") " inside " (function-ref code-tag) ". It receives a string and an expression. For example, if I write this:")
+(text "Comments are ignored when Lisp is reading an expression, so you cannot place a regular comment inside a " (function-ref code-block) " form and expect to see it printed. If you want to print a comment you need to use the form " (function-ref code-comment) " inside " (function-ref code-tag) ". It receives a string and an expression. For example, if I write this:")
 
 (code-block ()
   (code-block (commented-code)
@@ -456,7 +456,7 @@
      (code-comment "We print the number 5"
 		   (print x)))))
 
-(text "When explaining some piece of code you should focus on the important parts. Or, equivalently, you should hide the irrelevant ones. You can do that using the form " (inline-code "code-hide") ". For example, if I write this:")
+(text "When explaining some piece of code you should focus on the important parts. Or, equivalently, you should hide the irrelevant ones. You can do that using the form " (function-ref code-hide) ". For example, if I write this:")
 
 (code-block ()
   (code-block (hidden-code)
@@ -538,7 +538,7 @@
   (code-block (z-tag)
     z-tag))
 
-(text "You can also remove the code using the form " (inline-code "code-remove") ". It works the same as " (inline-code "code-hide") ". For example, you can create a making-function explanation:")
+(text "You can also remove the code using the form " (function-ref code-remove) ". It works the same as " (function-ref code-hide) ". For example, you can create a making-function explanation:")
 
 (code-block ()
   (code-block (making-function-1)
