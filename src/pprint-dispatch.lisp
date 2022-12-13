@@ -20,7 +20,9 @@
 				  (not (equal sym-package (find-package "CL")))
 				  (case (nth-value 1 (find-symbol (symbol-name sym) sym-package))
 				    (:external :external)
-				    (:internal (if (or (boundp sym) (fboundp sym))
+				    (:internal (if (or (boundp sym)
+						       (fboundp sym)
+						       (subtypep sym '(or standard-class built-in-class structure-class)))
 						   :internal
 						   nil))
 				    (t nil))))
