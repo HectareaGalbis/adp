@@ -18,8 +18,8 @@
 (defpackage #:adp-private
   (:use #:cl #:alexandria)
   (:nicknames #:adppvt)
-  (:export #:add-element #:project-print #:add-code-tag #:*adp-pprint-dispatch* #:with-special-writers
-	   #:check-special-writers #:with-new-style-parameter-list #:with-style-parameters #:with-tag-tables
+  (:export #:add-element #:project-print #:add-code-tag #:*adp-pprint-dispatch* #:with-writers
+	   #:check-writers #:with-new-style-parameter-list #:with-style-parameters #:with-tag-tables
 	   #:define-style-parameter #:select-file #:relative-truename
 
 	   #:header #:subheader #:subsubheader #:text #:table #:cell #:itemize #:enumerate #:item

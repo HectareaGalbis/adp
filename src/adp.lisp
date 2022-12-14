@@ -649,13 +649,13 @@ arguments to let the user customize briefly how documentation is printed."
   (declare (type symbol style))
   (assert (asdf:find-system system) (system) "ADP error: The system ~s was not found." system)
 
-  (adppvt:with-special-writers
+  (adppvt:with-writers
 
     (adppvt:with-new-style-parameter-list
 
       (load-style style)
     
-      (adppvt:check-special-writers)
+      (adppvt:check-writers)
     
       (adppvt:with-style-parameters style-args
 	

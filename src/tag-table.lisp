@@ -12,28 +12,31 @@
   (:documentation
    "Relates a tag with an element."))
 
-(defvar *tag-tables* nil)
 
+(defmacro define-with-tag-tables (name &body tag-tables)
+  (with-gensyms (body let-bindings table)
+    `(defmacro ,name (&body ,body)
+       (let ((,let-bindings (mapcar (lambda (,table)
+				      `(,,table (make-instance 'tag-table)))
+				    ',tag-tables)))
+	 `(let ,,let-bindings
+	    ,@,body)))))
 
-(defmacro with-tag-tables (&body body)
-  ; ARREGLAR: Ponerlo todo con (setf (symbol-value ...) ...) antes y despues de body.
-  (let ((let-bindings (mapcar (lambda (tag-table)
-				`(,tag-table (make-instance 'tag-table)))
-			      *tag-tables*)))
-    `(let ,let-bindings
-       ,@body)))
+(defmacro define-tag-tables (with-tag-tables-name &body names)
+  (let ((definitions (mapcar (lambda (name)
+			       `(defvar ,name nil))
+			     names)))
+    `(progn
+       ,@definitions
+       (define-with-tag-tables ,with-tag-tables-name
+	 ,@names))))
 
-(defmacro define-tag-table (name)
-  (when (not (boundp name))
-    (push name *tag-tables*))
-  `(defvar ,name nil))
-
-
-(define-tag-table *header-tags*)
-(define-tag-table *symbol-tags*)
-(define-tag-table *function-tags*)
-(define-tag-table *type-tags*)
-(define-tag-table *code-tags*)
+(define-tag-tables with-tag-tables
+  *header-tags*
+  *symbol-tags*
+  *function-tags*
+  *type-tags*
+  *code-tags*)
 
 
 (defun tag-table-tags (tag-table)

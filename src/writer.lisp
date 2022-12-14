@@ -2,99 +2,106 @@
 (in-package :adppvt)
 
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-
-  (defstruct writer
-    proc
-    optional)
+(defstruct writer
+  proc
+  optional)
   
-  (let ((writers nil))
-    
-    (defmacro with-special-writers (&body body)
-      (let ((let-proc-binds (mapcar (lambda (writer)
-				      (list (writer-proc writer) nil))
-				    writers)))
-	`(let ,let-proc-binds
-	   ,@body)))
+(defmacro define-with-writers (name &body writer-names)
+  (with-gensyms (body let-bindings writer-name)
+    `(defmacro ,name (&body ,body)
+       (let ((,let-bindings (mapcar (lambda (,writer-name)
+				      `(,,writer-name nil))
+				    ',writer-names)))
+	 `(let ,,let-bindings
+	    ,@,body)))))
 
-    (defmacro check-special-writers ()
-      (let ((unless-exprs (loop for writer in writers
-				if (not (writer-optional writer))
-				  collect `(unless ,(writer-proc writer)
-					     (error "ADP error: The function ~a is not defined in the current style."
-						    ,(symbol-name (writer-proc writer)))))))
-	`(progn
-	   ,@unless-exprs)))
-    
-    (defmacro define-customizable-writer (writer-proc &optional optionalp)
-      (check-type writer-proc symbol)
-      (check-type optionalp boolean)
-      (when (not (boundp writer-proc))
-	(push (make-writer :proc writer-proc :optional optionalp) writers))
-      `(defvar ,writer-proc nil))))
+(defmacro define-check-writers (name &body writer-name-optionals)
+  (with-gensyms (unless-exprs writer-name optionalp)
+    `(defmacro ,name ()
+       (let ((,unless-exprs (loop for (,writer-name ,optionalp) in ',writer-name-optionals
+				  if (not ,optionalp)
+				    collect `(unless ,,writer-name
+					       (error "ADP error: The function ~a is not defined in the current style."
+						      ,(symbol-name ,writer-name))))))
+	 `(progn
+	    ,@,unless-exprs)))))
 
-;; file
-(define-customizable-writer *begin-file-writer* t)
-(define-customizable-writer *end-file-writer* t)
-(define-customizable-writer *file-extension*)
+(defmacro define-writers (with-writers-name check-writers-name &body writer-name-optionals)
+  (let ((definitions (mapcar (lambda (name-optional)
+			       `(defvar ,(car name-optional) nil))
+			     writer-name-optionals)))
+    `(progn
+       ,@definitions
+       (define-with-writers ,with-writers-name
+	 ,@(mapcar #'car writer-name-optionals))
+       (define-check-writers ,check-writers-name
+	 ,@writer-name-optionals))))
 
-;; project
-(define-customizable-writer *begin-project-writer* t)
-(define-customizable-writer *end-project-writer* t)
 
-;; header
-(define-customizable-writer *header-writer*)
-(define-customizable-writer *subheader-writer*)
-(define-customizable-writer *subsubheader-writer*)
+(define-writers with-writers check-writers
 
-;; text
-(define-customizable-writer *text-writer*)
-(define-customizable-writer *escape-text* t)
+  ;; file
+  (*begin-file-writer* t)
+  (*end-file-writer* t)
+  (*file-extension* nil)
 
-;; text enrichment
-(define-customizable-writer *bold-writer*)
-(define-customizable-writer *italic-writer*)
-(define-customizable-writer *emphasis-writer*)
-(define-customizable-writer *inline-code-writer*)
+  ;; project
+  (*begin-project-writer* t)
+  (*end-project-writer* t)
 
-;; text reference
-(define-customizable-writer *header-ref-writer*)
-(define-customizable-writer *symbol-ref-writer*)
-(define-customizable-writer *function-ref-writer*)
-(define-customizable-writer *type-ref-writer*)
+  ;; header
+  (*header-writer* nil)
+  (*subheader-writer* nil)
+  (*subsubheader-writer* nil)
 
-;; web link
-(define-customizable-writer *web-link-writer*)
+  ;; text
+  (*text-writer* nil)
+  (*escape-text* t)
 
-;; image
-(define-customizable-writer *image-writer*)
+  ;; text enrichment
+  (*bold-writer* nil)
+  (*italic-writer* nil)
+  (*emphasis-writer* nil)
+  (*inline-code-writer* nil)
 
-;; table
-(define-customizable-writer *table-writer*)
+  ;; text reference
+  (*header-ref-writer* nil)
+  (*symbol-ref-writer* nil)
+  (*function-ref-writer* nil)
+  (*type-ref-writer* nil)
 
-;; itemize
-(define-customizable-writer *itemize-writer*)
+  ;; web link
+  (*web-link-writer* nil)
 
-;; code
-(define-customizable-writer *code-block-writer*)
-(define-customizable-writer *code-example-writer*)
+  ;; image
+  (*image-writer* nil)
 
-;; definition
-(define-customizable-writer *defclass-writer*)
-(define-customizable-writer *defconstant-writer*)
-(define-customizable-writer *defgeneric-writer*)
-(define-customizable-writer *define-compiler-macro-writer*)
-(define-customizable-writer *define-condition-writer*)
-(define-customizable-writer *define-method-combination-writer*)
-(define-customizable-writer *define-modify-macro-writer*)
-(define-customizable-writer *define-setf-expander-writer*)
-(define-customizable-writer *define-symbol-macro-writer*)
-(define-customizable-writer *defmacro-writer*)
-(define-customizable-writer *defmethod-writer*)
-(define-customizable-writer *defpackage-writer*)
-(define-customizable-writer *defparameter-writer*)
-(define-customizable-writer *defsetf-writer*)
-(define-customizable-writer *defstruct-writer*)
-(define-customizable-writer *deftype-writer*)
-(define-customizable-writer *defun-writer*)
-(define-customizable-writer *defvar-writer*)
+  ;; table
+  (*table-writer* nil)
+
+  ;; itemize
+  (*itemize-writer* nil)
+
+  ;; code
+  (*code-block-writer* nil)
+  (*code-example-writer* nil)
+
+  ;; definition
+  (*defclass-writer* nil)
+  (*defconstant-writer* nil)
+  (*defgeneric-writer* nil)
+  (*define-compiler-macro-writer* nil)
+  (*define-condition-writer* nil)
+  (*define-method-combination-writer* nil)
+  (*define-modify-macro-writer* nil)
+  (*define-setf-expander-writer* nil)
+  (*define-symbol-macro-writer* nil)
+  (*defmacro-writer* nil)
+  (*defmethod-writer* nil)
+  (*defpackage-writer* nil)
+  (*defparameter-writer* nil)
+  (*defsetf-writer* nil)
+  (*defstruct-writer* nil)
+  (*deftype-writer* nil)
+  (*defun-writer* nil)
+  (*defvar-writer* nil))
