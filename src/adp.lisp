@@ -619,8 +619,7 @@ be printed."
     "Perform the loading of a Lisp file as associated to specified action (O . C)"
     (asdf/lisp-action:call-with-around-compile-hook
      c #'(lambda ()
-           (let ((*adp* t)
-		 (*gensym-counter* 0))
+           (let ((*adp* t))
 	     (uiop:load* (first (asdf:input-files o c))
 			 :external-format (asdf:component-external-format c))))))
 
