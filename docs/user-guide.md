@@ -207,7 +207,7 @@ Note that each item inside [ADP\:ITEMIZE](/docs/user-api.md#macro-itemize) is a 
 Inside a [ADP\:TEXT](/docs/user-api.md#macro-text) form\, a [ADP\:CELL](/docs/user-api.md#macro-cell) from a [ADP\:TABLE](/docs/user-api.md#macro-table) form and a [ADP\:ITEM](/docs/user-api.md#macro-item) from a [ADP\:ITEMIZE](/docs/user-api.md#macro-itemize) or [ADP\:ENUMERATE](/docs/user-api.md#macro-enumerate) form\, we can enrich the text with the macros [ADP\:BOLD](/docs/user-api.md#macro-bold)\, [ADP\:ITALIC](/docs/user-api.md#macro-italic)\, [ADP\:EMPHASIS](/docs/user-api.md#macro-emphasis) and [ADP\:WEB\-LINK](/docs/user-api.md#macro-web-link)\. For example\:
 
 `````Lisp
-(ADP:TEXT "As " (ADP:BOLD "Andrew,") " said: "
+(ADP:TEXT "As " (ADP:BOLD "Andrew") " said: "
           (ADP:ITALIC "You only need " (+ 1 2 3) " ")
           (ADP:WEB-LINK "coins" "https://en.wikipedia.org/wiki/Coin") " "
           (ADP:ITALIC "to enter in") " " (ADP:EMPHASIS "The Giant Red Tree."))
@@ -215,7 +215,7 @@ Inside a [ADP\:TEXT](/docs/user-api.md#macro-text) form\, a [ADP\:CELL](/docs/us
 
 You will see this\:
 
-As <strong>Andrew\,</strong> said\: <em>You only need 6 </em>[coins](https://en.wikipedia.org/wiki/Coin) <em>to enter in</em> <strong><em>The Giant Red Tree\.</em></strong>
+As <strong>Andrew</strong> said\: <em>You only need 6 </em>[coins](https://en.wikipedia.org/wiki/Coin) <em>to enter in</em> <strong><em>The Giant Red Tree\.</em></strong>
 
 Note that spaces are placed out of enrichment functions \(after ``` italic ``` and ``` web-link ``` calls\)\. Also\, you cannot nest calls of [ADP\:BOLD](/docs/user-api.md#macro-bold)\, [ADP\:ITALIC](/docs/user-api.md#macro-italic)\, [ADP\:EMPHASIS](/docs/user-api.md#macro-emphasis) and [ADP\:WEB\-LINK](/docs/user-api.md#macro-web-link)\. For example\, if you try this\:
 
