@@ -135,7 +135,7 @@ This is the text macro\. The result of 3\+4 is 7\. As we will see later you can 
 
 ### Tables
 
-You can add tables using the macro [ADP\:TABLE](/docs/user-api.md#macro-table)\. The best way to see how to use it is an example\. Imagine we want to show some data stored in some variables\.
+You can add tables using the macros [ADP\:TABLE](/docs/user-api.md#macro-table) and [ADP\:CELL](/docs/user-api.md#macro-cell)\. The best way to see how to use it is an example\. Imagine we want to show some data stored in some variables\.
 
 `````Lisp
 (DEFPARAMETER PETER-INFO '(34 "Peter Garcia" 1435))
@@ -172,39 +172,39 @@ And you will see this\:
 | 53 | Laura Beneyto | 1543€ |
 
 
-Note that in the _Salary_ column we used multiple values in each cell\. Each cell can accept multiple values and they are treated as if they are in the [ADP\:TEXT](/docs/user-api.md#macro-text) macro\. In other words\, each element in a cell is [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)\-ed and the results are concatenated\.
+Note that in the _Salary_ column we used multiple values in each cell\. Each call to [ADP\:CELL](/docs/user-api.md#macro-cell) can accept multiple values and they are treated as if they are in the [ADP\:TEXT](/docs/user-api.md#macro-text) macro\. In other words\, each element in a cell is [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)\-ed and the results are concatenated\.
 
 ### Lists
 
-You can add lists with [ADP\:ITEMIZE](/docs/user-api.md#macro-itemize)\. For example\:
+You can add lists with [ADP\:ITEMIZE](/docs/user-api.md#macro-itemize) or [ADP\:ENUMERATE](/docs/user-api.md#macro-enumerate)\. For example\:
 
 `````Lisp
 (ADP:ITEMIZE (ADP:ITEM "Vegetables:")
-             (ADP:ITEMIZE (ADP:ITEM 3 " peppers:")
-                          (ADP:ITEMIZE (ADP:ITEM 1 " green pepper")
-                                       (ADP:ITEM (- 3 1) " red pepper"))
-                          (ADP:ITEM 0.25 "Kg of carrots"))
+             (ADP:ENUMERATE (ADP:ITEM 3 " peppers:")
+                            (ADP:ITEMIZE (ADP:ITEM 1 " green pepper")
+                                         (ADP:ITEM (- 3 1) " red pepper"))
+                            (ADP:ITEM 0.25 "Kg of carrots"))
              (ADP:ITEM "Fruits:")
-             (ADP:ITEMIZE (ADP:ITEM 0.5 "Kg of apples")
-                          (ADP:ITEM 6 " oranges")))
+             (ADP:ENUMERATE (ADP:ITEM 0.5 "Kg of apples")
+                            (ADP:ITEM 6 " oranges")))
 `````
 
 You will see this\:
 
 * Vegetables\:
-  * 3 peppers\:
-    * 1 green pepper
-    * 2 red pepper
-  * 0\.25Kg of carrots
+  1. 3 peppers\:
+     * 1 green pepper
+     * 2 red pepper
+  2. 0\.25Kg of carrots
 * Fruits\:
-  * 0\.5Kg of apples
-  * 6 oranges
+  1. 0\.5Kg of apples
+  2. 6 oranges
 
-Note that each item inside [ADP\:ITEMIZE](/docs/user-api.md#macro-itemize) is a list starting with ``` ITEM ``` or ``` ITEMIZE ```\. When you use ``` ITEM ``` every object will be [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)\-ed and then concatenated\. In other words\, it works the same as [ADP\:TEXT](/docs/user-api.md#macro-text) or [ADP\:TABLE](/docs/user-api.md#macro-table)\. On the other hand\, when using ``` ITEMIZE ``` you are indicating that you want a sublist of items\.
+Note that each item inside [ADP\:ITEMIZE](/docs/user-api.md#macro-itemize) is a list starting with [ADP\:ITEM](/docs/user-api.md#macro-item)\, [ADP\:ITEMIZE](/docs/user-api.md#macro-itemize) or [ADP\:ITEMIZE](/docs/user-api.md#macro-itemize)\. When you use [ADP\:ITEM](/docs/user-api.md#macro-item) every object will be [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)\-ed and then concatenated\. In other words\, it works the same as [ADP\:TEXT](/docs/user-api.md#macro-text) or [ADP\:CELL](/docs/user-api.md#macro-cell)\. On the other hand\, when using [ADP\:ITEMIZE](/docs/user-api.md#macro-itemize) or [ADP\:ENUMERATE](/docs/user-api.md#macro-enumerate) you are indicating that you want a sublist of items\.
 
 ### Text enrichment
 
-Inside a [ADP\:TEXT](/docs/user-api.md#macro-text) form\, a ``` CELL ``` from a [ADP\:TABLE](/docs/user-api.md#macro-table) form and a ``` ITEM ``` form a [ADP\:ITEMIZE](/docs/user-api.md#macro-itemize) form\, we can enrich the text with the macros [ADP\:BOLD](/docs/user-api.md#macro-bold)\, [ADP\:ITALIC](/docs/user-api.md#macro-italic)\, [ADP\:EMPHASIS](/docs/user-api.md#macro-emphasis) and [ADP\:WEB\-LINK](/docs/user-api.md#macro-web-link)\. For example\:
+Inside a [ADP\:TEXT](/docs/user-api.md#macro-text) form\, a [ADP\:CELL](/docs/user-api.md#macro-cell) from a [ADP\:TABLE](/docs/user-api.md#macro-table) form and a [ADP\:ITEM](/docs/user-api.md#macro-item) from a [ADP\:ITEMIZE](/docs/user-api.md#macro-itemize) or [ADP\:ENUMERATE](/docs/user-api.md#macro-enumerate) form\, we can enrich the text with the macros [ADP\:BOLD](/docs/user-api.md#macro-bold)\, [ADP\:ITALIC](/docs/user-api.md#macro-italic)\, [ADP\:EMPHASIS](/docs/user-api.md#macro-emphasis) and [ADP\:WEB\-LINK](/docs/user-api.md#macro-web-link)\. For example\:
 
 `````Lisp
 (ADP:TEXT "As " (ADP:BOLD "Andrew") " said: "

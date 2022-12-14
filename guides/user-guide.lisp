@@ -114,7 +114,7 @@
 
 (subsubheader "Tables")
 
-(text "You can add tables using the macro " (function-ref table) ". The best way to see how to use it is an example. Imagine we want to show some data stored in some variables.")
+(text "You can add tables using the macros " (function-ref table) " and " (function-ref cell) ". The best way to see how to use it is an example. Imagine we want to show some data stored in some variables.")
 
 
 (code-tag (info-table)
@@ -147,12 +147,12 @@
 	 ((cell (get-age maria-info)) (cell (get-name maria-info)) (cell (get-salary maria-info) "€"))
 	 ((cell (get-age laura-info)) (cell (get-name laura-info)) (cell (get-salary laura-info) "€"))))
 
-(text "Note that in the " (italic "Salary") " column we used multiple values in each cell. Each cell can accept multiple values and they are treated as if they are in the " (function-ref text) " macro. In other words, each element in a cell is " (cl-ref princ) "-ed and the results are concatenated.")
+(text "Note that in the " (italic "Salary") " column we used multiple values in each cell. Each call to "(function-ref cell)" can accept multiple values and they are treated as if they are in the " (function-ref text) " macro. In other words, each element in a cell is " (cl-ref princ) "-ed and the results are concatenated.")
 
 
 (subsubheader "Lists")
 
-(text "You can add lists with " (function-ref itemize) ". For example:")
+(text "You can add lists with " (function-ref itemize) " or " (function-ref enumerate) ". For example:")
 
 (code-block (list-example)
   list-example)
@@ -161,20 +161,20 @@
 
 (code-tag (list-example)
   (itemize (item "Vegetables:")
-	   (itemize (item 3 " peppers:")
-		     (itemize (item 1 " green pepper")
+	   (enumerate (item 3 " peppers:")
+		      (itemize (item 1 " green pepper")
 			       (item (- 3 1) " red pepper"))
-		     (item 0.25 "Kg of carrots"))
+		      (item 0.25 "Kg of carrots"))
 	   (item "Fruits:")
-	   (itemize (item 0.5 "Kg of apples")
-		     (item 6 " oranges"))))
+	   (enumerate (item 0.5 "Kg of apples")
+		      (item 6 " oranges"))))
 
-(text "Note that each item inside " (function-ref itemize) " is a list starting with " (inline-code :item) " or " (inline-code :itemize) ". When you use " (inline-code :item) " every object will be " (cl-ref princ) "-ed and then concatenated. In other words, it works the same as " (function-ref text) " or " (function-ref table) ". On the other hand, when using " (inline-code :itemize) " you are indicating that you want a sublist of items.")
+(text "Note that each item inside " (function-ref itemize) " is a list starting with " (function-ref item) ", " (function-ref itemize) " or " (function-ref itemize) ". When you use " (function-ref item) " every object will be " (cl-ref princ) "-ed and then concatenated. In other words, it works the same as " (function-ref text) " or " (function-ref cell) ". On the other hand, when using " (function-ref itemize) " or " (function-ref enumerate) " you are indicating that you want a sublist of items.")
 
 
 (subsubheader "Text enrichment")
 
-(text "Inside a " (function-ref text) " form, a " (inline-code :cell) " from a " (function-ref table) " form and a " (inline-code :item) " form a " (function-ref itemize) " form, we can enrich the text with the macros " (function-ref bold) ", " (function-ref italic) ", " (function-ref emphasis) " and " (function-ref web-link) ". For example:")
+(text "Inside a " (function-ref text) " form, a " (function-ref cell) " from a " (function-ref table) " form and a " (function-ref item) " from a " (function-ref itemize) " or " (function-ref enumerate) " form, we can enrich the text with the macros " (function-ref bold) ", " (function-ref italic) ", " (function-ref emphasis) " and " (function-ref web-link) ". For example:")
 
 (code-block (rich-text-example)
   rich-text-example)
