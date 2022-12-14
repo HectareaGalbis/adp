@@ -88,7 +88,7 @@
   (format stream "<strong>~a</strong>" (escape-characters text)))
 
 (adpsm:define-italic-writer (stream text)
-  (format stream "_~a_" (escape-characters text)))
+  (format stream "<em>~a</em>" (escape-characters text)))
 
 (adpsm:define-emphasis-writer (stream text)
   (format stream "***~a***" (escape-characters text)))

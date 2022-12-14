@@ -131,7 +131,7 @@ When you want to add text you must use the macro [ADP\:TEXT](/docs/user-api.md#m
 
 If I use that right now\:
 
-This is the text macro\. The result of 3\+4 is 7\. As we will see later you can enrich the text with <strong>bold words</strong>\, _italic words_\, ***emphasis words*** and more\.
+This is the text macro\. The result of 3\+4 is 7\. As we will see later you can enrich the text with <strong>bold words</strong>\, <em>italic words</em>\, ***emphasis words*** and more\.
 
 ### Tables
 
@@ -172,7 +172,7 @@ And you will see this\:
 | 53 | Laura Beneyto | 1543€ |
 
 
-Note that in the _Salary_ column we used multiple values in each cell\. Each call to [ADP\:CELL](/docs/user-api.md#macro-cell) can accept multiple values and they are treated as if they are in the [ADP\:TEXT](/docs/user-api.md#macro-text) macro\. In other words\, each element in a cell is [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)\-ed and the results are concatenated\.
+Note that in the <em>Salary</em> column we used multiple values in each cell\. Each call to [ADP\:CELL](/docs/user-api.md#macro-cell) can accept multiple values and they are treated as if they are in the [ADP\:TEXT](/docs/user-api.md#macro-text) macro\. In other words\, each element in a cell is [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)\-ed and the results are concatenated\.
 
 ### Lists
 
@@ -215,7 +215,7 @@ Inside a [ADP\:TEXT](/docs/user-api.md#macro-text) form\, a [ADP\:CELL](/docs/us
 
 You will see this\:
 
-As <strong>Andrew</strong> said\: _You only need 6 _[coins](https://en.wikipedia.org/wiki/Coin) _to enter in_ ***The Giant Red Tree\.***
+As <strong>Andrew</strong> said\: <em>You only need 6 </em>[coins](https://en.wikipedia.org/wiki/Coin) <em>to enter in</em> ***The Giant Red Tree\.***
 
 Note that spaces are placed out of enrichment functions \(after ``` italic ``` and ``` web-link ``` calls\)\. Also\, you cannot nest calls of [ADP\:BOLD](/docs/user-api.md#macro-bold)\, [ADP\:ITALIC](/docs/user-api.md#macro-italic)\, [ADP\:EMPHASIS](/docs/user-api.md#macro-emphasis) and [ADP\:WEB\-LINK](/docs/user-api.md#macro-web-link)\. For example\, if you try this\:
 

@@ -4,7 +4,7 @@ Welcome to ADP\!
 
 ## Introduction
 
-_Add Documentation\, Please_ is a library for literate programming and semi\-automatic API generation\. There are already good projects for literate programming like ``` Erudite ``` so\, why another project\? Well\, they work differently and ``` Erudite ``` just doesn\'t adjust to my needs\.
+<em>Add Documentation\, Please</em> is a library for literate programming and semi\-automatic API generation\. There are already good projects for literate programming like ``` Erudite ``` so\, why another project\? Well\, they work differently and ``` Erudite ``` just doesn\'t adjust to my needs\.
 
 <strong>ADP</strong> is simple but practical\. To generate documentation you have to use different macros\. For example\, if you want a header\, then you use the [ADP\:HEADER](/docs/user-api.md#macro-header) macro\. Or if you want a block of code you use [ADP\:CODE\-BLOCK](/docs/user-api.md#macro-code-block)\. The reason behind using macros to literate programming is that you can make your own macros using the ones exported by <strong>ADP</strong>\.
 
