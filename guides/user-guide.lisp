@@ -182,7 +182,7 @@
 (text "You will see this:")
 
 (code-tag (rich-text-example)
-  (text "As " (bold "Andrew") " said: " (italic "You only need " (+ 1 2 3)) " " (web-link "coins" "https://en.wikipedia.org/wiki/Coin") " " (italic "to enter in") " " (emphasis "The Giant Red Tree.")))
+  (text "As " (bold "Andrew") " said: " (italic "You only need " (+ 1 2 3) " ") (web-link "coins" "https://en.wikipedia.org/wiki/Coin") " " (italic "to enter in") " " (emphasis "The Giant Red Tree.")))
 
 (text "Note that spaces are placed out of enrichment functions (after " (inline-code "italic") " and " (inline-code "web-link") " calls). Also, you cannot nest calls of " (function-ref bold) ", " (function-ref italic) ", " (function-ref emphasis) " and " (function-ref web-link) ". For example, if you try this:")
 
