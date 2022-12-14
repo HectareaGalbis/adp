@@ -1,6 +1,6 @@
 <h1 id="STYLE-MAKER-API-HEADER7">Style\-maker API</h1>
 
-<h2 id="G161060">ADP pprint dispatch</h2>
+<h2 id="G2188106">ADP pprint dispatch</h2>
 
 #### Variable: \*ADP\-PPRINT\-DISPATCH\*
 
@@ -13,7 +13,7 @@ ADP custom pprint dispatch table to make the code printing look better. The main
 package extension of a symbol is printed. It will only print the extension package when a symbol is exported.
 ````
 
-<h2 id="G161161">Style parameters</h2>
+<h2 id="G2189107">Style parameters</h2>
 
 #### Macro: DEFINE\-STYLE\-PARAMETER
 
@@ -31,7 +31,7 @@ using the symbol name of NAME. If REQUIRED is non-NIL, the user must use this pa
 ADP:LOAD-SYSTEM.
 ````
 
-<h2 id="G161262">Writers</h2>
+<h2 id="G2190108">Writers</h2>
 
 #### Macro: DEFINE\-BEGIN\-FILE\-WRITER
 
@@ -523,9 +523,9 @@ Define a function to print a defun definition. It receives the stream, and the d
 Define a function to print a defvar definition. It receives the stream, and the definition expression.
 ````
 
-<h2 id="G165563">API function components</h2>
+<h2 id="G2233109">API function components</h2>
 
-<h3 id="G165664">Defclass components</h3>
+<h3 id="G2234110">Defclass components</h3>
 
 #### Macro: WITH\-DEFCLASS\-COMPONENTS
 
@@ -536,7 +536,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="G166065">Defconstant components</h3>
+<h3 id="G2238111">Defconstant components</h3>
 
 #### Macro: WITH\-DEFCONSTANT\-COMPONENTS
 
@@ -547,7 +547,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="G166466">Defgeneric components</h3>
+<h3 id="G2242112">Defgeneric components</h3>
 
 #### Macro: WITH\-DEFGENERIC\-COMPONENTS
 
@@ -558,7 +558,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="G166867">Define\-compiler\-macro components</h3>
+<h3 id="G2246113">Define\-compiler\-macro components</h3>
 
 #### Macro: WITH\-DEFINE\-COMPILER\-MACRO\-COMPONENTS
 
@@ -570,7 +570,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="G167268">Define\-condition components</h3>
+<h3 id="G2250114">Define\-condition components</h3>
 
 #### Macro: WITH\-DEFINE\-CONDITION\-COMPONENTS
 
@@ -581,7 +581,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="G167669">Define\-method\-combination components</h3>
+<h3 id="G2254115">Define\-method\-combination components</h3>
 
 #### Macro: WITH\-DEFINE\-METHOD\-COMBINATION\-COMPONENTS
 
@@ -593,7 +593,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="G168070">Define\-modify\-macro components</h3>
+<h3 id="G2258116">Define\-modify\-macro components</h3>
 
 #### Macro: WITH\-DEFINE\-MODIFY\-MACRO\-COMPONENTS
 
@@ -605,7 +605,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="G168471">Define\-setf\-expander components</h3>
+<h3 id="G2262117">Define\-setf\-expander components</h3>
 
 #### Macro: WITH\-DEFINE\-SETF\-EXPANDER\-COMPONENTS
 
@@ -617,7 +617,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="G168872">Define\-symbol\-macro components</h3>
+<h3 id="G2266118">Define\-symbol\-macro components</h3>
 
 #### Macro: WITH\-DEFINE\-SYMBOL\-MACRO\-COMPONENTS
 
@@ -629,7 +629,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="G169273">Defmacro components</h3>
+<h3 id="G2270119">Defmacro components</h3>
 
 #### Macro: WITH\-DEFMACRO\-COMPONENTS
 
@@ -640,7 +640,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="G169674">defmethod components</h3>
+<h3 id="G2274120">defmethod components</h3>
 
 #### Macro: WITH\-DEFMETHOD\-COMPONENTS
 
@@ -651,7 +651,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="G170075">Defpackage components</h3>
+<h3 id="G2278121">Defpackage components</h3>
 
 #### Macro: WITH\-DEFPACKAGE\-COMPONENTS
 
@@ -662,7 +662,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="G170476">Defparameter components</h3>
+<h3 id="G2282122">Defparameter components</h3>
 
 #### Macro: WITH\-DEFPARAMETER\-COMPONENTS
 
@@ -673,7 +673,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="G170877">Defsetf components</h3>
+<h3 id="G2286123">Defsetf components</h3>
 
 #### Macro: WITH\-DEFSETF\-COMPONENTS
 
@@ -684,7 +684,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="G171278">Defstruct components</h3>
+<h3 id="G2290124">Defstruct components</h3>
 
 #### Macro: WITH\-DEFSTRUCT\-COMPONENTS
 
@@ -695,7 +695,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="G171679">Deftype components</h3>
+<h3 id="G2294125">Deftype components</h3>
 
 #### Macro: WITH\-DEFTYPE\-COMPONENTS
 
@@ -706,7 +706,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="G172080">Defun components</h3>
+<h3 id="G2298126">Defun components</h3>
 
 #### Macro: WITH\-DEFUN\-COMPONENTS
 
@@ -717,7 +717,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="G172481">Defvar components</h3>
+<h3 id="G2302127">Defvar components</h3>
 
 #### Macro: WITH\-DEFVAR\-COMPONENTS
 

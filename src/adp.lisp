@@ -11,12 +11,23 @@
 
 ;; ----- advanced adp macros -----
 
+(defvar *unique-header-tag-suffixes* (make-hash-table :test 'equal))
+
+(defun make-unique-tag (title)
+  (multiple-value-bind (suffix foundp) (gethash title *unique-header-tag-suffixes*)
+    (let ((possible-next-suffix (if foundp suffix 0)))
+      (loop for next-suffix = possible-next-suffix then (1+ next-suffix) 
+	    while (find-symbol (format nil "~a~a" title next-suffix))
+	    finally (setf (gethash title *unique-header-tag-suffixes*) (1+ next-suffix))
+		    (return
+		      (intern (format nil "~a~a" title next-suffix)))))))
+
 (cl:defmacro adv-header (str &optional tag)
   (when *adp*
     (check-type str string "a string")
     (check-type tag (or null symbol) "a symbol or nil")
     (let ((user-tag-p (and tag t))
-	  (fixed-tag (or tag (gensym))))
+	  (fixed-tag (or tag (make-unique-tag str))))
       `(progn
 	 (adppvt:add-element *project* (make-instance 'adppvt:header
 						      :name "header"
@@ -32,7 +43,7 @@
     (check-type str string "a string")
     (check-type tag (or null symbol) "a symbol or nil")
     (let ((user-tag-p (and tag t))
-	  (fixed-tag (or tag (gensym))))
+	  (fixed-tag (or tag (make-unique-tag str))))
       `(progn
 	 (adppvt:add-element *project* (make-instance 'adppvt:subheader
 						      :name "header"
@@ -97,7 +108,7 @@
 	   (check-type ,str string "a string")
 	   (check-type ,tag (or null symbol) "a symbol or nil")
 	   (let ((,user-tag-p (and ,tag t))
-		 (,fixed-tag (or ,tag (gensym))))
+		 (,fixed-tag (or ,tag (make-unique-tag ,str))))
 	     `(progn
 		(adppvt:add-element *project* (make-instance ',',type
 							     :name ,,(string-downcase (symbol-name name))

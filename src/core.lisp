@@ -124,6 +124,8 @@
 
 (defmethod add-element :after (project (element header-type))
   (with-slots (tag (header-location source-location)) element
+    (when (not (symbol-package tag))
+      (error 'uninterned-tag-error :source-element element :tag tag))
     (multiple-value-bind (previous-header foundp) (tag-table-find-elements *header-tags* tag)
       (if foundp
 	  (error 'already-defined-tag-error :source-element element :previous-source-element previous-header :tag tag)

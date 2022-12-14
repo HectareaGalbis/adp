@@ -61,6 +61,17 @@
 		       (slot-value first-element 'source-location) (slot-value first-element 'name))))))
 
 
+(define-condition uninterned-tag-error (error)
+  ((source-element :initarg :source-element
+		   :type element)
+   (tag :initarg :tag
+	:type symbol))
+  (:report (lambda (condition stream)
+	     (with-slots (source-element tag) condition
+	       (format stream "ADP error at '~a': The tag ~s defined using ~a is uninterned.~%"
+		       (slot-value source-element 'source-location) tag (slot-value source-element 'name))))))
+
+
 (define-condition already-defined-tag-error (error)
   ((source-element :initarg :source-element
 		   :type element)
