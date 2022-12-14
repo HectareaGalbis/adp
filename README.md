@@ -1,4 +1,4 @@
-# Add Documentation\, Please
+<h1 id="G289648">Add Documentation\, Please</h1>
 
 Welcome to ADP\!
 
@@ -32,10 +32,10 @@ ADP is available on Quicklisp\! So\, just eval ``` (ql:quickload :adp) ```\. It 
 
 ## Documentation
 
-* The ADP guide\: [The ADP User Guide](/docs/user-guide.md#the-adp-user-guide)
-* The ADP api\: [ADP User Interface](/docs/user-api.md#adp-user-interface)
-* The Style\-Maker guide\: [The Style\-maker Guide](/docs/style-maker-guide.md#the-style-maker-guide)
-* The Style\-Maker api\: [Style\-maker API](/docs/style-maker-api.md#style-maker-api)
+* The ADP guide\: [The ADP User Guide](/docs/user-guide.md#USER-GUIDE-HEADER4)
+* The ADP api\: [ADP User Interface](/docs/user-api.md#USER-API-HEADER1)
+* The Style\-Maker guide\: [The Style\-maker Guide](/docs/style-maker-guide.md#STYLE-MAKER-GUIDE-HEADER5)
+* The Style\-Maker api\: [Style\-maker API](/docs/style-maker-api.md#STYLE-MAKER-API-HEADER2)
 
 ## Available styles
 

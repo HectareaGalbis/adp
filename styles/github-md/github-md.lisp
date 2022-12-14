@@ -38,11 +38,22 @@
     (nth-value 1 (macroexpand-1 sym env))))
 
 
+(defvar *header-ids* (make-hash-table))
+
+(defun get-symbol-id (sym)
+  (multiple-value-bind (id id-exists) (gethash sym *header-ids*)
+    (if id-exists
+	id
+	(let ((new-id (symbol-name (gentemp (symbol-name sym)))))
+	  (setf (gethash sym *header-ids*) new-id)
+	  (values new-id)))))
+
+
+
 ;; ----- guide functions -----
 
 (adpsm:define-header-writer (stream text tag)
-  (declare (ignore tag))
-  (format stream "# ~a~%~%" (escape-characters text)))
+  (format stream "<h1 id=~s>~a</h1>~%~%" (get-symbol-id tag) (escape-characters text)))
 
 (adpsm:define-subheader-writer (stream text tag)
   (declare (ignore tag))
@@ -101,8 +112,7 @@
   (format stream "[~a](~a)" (escape-characters name) link))
 
 (adpsm:define-header-ref-writer (stream tag header-text file-path)
-  (declare (ignore tag))
-  (format stream "[~a](/~a.md#~a)" (escape-characters header-text) file-path (convert-to-github-header-anchor header-text)))
+  (format stream "[~a](/~a.md#~a)" (escape-characters header-text) file-path (get-symbol-id tag)))
 
 (adpsm:define-symbol-ref-writer (stream tag file-path)
   (let* ((symbol-header (cond

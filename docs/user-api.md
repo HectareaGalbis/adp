@@ -1,4 +1,4 @@
-# ADP User Interface
+<h1 id="USER-API-HEADER1">ADP User Interface</h1>
 
 ## Literate programming functions
 
