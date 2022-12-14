@@ -91,7 +91,7 @@
   (format stream "<em>~a</em>" (escape-characters text)))
 
 (adpsm:define-emphasis-writer (stream text)
-  (format stream "***~a***" (escape-characters text)))
+  (format stream "<strong><em>~a</em></strong>" (escape-characters text)))
 
 (adpsm:define-inline-code-writer (stream text)
   (let ((*print-pretty* nil))
