@@ -85,7 +85,7 @@
   (format stream "![~a](/~a)~%~%" (escape-characters alt-text) rel-image-path))
 
 (adpsm:define-bold-writer (stream text)
-  (format stream "**~a**" (escape-characters text)))
+  (format stream "<strong>~a</strong>" (escape-characters text)))
 
 (adpsm:define-italic-writer (stream text)
   (format stream "_~a_" (escape-characters text)))
