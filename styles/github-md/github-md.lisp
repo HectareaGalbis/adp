@@ -33,6 +33,19 @@
 	  do (vector-push-extend char fixed-text))
     (values fixed-text)))
 
+(defun escape-html-characters (text)
+  (let ((punctuation-chars '((#\< . "&#60;")
+			     (#\> . "&#62;")))
+	(fixed-text (make-array (length text) :adjustable t :fill-pointer 0 :element-type 'character)))
+    (with-output-to-string (stream fixed-text)
+      (loop for char across text
+	    for code = (cdr (assoc char punctuation-chars))
+	    if code
+	      do (princ code stream)
+	    else
+	      do (princ char stream)))    
+    (values fixed-text)))
+
 (defun symbol-macro-p (sym &optional env)
   (let ((*macroexpand-hook* (constantly nil)))
     (nth-value 1 (macroexpand-1 sym env))))
@@ -46,13 +59,13 @@
 ;; ----- guide functions -----
 
 (adpsm:define-header-writer (stream text tag)
-  (format stream "<h1 id=~s>~a</h1>~%~%" (get-symbol-id tag) text))
+  (format stream "<h1 id=~s>~a</h1>~%~%" (get-symbol-id tag) (escape-html-characters text)))
 
 (adpsm:define-subheader-writer (stream text tag)
-  (format stream "<h2 id=~s>~a</h2>~%~%" (get-symbol-id tag) text))
+  (format stream "<h2 id=~s>~a</h2>~%~%" (get-symbol-id tag) (escape-html-characters text)))
 
 (adpsm:define-subsubheader-writer (stream text tag)
-  (format stream "<h3 id=~s>~a</h3>~%~%" (get-symbol-id tag) text))
+  (format stream "<h3 id=~s>~a</h3>~%~%" (get-symbol-id tag) (escape-html-characters text)))
 
 (adpsm:define-escape-text (text)
   (escape-characters text))
@@ -103,9 +116,7 @@
   (format stream "[~a](~a)" (escape-characters name) link))
 
 (adpsm:define-header-ref-writer (stream tag header-text file-path)
-  (format stream "<a href=\"/~a.md#~a\">~a</a>" file-path (get-symbol-id tag) header-text)
-  ;; (format stream "[~a](/~a.md#~a)" (escape-characters header-text) file-path (get-symbol-id tag))
-  )
+  (format stream "<a href=\"/~a.md#~a\">~a</a>" file-path (get-symbol-id tag) header-text))
 
 (adpsm:define-symbol-ref-writer (stream tag file-path)
   (let* ((symbol-header (cond
