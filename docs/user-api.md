@@ -1,6 +1,6 @@
 <h1 id="ADP:USER-API-HEADER">ADP User Interface</h1>
 
-<h2 id="ADP:Literate programming functions0">Literate programming functions</h2>
+<h2 id="ADP:HEADERTAG0">Literate programming functions</h2>
 
 #### Macro: HEADER
 
@@ -582,7 +582,7 @@ Add a defun declaration. The macro expands to cl:defun. Also, the function name 
 Add a defvar declaration. The macro expands to cl:defvar. Also, the variable name is used to create a symbol-tag.
 ````
 
-<h2 id="ADP:Writer functions0">Writer functions</h2>
+<h2 id="ADP:HEADERTAG1">Writer functions</h2>
 
 #### Macro: IN\-FILE
 

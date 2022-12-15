@@ -6,21 +6,18 @@
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (cl:defvar *adp* nil)
-  (cl:defvar *project* nil))
+  (cl:defvar *project* nil)
+  (cl:defvar *header-tag-counter* nil))
 
 
 ;; ----- advanced adp macros -----
 
 (cl:defvar *unique-header-tag-suffixes* (make-hash-table :test 'equal))
 
-(cl:defun make-unique-tag (title)
-  (multiple-value-bind (suffix foundp) (gethash title *unique-header-tag-suffixes*)
-    (let ((possible-next-suffix (if foundp suffix 0)))
-      (loop for next-suffix = possible-next-suffix then (1+ next-suffix) 
-	    while (find-symbol (format nil "~a~a" title next-suffix))
-	    finally (setf (gethash title *unique-header-tag-suffixes*) (1+ next-suffix))
-		    (return
-		      (intern (print (format nil "~a~a" title next-suffix))))))))
+(cl:defun make-unique-tag ()
+  (prog1
+      (intern (format nil "~a~a" "HEADERTAG" *header-tag-counter*) "ADP")
+    (incf *header-tag-counter*)))
 
 (cl:defmacro adv-header (str &optional tag)
   (when *adp*
@@ -29,7 +26,7 @@
     (let ((user-tag-p (and tag t)))
       (with-gensyms (fixed-tag)
 	`(progn
-	   (let ((,fixed-tag (or ',tag (make-unique-tag ,str))))
+	   (let ((,fixed-tag (or ',tag (make-unique-tag))))
 	     (adppvt:add-element *project* (make-instance 'adppvt:header
 							  :name "header"
 							  :tag ,fixed-tag
@@ -46,7 +43,7 @@
     (let ((user-tag-p (and tag t)))
       (with-gensyms (fixed-tag)
 	`(progn
-	   (let ((,fixed-tag (or ',tag (make-unique-tag ,str))))
+	   (let ((,fixed-tag (or ',tag (make-unique-tag))))
 	     (adppvt:add-element *project* (make-instance 'adppvt:subheader
 							  :name "subheader"
 							  :tag ,fixed-tag
@@ -111,7 +108,7 @@
 	   (check-type ,tag (or null symbol) "a symbol or nil")
 	   (let ((,user-tag-p (and ,tag t)))
 	     (with-gensyms (,fixed-tag)
-	       `(let ((,,fixed-tag (or ',,tag (make-unique-tag ,,str))))
+	       `(let ((,,fixed-tag (or ',,tag (make-unique-tag))))
 		  (adppvt:add-element *project* (make-instance ',',type
 							       :name ,,(string-downcase (symbol-name name))
 							       :tag ,,fixed-tag
@@ -677,7 +674,8 @@ arguments to let the user customize briefly how documentation is printed."
 		 (fixed-root-path (make-pathname :host (pathname-host root-path)
 						 :device (pathname-device root-path)
 						 :directory (pathname-directory root-path)))
-		 (*project* (make-instance 'adppvt:project :root-directory fixed-root-path)))
+		 (*project* (make-instance 'adppvt:project :root-directory fixed-root-path))
+		 (*header-tag-counter* 0))
 
 	    (load-project system)
 

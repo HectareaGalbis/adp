@@ -6,26 +6,26 @@ I will try to do my best explaining how to use ADP\. If this is not sufficient\,
 
 * [The ADP User Guide](/docs/user-guide.md#ADP:USER-GUIDE-HEADER)
   * [Setting up ADP](/docs/user-guide.md#ADP:SETTING-UP-SUBHEADER-SEGUNDO)
-  * [Selecting a file to write in](/docs/user-guide.md#ADP:Selecting a file to write in0)
-  * [Functions to generate the API](/docs/user-guide.md#ADP:Functions to generate the API0)
-  * [Functions to generate guides\.](/docs/user-guide.md#ADP:Functions to generate guides.0)
+  * [Selecting a file to write in](/docs/user-guide.md#ADP:HEADERTAG29)
+  * [Functions to generate the API](/docs/user-guide.md#ADP:HEADERTAG30)
+  * [Functions to generate guides\.](/docs/user-guide.md#ADP:HEADERTAG31)
     * [Headers](/docs/user-guide.md#ADP:HEADERS-SUBSUBHEADER)
-* [This is a header](/docs/user-guide.md#ADP:This is a header0)
-  * [This is a subheader](/docs/user-guide.md#ADP:This is a subheader0)
-    * [This is a subsubheader](/docs/user-guide.md#ADP:This is a subsubheader0)
-    * [Text](/docs/user-guide.md#ADP:Text0)
-    * [Tables](/docs/user-guide.md#ADP:Tables0)
-    * [Lists](/docs/user-guide.md#ADP:Lists0)
-    * [Text enrichment](/docs/user-guide.md#ADP:Text enrichment0)
-    * [Images](/docs/user-guide.md#ADP:Images0)
-    * [Code blocks](/docs/user-guide.md#ADP:Code blocks0)
-  * [Generating the documentation](/docs/user-guide.md#ADP:Generating the documentation0)
+* [This is a header](/docs/user-guide.md#ADP:HEADERTAG32)
+  * [This is a subheader](/docs/user-guide.md#ADP:HEADERTAG33)
+    * [This is a subsubheader](/docs/user-guide.md#ADP:HEADERTAG34)
+    * [Text](/docs/user-guide.md#ADP:HEADERTAG35)
+    * [Tables](/docs/user-guide.md#ADP:HEADERTAG36)
+    * [Lists](/docs/user-guide.md#ADP:HEADERTAG37)
+    * [Text enrichment](/docs/user-guide.md#ADP:HEADERTAG38)
+    * [Images](/docs/user-guide.md#ADP:HEADERTAG39)
+    * [Code blocks](/docs/user-guide.md#ADP:HEADERTAG40)
+  * [Generating the documentation](/docs/user-guide.md#ADP:HEADERTAG41)
   * [Cross references](/docs/user-guide.md#ADP:TAGS-SUBHEADER)
-    * [Header\-tags](/docs/user-guide.md#ADP:Header-tags0)
+    * [Header\-tags](/docs/user-guide.md#ADP:HEADERTAG42)
     * [Function\-tags\, symbol\-tags and type\-tags](/docs/user-guide.md#ADP:FUNCTION-TAGS-SUBSUBHEADER)
-    * [Code\-tags](/docs/user-guide.md#ADP:Code-tags0)
-    * [Quoting\, commenting\, hiding and removing your code](/docs/user-guide.md#ADP:Quoting, commenting, hiding and removing your code0)
-  * [Tips and final comments](/docs/user-guide.md#ADP:Tips and final comments0)
+    * [Code\-tags](/docs/user-guide.md#ADP:HEADERTAG43)
+    * [Quoting\, commenting\, hiding and removing your code](/docs/user-guide.md#ADP:HEADERTAG44)
+  * [Tips and final comments](/docs/user-guide.md#ADP:HEADERTAG45)
 
 <h2 id="ADP:SETTING-UP-SUBHEADER-SEGUNDO">Setting up ADP</h2>
 
@@ -51,7 +51,7 @@ You only need to add ``` :adp ``` to the ``` :depends-on ``` list\.
 
 Your system is now ready to use ADP\.
 
-<h2 id="ADP:Selecting a file to write in0">Selecting a file to write in</h2>
+<h2 id="ADP:HEADERTAG29">Selecting a file to write in</h2>
 
 Before start using the macros to write documentation\, we need to select a file where to store it\. We can do this using the [ADP\:IN\-FILE](/docs/user-api.md#macro-in-file) macro\. You can always add this macro after [IN\-PACKAGE](http://www.lispworks.com/reference/HyperSpec/Body/m_in_pkg.htm)\.
 
@@ -63,7 +63,7 @@ Before start using the macros to write documentation\, we need to select a file 
 
 We need to pass a pathname to [ADP\:IN\-FILE](/docs/user-api.md#macro-in-file)\. This pathname will be relative to the system\'s root directory\. So\, in this case a file named ``` my-file ``` will be created inside the ``` docs ``` directory in your system\'s root directory\. Besides\, note that the pathname does not include an extension\. This is because later you can select between different styles and each style will generate different types of files\. After writing this line of code we can start to use the rest of the macros\.
 
-<h2 id="ADP:Functions to generate the API0">Functions to generate the API</h2>
+<h2 id="ADP:HEADERTAG30">Functions to generate the API</h2>
 
 I\'m sure your code defines a lot of things like functions\, macros and symbols\. In order to do that you have had to use define macros like [DEFUN](http://www.lispworks.com/reference/HyperSpec/Body/m_defun.htm)\, [DEFMACRO](http://www.lispworks.com/reference/HyperSpec/Body/m_defmac.htm) or [DEFPARAMETER](http://www.lispworks.com/reference/HyperSpec/Body/m_defpar.htm)\. Print some documentation of this definitions is very easy with ADP\. For example\, consider this function definition\:
 
@@ -94,7 +94,7 @@ That\'s all\! Actually\, note that if you load your project as always after chan
 
 Same as with [ADP\:DEFUN](/docs/user-api.md#macro-defun)\, every macro that defines something is redefined to print documentation\. You can see every macro here\: [API reference functions](/docs/user-api.md#ADP:API-SUBHEADER)
 
-<h2 id="ADP:Functions to generate guides.0">Functions to generate guides\.</h2>
+<h2 id="ADP:HEADERTAG31">Functions to generate guides\.</h2>
 
 The other group of functions are intended to generate guides and tutorials \(like this one\)\. But you can use them wherever you want and however you want\. Even you can use them together with the API functions above\.
 
@@ -112,13 +112,13 @@ You can add headers in your documentation\. In other words\, they work as titles
 
 You will see this\:
 
-<h1 id="ADP:This is a header0">This is a header</h1>
+<h1 id="ADP:HEADERTAG32">This is a header</h1>
 
-<h2 id="ADP:This is a subheader0">This is a subheader</h2>
+<h2 id="ADP:HEADERTAG33">This is a subheader</h2>
 
-<h3 id="ADP:This is a subsubheader0">This is a subsubheader</h3>
+<h3 id="ADP:HEADERTAG34">This is a subsubheader</h3>
 
-<h3 id="ADP:Text0">Text</h3>
+<h3 id="ADP:HEADERTAG35">Text</h3>
 
 When you want to add text you must use the macro [ADP\:TEXT](/docs/user-api.md#macro-text)\. It receives a variable number of arguments\. Each argument is evaluated at run\-time and its result is [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)\-ed\. Then\, all the content that has been [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)\-ed is concatenated into a single string and finally it is printed in the documentation file\. For example\:
 
@@ -133,7 +133,7 @@ If I use that right now\:
 
 This is the text macro\. The result of 3\+4 is 7\. As we will see later you can enrich the text with <strong>bold words</strong>\, <em>italic words</em>\, <strong><em>emphasis words</em></strong> and more\.
 
-<h3 id="ADP:Tables0">Tables</h3>
+<h3 id="ADP:HEADERTAG36">Tables</h3>
 
 You can add tables using the macros [ADP\:TABLE](/docs/user-api.md#macro-table) and [ADP\:CELL](/docs/user-api.md#macro-cell)\. The best way to see how to use it is an example\. Imagine we want to show some data stored in some variables\.
 
@@ -174,7 +174,7 @@ And you will see this\:
 
 Note that in the <em>Salary</em> column we used multiple values in each cell\. Each call to [ADP\:CELL](/docs/user-api.md#macro-cell) can accept multiple values and they are treated as if they are in the [ADP\:TEXT](/docs/user-api.md#macro-text) macro\. In other words\, each element in a cell is [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)\-ed and the results are concatenated\.
 
-<h3 id="ADP:Lists0">Lists</h3>
+<h3 id="ADP:HEADERTAG37">Lists</h3>
 
 You can add lists with [ADP\:ITEMIZE](/docs/user-api.md#macro-itemize) or [ADP\:ENUMERATE](/docs/user-api.md#macro-enumerate)\. For example\:
 
@@ -202,7 +202,7 @@ You will see this\:
 
 Note that each item inside [ADP\:ITEMIZE](/docs/user-api.md#macro-itemize) is a list starting with [ADP\:ITEM](/docs/user-api.md#macro-item)\, [ADP\:ITEMIZE](/docs/user-api.md#macro-itemize) or [ADP\:ITEMIZE](/docs/user-api.md#macro-itemize)\. When you use [ADP\:ITEM](/docs/user-api.md#macro-item) every object will be [PRINC](http://www.lispworks.com/reference/HyperSpec/Body/f_wr_pr.htm)\-ed and then concatenated\. In other words\, it works the same as [ADP\:TEXT](/docs/user-api.md#macro-text) or [ADP\:CELL](/docs/user-api.md#macro-cell)\. On the other hand\, when using [ADP\:ITEMIZE](/docs/user-api.md#macro-itemize) or [ADP\:ENUMERATE](/docs/user-api.md#macro-enumerate) you are indicating that you want a sublist of items\.
 
-<h3 id="ADP:Text enrichment0">Text enrichment</h3>
+<h3 id="ADP:HEADERTAG38">Text enrichment</h3>
 
 Inside a [ADP\:TEXT](/docs/user-api.md#macro-text) form\, a [ADP\:CELL](/docs/user-api.md#macro-cell) from a [ADP\:TABLE](/docs/user-api.md#macro-table) form and a [ADP\:ITEM](/docs/user-api.md#macro-item) from a [ADP\:ITEMIZE](/docs/user-api.md#macro-itemize) or [ADP\:ENUMERATE](/docs/user-api.md#macro-enumerate) form\, we can enrich the text with the macros [ADP\:BOLD](/docs/user-api.md#macro-bold)\, [ADP\:ITALIC](/docs/user-api.md#macro-italic)\, [ADP\:EMPHASIS](/docs/user-api.md#macro-emphasis) and [ADP\:WEB\-LINK](/docs/user-api.md#macro-web-link)\. For example\:
 
@@ -225,7 +225,7 @@ You cannot nest calls of [ADP\:BOLD](/docs/user-api.md#macro-bold)\, [ADP\:ITALI
 
 an error will be raised\.
 
-<h3 id="ADP:Images0">Images</h3>
+<h3 id="ADP:HEADERTAG39">Images</h3>
 
 You can add images with the macro [ADP\:IMAGE](/docs/user-api.md#macro-image)\. For example\, an image is located at ``` guides/images/ ```\. If I evaluate the next expression\:
 
@@ -239,7 +239,7 @@ I get this\:
 
 The first argument is the alternative text of the image\. If for some reason the image cannot be loaded in some web page\, the alternative text is used instead\. The second argument is the pathname of the image\, relative to the system\'s root directory\.
 
-<h3 id="ADP:Code blocks0">Code blocks</h3>
+<h3 id="ADP:HEADERTAG40">Code blocks</h3>
 
 A good Lisp tutorial must include Lisp code examples\. ADP defines some macros to print code blocks\: [ADP\:CODE\-BLOCK](/docs/user-api.md#macro-code-block)\, [ADP\:VERBATIM\-CODE\-BLOCK](/docs/user-api.md#macro-verbatim-code-block) and [ADP\:CODE\-EXAMPLE](/docs/user-api.md#macro-code-example)\. The first macro does not evaluate the code\. So\, for example if you write this\:
 
@@ -324,7 +324,7 @@ You will see\:
 "world"
 ```
 
-<h2 id="ADP:Generating the documentation0">Generating the documentation</h2>
+<h2 id="ADP:HEADERTAG41">Generating the documentation</h2>
 
 There are still some useful macros that I didn\'t explain yet\. However\, I think it is now a good time to learn how to actually generate the documentation\. You may have multiple files where the macros explained above are used\. Also\, all the information is associated with a file because you have used the macro [ADP\:IN\-FILE](/docs/user-api.md#macro-in-file) whereever you have needed\.
 
@@ -348,7 +348,7 @@ And that\'s all\! The documentation is ready to be read\.
 
 ADP supports cross references with tags\. A tag is a just a symbol with some information associated\. There are six types of tags\: header\-tags\, function\-tags\, symbol\-tags\, type\-tags\, file\-tags and code\-tags\.
 
-<h3 id="ADP:Header-tags0">Header\-tags</h3>
+<h3 id="ADP:HEADERTAG42">Header\-tags</h3>
 
 A header\-tag is a symbol with a header associated\. We have already seen how to add a header to the documentation\. But I didn\'t say that the macros [ADP\:HEADER](/docs/user-api.md#macro-header)\, [ADP\:SUBHEADER](/docs/user-api.md#macro-subheader) and [ADP\:SUBSUBHEADER](/docs/user-api.md#macro-subsubheader) receives a second optional argument\. As you can imagine\, this second argument must be a symbol that will be converted to a header tag\. For example\, the first header of this file is created with this expression\:
 
@@ -417,7 +417,7 @@ Lastly\, an example using a type\-tag\:
 
 Using a type tag\: [ALSO\-A\-TYPE\?](/docs/user-guide.md#type-also-a-type)
 
-<h3 id="ADP:Code-tags0">Code\-tags</h3>
+<h3 id="ADP:HEADERTAG43">Code\-tags</h3>
 
 Code\-tags work differently to those we have just seen above\. Code\-tags are used inside the [ADP\:CODE\-BLOCK](/docs/user-api.md#macro-code-block) macro\. Imagine that you are making a tutorial\. You are explaining how some piece of code works and you test that code in a different file to make sure your tutorial is well done\. But one day\, you decide to change your code\. Now the tutorial needs to be changed too\. To avoid writing your code twice you can use code\-tags\. Suppose that your code looks like this\:
 
@@ -489,7 +489,7 @@ You will see this\:
 (ADP:DEFPARAMETER A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE T)
 `````
 
-<h3 id="ADP:Quoting, commenting, hiding and removing your code0">Quoting\, commenting\, hiding and removing your code</h3>
+<h3 id="ADP:HEADERTAG44">Quoting\, commenting\, hiding and removing your code</h3>
 
 Code tags are great but [ADP\:CODE\-TAG](/docs/user-api.md#macro-code-tag) will expand to the code you write\. Sometimes you will want to create a tag to some piece of code but not to evaluate it\. In that case we can quote the code using the form [ADP\:CODE\-QUOTE](/docs/user-api.md#macro-code-quote)\. For example\, you can write this\:
 
@@ -678,7 +678,7 @@ And you will see this\:
   (PRINT 6))
 `````
 
-<h2 id="ADP:Tips and final comments0">Tips and final comments</h2>
+<h2 id="ADP:HEADERTAG45">Tips and final comments</h2>
 
 I hope this guide is useful\. I usually see Common Lisp projects that looks awesome but they lack guides or even documentation\. That\'s why I started to document all my projects and then I realized that I needed some tool to make it easier\. I know that there are already other documentation generators\, but none of them suits my needs\. Luckily\, Common Lisp makes doing this kind of tools relatively easy compared to other languages\. Lastly\, I want to give you some tips or ways to use ADP that I ended up doing myself\.
 
