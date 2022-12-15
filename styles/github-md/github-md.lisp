@@ -39,10 +39,7 @@
 
 
 (defun get-symbol-id (sym)
-  (let ((package (symbol-package sym)))
-    (if package
-	(format nil "~a:~a" (package-name package) (symbol-name sym))
-	(format nil "~a" (symbol-name sym)))))
+  (format nil "~a:~a" (package-name (symbol-package sym)) (symbol-name sym)))
 
 
 
