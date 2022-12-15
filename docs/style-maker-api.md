@@ -1,4 +1,4 @@
-<h1 id="ADP-STYLE-MAKER:STYLE-MAKER-API-HEADER">Style\-maker API</h1>
+<h1 id="ADP-STYLE-MAKER:STYLE-MAKER-API-HEADER">Style-maker API</h1>
 
 <h2 id="ADP:HEADERTAG2">ADP pprint dispatch</h2>
 
@@ -558,7 +558,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="ADP:HEADERTAG9">Define\-compiler\-macro components</h3>
+<h3 id="ADP:HEADERTAG9">Define-compiler-macro components</h3>
 
 #### Macro: WITH\-DEFINE\-COMPILER\-MACRO\-COMPONENTS
 
@@ -570,7 +570,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="ADP:HEADERTAG10">Define\-condition components</h3>
+<h3 id="ADP:HEADERTAG10">Define-condition components</h3>
 
 #### Macro: WITH\-DEFINE\-CONDITION\-COMPONENTS
 
@@ -581,7 +581,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="ADP:HEADERTAG11">Define\-method\-combination components</h3>
+<h3 id="ADP:HEADERTAG11">Define-method-combination components</h3>
 
 #### Macro: WITH\-DEFINE\-METHOD\-COMBINATION\-COMPONENTS
 
@@ -593,7 +593,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="ADP:HEADERTAG12">Define\-modify\-macro components</h3>
+<h3 id="ADP:HEADERTAG12">Define-modify-macro components</h3>
 
 #### Macro: WITH\-DEFINE\-MODIFY\-MACRO\-COMPONENTS
 
@@ -605,7 +605,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="ADP:HEADERTAG13">Define\-setf\-expander components</h3>
+<h3 id="ADP:HEADERTAG13">Define-setf-expander components</h3>
 
 #### Macro: WITH\-DEFINE\-SETF\-EXPANDER\-COMPONENTS
 
@@ -617,7 +617,7 @@ Define a function to print a defvar definition. It receives the stream, and the 
   ...)
 ```
 
-<h3 id="ADP:HEADERTAG14">Define\-symbol\-macro components</h3>
+<h3 id="ADP:HEADERTAG14">Define-symbol-macro components</h3>
 
 #### Macro: WITH\-DEFINE\-SYMBOL\-MACRO\-COMPONENTS
 

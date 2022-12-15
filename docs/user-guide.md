@@ -94,7 +94,7 @@ That\'s all\! Actually\, note that if you load your project as always after chan
 
 Same as with [ADP\:DEFUN](/docs/user-api.md#macro-defun)\, every macro that defines something is redefined to print documentation\. You can see every macro here\: [API reference functions](/docs/user-api.md#ADP:API-SUBHEADER)
 
-<h2 id="ADP:HEADERTAG31">Functions to generate guides\.</h2>
+<h2 id="ADP:HEADERTAG31">Functions to generate guides.</h2>
 
 The other group of functions are intended to generate guides and tutorials \(like this one\)\. But you can use them wherever you want and however you want\. Even you can use them together with the API functions above\.
 
@@ -348,7 +348,7 @@ And that\'s all\! The documentation is ready to be read\.
 
 ADP supports cross references with tags\. A tag is a just a symbol with some information associated\. There are six types of tags\: header\-tags\, function\-tags\, symbol\-tags\, type\-tags\, file\-tags and code\-tags\.
 
-<h3 id="ADP:HEADERTAG42">Header\-tags</h3>
+<h3 id="ADP:HEADERTAG42">Header-tags</h3>
 
 A header\-tag is a symbol with a header associated\. We have already seen how to add a header to the documentation\. But I didn\'t say that the macros [ADP\:HEADER](/docs/user-api.md#macro-header)\, [ADP\:SUBHEADER](/docs/user-api.md#macro-subheader) and [ADP\:SUBSUBHEADER](/docs/user-api.md#macro-subsubheader) receives a second optional argument\. As you can imagine\, this second argument must be a symbol that will be converted to a header tag\. For example\, the first header of this file is created with this expression\:
 
@@ -368,7 +368,7 @@ Go to the top\: [The ADP User Guide](/docs/user-guide.md#ADP:USER-GUIDE-HEADER)
 
 Note that the macro is used inside a [ADP\:TEXT](/docs/user-api.md#macro-text) form\. Same as with [ADP\:BOLD](/docs/user-api.md#macro-bold) or [ADP\:ITALIC](/docs/user-api.md#macro-italic)\, [ADP\:HEADER\-REF](/docs/user-api.md#macro-header-ref) only can be used inside [ADP\:TEXT](/docs/user-api.md#macro-text)\, [ADP\:TABLE](/docs/user-api.md#macro-table) or [ADP\:ITEMIZE](/docs/user-api.md#macro-itemize)\.
 
-<h3 id="ADP:FUNCTION-TAGS-SUBSUBHEADER">Function\-tags\, symbol\-tags and type\-tags</h3>
+<h3 id="ADP:FUNCTION-TAGS-SUBSUBHEADER">Function-tags, symbol-tags and type-tags</h3>
 
 These tags are symbols associated with a function\, a variable or a type respectively\. More specifically\, the macros used to define things like [ADP\:DEFUN](/docs/user-api.md#macro-defun)\, [ADP\:DEFPARAMETER](/docs/user-api.md#macro-defparameter) or [ADP\:DEFSTRUCT](/docs/user-api.md#macro-defstruct) can create automatically a function\-tag\, a symbol\-tag or a type\-tag respectively\. The tag created is the symbol of the name of the function\, variable or type defined respectively\. ADP defines three types of tags because the same symbol can refer to a function\, a variable and a type simultaneously\. The next list shows what type of tags are defined by which macros\:
 
@@ -417,7 +417,7 @@ Lastly\, an example using a type\-tag\:
 
 Using a type tag\: [ALSO\-A\-TYPE\?](/docs/user-guide.md#type-also-a-type)
 
-<h3 id="ADP:HEADERTAG43">Code\-tags</h3>
+<h3 id="ADP:HEADERTAG43">Code-tags</h3>
 
 Code\-tags work differently to those we have just seen above\. Code\-tags are used inside the [ADP\:CODE\-BLOCK](/docs/user-api.md#macro-code-block) macro\. Imagine that you are making a tutorial\. You are explaining how some piece of code works and you test that code in a different file to make sure your tutorial is well done\. But one day\, you decide to change your code\. Now the tutorial needs to be changed too\. To avoid writing your code twice you can use code\-tags\. Suppose that your code looks like this\:
 
@@ -489,7 +489,7 @@ You will see this\:
 (ADP:DEFPARAMETER A-PARAMETER-DEFINED-AT-THE-END-OF-THE-FILE T)
 `````
 
-<h3 id="ADP:HEADERTAG44">Quoting\, commenting\, hiding and removing your code</h3>
+<h3 id="ADP:HEADERTAG44">Quoting, commenting, hiding and removing your code</h3>
 
 Code tags are great but [ADP\:CODE\-TAG](/docs/user-api.md#macro-code-tag) will expand to the code you write\. Sometimes you will want to create a tag to some piece of code but not to evaluate it\. In that case we can quote the code using the form [ADP\:CODE\-QUOTE](/docs/user-api.md#macro-code-quote)\. For example\, you can write this\:
 

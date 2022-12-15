@@ -1,4 +1,4 @@
-<h1 id="ADP:HEADERTAG24">Add Documentation\, Please</h1>
+<h1 id="ADP:HEADERTAG24">Add Documentation, Please</h1>
 
 Welcome to ADP\!
 

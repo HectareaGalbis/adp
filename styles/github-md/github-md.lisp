@@ -46,13 +46,13 @@
 ;; ----- guide functions -----
 
 (adpsm:define-header-writer (stream text tag)
-  (format stream "<h1 id=~s>~a</h1>~%~%" (get-symbol-id tag) (escape-characters text)))
+  (format stream "<h1 id=~s>~a</h1>~%~%" (get-symbol-id tag) text))
 
 (adpsm:define-subheader-writer (stream text tag)
-  (format stream "<h2 id=~s>~a</h2>~%~%" (get-symbol-id tag) (escape-characters text)))
+  (format stream "<h2 id=~s>~a</h2>~%~%" (get-symbol-id tag) text))
 
 (adpsm:define-subsubheader-writer (stream text tag)
-  (format stream "<h3 id=~s>~a</h3>~%~%" (get-symbol-id tag) (escape-characters text)))
+  (format stream "<h3 id=~s>~a</h3>~%~%" (get-symbol-id tag) text))
 
 (adpsm:define-escape-text (text)
   (escape-characters text))
