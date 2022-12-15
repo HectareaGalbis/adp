@@ -103,7 +103,9 @@
   (format stream "[~a](~a)" (escape-characters name) link))
 
 (adpsm:define-header-ref-writer (stream tag header-text file-path)
-  (format stream "[~a](/~a.md#~a)" (escape-characters header-text) file-path (get-symbol-id tag)))
+  (format stream "<a href=\"~a.md#~a\">~a</a>" file-path (get-symbol-id tag) header-text)
+  ;; (format stream "[~a](/~a.md#~a)" (escape-characters header-text) file-path (get-symbol-id tag))
+  )
 
 (adpsm:define-symbol-ref-writer (stream tag file-path)
   (let* ((symbol-header (cond
