@@ -4,7 +4,7 @@
 (in-file #P"docs/user-guide")
 
 (code-tag (code-user-guide-header)
-  (header "The ADP User Guide </h1>" user-guide-header))
+  (header "The ADP User Guide" user-guide-header))
 
 (text "Welcome to the ADP User Guide! Here you will learn how to add documentation to your projects using ADP. ADP can be divided in two groups of functions. The API functions and Guide function. However, despite that distinction all the functions can be mixed to generate your documentation.")
 
