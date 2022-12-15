@@ -32,7 +32,7 @@ ADP is available on Quicklisp\! So\, just eval ``` (ql:quickload :adp) ```\. It 
 
 <h2 id="ADP:HEADERTAG27">Documentation</h2>
 
-* The ADP guide\: <a href="/docs/user-guide.md#ADP:USER-GUIDE-HEADER">The ADP User Guide </h1></a>
+* The ADP guide\: <a href="/docs/user-guide.md#ADP:USER-GUIDE-HEADER">The ADP User Guide &#60;/h1&#62;</a>
 * The ADP api\: <a href="/docs/user-api.md#ADP:USER-API-HEADER">ADP User Interface</a>
 * The Style\-Maker guide\: <a href="/docs/style-maker-guide.md#ADP:STYLE-MAKER-GUIDE-HEADER">The Style-maker Guide</a>
 * The Style\-Maker api\: <a href="/docs/style-maker-api.md#ADP-STYLE-MAKER:STYLE-MAKER-API-HEADER">Style-maker API</a>
