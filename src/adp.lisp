@@ -11,47 +11,49 @@
 
 ;; ----- advanced adp macros -----
 
-(defvar *unique-header-tag-suffixes* (make-hash-table :test 'equal))
+(cl:defvar *unique-header-tag-suffixes* (make-hash-table :test 'equal))
 
-(defun make-unique-tag (title)
+(cl:defun make-unique-tag (title)
   (multiple-value-bind (suffix foundp) (gethash title *unique-header-tag-suffixes*)
     (let ((possible-next-suffix (if foundp suffix 0)))
       (loop for next-suffix = possible-next-suffix then (1+ next-suffix) 
 	    while (find-symbol (format nil "~a~a" title next-suffix))
 	    finally (setf (gethash title *unique-header-tag-suffixes*) (1+ next-suffix))
 		    (return
-		      (intern (format nil "~a~a" title next-suffix)))))))
+		      (intern (print (format nil "~a~a" title next-suffix))))))))
 
 (cl:defmacro adv-header (str &optional tag)
   (when *adp*
     (check-type str string "a string")
     (check-type tag (or null symbol) "a symbol or nil")
-    (let ((user-tag-p (and tag t))
-	  (fixed-tag (or tag (make-unique-tag str))))
-      `(progn
-	 (adppvt:add-element *project* (make-instance 'adppvt:header
-						      :name "header"
-						      :tag ',fixed-tag
-						      :title ,str
-						      :user-tag-p ,user-tag-p
-						      :source-location (adppvt:relative-truename *project*)))
-	 (values)))))
+    (let ((user-tag-p (and tag t)))
+      (with-gensyms (fixed-tag)
+	`(progn
+	   (let ((,fixed-tag (or ',tag (make-unique-tag ,str))))
+	     (adppvt:add-element *project* (make-instance 'adppvt:header
+							  :name "header"
+							  :tag ,fixed-tag
+							  :title ,str
+							  :user-tag-p ,user-tag-p
+							  :source-location (adppvt:relative-truename *project*))))
+	   (values))))))
 
 
 (cl:defmacro adv-subheader (str &optional tag)
   (when *adp*
     (check-type str string "a string")
     (check-type tag (or null symbol) "a symbol or nil")
-    (let ((user-tag-p (and tag t))
-	  (fixed-tag (or tag (make-unique-tag str))))
-      `(progn
-	 (adppvt:add-element *project* (make-instance 'adppvt:subheader
-						      :name "header"
-						      :tag ',fixed-tag
-						      :title ,str
-						      :user-tag-p ,user-tag-p
-						      :source-location (adppvt:relative-truename *project*)))
-	 (values)))))
+    (let ((user-tag-p (and tag t)))
+      (with-gensyms (fixed-tag)
+	`(progn
+	   (let ((,fixed-tag (or ',tag (make-unique-tag ,str))))
+	     (adppvt:add-element *project* (make-instance 'adppvt:subheader
+							  :name "subheader"
+							  :tag ,fixed-tag
+							  :title ,str
+							  :user-tag-p ,user-tag-p
+							  :source-location (adppvt:relative-truename *project*))))
+	   (values))))))
 
 
 (cl:defmacro adv-defmacro (&body defmacro-body)
@@ -107,16 +109,16 @@
 	 (when *adp*
 	   (check-type ,str string "a string")
 	   (check-type ,tag (or null symbol) "a symbol or nil")
-	   (let ((,user-tag-p (and ,tag t))
-		 (,fixed-tag (or ,tag (make-unique-tag ,str))))
-	     `(progn
-		(adppvt:add-element *project* (make-instance ',',type
-							     :name ,,(string-downcase (symbol-name name))
-							     :tag ',,fixed-tag
-							     :title ,,str
-							     :user-tag-p ,,user-tag-p
-							     :source-location (adppvt:relative-truename *project*)))
-		(values))))))))
+	   (let ((,user-tag-p (and ,tag t)))
+	     (with-gensyms (,fixed-tag)
+	       `(let ((,,fixed-tag (or ',,tag (make-unique-tag ,,str))))
+		  (adppvt:add-element *project* (make-instance ',',type
+							       :name ,,(string-downcase (symbol-name name))
+							       :tag ,,fixed-tag
+							       :title ,,str
+							       :user-tag-p ,,user-tag-p
+							       :source-location (adppvt:relative-truename *project*)))
+		  (values)))))))))
 
 (define-header-macro header adppvt:header)
 (define-header-macro subheader adppvt:subheader)

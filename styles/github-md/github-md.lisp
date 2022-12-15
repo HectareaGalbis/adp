@@ -38,15 +38,11 @@
     (nth-value 1 (macroexpand-1 sym env))))
 
 
-(defvar *header-ids* (make-hash-table))
-
 (defun get-symbol-id (sym)
-  (multiple-value-bind (id id-exists) (gethash sym *header-ids*)
-    (if id-exists
-	id
-	(let ((new-id (symbol-name (gentemp (symbol-name sym)))))
-	  (setf (gethash sym *header-ids*) new-id)
-	  (values new-id)))))
+  (let ((package (symbol-package sym)))
+    (if package
+	(format nil "~a:~a" (package-name package) (symbol-name sym))
+	(format nil "~a" (symbol-name sym)))))
 
 
 

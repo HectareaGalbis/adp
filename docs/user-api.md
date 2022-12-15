@@ -1,6 +1,6 @@
-<h1 id="USER-API-HEADER1">ADP User Interface</h1>
+<h1 id="ADP:USER-API-HEADER">ADP User Interface</h1>
 
-<h2 id="G2178104">Literate programming functions</h2>
+<h2 id="ADP:Literate programming functions0">Literate programming functions</h2>
 
 #### Macro: HEADER
 
@@ -382,7 +382,7 @@ be printed.
 Same as code-block, but tags cannot be used and the code is evaluated. The standard output and the last-form's results are also printed.
 ````
 
-<h2 id="API-SUBHEADER3">API reference functions</h2>
+<h2 id="ADP:API-SUBHEADER">API reference functions</h2>
 
 #### Macro: DEFCLASS
 
@@ -582,7 +582,7 @@ Add a defun declaration. The macro expands to cl:defun. Also, the function name 
 Add a defvar declaration. The macro expands to cl:defvar. Also, the variable name is used to create a symbol-tag.
 ````
 
-<h2 id="G2185105">Writer functions</h2>
+<h2 id="ADP:Writer functions0">Writer functions</h2>
 
 #### Macro: IN\-FILE
 
@@ -615,7 +615,7 @@ Each style will create different files. The style-args are style-dependent. In o
 arguments to let the user customize briefly how documentation is printed.
 ````
 
-<h2 id="ADDITIONAL-FUNCTIONS-SUBHEADER5">Additional functions</h2>
+<h2 id="ADP:ADDITIONAL-FUNCTIONS-SUBHEADER">Additional functions</h2>
 
 #### Macro: EVAL\-WHEN\-ADP
 
@@ -640,7 +640,7 @@ Otherwise, this macro expands to NIL.
 Add a reference to a Common Lisp symbol when using the macros text, cell or item.
 ````
 
-<h2 id="MACRO-CHARACTERS-SUBHEADER6">Macro characters</h2>
+<h2 id="ADP:MACRO-CHARACTERS-SUBHEADER">Macro characters</h2>
 
 The next table shows which macro characters can be used and what they expand to\:
 
