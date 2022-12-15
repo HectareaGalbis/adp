@@ -12,8 +12,6 @@
 
 ;; ----- advanced adp macros -----
 
-(cl:defvar *unique-header-tag-suffixes* (make-hash-table :test 'equal))
-
 (cl:defun make-unique-tag ()
   (prog1
       (intern (format nil "~a~a" "HEADERTAG" *header-tag-counter*) "ADP")
@@ -88,7 +86,7 @@
 
 (adv-in-file #P"docs/user-api")
 
-(adv-header "ADP User Interface" user-api-header)
+(adv-header "ADP User Interface" |user api header|)
 
 
 ;; ----- Literature -----
