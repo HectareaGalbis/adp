@@ -42,7 +42,7 @@
 (subheader "Documentation")
 
 (itemize (item "The ADP guide: " (header-ref user-guide-header))
-	 (item "The ADP api: " (header-ref |user api header|))
+	 (item "The ADP api: " (header-ref user-api-header))
 	 (item "The Style-Maker guide: " (header-ref style-maker-guide-header))
 	 (item "The Style-Maker api: " (header-ref adpsm:style-maker-api-header)))
 

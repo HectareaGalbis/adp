@@ -1,4 +1,4 @@
-<h1 id="ADP:user api header">ADP User Interface</h1>
+<h1 id="ADP:USER-API-HEADER">ADP User Interface</h1>
 
 <h2 id="ADP:HEADERTAG0">Literate programming functions</h2>
 

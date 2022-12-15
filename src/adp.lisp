@@ -86,7 +86,7 @@
 
 (adv-in-file #P"docs/user-api")
 
-(adv-header "ADP User Interface" |user api header|)
+(adv-header "ADP User Interface" user-api-header)
 
 
 ;; ----- Literature -----
