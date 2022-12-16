@@ -14,7 +14,8 @@
 
 (defclass tagged-element (element)
   ((tag :initarg :tag
-	:type symbol))
+	:initform nil
+	:type (or symbol null)))
   (:documentation
    "Represent an element that can be associated with a tag."))
 

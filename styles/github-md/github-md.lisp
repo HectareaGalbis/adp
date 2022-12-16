@@ -51,21 +51,26 @@
     (nth-value 1 (macroexpand-1 sym env))))
 
 
-(defun get-symbol-id (sym)
-  (format nil "~a:~a" (package-name (symbol-package sym)) (symbol-name sym)))
+(defun get-symbol-id (sym type)
+  (let ((type-str (ecase type
+		    (:header "header")
+		    (:symbol "symbol")
+		    (:function "function")
+		    (:type "type"))))
+    (format nil "~a:~a:~a" type-str (package-name (symbol-package sym)) (symbol-name sym))))
 
 
 
 ;; ----- guide functions -----
 
 (adpsm:define-header-writer (stream text tag)
-  (format stream "<h1 id=~s>~a</h1>~%~%" (get-symbol-id tag) (escape-html-characters text)))
+  (format stream "<h1 id=~s>~a</h1>~%~%" (get-symbol-id tag :header) (escape-html-characters text)))
 
 (adpsm:define-subheader-writer (stream text tag)
-  (format stream "<h2 id=~s>~a</h2>~%~%" (get-symbol-id tag) (escape-html-characters text)))
+  (format stream "<h2 id=~s>~a</h2>~%~%" (get-symbol-id tag :header) (escape-html-characters text)))
 
 (adpsm:define-subsubheader-writer (stream text tag)
-  (format stream "<h3 id=~s>~a</h3>~%~%" (get-symbol-id tag) (escape-html-characters text)))
+  (format stream "<h3 id=~s>~a</h3>~%~%" (get-symbol-id tag :header) (escape-html-characters text)))
 
 (adpsm:define-escape-text (text)
   (escape-characters text))
@@ -116,42 +121,16 @@
   (format stream "[~a](~a)" (escape-characters name) link))
 
 (adpsm:define-header-ref-writer (stream tag header-text file-path)
-  (format stream "<a href=\"/~a.md#~a\">~a</a>" file-path (get-symbol-id tag) (escape-html-characters header-text)))
+  (format stream "<a href=\"/~a.md#~a\">~a</a>" file-path (get-symbol-id tag :header) (escape-html-characters header-text)))
 
 (adpsm:define-symbol-ref-writer (stream tag file-path)
-  (let* ((symbol-header (cond
-			  ((symbol-macro-p tag)
-			   (format nil "Symbol macro: ~a" (escape-characters (princ-to-string tag))))
-			  ((constantp tag)
-			   (format nil "Constant: ~a" (escape-characters (princ-to-string tag))))
-			  (t (format nil "Variable: ~a" (escape-characters (princ-to-string tag))))))
-	 (symbol-anchor (convert-to-github-header-anchor symbol-header))
-	 (*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-    (format stream "[~a](/~a.md#~a)" (escape-characters (prin1-to-string tag)) file-path symbol-anchor)))
+  (format stream "<a href=\"/~a.md#~a\">~a</a>" file-path (get-symbol-id tag :symbol) (escape-html-characters (prin1-to-string tag))))
 
 (adpsm:define-function-ref-writer (stream tag file-path)
-  (let* ((function-header (cond
-			    ((macro-function tag)
-			     (format nil "Macro: ~a" (escape-characters (princ-to-string tag))))
-			    ((subtypep tag 'generic-function)
-			     (format nil "Generic function: ~a" (escape-characters (princ-to-string tag))))
-			    (t (format nil "Function: ~a" (escape-characters (princ-to-string tag))))))
-	 (function-anchor (convert-to-github-header-anchor function-header))
-	 (*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-    (format stream "[~a](/~a.md#~a)" (escape-characters (prin1-to-string tag)) file-path function-anchor)))
+  (format stream "<a href=\"/~a.md#~a\">~a</a>" file-path (get-symbol-id tag :function) (escape-html-characters (prin1-to-string tag))))
 
 (adpsm:define-type-ref-writer (stream tag file-path)
-  (let* ((type-header (cond
-			((subtypep tag 'condition)
-			 (format nil "Condition: ~a" (escape-characters (princ-to-string tag))))
-			((subtypep tag 'structure-class)
-			 (format nil "Struct: ~a" (escape-characters (princ-to-string tag))))
-			((subtypep tag 'class)
-			 (format nil "Class: ~a" (escape-characters (princ-to-string tag))))
-			(t (format nil "Type: ~a" (escape-characters (princ-to-string tag))))))
-	 (type-anchor (convert-to-github-header-anchor type-header))
-	 (*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-    (format stream "[~a](/~a.md#~a)" (escape-characters (prin1-to-string tag)) file-path type-anchor)))
+  (format stream "<a href=\"/~a.md#~a\">~a</a>" file-path (get-symbol-id tag :type) (escape-html-characters (prin1-to-string tag))))
 
 (adpsm:define-code-block-writer (stream lang text-code)
   (format stream "`````~@[~a~]~%~a~%`````~%~%" lang text-code))
@@ -162,26 +141,29 @@
 
 ;; ----- api functions -----
 
-(adpsm:define-defclass-writer (stream source)
+(adpsm:define-defclass-writer (stream source tag)
   (adpsm:with-defclass-components ((class-name superclass-names slot-specifiers documentation default-initargs metaclass) source)
-    (format stream "#### Class: ~a~%~%" (escape-characters (princ-to-string class-name)))
+    (format stream "<h4 id=~s>Class: ~a</h4>~%~%"
+	    (get-symbol-id tag :type) (escape-html-characters (princ-to-string class-name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defclass ~s ~s~%  ~s~@[~%  (:default-initargs~{ ~s~})~]~[~%  (:metaclass ~s)~])~%```~%~%"
 	      class-name superclass-names slot-specifiers default-initargs metaclass documentation))
     (when documentation
       (format stream "````~%~a~%````~%~%" (escape-characters documentation)))))
 
-(adpsm:define-defconstant-writer (stream source)
+(adpsm:define-defconstant-writer (stream source tag)
   (adpsm:with-defconstant-components ((name initial-value documentation) source)
-    (format stream "#### Constant: ~a~%~%" (escape-characters (princ-to-string name)))
+    (format stream "<h4 id=~s>Constant: ~a</h4>~%~%"
+	    (get-symbol-id tag :symbol) (escape-html-characters (princ-to-string name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defconstant ~s ~s)~%```~%~%" name initial-value))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adpsm:define-defgeneric-writer (stream source)
+(adpsm:define-defgeneric-writer (stream source tag)
   (adpsm:with-defgeneric-components ((function-name gf-lambda-list documentation) source)
-    (format stream "#### Generic function: ~a~%~%" (escape-characters (princ-to-string function-name)))
+    (format stream "<h4 id=~s>Generic function: ~a</h4>~%~%"
+	    (get-symbol-id tag :function) (escape-html-characters (princ-to-string function-name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defgeneric ~s ~s~%  ...)~%```~%~%" function-name gf-lambda-list))
     (when documentation
@@ -189,54 +171,59 @@
 
 (adpsm:define-define-compiler-macro-writer (stream source)
   (adpsm:with-define-compiler-macro-components ((name documentation) source)
-    (format stream "#### Compiler macro: ~a~%~%" (escape-characters (princ-to-string name)))
+    (format stream "<h4>Compiler macro: ~a</h4>~%~%" (escape-html-characters (princ-to-string name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(define-compiler-macro ~s~%  ...)~%```~%~%" name))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adpsm:define-define-condition-writer (stream source)
-  (adpsm:with-define-condition-components ((name parent-types slot-specs default-initargs report-name documentation) source)
-    (format stream "#### Condition: ~a~%~%" (escape-characters (princ-to-string name)))
+(adpsm:define-define-condition-writer (stream source tag)
+  (adpsm:with-define-condition-components ((name parent-types slot-specs documentation) source)
+    (format stream "<h4 id=~s>Condition: ~a</h4>~%~%"
+	    (get-symbol-id tag :type) (escape-characters (princ-to-string name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-      (format stream "```Lisp~%(defcondition ~s ~s~%  ~s~@[~%  (:default-initargs~{ ~s~})~]~@[~%  (:report ~s)~])~%```~%~%"
-	      name parent-types slot-specs default-initargs report-name))
+      (format stream "```Lisp~%(defcondition ~s ~s~%  ~s~%```~%~%"
+	      name parent-types slot-specs))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
 (adpsm:define-define-method-combination-writer (stream source)
   (adpsm:with-define-method-combination-components ((name documentation) source)
-    (format stream "#### Method combination: ~a~%~%" (escape-characters (princ-to-string name)))
+    (format stream "<h4>Method combination: ~a</h4>~%~%" (escape-html-characters (princ-to-string name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(define-method-combination ~s~%  ...)~%```~%~%" name))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adpsm:define-define-modify-macro-writer (stream source)
+(adpsm:define-define-modify-macro-writer (stream source tag)
   (adpsm:with-define-modify-macro-components ((name lambda-list function documentation) source)
-    (format stream "#### Macro: ~a~%~%" (escape-characters (princ-to-string name)))
+    (format stream "<h4 id=~s>Modify macro: ~a</h4>~%~%"
+	    (get-symbol-id tag :function) (escape-html-characters (princ-to-string name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-      (format stream "```Lisp~%(define-modify-macro ~s ~s ~s)~%```~%~%" name lambda-list function))
+      (format stream "```Lisp~%(define-modify-macro ~s ~s ~s)~%```~%~%"
+	      name lambda-list function))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
 (adpsm:define-define-setf-expander-writer (stream source)
   (adpsm:with-define-setf-expander-components ((access-fn lambda-list documentation) source)
-    (format stream "#### Setf expander: ~a~%~%" (escape-characters (princ-to-string access-fn)))
+    (format stream "<h4>Setf expander: ~a</h4>~%~%" (escape-html-characters (princ-to-string access-fn)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(define-setf-expander ~s ~s~%  ...)~%```~%~%" access-fn lambda-list))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adpsm:define-define-symbol-macro-writer (stream source)
+(adpsm:define-define-symbol-macro-writer (stream source tag)
   (adpsm:with-define-symbol-macro-components ((symbol expansion) source)
-    (format stream "#### Symbol macro: ~a~%~%" (escape-characters (princ-to-string symbol)))
+    (format stream "<h4 id=~s>Symbol macro: ~a</h4>~%~%"
+	    (get-symbol-id tag :symbol) (escape-html-characters (princ-to-string symbol)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(define-symbol-macro ~s ~s)~%```~%~%" symbol expansion))))
 
-(adpsm:define-defmacro-writer (stream source)
+(adpsm:define-defmacro-writer (stream source tag)
   (adpsm:with-defmacro-components ((name lambda-list documentation) source)
-    (format stream "#### Macro: ~a~%~%" (escape-characters (princ-to-string name)))
+    (format stream "<h4 id=~s>Macro: ~a</h4>~%~%"
+	    (get-symbol-id tag :function) (escape-html-characters (princ-to-string name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defmacro ~s ~s~%  ...)~%```~%~%" name lambda-list))
     (when documentation
@@ -244,7 +231,7 @@
 
 (adpsm:define-defmethod-writer (stream source)
   (adpsm:with-defmethod-components ((function-name method-qualifiers specialized-lambda-list documentation) source)
-    (format stream "#### Method: ~a~%~%" (escape-characters (princ-to-string function-name)))
+    (format stream "<h4>Method: ~a</h4>~%~%" (escape-html-characters (princ-to-string function-name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defmethod ~s~{ ~s~} ~s~%  ...)~%```~%~%" function-name method-qualifiers specialized-lambda-list))
     (when documentation
@@ -252,16 +239,17 @@
 
 (adpsm:define-defpackage-writer (stream source)
   (adpsm:with-defpackage-components ((defined-package-name nicknames use-package-names documentation) source)
-    (format stream "#### Package: ~a~%~%" (escape-characters (princ-to-string defined-package-name)))
+    (format stream "<h4>Package: ~a</h4>~%~%" (escape-html-characters (princ-to-string defined-package-name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defpackage ~s~@[~%  (:nicknames~{ ~s~})~]~@[~%  (:use~{ ~s~})~]~%  ...)~%```~%~%"
 	      defined-package-name nicknames use-package-names))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adpsm:define-defparameter-writer (stream source)
+(adpsm:define-defparameter-writer (stream source tag)
   (adpsm:with-defparameter-components ((name initial-value documentation) source)
-    (format stream "#### Variable: ~a~%~%" (escape-characters (princ-to-string name)))
+    (format stream "<h4 id=~s>Parameter: ~a</h4>~%~%"
+	    (get-symbol-id tag :symbol) (escape-html-characters (princ-to-string name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defparameter ~s ~s)~%```~%~%"
 	      name initial-value))
@@ -270,39 +258,43 @@
 
 (adpsm:define-defsetf-writer (stream source)
   (adpsm:with-defsetf-components ((access-fn update-fn documentation) source)
-    (format stream "#### Defsetf: ~a~%~%" (escape-characters (princ-to-string access-fn)))
+    (format stream "<h4>Defsetf: ~a</h4>~%~%" (escape-characters (princ-to-string access-fn)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defsetf ~s ~s)" access-fn update-fn))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adpsm:define-defstruct-writer (stream source)
+(adpsm:define-defstruct-writer (stream source tag)
   (adpsm:with-defstruct-components ((structure-name name-and-options slot-descriptions documentation) source)
-    (format stream "#### Struct: ~a~%~%" (escape-characters (princ-to-string structure-name)))
+    (format stream "<h4 id=~s>Struct: ~a</h4>~%~%"
+	    (get-symbol-id tag :type) (escape-html-characters (princ-to-string structure-name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defstruct ~s~%  ~s)~%```~%~%" name-and-options slot-descriptions))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adpsm:define-deftype-writer (stream source)
+(adpsm:define-deftype-writer (stream source tag)
   (adpsm:with-deftype-components ((name lambda-list documentation) source)
-    (format stream "#### Type: ~a~%~%" (escape-characters (princ-to-string name)))
+    (format stream "<h4 id=~s>Type: ~a</h4>~%~%"
+	    (get-symbol-id tag :type) (escape-html-characters (princ-to-string name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(deftype ~s ~s~%  ...)~%```~%~%" name lambda-list))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adpsm:define-defun-writer (stream source)
+(adpsm:define-defun-writer (stream source tag)
   (adpsm:with-defun-components ((function-name lambda-list documentation) source)
-    (format stream "#### Function: ~a~%~%" (escape-characters (princ-to-string function-name)))
+    (format stream "<h4 id=~s>Function: ~a</h4>~%~%"
+	    (get-symbol-id tag :function) (escape-html-characters (princ-to-string function-name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defun ~s ~s~%  ...)~%```~%~%" function-name lambda-list))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
-(adpsm:define-defvar-writer (stream source)
+(adpsm:define-defvar-writer (stream source tag)
   (adpsm:with-defvar-components ((name initial-value documentation) source)
-    (format stream "#### Variable: ~a~%~%" (escape-characters (princ-to-string name)))
+    (format stream "<h4 id=~s>Variable: ~a</h4>~%~%"
+	    (get-symbol-id tag :symbol) (escape-html-characters (princ-to-string name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
       (format stream "```Lisp~%(defvar ~s~@[ ~s~])~%```~%~%" name initial-value))
     (when documentation

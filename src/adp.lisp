@@ -77,8 +77,8 @@
   (when *adp*
     (check-type path pathname)
     (let* ((fixed-path (make-pathname :directory (cons :relative (cdr (pathname-directory path)))
-					   :name (pathname-name path)
-					   :type (pathname-type path))))
+				      :name (pathname-name path)
+				      :type (pathname-type path))))
       `(adppvt:select-file *project* ,fixed-path))))
 
 
@@ -517,24 +517,24 @@ be printed."
 (adv-defmacro code-example (&body code)
   "Same as code-block, but tags cannot be used and the code is evaluated. The standard output and the last-form's results are also printed."
   (when *adp*
-      (assert (not (null code)) () "Expected at least one expression in a code-example form.")
-      (with-gensyms (output result expr)
-	`(let* ((,output (make-array 10 :adjustable t :fill-pointer 0 :element-type 'character))
-		(,result (multiple-value-list (with-output-to-string (*standard-output* ,output)
-						,@code))))
+    (assert (not (null code)) () "Expected at least one expression in a code-example form.")
+    (with-gensyms (output result expr)
+      `(let* ((,output (make-array 10 :adjustable t :fill-pointer 0 :element-type 'character))
+	      (,result (multiple-value-list (with-output-to-string (*standard-output* ,output)
+					      ,@code))))
 
-	   (adppvt:add-element *project* (make-instance 'adppvt:code-example
-							:name "code-example"
-							:code-elements (mapcar (lambda (,expr)
-										 (make-instance 'adppvt:code
-												:name "code"
-												:expr ,expr
-												:source-location (adppvt:relative-truename *project*)))
-									       ',code)
-							:output ,output
-							:result ,result
-							:source-location (adppvt:relative-truename *project*)))
-	   (values)))))
+	 (adppvt:add-element *project* (make-instance 'adppvt:code-example
+						      :name "code-example"
+						      :code-elements (mapcar (lambda (,expr)
+									       (make-instance 'adppvt:code
+											      :name "code"
+											      :expr ,expr
+											      :source-location (adppvt:relative-truename *project*)))
+									     ',code)
+						      :output ,output
+						      :result ,result
+						      :source-location (adppvt:relative-truename *project*)))
+	 (values)))))
 
 
 ;; ----- API -----
@@ -593,8 +593,8 @@ be printed."
 (define-definition-macro deftype adppvt:deftype-definition (body (car body))
   "Add a deftype declaration. The macro expands to cl:deftype. Also, the type name is used to create a type-tag.")
 (define-definition-macro defun adppvt:defun-definition (body (if (symbolp (car body))
-					 (car body)
-					 nil))
+								 (car body)
+								 nil))
   "Add a defun declaration. The macro expands to cl:defun. Also, the function name is used to create a function-tag.")
 (define-definition-macro defvar adppvt:defvar-definition (body (car body))
   "Add a defvar declaration. The macro expands to cl:defvar. Also, the variable name is used to create a symbol-tag.")
@@ -608,8 +608,8 @@ be printed."
   (when *adp*
     (check-type path pathname)
     (let* ((fixed-path (make-pathname :directory (cons :relative (cdr (pathname-directory path)))
-					   :name (pathname-name path)
-					   :type (pathname-type path))))
+				      :name (pathname-name path)
+				      :type (pathname-type path))))
       `(adppvt:select-file *project* ,fixed-path))))
 
 
@@ -661,9 +661,9 @@ arguments to let the user customize briefly how documentation is printed."
     (adppvt:with-new-style-parameter-list
 
       (load-style style)
-    
+      
       (adppvt:check-writers)
-    
+      
       (adppvt:with-style-parameters style-args
 	
 	(adppvt:with-tag-tables

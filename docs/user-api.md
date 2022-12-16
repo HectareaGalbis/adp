@@ -1,8 +1,8 @@
-<h1 id="ADP:USER-API-HEADER">ADP User Interface</h1>
+<h1 id="header:ADP:USER-API-HEADER">ADP User Interface</h1>
 
-<h2 id="ADP:HEADERTAG0">Literate programming functions</h2>
+<h2 id="header:ADP:HEADERTAG0">Literate programming functions</h2>
 
-#### Macro: HEADER
+<h4 id="function:ADP:HEADER">Macro: HEADER</h4>
 
 ```Lisp
 (defmacro ADP:HEADER (STR &OPTIONAL TAG)
@@ -13,7 +13,7 @@
 Add a header with name str. Also, if tag is not nil but a symbol, a new header-tag is created.
 ````
 
-#### Macro: SUBHEADER
+<h4 id="function:ADP:SUBHEADER">Macro: SUBHEADER</h4>
 
 ```Lisp
 (defmacro ADP:SUBHEADER (STR &OPTIONAL TAG)
@@ -24,7 +24,7 @@ Add a header with name str. Also, if tag is not nil but a symbol, a new header-t
 Add a subheader with name str. Also, if tag is not nil but a symbol, a new header-tag is created.
 ````
 
-#### Macro: SUBSUBHEADER
+<h4 id="function:ADP:SUBSUBHEADER">Macro: SUBSUBHEADER</h4>
 
 ```Lisp
 (defmacro ADP:SUBSUBHEADER (STR &OPTIONAL TAG)
@@ -35,7 +35,7 @@ Add a subheader with name str. Also, if tag is not nil but a symbol, a new heade
 Add a subsubheader with name str. Also, if tag is not nil but a symbol, a new header-tag is created.
 ````
 
-#### Macro: TEXT
+<h4 id="function:ADP:TEXT">Macro: TEXT</h4>
 
 ```Lisp
 (defmacro ADP:TEXT (&REST OBJECTS)
@@ -47,7 +47,7 @@ Add plain text. The arguments in objects can be any lisp object. They will be pr
 You can use the following macros to enrich your text: bold, italic, emphasis, inline-code, web-link, header-ref, symbol-ref, function-ref and type-ref.
 ````
 
-#### Macro: CELL
+<h4 id="function:ADP:CELL">Macro: CELL</h4>
 
 ```Lisp
 (defmacro ADP:CELL (&REST OBJECTS)
@@ -59,7 +59,7 @@ Create a cell to place into a table. The arguments in objects can be any lisp ob
 You can use the following macros to enrich your cell text: bold, italic, emphasis, inline-code, web-link, header-ref, symbol-ref, function-ref and type-ref.
 ````
 
-#### Macro: TABLE
+<h4 id="function:ADP:TABLE">Macro: TABLE</h4>
 
 ```Lisp
 (defmacro ADP:TABLE (&REST ROWS)
@@ -70,7 +70,7 @@ You can use the following macros to enrich your cell text: bold, italic, emphasi
 Add a table. Each argument must be a list of text macro calls.
 ````
 
-#### Macro: ITEM
+<h4 id="function:ADP:ITEM">Macro: ITEM</h4>
 
 ```Lisp
 (defmacro ADP:ITEM (&REST ITEMS)
@@ -82,7 +82,7 @@ Create an item to be placed into a iterate/enumerate form. The arguments in obje
 You can use the following macros to enrich your cell text: bold, italic, emphasis, inline-code, web-link, header-ref, symbol-ref, function-ref and type-ref.
 ````
 
-#### Macro: ITEMIZE
+<h4 id="function:ADP:ITEMIZE">Macro: ITEMIZE</h4>
 
 ```Lisp
 (defmacro ADP:ITEMIZE (&WHOLE ITEMIZE-FORM &REST ITEMS)
@@ -96,7 +96,7 @@ of elements must be lists that must start with item, itemize or enumerate. In ot
 a nested list is added. A certain symbol will be printed before each element of the list.
 ````
 
-#### Macro: ENUMERATE
+<h4 id="function:ADP:ENUMERATE">Macro: ENUMERATE</h4>
 
 ```Lisp
 (defmacro ADP:ENUMERATE (&WHOLE ENUMERATE-FORM &REST ITEMS)
@@ -107,7 +107,7 @@ a nested list is added. A certain symbol will be printed before each element of 
 Same as itemize, but a number is printed before each element.
 ````
 
-#### Macro: TABLE\-OF\-CONTENTS
+<h4 id="function:ADP:TABLE-OF-CONTENTS">Macro: TABLE-OF-CONTENTS</h4>
 
 ```Lisp
 (defmacro ADP:TABLE-OF-CONTENTS NIL
@@ -119,7 +119,7 @@ Add a list of all headers and subheaders used in the system. The headers from di
 files are shown in the same order the files are loaded.
 ````
 
-#### Macro: MINI\-TABLE\-OF\-CONTENTS
+<h4 id="function:ADP:MINI-TABLE-OF-CONTENTS">Macro: MINI-TABLE-OF-CONTENTS</h4>
 
 ```Lisp
 (defmacro ADP:MINI-TABLE-OF-CONTENTS NIL
@@ -130,7 +130,7 @@ files are shown in the same order the files are loaded.
 Add a list of all headers, subheaders and subsubheaders used in the current documentation file.
 ````
 
-#### Macro: TABLE\-OF\-FUNCTIONS
+<h4 id="function:ADP:TABLE-OF-FUNCTIONS">Macro: TABLE-OF-FUNCTIONS</h4>
 
 ```Lisp
 (defmacro ADP:TABLE-OF-FUNCTIONS NIL
@@ -141,7 +141,7 @@ Add a list of all headers, subheaders and subsubheaders used in the current docu
 Add an ordered list of all functions and macros defined using ADP.
 ````
 
-#### Macro: TABLE\-OF\-SYMBOLS
+<h4 id="function:ADP:TABLE-OF-SYMBOLS">Macro: TABLE-OF-SYMBOLS</h4>
 
 ```Lisp
 (defmacro ADP:TABLE-OF-SYMBOLS NIL
@@ -152,7 +152,7 @@ Add an ordered list of all functions and macros defined using ADP.
 Add an ordered list of all variables defined using ADP.
 ````
 
-#### Macro: TABLE\-OF\-TYPES
+<h4 id="function:ADP:TABLE-OF-TYPES">Macro: TABLE-OF-TYPES</h4>
 
 ```Lisp
 (defmacro ADP:TABLE-OF-TYPES NIL
@@ -163,7 +163,7 @@ Add an ordered list of all variables defined using ADP.
 Add an ordered list of all types defined using ADP.
 ````
 
-#### Macro: IMAGE
+<h4 id="function:ADP:IMAGE">Macro: IMAGE</h4>
 
 ```Lisp
 (defmacro ADP:IMAGE (ALT-TEXT PATH)
@@ -175,7 +175,7 @@ Add an image with alt-text as the alternative text and path must be the pathname
 where the image is located.
 ````
 
-#### Macro: BOLD
+<h4 id="function:ADP:BOLD">Macro: BOLD</h4>
 
 ```Lisp
 (defmacro ADP:BOLD (&REST ARGS)
@@ -186,7 +186,7 @@ where the image is located.
 Add bold style to text. Each argument is princ-ed and concatenated into a string.
 ````
 
-#### Macro: ITALIC
+<h4 id="function:ADP:ITALIC">Macro: ITALIC</h4>
 
 ```Lisp
 (defmacro ADP:ITALIC (&REST ARGS)
@@ -197,7 +197,7 @@ Add bold style to text. Each argument is princ-ed and concatenated into a string
 Add italic style to text. Each argument is princ-ed and concatenated into a string.
 ````
 
-#### Macro: EMPHASIS
+<h4 id="function:ADP:EMPHASIS">Macro: EMPHASIS</h4>
 
 ```Lisp
 (defmacro ADP:EMPHASIS (&REST ARGS)
@@ -208,7 +208,7 @@ Add italic style to text. Each argument is princ-ed and concatenated into a stri
 Add bold and italic style to text. Each argument is princ-ed and concatenated into a string.
 ````
 
-#### Macro: INLINE\-CODE
+<h4 id="function:ADP:INLINE-CODE">Macro: INLINE-CODE</h4>
 
 ```Lisp
 (defmacro ADP:INLINE-CODE (&REST ARGS)
@@ -219,7 +219,7 @@ Add bold and italic style to text. Each argument is princ-ed and concatenated in
 Add inlined style to text. Each argument is princ-ed and concatenated into a string.
 ````
 
-#### Macro: WEB\-LINK
+<h4 id="function:ADP:WEB-LINK">Macro: WEB-LINK</h4>
 
 ```Lisp
 (defmacro ADP:WEB-LINK (NAME LINK)
@@ -230,7 +230,7 @@ Add inlined style to text. Each argument is princ-ed and concatenated into a str
 Add a hyperlink. The text showed is name and link must be a valid web URL. Both arguments must be strings.
 ````
 
-#### Macro: HEADER\-REF
+<h4 id="function:ADP:HEADER-REF">Macro: HEADER-REF</h4>
 
 ```Lisp
 (defmacro ADP:HEADER-REF (TAG)
@@ -242,7 +242,7 @@ Add a reference to a header when using the macros text, table or itemize. The ar
 Only the symbols used with the macros header, subheader and subsubheader are valid.
 ````
 
-#### Macro: SYMBOL\-REF
+<h4 id="function:ADP:SYMBOL-REF">Macro: SYMBOL-REF</h4>
 
 ```Lisp
 (defmacro ADP:SYMBOL-REF (TAG)
@@ -254,7 +254,7 @@ Add a reference to a variable when using the macros text, table or itemize. The 
 defined with adp:deconstant, adp:define-symbol-macro, adp:defparameter or adp:defvar.
 ````
 
-#### Macro: FUNCTION\-REF
+<h4 id="function:ADP:FUNCTION-REF">Macro: FUNCTION-REF</h4>
 
 ```Lisp
 (defmacro ADP:FUNCTION-REF (TAG)
@@ -266,7 +266,7 @@ Add a reference to a function symbol when using the macros text, table or itemiz
 defined with adp:defgeneric, adp:define-modify-macro, adp:defmacro or adp:defun.
 ````
 
-#### Macro: TYPE\-REF
+<h4 id="function:ADP:TYPE-REF">Macro: TYPE-REF</h4>
 
 ```Lisp
 (defmacro ADP:TYPE-REF (TAG)
@@ -278,7 +278,7 @@ Add a reference to a type symbol when using the macros text, table or itemize. T
 defined with adp:defclass, adp:define-condition, adp:defstruct or adp:deftype.
 ````
 
-#### Macro: CODE\-QUOTE
+<h4 id="function:ADP:CODE-QUOTE">Macro: CODE-QUOTE</h4>
 
 ```Lisp
 (defmacro ADP:CODE-QUOTE (&BODY BODY)
@@ -289,7 +289,7 @@ defined with adp:defclass, adp:define-condition, adp:defstruct or adp:deftype.
 Form recognized by code-tag that prevents the expressions from being evaluated.
 ````
 
-#### Macro: CODE\-COMMENT
+<h4 id="function:ADP:CODE-COMMENT">Macro: CODE-COMMENT</h4>
 
 ```Lisp
 (defmacro ADP:CODE-COMMENT (COMMENT &BODY BODY)
@@ -301,7 +301,7 @@ Form recognized by code-tag that prints a comment before the body expressions wh
 code-tag inside a code-block.
 ````
 
-#### Macro: CODE\-HIDE
+<h4 id="function:ADP:CODE-HIDE">Macro: CODE-HIDE</h4>
 
 ```Lisp
 (defmacro ADP:CODE-HIDE ((&REST TAGS) &BODY BODY)
@@ -313,7 +313,7 @@ Form recognized by code-tag that will hide the code printing '...'. The printing
 tag defined by code-tag inside a code-block.
 ````
 
-#### Macro: CODE\-REMOVE
+<h4 id="function:ADP:CODE-REMOVE">Macro: CODE-REMOVE</h4>
 
 ```Lisp
 (defmacro ADP:CODE-REMOVE ((&REST TAGS) &BODY BODY)
@@ -325,7 +325,7 @@ Form recognized by code-tag that will remove the code printing. This will be don
 by code-tag inside a code-block.
 ````
 
-#### Macro: CODE\-TAG
+<h4 id="function:ADP:CODE-TAG">Macro: CODE-TAG</h4>
 
 ```Lisp
 (defmacro ADP:CODE-TAG (TAGS &BODY EXPRS)
@@ -346,7 +346,7 @@ the next forms: code-hide, code-remove, code-show and code-comment.
   - code-comment: Receive a string. This string will be printed as a comment (printing ';;').
 ````
 
-#### Macro: CODE\-BLOCK
+<h4 id="function:ADP:CODE-BLOCK">Macro: CODE-BLOCK</h4>
 
 ```Lisp
 (defmacro ADP:CODE-BLOCK ((&REST TAGS) &BODY CODE)
@@ -358,7 +358,7 @@ Add a block of code. Each element of code will be prin1-ed but not evaluated. If
 the code assigned to that tag is printed instead of the symbol.
 ````
 
-#### Macro: VERBATIM\-CODE\-BLOCK
+<h4 id="function:ADP:VERBATIM-CODE-BLOCK">Macro: VERBATIM-CODE-BLOCK</h4>
 
 ```Lisp
 (defmacro ADP:VERBATIM-CODE-BLOCK (LANG ADP:TEXT)
@@ -371,7 +371,7 @@ denote the programming language that will be used. The second argument must be a
 be printed.
 ````
 
-#### Macro: CODE\-EXAMPLE
+<h4 id="function:ADP:CODE-EXAMPLE">Macro: CODE-EXAMPLE</h4>
 
 ```Lisp
 (defmacro ADP:CODE-EXAMPLE (&BODY CODE)
@@ -382,9 +382,9 @@ be printed.
 Same as code-block, but tags cannot be used and the code is evaluated. The standard output and the last-form's results are also printed.
 ````
 
-<h2 id="ADP:API-SUBHEADER">API reference functions</h2>
+<h2 id="header:ADP:API-SUBHEADER">API reference functions</h2>
 
-#### Macro: DEFCLASS
+<h4 id="function:ADP:DEFCLASS">Macro: DEFCLASS</h4>
 
 ```Lisp
 (defmacro ADP:DEFCLASS (&BODY BODY)
@@ -395,7 +395,7 @@ Same as code-block, but tags cannot be used and the code is evaluated. The stand
 Add a defclass declaration. The macro expands to cl:defclass. Also, the class name is used to create a type-tag.
 ````
 
-#### Macro: DEFCONSTANT
+<h4 id="function:ADP:DEFCONSTANT">Macro: DEFCONSTANT</h4>
 
 ```Lisp
 (defmacro ADP:DEFCONSTANT (&BODY BODY)
@@ -406,7 +406,7 @@ Add a defclass declaration. The macro expands to cl:defclass. Also, the class na
 Add a defconstant declaration. The macro expands to cl:defconstant. Also, the constant name is used to create a symbol-tag.
 ````
 
-#### Macro: DEFGENERIC
+<h4 id="function:ADP:DEFGENERIC">Macro: DEFGENERIC</h4>
 
 ```Lisp
 (defmacro ADP:DEFGENERIC (&BODY BODY)
@@ -417,7 +417,7 @@ Add a defconstant declaration. The macro expands to cl:defconstant. Also, the co
 Add a defgeneric declaration. The macro expands to cl:defgeneric. Also, the generic function name is used to create a function-tag.
 ````
 
-#### Macro: DEFINE\-COMPILER\-MACRO
+<h4 id="function:ADP:DEFINE-COMPILER-MACRO">Macro: DEFINE-COMPILER-MACRO</h4>
 
 ```Lisp
 (defmacro ADP:DEFINE-COMPILER-MACRO (&BODY BODY)
@@ -428,7 +428,7 @@ Add a defgeneric declaration. The macro expands to cl:defgeneric. Also, the gene
 Add a define-compiler-macro declaration. The macro expands to cl:define-compiler-macro.
 ````
 
-#### Macro: DEFINE\-CONDITION
+<h4 id="function:ADP:DEFINE-CONDITION">Macro: DEFINE-CONDITION</h4>
 
 ```Lisp
 (defmacro ADP:DEFINE-CONDITION (&BODY BODY)
@@ -439,7 +439,7 @@ Add a define-compiler-macro declaration. The macro expands to cl:define-compiler
 Add a define-condition declaration. The macro expands to cl:define-condition. Also, the condition name is used to create a type-tag.
 ````
 
-#### Macro: DEFINE\-METHOD\-COMBINATION
+<h4 id="function:ADP:DEFINE-METHOD-COMBINATION">Macro: DEFINE-METHOD-COMBINATION</h4>
 
 ```Lisp
 (defmacro ADP:DEFINE-METHOD-COMBINATION (&BODY BODY)
@@ -450,7 +450,7 @@ Add a define-condition declaration. The macro expands to cl:define-condition. Al
 Add a define-method-combination declaration. The macro expands to cl:define-method-combination.
 ````
 
-#### Macro: DEFINE\-MODIFY\-MACRO
+<h4 id="function:ADP:DEFINE-MODIFY-MACRO">Macro: DEFINE-MODIFY-MACRO</h4>
 
 ```Lisp
 (defmacro ADP:DEFINE-MODIFY-MACRO (&BODY BODY)
@@ -461,7 +461,7 @@ Add a define-method-combination declaration. The macro expands to cl:define-meth
 Add a define-modify-macro declaration. The macro expands to cl:define-modify-macro. Also, the macro name is used to create a function-tag.
 ````
 
-#### Macro: DEFINE\-SETF\-EXPANDER
+<h4 id="function:ADP:DEFINE-SETF-EXPANDER">Macro: DEFINE-SETF-EXPANDER</h4>
 
 ```Lisp
 (defmacro ADP:DEFINE-SETF-EXPANDER (&BODY BODY)
@@ -472,7 +472,7 @@ Add a define-modify-macro declaration. The macro expands to cl:define-modify-mac
 Add a define-setf-expander declaration. The macro expands to cl:define-setf-expander.
 ````
 
-#### Macro: DEFINE\-SYMBOL\-MACRO
+<h4 id="function:ADP:DEFINE-SYMBOL-MACRO">Macro: DEFINE-SYMBOL-MACRO</h4>
 
 ```Lisp
 (defmacro ADP:DEFINE-SYMBOL-MACRO (&BODY BODY)
@@ -483,7 +483,7 @@ Add a define-setf-expander declaration. The macro expands to cl:define-setf-expa
 Add a define-symbol-macro declaration. The macro expands to cl:define-symbol-macro. Also, the symbol name is used to create a symbol-tag.
 ````
 
-#### Macro: DEFMACRO
+<h4 id="function:ADP:DEFMACRO">Macro: DEFMACRO</h4>
 
 ```Lisp
 (defmacro ADP:DEFMACRO (&BODY BODY)
@@ -494,7 +494,7 @@ Add a define-symbol-macro declaration. The macro expands to cl:define-symbol-mac
 Add a defmacro declaration. The macro expands to cl:defmacro. Also, the macro name is used to create a function-tag.
 ````
 
-#### Macro: DEFMETHOD
+<h4 id="function:ADP:DEFMETHOD">Macro: DEFMETHOD</h4>
 
 ```Lisp
 (defmacro ADP:DEFMETHOD (&BODY BODY)
@@ -505,7 +505,7 @@ Add a defmacro declaration. The macro expands to cl:defmacro. Also, the macro na
 Add a defmethod declaration. The macro expands to cl:defmethod.
 ````
 
-#### Macro: DEFPACKAGE
+<h4 id="function:ADP:DEFPACKAGE">Macro: DEFPACKAGE</h4>
 
 ```Lisp
 (defmacro ADP:DEFPACKAGE (&BODY BODY)
@@ -516,7 +516,7 @@ Add a defmethod declaration. The macro expands to cl:defmethod.
 Add a defpackage declaration. The macro expands to cl:defpackage.
 ````
 
-#### Macro: DEFPARAMETER
+<h4 id="function:ADP:DEFPARAMETER">Macro: DEFPARAMETER</h4>
 
 ```Lisp
 (defmacro ADP:DEFPARAMETER (&BODY BODY)
@@ -527,7 +527,7 @@ Add a defpackage declaration. The macro expands to cl:defpackage.
 Add a defparameter declaration. The macro expands to cl:defparameter. Also, the parameter name is used to create a symbol-tag.
 ````
 
-#### Macro: DEFSETF
+<h4 id="function:ADP:DEFSETF">Macro: DEFSETF</h4>
 
 ```Lisp
 (defmacro ADP:DEFSETF (&BODY BODY)
@@ -538,7 +538,7 @@ Add a defparameter declaration. The macro expands to cl:defparameter. Also, the 
 Add a defsetf declaration. The macro expands to cl:defsetf.
 ````
 
-#### Macro: DEFSTRUCT
+<h4 id="function:ADP:DEFSTRUCT">Macro: DEFSTRUCT</h4>
 
 ```Lisp
 (defmacro ADP:DEFSTRUCT (&BODY BODY)
@@ -549,7 +549,7 @@ Add a defsetf declaration. The macro expands to cl:defsetf.
 Add a defstruct declaration. The macro expands to cl:defstruct. Also, the struct name is used to create a type-tag.
 ````
 
-#### Macro: DEFTYPE
+<h4 id="function:ADP:DEFTYPE">Macro: DEFTYPE</h4>
 
 ```Lisp
 (defmacro ADP:DEFTYPE (&BODY BODY)
@@ -560,7 +560,7 @@ Add a defstruct declaration. The macro expands to cl:defstruct. Also, the struct
 Add a deftype declaration. The macro expands to cl:deftype. Also, the type name is used to create a type-tag.
 ````
 
-#### Macro: DEFUN
+<h4 id="function:ADP:DEFUN">Macro: DEFUN</h4>
 
 ```Lisp
 (defmacro ADP:DEFUN (&BODY BODY)
@@ -571,7 +571,7 @@ Add a deftype declaration. The macro expands to cl:deftype. Also, the type name 
 Add a defun declaration. The macro expands to cl:defun. Also, the function name is used to create a function-tag.
 ````
 
-#### Macro: DEFVAR
+<h4 id="function:ADP:DEFVAR">Macro: DEFVAR</h4>
 
 ```Lisp
 (defmacro ADP:DEFVAR (&BODY BODY)
@@ -582,16 +582,16 @@ Add a defun declaration. The macro expands to cl:defun. Also, the function name 
 Add a defvar declaration. The macro expands to cl:defvar. Also, the variable name is used to create a symbol-tag.
 ````
 
-<h2 id="ADP:HEADERTAG1">Writer functions</h2>
+<h2 id="header:ADP:HEADERTAG1">Writer functions</h2>
 
-#### Macro: IN\-FILE
+<h4 id="function:ADP:IN-FILE">Macro: IN-FILE</h4>
 
 ```Lisp
 (defmacro ADP:IN-FILE (PATH)
   ...)
 ```
 
-#### Function: LOAD\-STYLE
+<h4 id="function:ADP:LOAD-STYLE">Function: LOAD-STYLE</h4>
 
 ```Lisp
 (defun LOAD-STYLE (STYLE)
@@ -602,7 +602,7 @@ Add a defvar declaration. The macro expands to cl:defvar. Also, the variable nam
 Load an adp style.
 ````
 
-#### Function: LOAD\-SYSTEM
+<h4 id="function:ADP:LOAD-SYSTEM">Function: LOAD-SYSTEM</h4>
 
 ```Lisp
 (defun ADP:LOAD-SYSTEM (SYSTEM STYLE &REST STYLE-ARGS)
@@ -615,9 +615,9 @@ Each style will create different files. The style-args are style-dependent. In o
 arguments to let the user customize briefly how documentation is printed.
 ````
 
-<h2 id="ADP:ADDITIONAL-FUNCTIONS-SUBHEADER">Additional functions</h2>
+<h2 id="header:ADP:ADDITIONAL-FUNCTIONS-SUBHEADER">Additional functions</h2>
 
-#### Macro: EVAL\-WHEN\-ADP
+<h4 id="function:ADP:EVAL-WHEN-ADP">Macro: EVAL-WHEN-ADP</h4>
 
 ```Lisp
 (defmacro EVAL-WHEN-ADP (&BODY BODY)
@@ -629,7 +629,7 @@ The body forms will be placed into a progn form only when documentation generati
 Otherwise, this macro expands to NIL.
 ````
 
-#### Macro: CL\-REF
+<h4 id="function:ADP:CL-REF">Macro: CL-REF</h4>
 
 ```Lisp
 (defmacro ADP:CL-REF (SYM)
@@ -640,25 +640,25 @@ Otherwise, this macro expands to NIL.
 Add a reference to a Common Lisp symbol when using the macros text, cell or item.
 ````
 
-<h2 id="ADP:MACRO-CHARACTERS-SUBHEADER">Macro characters</h2>
+<h2 id="header:ADP:MACRO-CHARACTERS-SUBHEADER">Macro characters</h2>
 
 The next table shows which macro characters can be used and what they expand to\:
 
 | Character | Macro | Example |
 | --- | --- | --- |
-| \@b | [ADP\:BOLD](/docs/user-api.md#macro-bold) | ``` @b("This text is bold") ``` |
-| \@i | [ADP\:ITALIC](/docs/user-api.md#macro-italic) | ``` @i("This text is italic") ``` |
-| \@e | [ADP\:EMPHASIS](/docs/user-api.md#macro-emphasis) | ``` @e("This text is emphasized") ``` |
-| \@c | [ADP\:INLINE\-CODE](/docs/user-api.md#macro-inline-code) | ``` @c("This text is inlined") ``` |
-| \@w | [ADP\:WEB\-LINK](/docs/user-api.md#macro-web-link) | ``` @w("Name of link" "www.example.com") ``` |
-| \@h | [ADP\:HEADER\-REF](/docs/user-api.md#macro-header-ref) | ``` @h(header) ``` |
-| \@f | [ADP\:FUNCTION\-REF](/docs/user-api.md#macro-function-ref) | ``` @f(function) ``` |
-| \@s | [ADP\:SYMBOL\-REF](/docs/user-api.md#macro-symbol-ref) | ``` @s(variable) ``` |
-| \@t | [ADP\:TYPE\-REF](/docs/user-api.md#macro-type-ref) | ``` @t(type) ``` |
-| \@l | [ADP\:CL\-REF](/docs/user-api.md#macro-cl-ref) | ``` @l(princ) ``` |
-| \@\' | [ADP\:CODE\-QUOTE](/docs/user-api.md#macro-code-quote) | ``` @'((code (not evaluated))) ``` |
-| \@\; | [ADP\:CODE\-COMMENT](/docs/user-api.md#macro-code-comment) | ``` @;("This is a comment" expr) ``` |
-| \@\_ | [ADP\:CODE\-REMOVE](/docs/user-api.md#macro-code-remove) | ``` @_((tag1 tag2) (code (to be (removed)))) ``` |
-| \@\. | [ADP\:CODE\-HIDE](/docs/user-api.md#macro-code-hide) | ``` @.((tag1 tag2) (code (to be (hidden)))) ``` |
+| \@b | <a href="/docs/user-api.md#function:ADP:BOLD">ADP:BOLD</a> | ``` @b("This text is bold") ``` |
+| \@i | <a href="/docs/user-api.md#function:ADP:ITALIC">ADP:ITALIC</a> | ``` @i("This text is italic") ``` |
+| \@e | <a href="/docs/user-api.md#function:ADP:EMPHASIS">ADP:EMPHASIS</a> | ``` @e("This text is emphasized") ``` |
+| \@c | <a href="/docs/user-api.md#function:ADP:INLINE-CODE">ADP:INLINE-CODE</a> | ``` @c("This text is inlined") ``` |
+| \@w | <a href="/docs/user-api.md#function:ADP:WEB-LINK">ADP:WEB-LINK</a> | ``` @w("Name of link" "www.example.com") ``` |
+| \@h | <a href="/docs/user-api.md#function:ADP:HEADER-REF">ADP:HEADER-REF</a> | ``` @h(header) ``` |
+| \@f | <a href="/docs/user-api.md#function:ADP:FUNCTION-REF">ADP:FUNCTION-REF</a> | ``` @f(function) ``` |
+| \@s | <a href="/docs/user-api.md#function:ADP:SYMBOL-REF">ADP:SYMBOL-REF</a> | ``` @s(variable) ``` |
+| \@t | <a href="/docs/user-api.md#function:ADP:TYPE-REF">ADP:TYPE-REF</a> | ``` @t(type) ``` |
+| \@l | <a href="/docs/user-api.md#function:ADP:CL-REF">ADP:CL-REF</a> | ``` @l(princ) ``` |
+| \@\' | <a href="/docs/user-api.md#function:ADP:CODE-QUOTE">ADP:CODE-QUOTE</a> | ``` @'((code (not evaluated))) ``` |
+| \@\; | <a href="/docs/user-api.md#function:ADP:CODE-COMMENT">ADP:CODE-COMMENT</a> | ``` @;("This is a comment" expr) ``` |
+| \@\_ | <a href="/docs/user-api.md#function:ADP:CODE-REMOVE">ADP:CODE-REMOVE</a> | ``` @_((tag1 tag2) (code (to be (removed)))) ``` |
+| \@\. | <a href="/docs/user-api.md#function:ADP:CODE-HIDE">ADP:CODE-HIDE</a> | ``` @.((tag1 tag2) (code (to be (hidden)))) ``` |
 
 
