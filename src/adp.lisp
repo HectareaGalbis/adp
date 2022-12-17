@@ -94,7 +94,7 @@
 (adv-subheader "Literate programming functions")
 
 (cl:defmacro define-header-macro (name type)
-  (let ((macro-doc (format nil "Add a ~a with name str. Also, if tag is not nil but a symbol, a new header-tag is created."
+  (let ((macro-doc (format nil "Add a ~a with name str. Also, if tag is not nil but an interned symbol, a new header-tag is created."
 			   (string-downcase (symbol-name name))))
 	(str (make-symbol "STR"))
 	(tag (make-symbol "TAG")))
@@ -143,7 +143,7 @@ You can use the following macros to enrich your cell text: bold, italic, emphasi
 
 
 (adv-defmacro table (&rest rows)
-  "Add a table. Each argument must be a list of text macro calls."
+  "Add a table. Each argument must be a list of cell macro calls."
   (when *adp*
     (loop with row-length = (length (car rows))
 	  for row in rows
@@ -314,19 +314,19 @@ where the image is located."
 			 :source-location (adppvt:relative-truename *project*))))))
 
 (define-reference-macro header-ref adppvt:header-ref
-  "Add a reference to a header when using the macros text, table or itemize. The argument is a symbol denoting a header-tag.
+  "Add a reference to a header when using the macros text, cell or item. The argument is a symbol denoting a header-tag.
 Only the symbols used with the macros header, subheader and subsubheader are valid.")
 
 (define-reference-macro symbol-ref adppvt:symbol-ref
-  "Add a reference to a variable when using the macros text, table or itemize. The argument is a symbol denoting a variable
-defined with adp:deconstant, adp:define-symbol-macro, adp:defparameter or adp:defvar.")
+  "Add a reference to a variable when using the macros text, cell or item. The argument is a symbol denoting a variable
+defined with adp:defconstant, adp:define-symbol-macro, adp:defparameter or adp:defvar.")
 
 (define-reference-macro function-ref adppvt:function-ref
-  "Add a reference to a function symbol when using the macros text, table or itemize. The argument is a symbol denoting a function
+  "Add a reference to a function symbol when using the macros text, cell or item. The argument is a symbol denoting a function
 defined with adp:defgeneric, adp:define-modify-macro, adp:defmacro or adp:defun.")
 
 (define-reference-macro type-ref adppvt:type-ref
-  "Add a reference to a type symbol when using the macros text, table or itemize. The argument is a symbol denoting a type
+  "Add a reference to a type symbol when using the macros text, cell or item. The argument is a symbol denoting a type
 defined with adp:defclass, adp:define-condition, adp:defstruct or adp:deftype.")
 
 
@@ -450,7 +450,7 @@ the next forms: code-hide, code-remove, code-show and code-comment.
                Hidding the code means printing \"...\" instead of the forms.
   - code-remove: Same as code-hide, but removes the code instead of printing \"...\"
   - code-quote: Every expression placed inside code-quote will have its evaluation disabled.
-  - code-comment: Receive a string. This string will be printed as a comment (printing ';;')."
+  - code-comment: Receive a string and the forms to be commented. This string will be printed as a comment (printing ';;')."
   `(progn
      ,@(when *adp*
 	 (check-type tags list "a list")

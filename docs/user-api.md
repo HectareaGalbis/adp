@@ -10,7 +10,7 @@
 ```
 
 ````
-Add a header with name str. Also, if tag is not nil but a symbol, a new header-tag is created.
+Add a header with name str. Also, if tag is not nil but an interned symbol, a new header-tag is created.
 ````
 
 <h4 id="function:ADP:SUBHEADER">Macro: SUBHEADER</h4>
@@ -21,7 +21,7 @@ Add a header with name str. Also, if tag is not nil but a symbol, a new header-t
 ```
 
 ````
-Add a subheader with name str. Also, if tag is not nil but a symbol, a new header-tag is created.
+Add a subheader with name str. Also, if tag is not nil but an interned symbol, a new header-tag is created.
 ````
 
 <h4 id="function:ADP:SUBSUBHEADER">Macro: SUBSUBHEADER</h4>
@@ -32,7 +32,7 @@ Add a subheader with name str. Also, if tag is not nil but a symbol, a new heade
 ```
 
 ````
-Add a subsubheader with name str. Also, if tag is not nil but a symbol, a new header-tag is created.
+Add a subsubheader with name str. Also, if tag is not nil but an interned symbol, a new header-tag is created.
 ````
 
 <h4 id="function:ADP:TEXT">Macro: TEXT</h4>
@@ -67,7 +67,7 @@ You can use the following macros to enrich your cell text: bold, italic, emphasi
 ```
 
 ````
-Add a table. Each argument must be a list of text macro calls.
+Add a table. Each argument must be a list of cell macro calls.
 ````
 
 <h4 id="function:ADP:ITEM">Macro: ITEM</h4>
@@ -238,7 +238,7 @@ Add a hyperlink. The text showed is name and link must be a valid web URL. Both 
 ```
 
 ````
-Add a reference to a header when using the macros text, table or itemize. The argument is a symbol denoting a header-tag.
+Add a reference to a header when using the macros text, cell or item. The argument is a symbol denoting a header-tag.
 Only the symbols used with the macros header, subheader and subsubheader are valid.
 ````
 
@@ -250,8 +250,8 @@ Only the symbols used with the macros header, subheader and subsubheader are val
 ```
 
 ````
-Add a reference to a variable when using the macros text, table or itemize. The argument is a symbol denoting a variable
-defined with adp:deconstant, adp:define-symbol-macro, adp:defparameter or adp:defvar.
+Add a reference to a variable when using the macros text, cell or item. The argument is a symbol denoting a variable
+defined with adp:defconstant, adp:define-symbol-macro, adp:defparameter or adp:defvar.
 ````
 
 <h4 id="function:ADP:FUNCTION-REF">Macro: FUNCTION-REF</h4>
@@ -262,7 +262,7 @@ defined with adp:deconstant, adp:define-symbol-macro, adp:defparameter or adp:de
 ```
 
 ````
-Add a reference to a function symbol when using the macros text, table or itemize. The argument is a symbol denoting a function
+Add a reference to a function symbol when using the macros text, cell or item. The argument is a symbol denoting a function
 defined with adp:defgeneric, adp:define-modify-macro, adp:defmacro or adp:defun.
 ````
 
@@ -274,7 +274,7 @@ defined with adp:defgeneric, adp:define-modify-macro, adp:defmacro or adp:defun.
 ```
 
 ````
-Add a reference to a type symbol when using the macros text, table or itemize. The argument is a symbol denoting a type
+Add a reference to a type symbol when using the macros text, cell or item. The argument is a symbol denoting a type
 defined with adp:defclass, adp:define-condition, adp:defstruct or adp:deftype.
 ````
 
@@ -343,7 +343,7 @@ the next forms: code-hide, code-remove, code-show and code-comment.
                Hidding the code means printing "..." instead of the forms.
   - code-remove: Same as code-hide, but removes the code instead of printing "..."
   - code-quote: Every expression placed inside code-quote will have its evaluation disabled.
-  - code-comment: Receive a string. This string will be printed as a comment (printing ';;').
+  - code-comment: Receive a string and the forms to be commented. This string will be printed as a comment (printing ';;').
 ````
 
 <h4 id="function:ADP:CODE-BLOCK">Macro: CODE-BLOCK</h4>
