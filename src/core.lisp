@@ -435,7 +435,7 @@
 (defmethod element-print ((element table-of-contents) stream)
   (with-slots (project) element
     (let ((headers (project-headers project)))
-      (funcall *itemize-writer* (process-itemize (make-itemize-toc element headers))))))
+      (funcall *itemize-writer* stream (process-itemize (make-itemize-toc element headers))))))
 
 (defmethod element-print ((element mini-table-of-contents) stream)
   (with-slots (file) element
