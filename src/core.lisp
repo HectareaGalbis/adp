@@ -498,19 +498,19 @@
   (make-itemize-table source-element *function-tags* 'function-ref "function-ref"))
 
 (defmethod element-print ((element table-of-functions) stream)
-  (funcall *itemize-writer* stream (make-itemize-tof element)))
+  (funcall *itemize-writer* stream (process-itemize (make-itemize-tof element))))
 
 (defun make-itemize-tos (source-element)
   (make-itemize-table source-element *symbol-tags* 'symbol-ref "symbol-ref"))
 
 (defmethod element-print ((element table-of-symbols) stream)
-  (funcall *itemize-writer* stream (make-itemize-tos element)))
+  (funcall *itemize-writer* stream (process-itemize (make-itemize-tos element))))
 
 (defun make-itemize-tot (source-element)
   (make-itemize-table source-element *type-tags* 'type-ref "type-ref"))
 
 (defmethod element-print ((element table-of-types) stream)
-  (funcall *itemize-writer* stream (make-itemize-tot element)))
+  (funcall *itemize-writer* stream (process-itemize (make-itemize-tot element))))
 
 
 ;; code
