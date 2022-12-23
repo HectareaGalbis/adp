@@ -766,7 +766,7 @@ files are shown in the same order the files are loaded."
 	(macro (ecase char
 		 (#\B 'bold)
 		 (#\I 'italic)
-		 (#\E 'bold-italic)
+		 (#\E 'emphasis)
 		 (#\C 'code-inline)
 		 (#\W 'web-link)
 		 (#\H 'header-ref)

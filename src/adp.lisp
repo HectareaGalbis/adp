@@ -437,7 +437,7 @@ by code-tag inside a code-block."
 		    (list (loop for expr in code
 				append (process-aux tag expr)))))
 		 (list code))))
-    (car (process-aux tag code))))
+    (print (car (process-aux tag code)))))
 
 (adv-defmacro code-tag (tags &body exprs)
   "Assign several tags to several forms. The forms are placed into a progn form. The argument tags must be a list
@@ -459,11 +459,11 @@ the next forms: code-hide, code-remove, code-show and code-comment.
 	       do (check-type tag symbol "a symbol"))
 	 (with-gensyms (tag expr)
 	   `((loop for ,tag in ',tags
-		   do (loop for ,expr in ',exprs
+		   do (loop for ,expr in (process-code-tag ,tag ',exprs)
 			    do (adppvt:add-code-tag ,tag (make-instance 'adppvt:tagged-code
 									:name "tagged-code"
 									:tag ,tag
-									:expr (process-code-tag ,tag ,expr)
+									:expr ,expr
 									:source-location (adppvt:relative-truename *project*))))))))
      ,@(remove-code-tag exprs)))
 
@@ -734,7 +734,7 @@ Otherwise, this macro expands to NIL."
 	(macro (ecase char
 		 (#\B 'bold)
 		 (#\I 'italic)
-		 (#\E 'bold-italic)
+		 (#\E 'emphasis)
 		 (#\C 'inline-code)
 		 (#\W 'web-link)
 		 (#\H 'header-ref)
