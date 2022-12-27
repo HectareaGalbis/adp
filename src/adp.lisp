@@ -437,7 +437,7 @@ by code-tag inside a code-block."
 		    (list (loop for expr in code
 				append (process-aux tag expr)))))
 		 (list code))))
-    (print (car (process-aux tag code)))))
+    (car (process-aux tag code))))
 
 (adv-defmacro code-tag (tags &body exprs)
   "Assign several tags to several forms. The forms are placed into a progn form. The argument tags must be a list
