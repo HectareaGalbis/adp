@@ -11,6 +11,13 @@
 				    shortest)
 	finally (return shortest)))
 
+(defun convert-string-case (str)
+  (case *print-case*
+    (:upcase (string-upcase str))
+    (:downcase (string-downcase str))
+    (:capitalize (string-capitalize str))
+    (t str)))
+
 (defun custom-symbol-pprint-function (stream sym)
   "Return a custom pprint function to print symbols."
   (let* ((sym-package (symbol-package sym))
@@ -25,8 +32,10 @@
 				    (package-name sym-package))))
 	 (*print-escape* nil))
     (case print-package-mode
-      (:external (format stream "~a:~a" package-to-print (symbol-name sym)))
-      (t (format stream "~a" (symbol-name sym))))))
+      (:external (format stream "~a:~a"
+			 (convert-string-case package-to-print)
+			 (convert-string-case (symbol-name sym))))
+      (t (format stream "~a" (convert-string-case (symbol-name sym)))))))
 
 (defun make-custom-pprint-dispatch ()
   (let ((custom-pprint-dispatch (copy-pprint-dispatch)))    

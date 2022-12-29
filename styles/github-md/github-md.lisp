@@ -146,8 +146,8 @@
     (format stream "<h4 id=~s>Class: ~a</h4>~%~%"
 	    (get-symbol-id tag :type) (escape-html-characters (princ-to-string class-name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-      (format stream "```Lisp~%(defclass ~s ~s~%  ~s~@[~%  (:default-initargs~{ ~s~})~]~[~%  (:metaclass ~s)~])~%```~%~%"
-	      class-name superclass-names slot-specifiers default-initargs metaclass documentation))
+      (format stream "```Lisp~%(~s ~s ~s~%  ~s~@[~%  (:default-initargs~{ ~s~})~]~[~%  (:metaclass ~s)~])~%```~%~%"
+	      'defclass class-name superclass-names slot-specifiers default-initargs metaclass documentation))
     (when documentation
       (format stream "````~%~a~%````~%~%" (escape-characters documentation)))))
 
@@ -156,7 +156,7 @@
     (format stream "<h4 id=~s>Constant: ~a</h4>~%~%"
 	    (get-symbol-id tag :symbol) (escape-html-characters (princ-to-string name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-      (format stream "```Lisp~%(defconstant ~s ~s)~%```~%~%" name initial-value))
+      (format stream "```Lisp~%(~s ~s ~s)~%```~%~%" 'defconstant name initial-value))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
@@ -165,7 +165,7 @@
     (format stream "<h4 id=~s>Generic function: ~a</h4>~%~%"
 	    (get-symbol-id tag :function) (escape-html-characters (princ-to-string function-name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-      (format stream "```Lisp~%(defgeneric ~s ~s~%  ...)~%```~%~%" function-name gf-lambda-list))
+      (format stream "```Lisp~%(~s ~s ~s~%  ...)~%```~%~%" 'defgeneric function-name gf-lambda-list))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
@@ -173,7 +173,7 @@
   (adpsm:with-define-compiler-macro-components ((name documentation) source)
     (format stream "<h4>Compiler macro: ~a</h4>~%~%" (escape-html-characters (princ-to-string name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-      (format stream "```Lisp~%(define-compiler-macro ~s~%  ...)~%```~%~%" name))
+      (format stream "```Lisp~%(~s ~s~%  ...)~%```~%~%" 'define-compiler-macro name))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
@@ -182,8 +182,8 @@
     (format stream "<h4 id=~s>Condition: ~a</h4>~%~%"
 	    (get-symbol-id tag :type) (escape-characters (princ-to-string name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-      (format stream "```Lisp~%(defcondition ~s ~s~%  ~s~%```~%~%"
-	      name parent-types slot-specs))
+      (format stream "```Lisp~%(~s ~s ~s~%  ~s)~%```~%~%"
+	      'define-condition name parent-types slot-specs))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
@@ -191,7 +191,7 @@
   (adpsm:with-define-method-combination-components ((name documentation) source)
     (format stream "<h4>Method combination: ~a</h4>~%~%" (escape-html-characters (princ-to-string name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-      (format stream "```Lisp~%(define-method-combination ~s~%  ...)~%```~%~%" name))
+      (format stream "```Lisp~%(~s ~s~%  ...)~%```~%~%" 'define-method-combination name))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
@@ -200,8 +200,8 @@
     (format stream "<h4 id=~s>Modify macro: ~a</h4>~%~%"
 	    (get-symbol-id tag :function) (escape-html-characters (princ-to-string name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-      (format stream "```Lisp~%(define-modify-macro ~s ~s ~s)~%```~%~%"
-	      name lambda-list function))
+      (format stream "```Lisp~%(~s ~s ~s ~s)~%```~%~%"
+	      'define-modify-macro name lambda-list function))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
@@ -209,7 +209,7 @@
   (adpsm:with-define-setf-expander-components ((access-fn lambda-list documentation) source)
     (format stream "<h4>Setf expander: ~a</h4>~%~%" (escape-html-characters (princ-to-string access-fn)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-      (format stream "```Lisp~%(define-setf-expander ~s ~s~%  ...)~%```~%~%" access-fn lambda-list))
+      (format stream "```Lisp~%(~s ~s ~s~%  ...)~%```~%~%" 'define-setf-expander access-fn lambda-list))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
@@ -218,14 +218,14 @@
     (format stream "<h4 id=~s>Symbol macro: ~a</h4>~%~%"
 	    (get-symbol-id tag :symbol) (escape-html-characters (princ-to-string symbol)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-      (format stream "```Lisp~%(define-symbol-macro ~s ~s)~%```~%~%" symbol expansion))))
+      (format stream "```Lisp~%(~s ~s ~s)~%```~%~%" 'define-symbol-macro symbol expansion))))
 
 (adpsm:define-defmacro-writer (stream source tag)
   (adpsm:with-defmacro-components ((name lambda-list documentation) source)
     (format stream "<h4 id=~s>Macro: ~a</h4>~%~%"
 	    (get-symbol-id tag :function) (escape-html-characters (princ-to-string name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-      (format stream "```Lisp~%(defmacro ~s ~s~%  ...)~%```~%~%" name lambda-list))
+      (format stream "```Lisp~%(~s ~s ~s~%  ...)~%```~%~%" 'defmacro name lambda-list))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
@@ -233,7 +233,7 @@
   (adpsm:with-defmethod-components ((function-name method-qualifiers specialized-lambda-list documentation) source)
     (format stream "<h4>Method: ~a</h4>~%~%" (escape-html-characters (princ-to-string function-name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-      (format stream "```Lisp~%(defmethod ~s~{ ~s~} ~s~%  ...)~%```~%~%" function-name method-qualifiers specialized-lambda-list))
+      (format stream "```Lisp~%(~s ~s~{ ~s~} ~s~%  ...)~%```~%~%" 'defmethod function-name method-qualifiers specialized-lambda-list))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
@@ -241,8 +241,8 @@
   (adpsm:with-defpackage-components ((defined-package-name nicknames use-package-names documentation) source)
     (format stream "<h4>Package: ~a</h4>~%~%" (escape-html-characters (princ-to-string defined-package-name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-      (format stream "```Lisp~%(defpackage ~s~@[~%  (:nicknames~{ ~s~})~]~@[~%  (:use~{ ~s~})~]~%  ...)~%```~%~%"
-	      defined-package-name nicknames use-package-names))
+      (format stream "```Lisp~%(~s ~s~@[~%  (:nicknames~{ ~s~})~]~@[~%  (:use~{ ~s~})~]~%  ...)~%```~%~%"
+	      'defpackage defined-package-name nicknames use-package-names))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
@@ -251,8 +251,8 @@
     (format stream "<h4 id=~s>Parameter: ~a</h4>~%~%"
 	    (get-symbol-id tag :symbol) (escape-html-characters (princ-to-string name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-      (format stream "```Lisp~%(defparameter ~s ~s)~%```~%~%"
-	      name initial-value))
+      (format stream "```Lisp~%(~s ~s ~s)~%```~%~%"
+	      'defparameter name initial-value))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
@@ -260,7 +260,7 @@
   (adpsm:with-defsetf-components ((access-fn update-fn documentation) source)
     (format stream "<h4>Defsetf: ~a</h4>~%~%" (escape-characters (princ-to-string access-fn)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-      (format stream "```Lisp~%(defsetf ~s ~s)" access-fn update-fn))
+      (format stream "```Lisp~%(~s ~s ~s)" 'defsetf access-fn update-fn))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
@@ -269,7 +269,7 @@
     (format stream "<h4 id=~s>Struct: ~a</h4>~%~%"
 	    (get-symbol-id tag :type) (escape-html-characters (princ-to-string structure-name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-      (format stream "```Lisp~%(defstruct ~s~%  ~s)~%```~%~%" name-and-options slot-descriptions))
+      (format stream "```Lisp~%(~s ~s~%  ~s)~%```~%~%" 'defstruct name-and-options slot-descriptions))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
@@ -278,7 +278,7 @@
     (format stream "<h4 id=~s>Type: ~a</h4>~%~%"
 	    (get-symbol-id tag :type) (escape-html-characters (princ-to-string name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-      (format stream "```Lisp~%(deftype ~s ~s~%  ...)~%```~%~%" name lambda-list))
+      (format stream "```Lisp~%(~s ~s ~s~%  ...)~%```~%~%" 'deftype name lambda-list))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
@@ -287,7 +287,7 @@
     (format stream "<h4 id=~s>Function: ~a</h4>~%~%"
 	    (get-symbol-id tag :function) (escape-html-characters (princ-to-string function-name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-      (format stream "```Lisp~%(defun ~s ~s~%  ...)~%```~%~%" function-name lambda-list))
+      (format stream "```Lisp~%(~s ~s ~s~%  ...)~%```~%~%" 'defun function-name lambda-list))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
@@ -296,7 +296,7 @@
     (format stream "<h4 id=~s>Variable: ~a</h4>~%~%"
 	    (get-symbol-id tag :symbol) (escape-html-characters (princ-to-string name)))
     (let ((*print-pprint-dispatch* adpsm:*adp-pprint-dispatch*))
-      (format stream "```Lisp~%(defvar ~s~@[ ~s~])~%```~%~%" name initial-value))
+      (format stream "```Lisp~%(~s ~s~@[ ~s~])~%```~%~%" 'defvar name initial-value))
     (when documentation
       (format stream "````~%~a~%````~%~%" documentation))))
 
