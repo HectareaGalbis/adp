@@ -58,24 +58,24 @@ A string with the number @+[3 4] in the middle.
 
 The data gathered by this scribble file should be: `"All this text is a string." "\n" "\n" "A string with the number " 7 " in the middle."`. So, the data gathered is the objects that are present in the file, whether they are literals or objects returned by a function or macro. This data is then processed by an exporter.
 
-Every type of common lisp is supported, nothing is discarded. It is the exporter that can ignore, warn or raise an error is some object is not wanted (by that exporter).
+Every type of common lisp is supported, nothing is discarded. It is the exporter that can ignore, warn or raise an error if some object is not wanted (by that exporter).
 
 
 ### Data from common lisp files
 
-The data cannot be gathered like in scribble files. The objects that are the result of evaluating any form in a lisp file is just ignored and cannot be gathered. So, in lisp files we need to call a function that tells ADP to gather some piece of data. The end user doesn't need to bother about this because exporters should define functions or macros to use in lisp mode. 
+The data cannot be gathered like in scribble files. The objects that are the result of evaluating any form in a lisp file is just ignored and cannot be gathered. So, in lisp files we need to call a function that tells ADP to gather some piece of data. The end user doesn't need to bother about this because exporters should define functions or macros to be used in lisp mode. 
 
-If you are exporter, you should use the function `adp:add-element`. See the next section to have a better global image of how data is stored.
+If you are making an exporter, you should use the function `adp:add-element`. Keep reading to see more details.
 
 
 ## How data is stored
 
-The data is stored as a hash map of pathnames (keys) and files (values) (actually, the file is an object representing a file). Each file contains the elements gathered by a lisp file or a scribble file. The order in which files are loaded is not guaranted to be same as the order they are stored in. However, the elements in a file are.
+The data is stored as a hash map of pathnames (keys) and files (values) (actually, the file is an object representing a file). Each file contains the elements gathered by a lisp file or a scribble file. The order in which files are loaded is not guaranted to be the same as the order they are stored in. On the other hand, the elements in a file are.
 
 Each file, contains the `ASDF` component it represents as well. Files have then two accessors:
 
 * `file-component`: Retrieves the `ASDF` component of a file.
-* `file-elements`: Retrieves the `ASDF` elements of a file.
+* `file-elements`: Retrieves the elements of a file.
 
 The elements are stored as a vector and each element is just an object. It can be a string, a number, a list, an instance of a class, etc.
 
@@ -91,13 +91,12 @@ An exporter must be its own project to be accessible via Quicklisp. Let's create
 (defsystem "adp-princ"
   :defsystem-depends-on ("adp")
   :components ((:file "package")
-               (:file "adp-princ")
-               (:scribble "README")))
+               (:file "adp-princ")))
 ```
 
-Note that we have used `:defsystem-depends-on` instead of `:depends-on`. This is needed if we want to use scribble files. In fact, we will use a scribble file named `README.scrbl`.
+Note that we have used `:defsystem-depends-on` instead of `:depends-on`. This is needed if we want to use scribble files.
 
-Of course, you can use whatever files you want. The exporter can use whatever package you want; suppose we're using the package `ADP-PRINC`. So, let's see now the file `adp-princ`:
+Of course, you can use whatever number of files you want. The exporter can use also whatever package you want; suppose we're using the package `ADP-PRINC`. So, let's see now the file `adp-princ`:
 
 ``` common-lisp
 (in-package #:adp-princ)
@@ -109,7 +108,7 @@ Of course, you can use whatever files you want. The exporter can use whatever pa
 
 First of all, we need to define an adp operation. It is actually an `ASDF` operation that inherits from another class and makes some imports and exports. 
 
-After this, we can now implement a method with using that operation:
+After this, we can now implement a method using that operation:
 
 ``` common-lisp
 (in-package #:adp-princ)
@@ -173,7 +172,7 @@ By default, let `process-element` `princ` an element. With this generic function
           :type string)))
           
 (defmethod process-element ((element header-object) stream)
-  (format stream "<h1>~a<\h1>" (header-title element)))
+  (format stream "<h1>~a</h1>" (header-title element)))
 ```
 
 It is clear that this function needs more job taking care of dangerous characters. But let's keep this easy.
@@ -211,7 +210,7 @@ To fix that, we can use the symbol `adp:*adp*`. It will be `t` when `ADP` is gat
     `(adp:add-element (make-instance 'header-object :title ,title))))
 ```
 
-Now, if the users just loads the system, `header` will expand to `NIL`, i.e. a no-op.
+Now, if the user just loads the system, `header` will expand to `NIL`, i.e. a no-op.
 
 
 ### Defining a function for text-mode
