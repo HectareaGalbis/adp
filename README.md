@@ -28,12 +28,12 @@ Each exporter is different, and you should read their own documentation. However
 
 ## Two different modes
 
-The at-syntax is really cenvenient for writing text. But lisp is not a good language to this. That's why we want scribble files. Scribble files are in text-mode while common lisp source files are in lisp-mode:
+The at-syntax is really cenvenient for writing text. But lisp is not a good language for this. That's why we want scribble files. Scribble files are in text-mode while common lisp source files are in lisp-mode:
 
 * Lisp files: Lisp-mode
 * Scribble files: Text-mode
 
-The at-syntax can be used in both modes. This is because you can also generate text files from lisp files. Each exporter should (or not) export functions and macros to use in lisp files which will give to ADP iformation to generate a text file. A text file will be created from a lisp file if that file uses some of those functions or macros; otherwise, the file is not created.
+The at-syntax can be used in both modes. This is because you can also generate text files from lisp files. Each exporter should (or not) export functions and macros to use in lisp files which will give to ADP information to generate a text file. A text file will be created from a lisp file if that file uses some of those functions or macros; otherwise, the file is not created.
 
 
 ## Exporters
@@ -53,7 +53,7 @@ By default, all text written in scribble files is gathered as a string. This str
 ``` text
 All this text is a string.
 
-A string splitted up by @+[3 4] in the middle.
+A string with the number @+[3 4] in the middle.
 ```
 
 The data gathered by this scribble file should be: `"All this text is a string." "\n" "\n" "A string with the number " 7 " in the middle."`. So, the data gathered is the objects that are present in the file, whether they are literals or objects returned by a function or macro. This data is then processed by an exporter.
