@@ -166,7 +166,7 @@ Used while loading a common lisp source file.")
 (defun export-adp-symbol (sym)
   "Imports a symbol into the adp-user package and then exports it."
   (check-type sym symbol)
-  (reexport sym "ADP-USER"))
+  (import sym "ADP-USER"))
 
 
 ;; ------ scribble ------
