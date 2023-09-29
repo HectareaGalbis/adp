@@ -73,29 +73,20 @@ Used while loading a common lisp source file.")
   ((asdf:sideway-operation :initform 'asdf:load-op :allocation :class))
   (:documentation "Operation for loading and generating the documentation of dependencies."))
 
-;; (defmethod action-description ((o prepare-adp-op) (c asdf:component))
-;;   (format nil (compatfmt "~@<generating documentation for dependencies of ~3i~_~A~@:>") c))
-
-;; (defmethod input-files ((o prepare-adp-op) (s asdf:system))
-;;   (asdf:if-let (it (system-source-file s)) (list it)))
-
 (defmethod asdf:perform ((o prepare-adp-op) (c asdf:component))
   (values))
 
 (defmethod asdf:perform ((o prepare-adp-op) (s asdf:system))
   (make-files-container))
 
+(defmethod asdf:operation-done-p ((o prepare-adp-op) (c asdf:component))
+  "We can't know if output files has been modified or removed. So, operation must always be done."
+  nil)
 
-(defclass adp-op (;; asdf::basic-load-op
-                  asdf:downward-operation asdf:selfward-operation)
+
+(defclass adp-op (asdf:downward-operation asdf:selfward-operation)
   ((asdf:selfward-operation :initform 'prepare-adp-op :allocation :class))
   (:documentation "Operation for loading and generating documentation."))
-
-;; (defmethod action-description ((o adp-op) (c asdf:component))
-;;   (format nil (asdf:compatfmt "~@<Generating documentation of ~3i~_~A~@:>") c))
-
-;; (defmethod action-description ((o adp-op) (c asdf:parent-component))
-;;   (format nil (asdf:compatfmt "~@<Generated documentation of ~3i~_~A~@:>") c))
 
 (defmethod asdf:perform ((o adp-op) (c asdf:cl-source-file))
   (let ((*adp* t)
@@ -103,16 +94,7 @@ Used while loading a common lisp source file.")
     (load (first (asdf:input-files o c))
           :external-format (asdf:component-external-format c))
     (when (> (length (file-elements *current-content-file*)) 0)
-      (add-file *current-content-file*)))
-  ;; (asdf:call-with-around-compile-hook
-  ;;  c #'(lambda ()
-  ;;        (let ((*adp* t)
-  ;;              (*current-content-file* (make-instance 'file :component c)))
-  ;;          (load* (first (input-files o c))
-  ;;                 :external-format (component-external-format c))
-  ;;          (when (> (length (file-elements *current-content-file*)) 0)
-  ;;            (add-file *current-content-file*)))))
-  )
+      (add-file *current-content-file*))))
 
 (defmethod asdf:perform ((o adp-op) (c scribble-source-file))
   (let* ((file (first (asdf:input-files o c)))
@@ -130,6 +112,9 @@ Used while loading a common lisp source file.")
   (export-content o *files* c)
   (destroy-files-container))
 
+(defmethod asdf:operation-done-p ((o adp-op) (c asdf:component))
+  "We can't know if output files has been modified or removed. So, operation must always be done."
+  nil)
 
 (defun reexport (symbol package)
   (import symbol package)
@@ -162,11 +147,6 @@ Used while loading a common lisp source file.")
 (defgeneric export-content (op files system)
   (:documentation
    "Exports the files gathered by ADP."))
-
-(defun export-adp-symbol (sym)
-  "Imports a symbol into the adp-user package and then exports it."
-  (check-type sym symbol)
-  (import sym "ADP-USER"))
 
 
 ;; ------ scribble ------
