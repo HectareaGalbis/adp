@@ -36,6 +36,16 @@ The at-syntax is really cenvenient for writing text. But lisp is not a good lang
 The at-syntax can be used in both modes. This is because you can also generate text files from lisp files. Each exporter should (or not) export functions and macros to use in lisp files which will give to ADP information to generate a text file. A text file will be created from a lisp file if that file uses some of those functions or macros; otherwise, the file is not created.
 
 
+## Installation
+
+Add [Ultralisp](https://ultralisp.org/) to Quicklisp:
+
+```common-lisp
+(ql-dist:install-dist "http://dist.ultralisp.org/"
+                      :prompt nil)
+```
+
+
 ## Exporters
 
 * [adp-plain](https://github.com/Hectarea1996/adp-plain): Generates files with plain text.
