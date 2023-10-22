@@ -119,12 +119,10 @@ An exporter must be its own project to be accessible via Quicklisp. Let's create
 
 ``` common-lisp
 (defsystem "adp-princ"
-  :defsystem-depends-on ("adp")
+  :depends-on ("adp")
   :components ((:file "package")
                (:file "adp-princ")))
 ```
-
-Note that we have used `:defsystem-depends-on` instead of `:depends-on`. This is needed if we want to use scribble files in our exporter project.
 
 Of course, you can use whatever number of files you want. The exporter can use also whatever package you want; suppose we're using the package `ADP-PRINC`. So, let's see now the file `adp-princ`:
 
