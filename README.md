@@ -190,7 +190,7 @@ The scribble mode already gives us some syntax highlighting, but we need to make
 
 ;; ------ scrbl ------
 (use-package scribble-mode
-  ;; We modify the syntax to adapt scribble-mode to the Common Lisp languages.
+  ;; We modify the syntax to adapt scribble-mode to the Common Lisp language.
   ;; With this it will understand prefix packages.
   :config
   (modify-syntax-entry ?: "_ " scribble-mode-syntax-table)
