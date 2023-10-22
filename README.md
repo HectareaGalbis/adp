@@ -172,3 +172,41 @@ And that's all!
 There are also generic functions that allow you to make some preparation before/after the system or a file is loaded. These are `adp:pre-process-system`, `adp:post-process-system`, `adp:pre-process-file` and `adp:post-process-file`. 
 
 Lastly, the symbol adp:*adp* is also exported and indicates if ADP is enabled while loading a file. Macros like `adp-github:defun` from the `adp-github` exporter makes use of it.
+
+## Writing scribble with Emacs
+
+Scribble has already its own mode: [scribble-mode](https://github.com/emacs-pe/scribble-mode/tree/master). However, Scribble was designed to be used with Scheme-like languages. But we can make some magic to get syntax highlighting and autocompletion with Common Lisp.
+
+The scribble mode already gives us some syntax highlighting, but we need to make some changes. On the other hand, we can get autocompletion with [company-mode](https://company-mode.github.io/) and [slime-company](https://github.com/anwyn/slime-company).
+
+`company` doesn't need any changes, but `scribble` and `slime-company` do. Here is how I configured these modes in my `init.el`:
+
+``` emacs-lisp
+;; ------ company ------
+(use-package company
+  :bind (:map company-active-map
+              ("<tab>" . company-complete-selection))
+  :config
+  (global-company-mode))
+
+
+;; ------ scrbl ------
+(use-package scribble-mode
+  ;; We modify the syntax to adapt scribble-mode to the Common Lisp languages.
+  ;; With this it will understand prefix packages.
+  :config
+  (modify-syntax-entry ?: "_ " scribble-mode-syntax-table)
+  (push `(,(rx (or space "(" "[" "{") (group (zero-or-one "#") ":" (+ (not (any space ")" "]" "}")))))
+          (1 font-lock-keyword-face))
+        scribble-mode-font-lock-keywords))
+
+
+;; ------ slime-company ------
+(use-package slime-company
+  :after (slime company scribble-mode)
+  :config
+  (push 'scribble-mode slime-company-major-modes) ; <-- This is the important line for slime-company
+  (setq slime-company-completion 'fuzzy))
+```
+
+Happy hacking! :D

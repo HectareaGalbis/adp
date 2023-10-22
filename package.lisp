@@ -2,6 +2,7 @@
 (defpackage #:adp
   (:use #:cl)
   (:export #:*adp*
+           #:add-element
            #:scribble
            #:file-component
            #:file-elements
