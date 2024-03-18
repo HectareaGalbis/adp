@@ -1,8 +1,8 @@
 
 (defsystem "adp"
   :author "Héctor Galbis Sanchis"
-  :description "Add Documentation, Please. A Common Lisp semi-automatic documentation generator and literate programming tool with Scribble files and @-syntax support."
+  :description "Add Documentation, Please. A Common Lisp documentation generator and literate programming tool with Scribble files and @-syntax support."
   :license "MIT"
-  :depends-on ("scribble" "alexandria")
+  :depends-on ("named-readtables" "scribble" "alexandria")
   :components ((:file "package")
-               (:file "adp")))
+               (:file "adp" :depends-on ("package"))))

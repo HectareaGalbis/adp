@@ -3,89 +3,15 @@
 
 Welcome to ADP!
 
+
 ## Introduction
 
 Simply put, ADP adds scribble files support to ASDF. Thus, you can add scribble files and use the well-known [at-syntax](https://docs.racket-lang.org/scribble/reader.html).
 
 Example:
 
-``` common-lisp
-(defsystem "my-project"
-  :defsystem-depends-on ("some-adp-exporter")
-  :components ((:file "package")
-                (:file "some-file")
-                (:scribble "guide")
-                (:scribble "reference")))
-```
+![Scribble file example](/images/example-adp.png "Example")
 
-As you might expect, using `:scribble` in your `asd` file will make `ASDF` to look for a `scrbl` file. However, using `asdf:load-system` won't do nothing. In order to generate files from `scrbl` files we need new operations. Those operations will be defined by exporters. Each exporter will process the contents of scribble files and will generate the pertinent files.
-
-Each exporter is different, and you should read their own documentation. However, all exporters have something in common. They will define a new `ASDF` operator. For example, the exporter named `adp-github` defines the operator `adp-github-op`. Then, to generate the latex files from the scribble ones, you should do the following:
-
-``` common-lisp
-(asdf:operate "adp-github-op" "my-project")
-```
-
-## Two different modes
-
-The at-syntax is really cenvenient for writing text. But lisp is not a good language for this. That's why we want scribble files. Scribble files are in text-mode while common lisp source files are in lisp-mode:
-
-* Lisp files: Lisp-mode
-* Scribble files: Text-mode
-
-### Text mode
-
-Scribbles are in text mode. By default, the text you write in this files are gathered by ADP as strings. Actually, it can gather every type of object, it doesn't ignore anything. It is the job of exporters processing or ignoring this objects.
-
-Scribble is mainly used in Racket, where you can choose the language to use with a line like `#lang scribble/base` or similar. With ADP, instead of selecting a language, you can select a package. In text mode, everything is a string unless you use the at-syntax. However, there is an exception: If the first expression is a call to `in-package`, then it will be processed as normal; then, the rest of the file will be processed in text mode.
-
-This could be an example of `adp-github`:
-
-``` common-lisp
-(in-package #:adp-github)
-
-@header{This is the title}
-
-This is an example of text. It is just text and it will be a string when ADP processes this file.
-
-@; This is a comment and will be ignored
-
-This is text with an @italic{italized} word. Newlines are
-also 
-
-recognized.
-
-Numbers like @(+ 3 4) or @+[5 7] are also gathered.
-```
-
-### Lisp mode
-
-ADP can also gather element from lisp source files. However, we need to tell explicitly that we want to do it. Instead of using the at-syntax (`@`), we need to use the sheat-syntax (`#@`).
-
-This could be an example of `adp-github`:
-
-``` common-lisp
-(in-package #:my-package)
-
-#@adpgh:header{This is the title}
-
-#@adpgh:text{
-This is an example of text and contains
-newlines
-
-and an @adpgh:italic{italized} word.
-}
-
-(defun foo ()
-  ;; ...
-  )
-
-#@adpgh:subheader{This is the section with the number @+[2 3]} ;; ... with the number 5
-
-;; And more stuff
-```
-
-Only the top-level expressions must use the sheat-syntax. Once we enter in text mode, we can use again the at-syntax.
 
 ## Installation
 
@@ -94,28 +20,59 @@ This project is available on Quicklisp. But, instead of installing this, you sho
 
 ## Exporters
 
-* [adp-plain](https://github.com/Hectarea1996/adp-plain): Generates files with plain text.
 * [adp-github](https://github.com/Hectarea1996/adp-github): Generates Github flavoured Markdown files with crossreferences, tables of contents, etc.
 
 
-## How data is stored
+## Getting started
 
-The data is stored as a vector of files (actually, the file is an object representing a file). Each file contains the elements gathered by a lisp file or a scribble file. The order in which files are loaded is the same as the order they are stored in.
+Each exporter defines diferent ways of adding `scribble` files, but usually all them have similarities.
 
-Each file, contains the `ASDF` component it represents as well. Files have then two accessors:
+1. Create a subsystem for the scribble files. It must `defsystem-depends-on` the selected exporter and should `depends-on` you project to be able to use everything you've defined there. Let's use `adp-github` in this example. This exporter defines the ASDF file type `scribble` as well as the ASDF operation `adp-github-op`. 
 
-* `file-component`: Retrieves the `ASDF` component of a file.
-* `file-elements`: Retrieves the elements of a file.
+``` common-lisp
+;;; my-project.asd
 
-The elements are stored as a vector and each element is just an object. It can be a string, a number, a list, an instance of a class, etc.
+(defsystem "my-project"
+  ...)
 
-When all the data is gathered, it is passed to the generic function `adp:export-content`. 
+(defsystem "my-project/docs"
+  :defsystem-depends-on ("adp-github")
+  :depends-on ("my-project")
+  :build-operation "adp-github-op" 
+  :components ((:file "doc-package")
+               (:scribble "user-guide")))
+```
+
+2. Create the files. In this example we need a regular file named `doc-package.lisp` and a scribble one named `user-guide.scrbl`. In the former we will define the package to use while writing scribble text. Those files could have the following contents:
+
+``` common-lisp
+;;; doc-package.lisp
+
+(defpackage "my-project-docs"
+  (:use #:cl #:adp-github))
+
+
+;;; user-guide.scrbl
+
+(in-package "my-project-docs")
+
+@header{User guide}
+
+Welcome to my project!
+```
+
+3. Generate the documentation. We only need to `make` the new subsystem. In your REPL, evaluate the following expression:
+
+``` common-lisp
+(asdf:make "my-project/docs")
+```
+
 
 ## How to create an exporter
 
 Creating an exporter is really easy. Let's do an example of an exporter that creates txt files and `princ`s every object that ADP gathers.
 
-An exporter must be its own project to be accessible via Quicklisp. Let's create the `asd` file:
+An exporter must be its own project. Let's create the `asd` file:
 
 ``` common-lisp
 (defsystem "adp-princ"
@@ -129,12 +86,14 @@ Of course, you can use whatever number of files you want. The exporter can use a
 ``` common-lisp
 (in-package #:adp-princ)
 
-(adp:define-adp-operation adp-princ-op)
+(adp:define-adp-operation adp-princ-op) ; <- defining a new operation
+
+(adp:define-adp-file scribble "scrbl")  ; <- defining a new ASDF file type
 
 ...
 ```
 
-First of all, we need to define an adp operation. It is actually an `ASDF` operation that inherits from another class. 
+First of all, we need to define an ASDF operation and an ASDF file. The operation will be the responsible of gather all the scribble contents from the new defined `scribble` files with extension `scrbl`.
 
 After this, we can now implement a method using that operation:
 
@@ -143,11 +102,22 @@ After this, we can now implement a method using that operation:
 
 (adp:define-adp-operation adp-princ-op)
 
+(adp:define-adp-file scribble "scrbl")
+
 (defmethod adp:export-content ((op adp-princ-op) files system)
   ...)
 ```
 
-As you can see, the method receives the operation we just defined, the files `ADP` has gathered and the `ASDF` system component. Like files is a vector, we only need to iterate over it:
+The argument `files` is a `vector` containing each `scribble` file used in the subsystem (actually, a `file` is an object representing a file). Each file contains the elements gathered from a `scribble` file. The order in which files are stored in is the same as the order they are loaded.
+
+Each file contains the `ASDF` component it represents as well. Files have then two accessors:
+
+* `adp:file-component`: Retrieves the `ASDF` component of a file.
+* `adp:file-elements`: Retrieves the elements of a file. The elements are stored in a `vector`.
+
+In this case, `file-component` will have always the type `scribble`. This type was defined by `adp:define-adp-file`. We could have defined more file types. Finally, we can use generic functions to call different methods depending on the type of these files.
+
+Coming back to `adp:export-content`, the method receives the operation we just defined, the files `ADP` has gathered and the `ASDF` system component. Like `files` is a vector, we only need to iterate over it:
 
 ``` common-lisp
 (defmethod adp:export-content ((op adp-princ-op) files system)
@@ -159,7 +129,7 @@ As you can see, the method receives the operation we just defined, the files `AD
                                              :type "txt")))
                (with-open-file (file-str target-path :direction :output :if-exists :supersede
                                                      :if-does-not-exist :create)
-                 (loop for element across (file-elements file)
+                 (loop for element across (adp:file-elements file)
                        do (princ element file-str))))))
 ```
 
@@ -169,7 +139,6 @@ And that's all!
 
 There are also generic functions that allow you to make some preparation before/after the system or a file is loaded. These are `adp:pre-process-system`, `adp:post-process-system`, `adp:pre-process-file` and `adp:post-process-file`. 
 
-Lastly, the symbol adp:*adp* is also exported and indicates if ADP is enabled while loading a file. Macros like `adp-github:defun` from the `adp-github` exporter makes use of it.
 
 ## Writing scribble with Emacs
 
