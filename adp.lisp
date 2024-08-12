@@ -64,7 +64,7 @@
   (:documentation "Operation for loading and generating documentation."))
 
 (defmethod asdf:perform ((o adp-op) (c asdf:cl-source-file))
-  (asdf:perform 'asdf:load-op c))
+  (asdf:perform 'asdf:load-source-op c))
 
 (defun get-package-and-stream (file)
   (let* ((file-strm (open file))
