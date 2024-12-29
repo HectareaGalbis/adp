@@ -161,8 +161,8 @@ A second value is returned specifing if SYMBOL does or does not denote an adp fu
   (setf (get symbol 'lambda-list) lambda-list))
 
 (macrolet
-    ((defdef (type)
-       `(cl:defmacro ,type (name (&rest args) &body body)
+    ((defdef (type name)
+       `(cl:defmacro ,name (name (&rest args) &body body)
           
           (let ((racket-args (parse-racket-args args)))
             (multiple-value-bind (actual-body declarations docstring) (alexandria:parse-body body :documentation t)
@@ -199,8 +199,8 @@ A second value is returned specifing if SYMBOL does or does not denote an adp fu
                             (list* ,key-args-sym ,reg-args-sym)
                           ,@declarations
                           ,@actual-body)))))))))))
-  (defdef defun-aux)
-  (defdef defmacro-aux))
+  (defdef defun defun-aux)
+  (defdef defmacro defmacro-aux))
 
 (cl:defmacro defun (name (&rest args) &body body)
   "Racket-like version of DEFUN.
@@ -261,7 +261,7 @@ more completely specified as follows:
     with a keyword-based actual argument using keyword, if supplied in an application; otherwise,
     the default-expr is evaluated to obtain a value to associate with id. If supplied-symbol is
     specified, it is associated with t or nil indicating if the argument is provided."
-  `(defun-aux name ,args ,@body))
+  `(defun-aux ,name ,args ,@body))
 
 (cl:defmacro defmacro (name (&rest args) &body body)
   "Same as ADP:DEFUN but arguments are not evaluated."

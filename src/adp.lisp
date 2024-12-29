@@ -9,14 +9,14 @@
   (:documentation
    "Represents an element in a scribble file."))
 
-(defun element-value (scribble-element)
+(cl:defun element-value (scribble-element)
   "Returns the value of an element.
 
 This value is what a certain form returned within a scribble file.
 The form can be retrieved with ADP:ELEMENT-FORM."
   (slot-value scribble-element 'value))
 
-(defun element-form (scribble-element)
+(cl:defun element-form (scribble-element)
   "Returns the form of an element.
 
 This form is the lisp form equivalent to a scribble one that the programmer wrote
@@ -25,15 +25,18 @@ within a scribble file. This form returned a value that can be retrieved with AD
 
 ;; ------ files ------
 (defclass scribble-file ()
-  ((component :initarg :component
-              :reader file-component
-              :type asdf:source-file)
-   (elements :initarg :elements
-             :reader file-elements
-	     :type list))
+  ((component :initarg :component)
+   (elements :initarg :elements))
   (:documentation
    "Represents a unit of documentation that groups several elements."))
 
+(defun file-component (scribble-file)
+  "Returns the ASDF component of a scribble file."
+  (slot-value scribble-file 'component))
+
+(defun file-elements (scribble-file)
+  "Returns all the elements of a scribble file."
+  (slot-value scribble-file 'elements))
 
 (defvar *files* nil
   "A container with all the content files. The keys are the pathnames of the file relative to the asdf root file.")

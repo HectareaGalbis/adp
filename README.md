@@ -1,178 +1,108 @@
 
-# Add Documentation, Please
 
-Welcome to ADP!
+<a id="TITLE:ADP-DOCS:TAG35"></a>
+# Add Documentation\, Please\.\.\.
+
+Welcome to ADP\!
+
+Simply put\, ADP adds scribble files support to ASDF\. Thus\, you can add scribble files and use the well\-known [at syntax](https://docs.racket-lang.org/scribble/reader.html)\.
+
+Also\, check out [cl\-scribble\-mode](https://github.com/HectareaGalbis/cl-scribble-mode) to edit scribble files with Common Lisp symbols\.
+
+Examples\:
+
+<img src="/images/cl-scribble-mode-example.gif" alt="cl-scribble-mode example" width="100%">
+
+<img src="/images/example-adp.png" alt="adp example" width="100%">
 
 
-## Introduction
-
-Simply put, ADP adds scribble files support to ASDF. Thus, you can add scribble files and use the well-known [at-syntax](https://docs.racket-lang.org/scribble/reader.html).
-
-Example:
-
-![Scribble file example](/images/example-adp.png "Example")
-
-
+<a id="TITLE:ADP-DOCS:TAG36"></a>
 ## Installation
 
-This project is available on Quicklisp. But, instead of installing this, you should install an exporter.
+This project is available on Quicklisp\. But\, instead of installing this\, you should install an exporter\.
 
 
+<a id="TITLE:ADP-DOCS:TAG37"></a>
 ## Exporters
 
-* [adp-github](https://github.com/Hectarea1996/adp-github): Generates Github flavoured Markdown files with crossreferences, tables of contents, etc.
+* [adp\-github](https://github.com/HectareaGalbis/adp-github)\: Generates Github flavoured Markdown files\.
 
 
-## Getting started
+<a id="TITLE:ADP-DOCS:TAG38"></a>
+## Documentation as another system
 
-Each exporter defines diferent ways of adding `scribble` files, but usually all them have similarities.
+Almost every Common Lisp project can have several systems\. These systems usually indicate which files of code should compiled and loaded and in which order\. There are\, sometimes\, other systems that does not load the project\'s code\, but does load unit tests to verify the correctness of the project\. It seems natural now that documentation should have its own system to document the project\.
 
-1. Create a subsystem for the scribble files. It must `defsystem-depends-on` the selected exporter and should `depends-on` you project to be able to use everything you've defined there. Let's use `adp-github` in this example. This exporter defines the ASDF file type `scribble` as well as the ASDF system class `adp-github`. 
+ADP extends ASDF with Scribble files\. These format is used exhaustively by the Racket language and it proves that Scribble is a very good language for writing documentation\.
 
-``` common-lisp
-;;; my-project.asd
+However\, Racket and Common Lisp are different\. That\'s why ADP tries to integrate Scribble into Common Lisp making some changes in favour to flexibility and power\. For example\, enabling the at\-syntax requires changing the readtable to use the scribble language\. But\, the Common Lisp programmer can still select which readtable to use in every Scribble file\. The package can also be choosen as normally\.
 
-(defsystem "my-project"
+In this documentation system\, the programmer can still specify lisp files to write auxiliar functions or macros to use later within Scribble files\. Remember that Scribble is just syntactic sugar for function calls\.
+
+`````common lisp
+;; Common Lisp
+(+ 3 4)
+
+;; Scribble
+7
+`````
+
+<a id="TITLE:ADP-DOCS:TAG39"></a>
+### Enabling scribble files
+
+ADP cannot be used directly to enable Scribble files\. Instead\, you need to load an exporter like [adp\-github](https://github.com/HectareaGalbis/adp-github)\.
+
+Enabling scribble files in your system requires 2 things\:
+
+* Add the exporter\'s system to the ```:defsystem-depends-on``` list\:
+
+
+`````common lisp
+(defsystem "my-system/docs"
+  :defsystem-depends-on ("adp-github")
   ...)
+`````
 
+* Specify the class of the system\:
+
+
+`````common lisp
+(defsystem "my-system/docs"
+  :defsystem-depends-on ("adp-github")
+  :class :adp-github
+  ...)
+`````
+
+And now\, add as many files as you want\. This can be a valid example of a documentation system\:
+
+`````common lisp
 (defsystem "my-project/docs"
   :defsystem-depends-on ("adp-github")
-  :depends-on ("my-project")
   :class :adp-github
-  :components ((:file "doc-package")
-               (:scribble "user-guide")))
-```
+  :depends-on ("my-project")
+  :components ((:module "scribble"
+                :components ((:file "package")
+                             (:file "custom-functions")
+                             (:scribble "reference")
+                             (:scribble "README")))))
+`````
 
-2. Create the files. In this example we need a regular file named `doc-package.lisp` and a scribble one named `user-guide.scrbl`. In the former we will define the package to use while writing scribble text. Those files could have the following contents:
-
-``` common-lisp
-;;; doc-package.lisp
-
-(defpackage #:my-project-docs
-  (:use #:cl #:adp-github))
+The system class ```:adp-github``` and the name of Scribble files like ```:scribble``` are defined by the exporter\. Each exporter might define one or more types of scribble files\.
 
 
-;;; user-guide.scrbl
+<a id="TITLE:ADP-DOCS:TAG40"></a>
+### Generating the files
 
-(in-package #:my-project-docs)
+Once the system is defined\, nothing special is required\. Just load the system\.
 
-@header{User guide}
+`````common lisp
+(asdf:load-system "my-project/docs")
+`````
 
-Welcome to my project!
-```
+Or\, equivalently\:
 
-3. Generate the documentation. We only need to `asdf:load-system` or `asdf:make` the new subsystem. In your REPL, evaluate the following expression:
-
-``` common-lisp
+`````common lisp
 (asdf:make "my-project/docs")
-```
+`````
 
-That's all!
-
-## How to create an exporter
-
-Let's do an example of an exporter that creates txt files and `princ`s every object that ADP gathers.
-
-An exporter should be a system. Let's create the `asd` file:
-
-``` common-lisp
-(defsystem "adp-princ"
-  :depends-on ("adp")
-  :components ((:file "package")
-               (:file "adp-princ")))
-```
-
-Of course, you can use whatever number of files you want. 
-
-Suppose we're using the package `ADP-PRINC`. First of all, we need to define an ASDF system class and an ASDF file. Let's see the file `adp-princ`:
-
-``` common-lisp
-(in-package #:adp-princ)
-
-(adp:define-adp-system adp-princ) ; <- defining a new system class
-
-(adp:define-adp-file scribble)  ; <- defining a new ASDF file type
-
-...
-```
-
-
-
-After this, we can now implement a method using that operation:
-
-``` common-lisp
-(in-package #:adp-princ)
-
-(adp:define-adp-system adp-princ)
-
-(adp:define-adp-file scribble)
-
-(defmethod adp:export-content ((system adp-princ) files)
-  (declare (type list files))
-  ...)
-```
-
-The argument `files` is a `list` containing each file whose type was defined by `adp:define-adp-file`. In this case, all files will be of type `scribble`. Each file contains the elements gathered by `adp`. The order files are stored in is the same as the order they are loaded. Each file contains the `ASDF` component it represents as well. Files have then two accessors:
-
-* `adp:file-component`: Retrieves the `ASDF` component of a file.
-* `adp:file-elements`: Retrieves the elements of a file. The elements are stored in a `list`.
-
-In this case, `file-component` will have always the type `scribble`. This type was defined by `adp:define-adp-file`. We could have defined more file types. Finally, we can use generic functions to call different methods depending on the type of these files.
-
-Coming back to `adp:export-content`, the method receives the `ASDF` system we defined using `adp:define-adp-system` and the files `ADP` has gathered. Like `files` is a list, we only need to iterate over it:
-
-``` common-lisp
-(defmethod adp:export-content ((op adp-princ-op) files system)
-  (loop for file in files
-        do (let ((target-file (make-pathname :directory (pathname-directory 
-                                                            (merge-pathnames file-path
-                                                                             (asdf:system-source-directory system)))
-                                             :name (pathname-name file-path)
-                                             :type "txt")))
-               (with-open-file (file-str target-path :direction :output :if-exists :supersede
-                                                     :if-does-not-exist :create)
-                 (loop for element in (adp:file-elements file)
-                       do (princ element file-str))))))
-```
-
-For every file, we are creating first the target pathname. It is the same as the source file, but with the type "txt". If it doesn't exist, we create the file and `princ` every object in it.
-
-And that's all! 
-
-## Writing scribble with Emacs
-
-Scribble has already its own mode: [scribble-mode](https://github.com/emacs-pe/scribble-mode/tree/master). However, Scribble was designed to be used with Scheme-like languages. But we can make some magic to get syntax highlighting and autocompletion with Common Lisp.
-
-The scribble mode already gives us some syntax highlighting, but we need to make some changes. On the other hand, we can get autocompletion with [company-mode](https://company-mode.github.io/) and [slime-company](https://github.com/anwyn/slime-company).
-
-`company` doesn't need any changes, but `scribble` and `slime-company` do. Here is how I configured these modes in my `init.el`:
-
-``` emacs-lisp
-;; ------ company ------
-(use-package company
-  :bind (:map company-active-map
-              ("<tab>" . company-complete-selection))
-  :config
-  (global-company-mode))
-
-
-;; ------ scrbl ------
-(use-package scribble-mode
-  ;; We modify the syntax to adapt scribble-mode to the Common Lisp language.
-  ;; With this it will understand prefix packages.
-  :config
-  (modify-syntax-entry ?: "_ " scribble-mode-syntax-table)
-  (push `(,(rx (or space "(" "[" "{") (group (zero-or-one "#") ":" (+ (not (any space ")" "]" "}")))))
-          (1 font-lock-keyword-face))
-        scribble-mode-font-lock-keywords))
-
-
-;; ------ slime-company ------
-(use-package slime-company
-  :after (slime company scribble-mode)
-  :config
-  (push 'scribble-mode slime-company-major-modes) ; <-- This is the important line for slime-company
-  (setq slime-company-completion 'fuzzy))
-```
-
-Happy hacking! :D
+The files will be generated according to the used exporter\.

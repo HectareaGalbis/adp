@@ -6,6 +6,7 @@
   :defsystem-depends-on ("adp-github")
   :class :adp-github
   :depends-on ("adp")
+  :serial t
   :components ((:module "scribble"
                 :components ((:file "package")
                              (:scribble "README")

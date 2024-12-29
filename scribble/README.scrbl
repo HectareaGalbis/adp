@@ -1,5 +1,5 @@
 
-(in-package #:adpgh-docs)
+(in-package #:adp-docs)
 
 @output-file["/README.md"]
 
