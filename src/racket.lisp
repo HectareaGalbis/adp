@@ -163,6 +163,7 @@ A second value is returned specifing if SYMBOL does or does not denote an adp fu
 (macrolet
     ((defdef (type)
        `(cl:defmacro ,type (name (&rest args) &body body)
+          
           (let ((racket-args (parse-racket-args args)))
             (multiple-value-bind (actual-body declarations docstring) (alexandria:parse-body body :documentation t)
               (alexandria:with-gensyms (key-args-sym args-sym reg-args-sym)
@@ -198,6 +199,70 @@ A second value is returned specifing if SYMBOL does or does not denote an adp fu
                             (list* ,key-args-sym ,reg-args-sym)
                           ,@declarations
                           ,@actual-body)))))))))))
-  (defdef defun)
-  (defdef defmacro))
+  (defdef defun-aux)
+  (defdef defmacro-aux))
 
+(cl:defmacro defun (name (&rest args) &body body)
+  "Racket-like version of DEFUN.
+
+This macro has the following syntax:
+
+(defun name racket-lambda-list [[declaration* | documentation]] form*)
+
+  racket-lambda-list ::= (arg*)
+                       | (arg* . rest-symbol)
+                       | (arg* &rest rest-symbol)
+                 arg ::= symbol
+                       | (symbol default-form [supplied-symbol])
+                       | keyword symbol
+                       | keyword (symbol default-form [supplied-symbol])
+
+The following explanation was taken and modified from: https://docs.racket-lang.org/reference/lambda.html
+
+Regarding the racket-lambda-list and considering only the first case of arg, DEFUN has one of the
+following three forms:
+
+  - (arg*)
+
+    The function accepts as many non-keyword argument values as the number of symbols.
+    Each symbol is associated with an argument value by position.
+
+  - (arg* . rest-symbol)
+  - (arg* &rest rest-symbol)
+
+    The function accepts any number of non-keyword arguments greater or equal to the number of symbols.
+    When the function is applied, the symbols are associated with argument values by position,
+    and all leftover arguments are placed into a list that is associated to rest-symbol.
+
+More generally, an arg can include a keyword and/or default value. Thus, the three cases above are
+more completely specified as follows:
+
+  - symbol
+
+    Adds one to both the minimum and maximum number of non-keyword arguments accepted by the function.
+    The symbol is associated with an actual argument by position.
+
+  - (symbol default-form [supplied-symbol])
+
+    Adds one to the maximum number of non-keyword arguments accepted by the procedure.
+    The symbol is associated with an actual argument by position, and if no such argument is provided,
+    the default-form is evaluated to produce a value associated with symbol. If supplied-symbol is
+    specified, it is associated with t or nil indicating if the argument is provided.
+    No arg with a default-expr can appear before a symbol without a default-form and without a keyword.
+
+  - keyword symbol
+
+    The function requires a keyword-based argument using keyword. The symbol is associated
+    with a keyword-based actual argument using keyword.
+
+  - keyword (symbol default-form [supplied-symbol])
+
+    The function accepts a keyword-based argument using keyword. The symbol is associated
+    with a keyword-based actual argument using keyword, if supplied in an application; otherwise,
+    the default-expr is evaluated to obtain a value to associate with id. If supplied-symbol is
+    specified, it is associated with t or nil indicating if the argument is provided."
+  `(defun-aux name ,args ,@body))
+
+(cl:defmacro defmacro (name (&rest args) &body body)
+  "Same as ADP:DEFUN but arguments are not evaluated."
+  `(defmacro-aux ,name ,args ,@body))

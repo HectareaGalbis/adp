@@ -4,12 +4,24 @@
 
 ;; ------ elements ------
 (defclass scribble-element ()
-  ((value :initarg :value
-          :reader element-value)
-   (form :initarg :form
-         :reader element-form))
+  ((value :initarg :value)
+   (form :initarg :form))
   (:documentation
    "Represents an element in a scribble file."))
+
+(defun element-value (scribble-element)
+  "Returns the value of an element.
+
+This value is what a certain form returned within a scribble file.
+The form can be retrieved with ADP:ELEMENT-FORM."
+  (slot-value scribble-element 'value))
+
+(defun element-form (scribble-element)
+  "Returns the form of an element.
+
+This form is the lisp form equivalent to a scribble one that the programmer wrote
+within a scribble file. This form returned a value that can be retrieved with ADP:ELEMENT-VALUE."
+  (slot-value scribble-element 'form))
 
 ;; ------ files ------
 (defclass scribble-file ()
@@ -131,20 +143,21 @@
 (defmethod asdf:perform ((o asdf:load-op) (c scribble-source-file))
   (let ((file (first (asdf:input-files o c))))
     (with-lisp-expressions-and-stream (in-package-expr in-readtable-expr stream) file
-      (let ((*package* *package*)
-            (*readtable* (named-readtables:find-readtable :scribble)))
-        (when in-package-expr
-          (eval-expression in-package-expr file))
-        (when in-readtable-expr
-          (eval-expression in-readtable-expr file))
-        (let* ((file-content (alexandria:read-stream-content-into-string stream))
-               (expressions (cdr (read-from-string (format nil "@list{~a}" file-content))))
-               (elements (loop for expr in expressions
-                               collect (make-instance 'scribble-element
-                                                      :value (eval-expression expr file)
-                                                      :form expr)))
-               (content-file (make-instance 'scribble-file :component c :elements elements)))
-          (add-file content-file))))))
+      (with-slots (default-readtable) c
+        (let ((*package* *package*)
+              (*readtable* (named-readtables:find-readtable default-readtable)))
+          (when in-package-expr
+            (eval-expression in-package-expr file))
+          (when in-readtable-expr
+            (eval-expression in-readtable-expr file))
+          (let* ((file-content (alexandria:read-stream-content-into-string stream))
+                 (expressions (cdr (read-from-string (format nil "@list{~a}" file-content))))
+                 (elements (loop for expr in expressions
+                                 collect (make-instance 'scribble-element
+                                                        :value (eval-expression expr file)
+                                                        :form expr)))
+                 (content-file (make-instance 'scribble-file :component c :elements elements)))
+            (add-file content-file)))))))
 
 
 ;; ------ exporter ------
@@ -153,28 +166,56 @@
   (export symbol package))
 
 (cl:defmacro define-adp-system (name)
-  "Defines an adp system."
+  "Defines an adp system class.
+
+NAME must be a symbol denoting the class of a system.
+The user will need to use a keyword with the same name to specify
+the defined class in its documentation system."
   (check-type name symbol)
   `(progn
      (defclass ,name (adp-system) ())
      (eval-when (:compile-toplevel :load-toplevel :execute)
-       (reexport ',name "ASDF")
-       (reexport ',name "ASDF/BUNDLE"))))
+       (reexport ',name "ASDF"))))
 
-(cl:defmacro define-adp-file (name &optional type)
-  "Defines an adp file."
+(cl:defmacro define-adp-file (name &key (type "scrbl") (default-readtable :scribble))
+  "Defines an adp file.
+
+NAME must be a symbol denoting the class of a file.
+The user will need to use a keyword with the same name to specify
+the defined file in its documentation system.
+TYPE denotes the extension of the file.
+DEFAULT-READTABLE denotes the default readtable to use when loading
+the scribble file. This can be used if the exporter defines some extension to scribble
+like latex math mode."
   (check-type name symbol)
   (check-type type (or string null))
+  (check-type default-readtable symbol)
   `(progn
      (defclass ,name (scribble-source-file)
-       ,(and type `((type :initform ,type))))
+       ((default-readtable :initform ',default-readtable)
+        ,@(and type `((type :initform ,type)))))
      (eval-when (:compile-toplevel :load-toplevel :execute)
-       (reexport ',name "ASDF")
-       (reexport ',name "ASDF/BUNDLE"))))
+       (reexport ',name "ASDF"))))
 
 (defgeneric export-content (system files)
   (:documentation
-   "Exports the files gathered by ADP.")
+   "Exports the elements gathered by ADP.
+
+This function must be implemented by the exporter and is called after all files are loaded.
+SYSTEM argument must be specialized with a class defined with DEFINE-ADP-SYSTEM.
+FILES is a list of ADP::SCRIBBLE-FILE objects. These objects has two attributes that can be retrieved
+using ADP:FILE-COMPONENT and ADP:FILE-ELEMENTS. The former returns the ASDF component that represents
+the file. The exporter must use the ASDF interface to retrieve information about this file like
+its pathname. The latter is a list of ADP::SCRIBBLE-ELEMENT objects. Each object has two attributes
+as well that can be retrieved with ADP:ELEMENT-VALUE and ADP:ELEMENT-FORM. The former returns
+the value of the element. This value is what the exporter must print. The former is the form
+that has generated the value. This can be useful for error messages.
+
+Regarding the type of each file, they are specifically of type a class defined with ADP:DEFINE-ADP-FILE.
+In fact, every file type defined with ADP:DEFINE-ADP-FILE has as direct superclass the
+ type ADP::SCRIBBLE-FILE.
+
+All files are in the same order as they were loaded. The same goes to elements within a file.")
   (:method (system files)
     (declare (ignore files))
     (error "The system of class ~s is not an ADP system." (class-of system))))
