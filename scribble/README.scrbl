@@ -39,13 +39,13 @@ However, Racket and Common Lisp are different. That's why ADP tries to integrate
 
 In this documentation system, the programmer can still specify lisp files to write auxiliar functions or macros to use later within Scribble files. Remember that Scribble is just syntactic sugar for function calls.
 
-@code-block[:lang "common lisp"]{
+@code-block[:lang "common lisp"]|{
 ;; Common Lisp
 (+ 3 4)
 
 ;; Scribble
 @+[3 4]
-}
+}|
 
 @subsubtitle{Enabling scribble files}
 

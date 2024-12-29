@@ -1,6 +1,6 @@
 
 
-<a id="TITLE:ADP-DOCS:TAG35"></a>
+<a id="TITLE:ADP-DOCS:TAG52"></a>
 # Add Documentation\, Please\.\.\.
 
 Welcome to ADP\!
@@ -16,19 +16,19 @@ Examples\:
 <img src="/images/example-adp.png" alt="adp example" width="100%">
 
 
-<a id="TITLE:ADP-DOCS:TAG36"></a>
+<a id="TITLE:ADP-DOCS:TAG53"></a>
 ## Installation
 
 This project is available on Quicklisp\. But\, instead of installing this\, you should install an exporter\.
 
 
-<a id="TITLE:ADP-DOCS:TAG37"></a>
+<a id="TITLE:ADP-DOCS:TAG54"></a>
 ## Exporters
 
 * [adp\-github](https://github.com/HectareaGalbis/adp-github)\: Generates Github flavoured Markdown files\.
 
 
-<a id="TITLE:ADP-DOCS:TAG38"></a>
+<a id="TITLE:ADP-DOCS:TAG55"></a>
 ## Documentation as another system
 
 Almost every Common Lisp project can have several systems\. These systems usually indicate which files of code should compiled and loaded and in which order\. There are\, sometimes\, other systems that does not load the project\'s code\, but does load unit tests to verify the correctness of the project\. It seems natural now that documentation should have its own system to document the project\.
@@ -44,10 +44,10 @@ In this documentation system\, the programmer can still specify lisp files to wr
 (+ 3 4)
 
 ;; Scribble
-7
+@+[3 4]
 `````
 
-<a id="TITLE:ADP-DOCS:TAG39"></a>
+<a id="TITLE:ADP-DOCS:TAG56"></a>
 ### Enabling scribble files
 
 ADP cannot be used directly to enable Scribble files\. Instead\, you need to load an exporter like [adp\-github](https://github.com/HectareaGalbis/adp-github)\.
@@ -90,7 +90,7 @@ And now\, add as many files as you want\. This can be a valid example of a docum
 The system class ```:adp-github``` and the name of Scribble files like ```:scribble``` are defined by the exporter\. Each exporter might define one or more types of scribble files\.
 
 
-<a id="TITLE:ADP-DOCS:TAG40"></a>
+<a id="TITLE:ADP-DOCS:TAG57"></a>
 ### Generating the files
 
 Once the system is defined\, nothing special is required\. Just load the system\.
