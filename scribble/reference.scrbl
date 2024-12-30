@@ -1,7 +1,7 @@
 
 (in-package #:adp-docs)
 
-@title{Reference}
+@title[:tag reference]{Reference}
 
 @table-of-functions[]
 

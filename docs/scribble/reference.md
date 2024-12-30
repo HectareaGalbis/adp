@@ -1,20 +1,20 @@
-<a id="TITLE:ADP-DOCS:TAG58"></a>
+<a id="TITLE:ADP-DOCS:REFERENCE"></a>
 # Reference
 
-* [adp\:define\-adp\-file](//home/hectarea/common-lisp/adp/docs/scribble/reference.md#FUNCTION:ADP-DOCS:TAG66)
-* [adp\:define\-adp\-system](//home/hectarea/common-lisp/adp/docs/scribble/reference.md#FUNCTION:ADP-DOCS:TAG67)
-* [adp\:defmacro](//home/hectarea/common-lisp/adp/docs/scribble/reference.md#FUNCTION:ADP-DOCS:TAG61)
-* [adp\:defun](//home/hectarea/common-lisp/adp/docs/scribble/reference.md#FUNCTION:ADP-DOCS:TAG59)
-* [adp\:element\-form](//home/hectarea/common-lisp/adp/docs/scribble/reference.md#FUNCTION:ADP-DOCS:TAG68)
-* [adp\:element\-value](//home/hectarea/common-lisp/adp/docs/scribble/reference.md#FUNCTION:ADP-DOCS:TAG63)
-* [adp\:export\-content](//home/hectarea/common-lisp/adp/docs/scribble/reference.md#FUNCTION:ADP-DOCS:TAG65)
-* [adp\:file\-component](//home/hectarea/common-lisp/adp/docs/scribble/reference.md#FUNCTION:ADP-DOCS:TAG64)
-* [adp\:file\-elements](//home/hectarea/common-lisp/adp/docs/scribble/reference.md#FUNCTION:ADP-DOCS:TAG62)
-* [adp\:function\-lambda\-list](//home/hectarea/common-lisp/adp/docs/scribble/reference.md#FUNCTION:ADP-DOCS:TAG60)
+* [adp\:define\-adp\-file](//home/hectarea/common-lisp/adp/docs/scribble/reference.md#FUNCTION:ADP-DOCS:TAG19)
+* [adp\:define\-adp\-system](//home/hectarea/common-lisp/adp/docs/scribble/reference.md#FUNCTION:ADP-DOCS:TAG20)
+* [adp\:defmacro](//home/hectarea/common-lisp/adp/docs/scribble/reference.md#FUNCTION:ADP-DOCS:TAG14)
+* [adp\:defun](//home/hectarea/common-lisp/adp/docs/scribble/reference.md#FUNCTION:ADP-DOCS:TAG12)
+* [adp\:element\-form](//home/hectarea/common-lisp/adp/docs/scribble/reference.md#FUNCTION:ADP-DOCS:TAG21)
+* [adp\:element\-value](//home/hectarea/common-lisp/adp/docs/scribble/reference.md#FUNCTION:ADP-DOCS:TAG16)
+* [adp\:export\-content](//home/hectarea/common-lisp/adp/docs/scribble/reference.md#FUNCTION:ADP-DOCS:TAG18)
+* [adp\:file\-component](//home/hectarea/common-lisp/adp/docs/scribble/reference.md#FUNCTION:ADP-DOCS:TAG17)
+* [adp\:file\-elements](//home/hectarea/common-lisp/adp/docs/scribble/reference.md#FUNCTION:ADP-DOCS:TAG15)
+* [adp\:function\-lambda\-list](//home/hectarea/common-lisp/adp/docs/scribble/reference.md#FUNCTION:ADP-DOCS:TAG13)
 
 
 <a id="FUNCTION:ADP:DEFINE-ADP-FILE"></a>
-<a id="FUNCTION:ADP-DOCS:TAG66"></a>
+<a id="FUNCTION:ADP-DOCS:TAG19"></a>
 #### Macro: adp:define-adp-file (name &key (type "scrbl") (default-readtable :scribble))
 
 `````text
@@ -30,7 +30,7 @@ like latex math mode.
 `````
 
 <a id="FUNCTION:ADP:DEFINE-ADP-SYSTEM"></a>
-<a id="FUNCTION:ADP-DOCS:TAG67"></a>
+<a id="FUNCTION:ADP-DOCS:TAG20"></a>
 #### Macro: adp:define-adp-system (name)
 
 `````text
@@ -42,7 +42,7 @@ the defined class in its documentation system.
 `````
 
 <a id="FUNCTION:ADP:DEFMACRO"></a>
-<a id="FUNCTION:ADP-DOCS:TAG61"></a>
+<a id="FUNCTION:ADP-DOCS:TAG14"></a>
 #### Macro: adp:defmacro (name (&rest args) &body body)
 
 `````text
@@ -50,7 +50,7 @@ Same as ADP:DEFUN but arguments are not evaluated.
 `````
 
 <a id="FUNCTION:ADP:DEFUN"></a>
-<a id="FUNCTION:ADP-DOCS:TAG59"></a>
+<a id="FUNCTION:ADP-DOCS:TAG12"></a>
 #### Macro: adp:defun (name (&rest args) &body body)
 
 `````text
@@ -115,7 +115,7 @@ more completely specified as follows:
 `````
 
 <a id="FUNCTION:ADP:ELEMENT-FORM"></a>
-<a id="FUNCTION:ADP-DOCS:TAG68"></a>
+<a id="FUNCTION:ADP-DOCS:TAG21"></a>
 #### Function: adp:element-form (scribble-element)
 
 `````text
@@ -126,7 +126,7 @@ within a scribble file. This form returned a value that can be retrieved with AD
 `````
 
 <a id="FUNCTION:ADP:ELEMENT-VALUE"></a>
-<a id="FUNCTION:ADP-DOCS:TAG63"></a>
+<a id="FUNCTION:ADP-DOCS:TAG16"></a>
 #### Function: adp:element-value (scribble-element)
 
 `````text
@@ -137,7 +137,7 @@ The form can be retrieved with ADP:ELEMENT-FORM.
 `````
 
 <a id="FUNCTION:ADP:EXPORT-CONTENT"></a>
-<a id="FUNCTION:ADP-DOCS:TAG65"></a>
+<a id="FUNCTION:ADP-DOCS:TAG18"></a>
 #### Generic function: adp:export-content (system files)
 
 `````text
@@ -161,7 +161,7 @@ All files are in the same order as they were loaded. The same goes to elements w
 `````
 
 <a id="FUNCTION:ADP:FILE-COMPONENT"></a>
-<a id="FUNCTION:ADP-DOCS:TAG64"></a>
+<a id="FUNCTION:ADP-DOCS:TAG17"></a>
 #### Function: adp:file-component (&rest args-sym1)
 
 `````text
@@ -169,7 +169,7 @@ Returns the ASDF component of a scribble file.
 `````
 
 <a id="FUNCTION:ADP:FILE-ELEMENTS"></a>
-<a id="FUNCTION:ADP-DOCS:TAG62"></a>
+<a id="FUNCTION:ADP-DOCS:TAG15"></a>
 #### Function: adp:file-elements (&rest args-sym1)
 
 `````text
@@ -177,7 +177,7 @@ Returns all the elements of a scribble file.
 `````
 
 <a id="FUNCTION:ADP:FUNCTION-LAMBDA-LIST"></a>
-<a id="FUNCTION:ADP-DOCS:TAG60"></a>
+<a id="FUNCTION:ADP-DOCS:TAG13"></a>
 #### Function: adp:function-lambda-list (symbol)
 
 `````text

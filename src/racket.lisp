@@ -146,19 +146,19 @@
               do (it-next vals-it)
               while (not (it-endp vals-it))
               finally (return (values key-values regular-values)))
-            (values nil nil))))))
+            (values nil nil)))))
 
-(cl:defun function-lambda-list (symbol)
-  "Retrieves the lambda list of an adp function or macro whose name is SYMBOL.
+  (cl:defun function-lambda-list (symbol)
+    "Retrieves the lambda list of an adp function or macro whose name is SYMBOL.
 A second value is returned specifing if SYMBOL does or does not denote an adp function or macro."
-  (alexandria:with-gensyms (default)
-    (let ((lambda-list (get symbol 'lambda-list default)))
-      (if (eq lambda-list default)
-          (values nil nil)
-          (values lambda-list t)))))
+    (alexandria:with-gensyms (default)
+      (let ((lambda-list (get symbol 'lambda-list default)))
+        (if (eq lambda-list default)
+            (values nil nil)
+            (values lambda-list t)))))
 
-(cl:defun (setf function-lambda-list) (lambda-list symbol)
-  (setf (get symbol 'lambda-list) lambda-list))
+  (cl:defun (setf function-lambda-list) (lambda-list symbol)
+    (setf (get symbol 'lambda-list) lambda-list)))
 
 (macrolet
     ((defdef (type name)

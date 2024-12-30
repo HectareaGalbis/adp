@@ -7,5 +7,5 @@
   :components ((:module "src"
                 :serial t
                 :components ((:file "package")
-                             (:file "adp")
-                             (:file "racket")))))
+                             (:file "racket")
+                             (:file "adp")))))
