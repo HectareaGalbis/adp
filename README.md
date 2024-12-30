@@ -54,7 +54,7 @@ However\, Racket and Common Lisp are different\. That\'s why ADP tries to integr
 
 In the documentation system\, the programmer can still specify lisp files to write auxiliar functions or macros to use later within Scribble files\. Remember that Scribble is just syntactic sugar for function calls\.
 
-`````common lisp
+`````common-lisp
 ;; Common Lisp
 (+ 3 4)
 
@@ -72,7 +72,7 @@ Enabling scribble files in your system requires 2 things\:
 * Add the exporter\'s system to the ```:defsystem-depends-on``` list\:
 
 
-`````common lisp
+`````common-lisp
 (defsystem "my-system/docs"
   :defsystem-depends-on ("adp-github")
   ...)
@@ -81,7 +81,7 @@ Enabling scribble files in your system requires 2 things\:
 * Specify the class of the system\:
 
 
-`````common lisp
+`````common-lisp
 (defsystem "my-system/docs"
   :defsystem-depends-on ("adp-github")
   :class :adp-github
@@ -90,7 +90,7 @@ Enabling scribble files in your system requires 2 things\:
 
 And now\, add as many files as you want\. This can be a valid example of a documentation system\:
 
-`````common lisp
+`````common-lisp
 (defsystem "my-project/docs"
   :defsystem-depends-on ("adp-github")
   :class :adp-github
@@ -110,13 +110,13 @@ The system class ```:adp-github``` and the name of Scribble files like ```:scrib
 
 Once the system is defined\, nothing special is required\. Just load the system\.
 
-`````common lisp
+`````common-lisp
 (asdf:load-system "my-project/docs")
 `````
 
 Or\, equivalently\:
 
-`````common lisp
+`````common-lisp
 (asdf:make "my-project/docs")
 `````
 
@@ -140,7 +140,7 @@ Let\'s do an example of how to start making an exporter\.
 
 Suppose that our exporter is named ```my-exporter```\. Let\'s create a project with this name\. As every project\, we need to define the main system\:
 
-`````common lisp
+`````common-lisp
 (defsystem "my-project"
   :depends-on ("adp")
   :components ((:file "package")
@@ -151,7 +151,7 @@ Let\'s jump directly into the ```exporter``` file assuming we defined the packag
 
 As we said\, we need to define a system class\. This is done with the macro [adp\:define\-adp\-system](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:DEFINE-ADP-SYSTEM)\:
 
-`````common lisp
+`````common-lisp
 (in-package #:exp)
 
 (adp:define-adp-system my-exporter)
@@ -162,7 +162,7 @@ In this case\, we named the system class ```my-exporter```\.
 The second thing to define is at least one file class\. We\'re using [adp\:define\-adp\-file](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:DEFINE-ADP-FILE)\. Let\'s name it ```expo```\, for example\:
 
 
-`````common lisp
+`````common-lisp
 (in-package #:exp)
 
 (adp:define-adp-system my-exporter)
@@ -180,7 +180,7 @@ Lastly\, we only need to implement the method [adp\:export\-content](//home/hect
 
 Remember that ```my-exporter``` was the system class we defined with [adp\:define\-adp\-system](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:DEFINE-ADP-SYSTEM) and ```expo``` is the file class we defined with [adp\:define\-adp\-file](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:DEFINE-ADP-FILE)\.
 
-`````common lisp
+`````common-lisp
 (in-package #:exp)
 
 (adp:define-adp-system my-exporter)
@@ -196,24 +196,22 @@ Note that we must specialize the first argument with our system class\.
 <a id="TITLE:ADP-DOCS:TAG10"></a>
 ### The system and the files
 
-So\, this is the minimum required to make an exporter\. The rest is up to you\.
+So\, this is the minimum required to make an exporter\. The rest is up to you\. But\, at least\, you must know how to handle the objects ```system``` and ```files```\. Let\'s see how to retrieve information from them\.
 
-But\, at least\, you must know how to handle the objects ```system``` and ```files```\. Let\'s see how to retrieve information from them\.
-
-* ```system```\: The class we defined named ```my-exporter``` has as direct superclass the class ```asdf:system```\. So\, you have all the ```asdf``` methods to know perfectly how the system is\. Here are some functions that I found to be useful\:
+* ```system```\: The class we defined named ```my-exporter``` has as direct superclass the class ```asdf:system```\. So\, you have all the ```asdf``` methods to know perfectly how the system is\. Here are some useful functions\:
   * ```asdf:component-name```\: You can retrieve the system\'s name\.
   * ```asdf:system-source-directory```\: Returns the absolute pathname of the system\'s directory\.
 * ```files```\: Each file of a type defined with [adp\:define\-adp\-file](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:DEFINE-ADP-FILE) has two attributes whose values can be retrieved with the following getters\:
   * [adp\:file\-component](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:FILE-COMPONENT)\: Returns the object of type ```asdf:component``` that represents the file within the system\. Similarly to the ```asdf:system```\, there are useful functions from ```asdf``` that we can use\:
     * ```asdf:component-pathname```\: Retrieves the absolute pathname of a component\. In this case\, the pathname of the file\.
-  * [adp\:file\-elements](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:FILE-ELEMENTS)\: Returns the elements of the file that needs to be printed\. These elements are also object with two attributes\. We can retrieve their values with the following functions\:
+  * [adp\:file\-elements](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:FILE-ELEMENTS)\: Returns the elements of the file that needs to be printed\. These elements are also objects with two attributes\. We can retrieve their values with the following functions\:
     * [adp\:element\-value](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:ELEMENT-VALUE)\: The actual value to be printed\. It can be an integer\, a string\, a float\, or even objects that needs to be printed in a special way\.
     * [adp\:element\-form](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:ELEMENT-FORM)\: The lisp form that produced the value\. This can be useful for error messages\.
 
 
 Knowing this\, every exporter could work similarly\. Just loop over files\, loop over the elements of each file\, and print them into a file stream\.
 
-`````common lisp
+`````common-lisp
 (defmethod adp:export-content ((system my-exporter) files)
   (loop for file in files
         for file-component = (adp:file-component file)
@@ -243,13 +241,13 @@ In Racket\, it could be defined like this\:
 
 And it can be used like this\:
 
-`````racket
+`````scribble
 @title[:tag "some-tag"]{This is the title.}
 `````
 
 However\, in Common Lisp this is impossible with the usual [DEFUN](http://www.lispworks.com/reference/HyperSpec/Body/m_defun.htm)\:
 
-`````racket
+`````common-lisp
 (defun title (&key tag &rest elements) ;; <- Error, &key is before &rest
   ...)
 
@@ -261,21 +259,21 @@ Because of this\, ADP defines the macros [adp\:defun](//home/hectarea/common-lis
 
 Now the example is pretty easy\:
 
-`````common lisp
+`````common-lisp
 (adp:defun title (:tag tag &rest elements)
   ...)
 `````
 
 Or using the racket style\:
 
-`````common lisp
+`````common-lisp
 (adp:defun title (:tag tag . elements)
   ...)
 `````
 
 This macros are adapted to Common Lisp\. We\'ve just saw the use of ```&rest```\. But\, we can also specify the supplied symbol to optional arguments\.
 
-`````common lisp
+`````common-lisp
 (adp:defun variable-reference (type :style (style "default-style" stylep) :variable variable &rest text)
   (if stylep
       ...
@@ -286,7 +284,7 @@ This macros are adapted to Common Lisp\. We\'ve just saw the use of ```&rest```\
 
 The macro [adp\:defmacro](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:DEFMACRO) works the same way\. In fact\, it doesn\'t accept destructuring\. The only difference is that arguments are not evaluated\. This is useful if we want to avoid the ```'``` character before symbols\.
 
-`````common lisp
+`````common-lisp
 (adp:defmacro variable-ref (type :style (style "default-style" stylep) :variable variable &rest text)
   `(variable-reference ',type :style ,style :variable ',variable ,@text))
 
@@ -295,7 +293,7 @@ The macro [adp\:defmacro](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP
 
 Lastly\, ADP offers the function [adp\:function\-lambda\-list](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:FUNCTION-LAMBDA-LIST) for retrieving the lambda list for functions and macros defined with [adp\:defun](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:DEFUN) and [adp\:defmacro](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:DEFMACRO)\.
 
-`````common lisp
+`````common-lisp
 (adp:function-lambda-list 'variable-ref)
 
 ;; Returns

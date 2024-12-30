@@ -44,7 +44,7 @@ However, Racket and Common Lisp are different. That's why ADP tries to integrate
 
 In the documentation system, the programmer can still specify lisp files to write auxiliar functions or macros to use later within Scribble files. Remember that Scribble is just syntactic sugar for function calls.
 
-@code-block[:lang "common lisp"]|{
+@code-block[:lang "common-lisp"]|{
 ;; Common Lisp
 (+ 3 4)
 
@@ -62,7 +62,7 @@ Enabling scribble files in your system requires 2 things:
         @item{Add the exporter's system to the @code{:defsystem-depends-on} list:}
 ]
 
-@code-block[:lang "common lisp"]{
+@code-block[:lang "common-lisp"]{
 (defsystem "my-system/docs"
   :defsystem-depends-on ("adp-github")
   ...)
@@ -72,7 +72,7 @@ Enabling scribble files in your system requires 2 things:
         @item{Specify the class of the system:}
 ]
 
-@code-block[:lang "common lisp"]{
+@code-block[:lang "common-lisp"]{
 (defsystem "my-system/docs"
   :defsystem-depends-on ("adp-github")
   :class :adp-github
@@ -81,7 +81,7 @@ Enabling scribble files in your system requires 2 things:
 
 And now, add as many files as you want. This can be a valid example of a documentation system:
 
-@code-block[:lang "common lisp"]{
+@code-block[:lang "common-lisp"]{
 (defsystem "my-project/docs"
   :defsystem-depends-on ("adp-github")
   :class :adp-github
@@ -100,13 +100,13 @@ The system class @code{:adp-github} and the name of Scribble files like @code{:s
 
 Once the system is defined, nothing special is required. Just load the system.
 
-@code-block[:lang "common lisp"]{
+@code-block[:lang "common-lisp"]{
 (asdf:load-system "my-project/docs")
 }
 
 Or, equivalently:
 
-@code-block[:lang "common lisp"]{
+@code-block[:lang "common-lisp"]{
 (asdf:make "my-project/docs")
 }
 
@@ -129,7 +129,7 @@ Let's do an example of how to start making an exporter.
 
 Suppose that our exporter is named @code{my-exporter}. Let's create a project with this name. As every project, we need to define the main system:
 
-@code-block[:lang "common lisp"]{
+@code-block[:lang "common-lisp"]{
 (defsystem "my-project"
   :depends-on ("adp")
   :components ((:file "package")
@@ -140,7 +140,7 @@ Let's jump directly into the @code{exporter} file assuming we defined the packag
 
 As we said, we need to define a system class. This is done with the macro @fref[adp:define-adp-system]:
 
-@code-block[:lang "common lisp"]{
+@code-block[:lang "common-lisp"]{
 (in-package #:exp)
 
 (adp:define-adp-system my-exporter)
@@ -151,7 +151,7 @@ In this case, we named the system class @code{my-exporter}.
 The second thing to define is at least one file class. We're using @fref[adp:define-adp-file]. Let's name it @code{expo}, for example:
 
 
-@code-block[:lang "common lisp"]{
+@code-block[:lang "common-lisp"]{
 (in-package #:exp)
 
 (adp:define-adp-system my-exporter)
@@ -170,7 +170,7 @@ Lastly, we only need to implement the method @fref[adp:export-content]. In this 
 
 Remember that @code{my-exporter} was the system class we defined with @fref[adp:define-adp-system] and @code{expo} is the file class we defined with @fref[adp:define-adp-file].
 
-@code-block[:lang "common lisp"]{
+@code-block[:lang "common-lisp"]{
 (in-package #:exp)
 
 (adp:define-adp-system my-exporter)
@@ -185,12 +185,10 @@ Note that we must specialize the first argument with our system class.
 
 @subsubtitle{The system and the files}
 
-So, this is the minimum required to make an exporter. The rest is up to you.
-
-But, at least, you must know how to handle the objects @code{system} and @code{files}. Let's see how to retrieve information from them.
+So, this is the minimum required to make an exporter. The rest is up to you. But, at least, you must know how to handle the objects @code{system} and @code{files}. Let's see how to retrieve information from them.
 
 @itemize[
-        @item{@code{system}: The class we defined named @code{my-exporter} has as direct superclass the class @code{asdf:system}. So, you have all the @code{asdf} methods to know perfectly how the system is. Here are some functions that I found to be useful:}
+        @item{@code{system}: The class we defined named @code{my-exporter} has as direct superclass the class @code{asdf:system}. So, you have all the @code{asdf} methods to know perfectly how the system is. Here are some useful functions:}
         @itemize[
                 @item{@code{asdf:component-name}: You can retrieve the system's name.}
                 @item{@code{asdf:system-source-directory}: Returns the absolute pathname of the system's directory.}
@@ -201,7 +199,7 @@ But, at least, you must know how to handle the objects @code{system} and @code{f
                 @itemize[
                         @item{@code{asdf:component-pathname}: Retrieves the absolute pathname of a component. In this case, the pathname of the file.}
                 ]
-                @item{@fref[adp:file-elements]: Returns the elements of the file that needs to be printed. These elements are also object with two attributes. We can retrieve their values with the following functions:}
+                @item{@fref[adp:file-elements]: Returns the elements of the file that needs to be printed. These elements are also objects with two attributes. We can retrieve their values with the following functions:}
                 @itemize[
                         @item{@fref[adp:element-value]: The actual value to be printed. It can be an integer, a string, a float, or even objects that needs to be printed in a special way.}
                         @item{@fref[adp:element-form]: The lisp form that produced the value. This can be useful for error messages.}
@@ -211,7 +209,7 @@ But, at least, you must know how to handle the objects @code{system} and @code{f
 
 Knowing this, every exporter could work similarly. Just loop over files, loop over the elements of each file, and print them into a file stream.
 
-@code-block[:lang "common lisp"]{
+@code-block[:lang "common-lisp"]{
 (defmethod adp:export-content ((system my-exporter) files)
   (loop for file in files
         for file-component = (adp:file-component file)
@@ -240,13 +238,13 @@ In Racket, it could be defined like this:
 
 And it can be used like this:
 
-@code-block[:lang "racket"]|{
+@code-block[:lang "scribble"]|{
 @title[:tag "some-tag"]{This is the title.}
 }|
 
 However, in Common Lisp this is impossible with the usual @clref[defun]:
 
-@code-block[:lang "racket"]{
+@code-block[:lang "common-lisp"]{
 (defun title (&key tag &rest elements) ;; <- Error, &key is before &rest
   ...)
 
@@ -258,21 +256,21 @@ Because of this, ADP defines the macros @fref[adp:defun] and @fref[adp:defmacro]
 
 Now the example is pretty easy:
 
-@code-block[:lang "common lisp"]{
+@code-block[:lang "common-lisp"]{
 (adp:defun title (:tag tag &rest elements)
   ...)
 }
 
 Or using the racket style:
 
-@code-block[:lang "common lisp"]{
+@code-block[:lang "common-lisp"]{
 (adp:defun title (:tag tag . elements)
   ...)
 }
 
 This macros are adapted to Common Lisp. We've just saw the use of @code{&rest}. But, we can also specify the supplied symbol to optional arguments.
 
-@code-block[:lang "common lisp"]|{
+@code-block[:lang "common-lisp"]|{
 (adp:defun variable-reference (type :style (style "default-style" stylep) :variable variable &rest text)
   (if stylep
       ...
@@ -283,7 +281,7 @@ This macros are adapted to Common Lisp. We've just saw the use of @code{&rest}. 
 
 The macro @fref[adp:defmacro] works the same way. In fact, it doesn't accept destructuring. The only difference is that arguments are not evaluated. This is useful if we want to avoid the @code{'} character before symbols.
 
-@code-block[:lang "common lisp"]|{
+@code-block[:lang "common-lisp"]|{
 (adp:defmacro variable-ref (type :style (style "default-style" stylep) :variable variable &rest text)
   `(variable-reference ',type :style ,style :variable ',variable ,@text))
 
@@ -292,7 +290,7 @@ The macro @fref[adp:defmacro] works the same way. In fact, it doesn't accept des
 
 Lastly, ADP offers the function @fref[adp:function-lambda-list] for retrieving the lambda list for functions and macros defined with @fref[adp:defun] and @fref[adp:defmacro].
 
-@code-block[:lang "common lisp"]{
+@code-block[:lang "common-lisp"]{
 (adp:function-lambda-list 'variable-ref)
 
 ;; Returns
