@@ -11,6 +11,7 @@ Welcome to ADP\!
 * [Documentation as another system](//home/hectarea/common-lisp/adp/README.md#TITLE:ADP-DOCS:TAG5)
   * [Enabling scribble files](//home/hectarea/common-lisp/adp/README.md#TITLE:ADP-DOCS:TAG6)
   * [Generating the files](//home/hectarea/common-lisp/adp/README.md#TITLE:ADP-DOCS:TAG7)
+* [Making an exporter](//home/hectarea/common-lisp/adp/README.md#TITLE:ADP-DOCS:TAG8)
   * [Defining the main elements](//home/hectarea/common-lisp/adp/README.md#TITLE:ADP-DOCS:TAG9)
   * [The system and the files](//home/hectarea/common-lisp/adp/README.md#TITLE:ADP-DOCS:TAG10)
   * [The interface](//home/hectarea/common-lisp/adp/README.md#TITLE:ADP-DOCS:TAG11)
