@@ -27,9 +27,9 @@ Also\, check out [cl\-scribble\-mode](https://github.com/HectareaGalbis/cl-scrib
 
 Examples\:
 
-<img src="//home/hectarea/common-lisp/adp/images/cl-scribble-mode-example.gif" alt="cl-scribble-mode example" width="100%">
+<img src="/images/cl-scribble-mode-example.gif" alt="cl-scribble-mode example" width="100%">
 
-<img src="//home/hectarea/common-lisp/adp/images/example-adp.png" alt="adp example" width="100%">
+<img src="/images/example-adp.png" alt="adp example" width="100%">
 
 
 <a id="TITLE:ADP-DOCS:TAG3"></a>
