@@ -34,6 +34,12 @@ This project should be installed only if you want to make an exporter.
         @item{@link[:address "https://github.com/HectareaGalbis/adp-github"]{adp-github}: Generates Github flavoured Markdown files.}
 ]
 
+@subtitle{Reference}
+
+@itemize[
+        @item{@tref[reference]}
+]
+
 @subtitle{Documentation as another system}
 
 Almost every Common Lisp project has several systems. These systems usually indicate which files of code should be compiled and loaded and in which order. There are, sometimes, other systems that does not load the project's code, but does load unit tests to verify the correctness of the project. It seems natural now that documentation should have its own system to document the project.

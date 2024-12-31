@@ -5,16 +5,17 @@
 
 Welcome to ADP\!
 
-* [Introduction](//home/hectarea/common-lisp/adp/README.md#TITLE:ADP-DOCS:TAG2)
-* [Installation](//home/hectarea/common-lisp/adp/README.md#TITLE:ADP-DOCS:TAG3)
-* [Exporters](//home/hectarea/common-lisp/adp/README.md#TITLE:ADP-DOCS:TAG4)
-* [Documentation as another system](//home/hectarea/common-lisp/adp/README.md#TITLE:ADP-DOCS:TAG5)
-  * [Enabling scribble files](//home/hectarea/common-lisp/adp/README.md#TITLE:ADP-DOCS:TAG6)
-  * [Generating the files](//home/hectarea/common-lisp/adp/README.md#TITLE:ADP-DOCS:TAG7)
-* [Making an exporter](//home/hectarea/common-lisp/adp/README.md#TITLE:ADP-DOCS:TAG8)
-  * [Defining the main elements](//home/hectarea/common-lisp/adp/README.md#TITLE:ADP-DOCS:TAG9)
-  * [The system and the files](//home/hectarea/common-lisp/adp/README.md#TITLE:ADP-DOCS:TAG10)
-  * [The interface](//home/hectarea/common-lisp/adp/README.md#TITLE:ADP-DOCS:TAG11)
+* [Introduction](/README.md#TITLE:ADP-DOCS:TAG2)
+* [Installation](/README.md#TITLE:ADP-DOCS:TAG3)
+* [Exporters](/README.md#TITLE:ADP-DOCS:TAG4)
+* [Reference](/README.md#TITLE:ADP-DOCS:TAG5)
+* [Documentation as another system](/README.md#TITLE:ADP-DOCS:TAG6)
+  * [Enabling scribble files](/README.md#TITLE:ADP-DOCS:TAG7)
+  * [Generating the files](/README.md#TITLE:ADP-DOCS:TAG8)
+* [Making an exporter](/README.md#TITLE:ADP-DOCS:TAG9)
+  * [Defining the main elements](/README.md#TITLE:ADP-DOCS:TAG10)
+  * [The system and the files](/README.md#TITLE:ADP-DOCS:TAG11)
+  * [The interface](/README.md#TITLE:ADP-DOCS:TAG12)
 
 
 <a id="TITLE:ADP-DOCS:TAG2"></a>
@@ -26,9 +27,9 @@ Also\, check out [cl\-scribble\-mode](https://github.com/HectareaGalbis/cl-scrib
 
 Examples\:
 
-<img src="/images/cl-scribble-mode-example.gif" alt="cl-scribble-mode example" width="100%">
+<img src="//home/hectarea/common-lisp/adp/images/cl-scribble-mode-example.gif" alt="cl-scribble-mode example" width="100%">
 
-<img src="/images/example-adp.png" alt="adp example" width="100%">
+<img src="//home/hectarea/common-lisp/adp/images/example-adp.png" alt="adp example" width="100%">
 
 
 <a id="TITLE:ADP-DOCS:TAG3"></a>
@@ -45,6 +46,12 @@ This project should be installed only if you want to make an exporter\.
 
 
 <a id="TITLE:ADP-DOCS:TAG5"></a>
+## Reference
+
+* [Reference](/docs/scribble/reference.md#TITLE:ADP-DOCS:REFERENCE)
+
+
+<a id="TITLE:ADP-DOCS:TAG6"></a>
 ## Documentation as another system
 
 Almost every Common Lisp project has several systems\. These systems usually indicate which files of code should be compiled and loaded and in which order\. There are\, sometimes\, other systems that does not load the project\'s code\, but does load unit tests to verify the correctness of the project\. It seems natural now that documentation should have its own system to document the project\.
@@ -63,7 +70,7 @@ In the documentation system\, the programmer can still specify lisp files to wri
 @+[3 4]
 `````
 
-<a id="TITLE:ADP-DOCS:TAG6"></a>
+<a id="TITLE:ADP-DOCS:TAG7"></a>
 ### Enabling scribble files
 
 ADP cannot be used directly to enable Scribble files\. Instead\, you need to load an exporter like [adp\-github](https://github.com/HectareaGalbis/adp-github)\.
@@ -106,7 +113,7 @@ And now\, add as many files as you want\. This can be a valid example of a docum
 The system class ```:adp-github``` and the name of Scribble files like ```:scribble``` are defined by the exporter\. Each exporter might define one or more types of scribble files\.
 
 
-<a id="TITLE:ADP-DOCS:TAG7"></a>
+<a id="TITLE:ADP-DOCS:TAG8"></a>
 ### Generating the files
 
 Once the system is defined\, nothing special is required\. Just load the system\.
@@ -124,19 +131,19 @@ Or\, equivalently\:
 The files will be generated according to the used exporter\.
 
 
-<a id="TITLE:ADP-DOCS:TAG8"></a>
+<a id="TITLE:ADP-DOCS:TAG9"></a>
 ## Making an exporter
 
 All the exporters must have the next elements\:
 
 1. A system class\.
 2. A file class\.
-3. An implementation of the method [adp\:export\-content](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:EXPORT-CONTENT)\.
+3. An implementation of the method [adp\:export\-content](/docs/scribble/reference.md#FUNCTION:ADP:EXPORT-CONTENT)\.
 
 
 Let\'s do an example of how to start making an exporter\.
 
-<a id="TITLE:ADP-DOCS:TAG9"></a>
+<a id="TITLE:ADP-DOCS:TAG10"></a>
 ### Defining the main elements
 
 Suppose that our exporter is named ```my-exporter```\. Let\'s create a project with this name\. As every project\, we need to define the main system\:
@@ -150,7 +157,7 @@ Suppose that our exporter is named ```my-exporter```\. Let\'s create a project w
 
 Let\'s jump directly into the ```exporter``` file assuming we defined the package named ```exp```\.
 
-As we said\, we need to define a system class\. This is done with the macro [adp\:define\-adp\-system](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:DEFINE-ADP-SYSTEM)\:
+As we said\, we need to define a system class\. This is done with the macro [adp\:define\-adp\-system](/docs/scribble/reference.md#FUNCTION:ADP:DEFINE-ADP-SYSTEM)\:
 
 `````common-lisp
 (in-package #:exp)
@@ -160,7 +167,7 @@ As we said\, we need to define a system class\. This is done with the macro [adp
 
 In this case\, we named the system class ```my-exporter```\.
 
-The second thing to define is at least one file class\. We\'re using [adp\:define\-adp\-file](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:DEFINE-ADP-FILE)\. Let\'s name it ```expo```\, for example\:
+The second thing to define is at least one file class\. We\'re using [adp\:define\-adp\-file](/docs/scribble/reference.md#FUNCTION:ADP:DEFINE-ADP-FILE)\. Let\'s name it ```expo```\, for example\:
 
 
 `````common-lisp
@@ -171,15 +178,15 @@ The second thing to define is at least one file class\. We\'re using [adp\:defin
 (adp:define-adp-file expo)
 `````
 
-The macro [adp\:define\-adp\-file](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:DEFINE-ADP-FILE) receives additional optional arguments\. See the [\(reference\)](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:DEFINE-ADP-FILE) for details\.
+The macro [adp\:define\-adp\-file](/docs/scribble/reference.md#FUNCTION:ADP:DEFINE-ADP-FILE) receives additional optional arguments\. See the [reference](/docs/scribble/reference.md#FUNCTION:ADP:DEFINE-ADP-FILE) for details\.
 
-Lastly\, we only need to implement the method [adp\:export\-content](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:EXPORT-CONTENT)\. In this case\, it will receive the following arguments\:
+Lastly\, we only need to implement the method [adp\:export\-content](/docs/scribble/reference.md#FUNCTION:ADP:EXPORT-CONTENT)\. In this case\, it will receive the following arguments\:
 
 * An object of type ```my-exporter```\.
 * A list of objects of type ```expo```\.
 
 
-Remember that ```my-exporter``` was the system class we defined with [adp\:define\-adp\-system](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:DEFINE-ADP-SYSTEM) and ```expo``` is the file class we defined with [adp\:define\-adp\-file](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:DEFINE-ADP-FILE)\.
+Remember that ```my-exporter``` was the system class we defined with [adp\:define\-adp\-system](/docs/scribble/reference.md#FUNCTION:ADP:DEFINE-ADP-SYSTEM) and ```expo``` is the file class we defined with [adp\:define\-adp\-file](/docs/scribble/reference.md#FUNCTION:ADP:DEFINE-ADP-FILE)\.
 
 `````common-lisp
 (in-package #:exp)
@@ -194,7 +201,7 @@ Remember that ```my-exporter``` was the system class we defined with [adp\:defin
 
 Note that we must specialize the first argument with our system class\.
 
-<a id="TITLE:ADP-DOCS:TAG10"></a>
+<a id="TITLE:ADP-DOCS:TAG11"></a>
 ### The system and the files
 
 So\, this is the minimum required to make an exporter\. The rest is up to you\. But\, at least\, you must know how to handle the objects ```system``` and ```files```\. Let\'s see how to retrieve information from them\.
@@ -202,12 +209,12 @@ So\, this is the minimum required to make an exporter\. The rest is up to you\. 
 * ```system```\: The class we defined named ```my-exporter``` has as direct superclass the class ```asdf:system```\. So\, you have all the ```asdf``` methods to know perfectly how the system is\. Here are some useful functions\:
   * ```asdf:component-name```\: You can retrieve the system\'s name\.
   * ```asdf:system-source-directory```\: Returns the absolute pathname of the system\'s directory\.
-* ```files```\: Each file of a type defined with [adp\:define\-adp\-file](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:DEFINE-ADP-FILE) has two attributes whose values can be retrieved with the following getters\:
-  * [adp\:file\-component](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:FILE-COMPONENT)\: Returns the object of type ```asdf:component``` that represents the file within the system\. Similarly to the ```asdf:system```\, there are useful functions from ```asdf``` that we can use\:
+* ```files```\: Each file of a type defined with [adp\:define\-adp\-file](/docs/scribble/reference.md#FUNCTION:ADP:DEFINE-ADP-FILE) has two attributes whose values can be retrieved with the following getters\:
+  * [adp\:file\-component](/docs/scribble/reference.md#FUNCTION:ADP:FILE-COMPONENT)\: Returns the object of type ```asdf:component``` that represents the file within the system\. Similarly to the ```asdf:system```\, there are useful functions from ```asdf``` that we can use\:
     * ```asdf:component-pathname```\: Retrieves the absolute pathname of a component\. In this case\, the pathname of the file\.
-  * [adp\:file\-elements](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:FILE-ELEMENTS)\: Returns the elements of the file that needs to be printed\. These elements are also objects with two attributes\. We can retrieve their values with the following functions\:
-    * [adp\:element\-value](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:ELEMENT-VALUE)\: The actual value to be printed\. It can be an integer\, a string\, a float\, or even objects that needs to be printed in a special way\.
-    * [adp\:element\-form](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:ELEMENT-FORM)\: The lisp form that produced the value\. This can be useful for error messages\.
+  * [adp\:file\-elements](/docs/scribble/reference.md#FUNCTION:ADP:FILE-ELEMENTS)\: Returns the elements of the file that needs to be printed\. These elements are also objects with two attributes\. We can retrieve their values with the following functions\:
+    * [adp\:element\-value](/docs/scribble/reference.md#FUNCTION:ADP:ELEMENT-VALUE)\: The actual value to be printed\. It can be an integer\, a string\, a float\, or even objects that needs to be printed in a special way\.
+    * [adp\:element\-form](/docs/scribble/reference.md#FUNCTION:ADP:ELEMENT-FORM)\: The lisp form that produced the value\. This can be useful for error messages\.
 
 
 Knowing this\, every exporter could work similarly\. Just loop over files\, loop over the elements of each file\, and print them into a file stream\.
@@ -226,7 +233,7 @@ Knowing this\, every exporter could work similarly\. Just loop over files\, loop
                           (error "Error while printing the value from ~s" element-form)))))))
 `````
 
-<a id="TITLE:ADP-DOCS:TAG11"></a>
+<a id="TITLE:ADP-DOCS:TAG12"></a>
 ### The interface
 
 The Scribble language was defined specifically for Racket\. But Common Lisp works differently\. And this is true for functions\. In Racket\, keyword arguments can be placed wherever you want\, but in Common Lisp they can only be used after every required and optional arguments\.
@@ -246,7 +253,7 @@ And it can be used like this\:
 @title[:tag "some-tag"]{This is the title.}
 `````
 
-However\, in Common Lisp this is impossible with the usual [DEFUN](http://www.lispworks.com/reference/HyperSpec/Body/m_defun.htm)\:
+However\, in Common Lisp this is impossible with the usual [defun](http://www.lispworks.com/reference/HyperSpec/Body/m_defun.htm)\:
 
 `````common-lisp
 (defun title (&key tag &rest elements) ;; <- Error, &key is before &rest
@@ -256,7 +263,7 @@ However\, in Common Lisp this is impossible with the usual [DEFUN](http://www.li
   ...)
 `````
 
-Because of this\, ADP defines the macros [adp\:defun](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:DEFUN) and [adp\:defmacro](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:DEFMACRO)\.
+Because of this\, ADP defines the macros [adp\:defun](/docs/scribble/reference.md#FUNCTION:ADP:DEFUN) and [adp\:defmacro](/docs/scribble/reference.md#FUNCTION:ADP:DEFMACRO)\.
 
 Now the example is pretty easy\:
 
@@ -283,7 +290,7 @@ This macros are adapted to Common Lisp\. We\'ve just saw the use of ```&rest```\
 @variable-reference['constant :variable 'some-var :style "another-style"]{the variable you like}
 `````
 
-The macro [adp\:defmacro](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:DEFMACRO) works the same way\. In fact\, it doesn\'t accept destructuring\. The only difference is that arguments are not evaluated\. This is useful if we want to avoid the ```'``` character before symbols\.
+The macro [adp\:defmacro](/docs/scribble/reference.md#FUNCTION:ADP:DEFMACRO) works the same way\. In fact\, it doesn\'t accept destructuring\. The only difference is that arguments are not evaluated\. This is useful if we want to avoid the ```'``` character before symbols\.
 
 `````common-lisp
 (adp:defmacro variable-ref (type :style (style "default-style" stylep) :variable variable &rest text)
@@ -292,7 +299,7 @@ The macro [adp\:defmacro](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP
 @variable-ref[constant :variable some-var :style "another-style"]{the variable you like}
 `````
 
-Lastly\, ADP offers the function [adp\:function\-lambda\-list](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:FUNCTION-LAMBDA-LIST) for retrieving the lambda list for functions and macros defined with [adp\:defun](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:DEFUN) and [adp\:defmacro](//home/hectarea/common-lisp/adp/README.md#FUNCTION:ADP:DEFMACRO)\.
+Lastly\, ADP offers the function [adp\:function\-lambda\-list](/docs/scribble/reference.md#FUNCTION:ADP:FUNCTION-LAMBDA-LIST) for retrieving the lambda list for functions and macros defined with [adp\:defun](/docs/scribble/reference.md#FUNCTION:ADP:DEFUN) and [adp\:defmacro](/docs/scribble/reference.md#FUNCTION:ADP:DEFMACRO)\.
 
 `````common-lisp
 (adp:function-lambda-list 'variable-ref)
